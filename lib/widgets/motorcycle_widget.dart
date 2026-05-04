@@ -89,7 +89,7 @@ class _MotorcycleWidgetState extends State<MotorcycleWidget>
                 child: Transform.rotate(
                   angle: widget.angle * 0.32,
                   child: Image.asset(
-                    'assets/images/jy_the_rider.png',
+                    'assets/images/jy_the_rider_flipped.png',
                     width: widget.size,
                     height: widget.size,
                     fit: BoxFit.contain,

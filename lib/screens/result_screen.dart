@@ -1,31 +1,44 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 
+import '../models/meal_progress_snapshot.dart';
 import '../models/meal_session_result.dart';
 import '../models/meal_timer_config.dart';
+import '../models/reward_item.dart';
+import '../services/local_meal_progress_service.dart';
 import 'home_screen.dart';
 import 'timer_screen.dart';
 
-class ResultScreen extends StatelessWidget {
+class ResultScreen extends StatefulWidget {
   const ResultScreen({
     super.key,
     required this.result,
     required this.config,
+    required this.mealProgressService,
     required this.onConfigChanged,
   });
 
   final MealSessionResult result;
   final MealTimerConfig config;
+  final LocalMealProgressService mealProgressService;
   final ValueChanged<MealTimerConfig> onConfigChanged;
 
-  static const _rewardStickers = ['🏁 도착 깃발 스티커', '⭐ 반짝 별 스티커', '🪖 멋진 헬멧 스티커'];
+  @override
+  State<ResultScreen> createState() => _ResultScreenState();
+}
+
+class _ResultScreenState extends State<ResultScreen> {
+  late final Future<RecordedMealSession> _recordedSession = widget
+      .mealProgressService
+      .recordMealResult(widget.result);
 
   void _restart(BuildContext context) {
     Navigator.of(context).pushReplacement(
       MaterialPageRoute(
-        builder: (_) =>
-            TimerScreen(config: config, onConfigChanged: onConfigChanged),
+        builder: (_) => TimerScreen(
+          config: widget.config,
+          mealProgressService: widget.mealProgressService,
+          onConfigChanged: widget.onConfigChanged,
+        ),
       ),
     );
   }
@@ -33,8 +46,11 @@ class ResultScreen extends StatelessWidget {
   void _goHome(BuildContext context) {
     Navigator.of(context).pushAndRemoveUntil(
       MaterialPageRoute(
-        builder: (_) =>
-            HomeScreen(config: config, onConfigChanged: onConfigChanged),
+        builder: (_) => HomeScreen(
+          config: widget.config,
+          mealProgressService: widget.mealProgressService,
+          onConfigChanged: widget.onConfigChanged,
+        ),
       ),
       (_) => false,
     );
@@ -42,12 +58,7 @@ class ResultScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final completedBeforeArrival = result.completedBeforeArrival;
-    final sticker = completedBeforeArrival
-        ? _rewardStickers[Random(
-            result.startedAt.millisecondsSinceEpoch,
-          ).nextInt(_rewardStickers.length)]
-        : '🏍️ 오늘의 라이더 스티커';
+    final completedBeforeArrival = widget.result.completedBeforeArrival;
 
     return Scaffold(
       body: SafeArea(
@@ -88,23 +99,13 @@ class ResultScreen extends StatelessWidget {
                             ?.copyWith(fontWeight: FontWeight.w800),
                       ),
                       const SizedBox(height: 24),
-                      DecoratedBox(
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFFFF1B8),
-                          borderRadius: BorderRadius.circular(22),
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 18,
-                            vertical: 16,
-                          ),
-                          child: Text(
-                            sticker,
-                            textAlign: TextAlign.center,
-                            style: Theme.of(context).textTheme.titleLarge
-                                ?.copyWith(fontWeight: FontWeight.w900),
-                          ),
-                        ),
+                      FutureBuilder<RecordedMealSession>(
+                        future: _recordedSession,
+                        builder: (context, snapshot) {
+                          return _RewardResultBox(
+                            rewards: snapshot.data?.awardedRewards,
+                          );
+                        },
                       ),
                     ],
                   ),
@@ -124,6 +125,41 @@ class ResultScreen extends StatelessWidget {
               ),
             ],
           ),
+        ),
+      ),
+    );
+  }
+}
+
+class _RewardResultBox extends StatelessWidget {
+  const _RewardResultBox({required this.rewards});
+
+  final List<RewardDefinition>? rewards;
+
+  @override
+  Widget build(BuildContext context) {
+    final labels = rewards
+        ?.map((reward) => reward.displayLabel)
+        .toList(growable: false);
+    final text = labels == null
+        ? '보상 정리 중...'
+        : labels.isEmpty
+        ? '오늘의 기록을 저장했어'
+        : labels.join('\n');
+
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: const Color(0xFFFFF1B8),
+        borderRadius: BorderRadius.circular(22),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
+        child: Text(
+          text,
+          textAlign: TextAlign.center,
+          style: Theme.of(
+            context,
+          ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w900),
         ),
       ),
     );

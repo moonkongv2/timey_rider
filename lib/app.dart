@@ -2,16 +2,19 @@ import 'package:flutter/material.dart';
 
 import 'models/meal_timer_config.dart';
 import 'screens/home_screen.dart';
+import 'services/local_meal_progress_service.dart';
 import 'services/local_settings_service.dart';
 
 class YamyamRiderApp extends StatefulWidget {
   const YamyamRiderApp({
     super.key,
     required this.settingsService,
+    required this.mealProgressService,
     required this.initialConfig,
   });
 
   final LocalSettingsService settingsService;
+  final LocalMealProgressService mealProgressService;
   final MealTimerConfig initialConfig;
 
   @override
@@ -78,7 +81,11 @@ class _YamyamRiderAppState extends State<YamyamRiderApp> {
           ),
         ),
       ),
-      home: HomeScreen(config: _config, onConfigChanged: _saveConfig),
+      home: HomeScreen(
+        config: _config,
+        mealProgressService: widget.mealProgressService,
+        onConfigChanged: _saveConfig,
+      ),
     );
   }
 }

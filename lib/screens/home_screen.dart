@@ -1,17 +1,24 @@
 import 'package:flutter/material.dart';
 
+import '../models/meal_progress_snapshot.dart';
 import '../models/meal_timer_config.dart';
+import '../models/reward_item.dart';
+import '../services/local_meal_progress_service.dart';
+import '../utils/duration_format.dart';
 import 'settings_screen.dart';
+import 'sticker_collection_screen.dart';
 import 'timer_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({
     super.key,
     required this.config,
+    required this.mealProgressService,
     required this.onConfigChanged,
   });
 
   final MealTimerConfig config;
+  final LocalMealProgressService mealProgressService;
   final ValueChanged<MealTimerConfig> onConfigChanged;
 
   @override
@@ -36,6 +43,7 @@ class _HomeScreenState extends State<HomeScreen> {
       MaterialPageRoute(
         builder: (_) => TimerScreen(
           config: config,
+          mealProgressService: widget.mealProgressService,
           onConfigChanged: widget.onConfigChanged,
         ),
       ),
@@ -142,6 +150,156 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                   ],
                 ),
+              ),
+            ),
+            const SizedBox(height: 24),
+            FutureBuilder<MealProgressSnapshot>(
+              future: widget.mealProgressService.loadSnapshot(),
+              builder: (context, snapshot) {
+                return _ProgressSummary(
+                  snapshot: snapshot.data,
+                  onOpenStickers: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (_) => StickerCollectionScreen(
+                          mealProgressService: widget.mealProgressService,
+                        ),
+                      ),
+                    );
+                  },
+                );
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _ProgressSummary extends StatelessWidget {
+  const _ProgressSummary({
+    required this.snapshot,
+    required this.onOpenStickers,
+  });
+
+  final MealProgressSnapshot? snapshot;
+  final VoidCallback onOpenStickers;
+
+  @override
+  Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
+    final history = snapshot?.history ?? const [];
+    final inventory = snapshot?.inventory ?? const [];
+    final recent = history.isEmpty ? null : history.first;
+    final knownStickers = inventory.where(
+      (item) =>
+          RewardCatalog.findById(item.rewardId)?.type == RewardType.sticker,
+    );
+    final stickerCount = knownStickers.fold<int>(
+      0,
+      (total, item) => total + item.count,
+    );
+    final stickerKindCount = knownStickers.length;
+
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              '지율이의 냠냠 기록',
+              style: textTheme.titleLarge?.copyWith(
+                fontWeight: FontWeight.w900,
+              ),
+            ),
+            const SizedBox(height: 14),
+            Row(
+              children: [
+                Expanded(
+                  child: _SummaryTile(
+                    icon: Icons.restaurant_rounded,
+                    label: '식사',
+                    value: '${history.length}번',
+                  ),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: _SummaryTile(
+                    icon: Icons.auto_awesome_rounded,
+                    label: '종류',
+                    value: '$stickerKindCount개',
+                  ),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: _SummaryTile(
+                    icon: Icons.stars_rounded,
+                    label: '스티커',
+                    value: '$stickerCount장',
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 14),
+            Text(
+              recent == null
+                  ? '아직 저장된 식사 이력이 없어.'
+                  : '최근 식사 ${formatDuration(recent.actualDuration)} · ${recent.completedBeforeArrival ? '도착 전 완료' : '도착 후 완료'}',
+              style: textTheme.bodyLarge?.copyWith(
+                color: const Color(0xFF7A6250),
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+            const SizedBox(height: 14),
+            OutlinedButton.icon(
+              onPressed: onOpenStickers,
+              icon: const Icon(Icons.collections_bookmark_rounded),
+              label: const Text('스티커 보관함 보기'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _SummaryTile extends StatelessWidget {
+  const _SummaryTile({
+    required this.icon,
+    required this.label,
+    required this.value,
+  });
+
+  final IconData icon;
+  final String label;
+  final String value;
+
+  @override
+  Widget build(BuildContext context) {
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: const Color(0xFFFFF8EF),
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
+        child: Column(
+          children: [
+            Icon(icon, color: const Color(0xFF7A6250)),
+            const SizedBox(height: 6),
+            Text(
+              value,
+              style: Theme.of(
+                context,
+              ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w900),
+            ),
+            Text(
+              label,
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                color: const Color(0xFF7A6250),
+                fontWeight: FontWeight.w700,
               ),
             ),
           ],

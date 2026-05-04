@@ -36,11 +36,13 @@ class RoadView extends StatelessWidget {
                 ),
                 _Marker(
                   label: '출발',
+                  icon: Icons.home_rounded,
                   alignment: Alignment.bottomLeft,
                   margin: const EdgeInsets.only(left: 18, bottom: 16),
                 ),
                 _Marker(
                   label: '도착',
+                  icon: Icons.star_rounded,
                   alignment: Alignment.topRight,
                   margin: const EdgeInsets.only(top: 16, right: 18),
                 ),
@@ -65,11 +67,13 @@ class RoadView extends StatelessWidget {
 class _Marker extends StatelessWidget {
   const _Marker({
     required this.label,
+    required this.icon,
     required this.alignment,
     required this.margin,
   });
 
   final String label;
+  final IconData icon;
   final Alignment alignment;
   final EdgeInsets margin;
 
@@ -85,13 +89,10 @@ class _Marker extends StatelessWidget {
             borderRadius: BorderRadius.circular(16),
           ),
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-            child: Text(
-              label,
-              style: const TextStyle(
-                fontWeight: FontWeight.w900,
-                color: Color(0xFF5B4636),
-              ),
+            padding: const EdgeInsets.all(9),
+            child: Semantics(
+              label: label,
+              child: Icon(icon, color: const Color(0xFF5B4636), size: 28),
             ),
           ),
         ),

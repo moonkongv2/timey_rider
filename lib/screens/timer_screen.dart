@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 
 import '../controllers/meal_timer_controller.dart';
-import '../models/meal_timer_config.dart';
 import '../models/meal_session_result.dart';
+import '../models/meal_timer_config.dart';
+import '../services/local_meal_progress_service.dart';
 import '../utils/duration_format.dart';
 import '../widgets/meal_message_card.dart';
 import '../widgets/road_view.dart';
@@ -13,10 +14,12 @@ class TimerScreen extends StatefulWidget {
   const TimerScreen({
     super.key,
     required this.config,
+    required this.mealProgressService,
     required this.onConfigChanged,
   });
 
   final MealTimerConfig config;
+  final LocalMealProgressService mealProgressService;
   final ValueChanged<MealTimerConfig> onConfigChanged;
 
   @override
@@ -73,6 +76,7 @@ class _TimerScreenState extends State<TimerScreen> {
         builder: (_) => ResultScreen(
           result: result,
           config: widget.config,
+          mealProgressService: widget.mealProgressService,
           onConfigChanged: widget.onConfigChanged,
         ),
       ),
