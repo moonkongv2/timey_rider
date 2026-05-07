@@ -6,11 +6,13 @@ class RewardStickerImage extends StatelessWidget {
   const RewardStickerImage({
     super.key,
     required this.reward,
+    this.semanticLabel,
     this.size = 88,
     this.locked = false,
   });
 
   final RewardDefinition reward;
+  final String? semanticLabel;
   final double size;
   final bool locked;
 
@@ -21,7 +23,7 @@ class RewardStickerImage extends StatelessWidget {
       width: size,
       height: size,
       fit: BoxFit.contain,
-      semanticLabel: locked ? '아직 미획득' : reward.name,
+      semanticLabel: semanticLabel ?? reward.id,
       errorBuilder: (_, _, _) =>
           _FallbackStickerIcon(reward: reward, size: size, locked: locked),
     );

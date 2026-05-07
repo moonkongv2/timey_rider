@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 
 import 'l10n/app_texts.dart';
 import 'models/meal_timer_config.dart';
@@ -39,7 +40,13 @@ class _YamyamRiderAppState extends State<YamyamRiderApp> {
 
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: AppTexts.common.appTitle,
+      onGenerateTitle: (context) => AppTexts.of(context).common.appTitle,
+      supportedLocales: AppTexts.supportedLocales,
+      localizationsDelegates: const [
+        GlobalMaterialLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+      ],
       theme: ThemeData(
         colorScheme: colorScheme,
         scaffoldBackgroundColor: const Color(0xFFFFF8EF),

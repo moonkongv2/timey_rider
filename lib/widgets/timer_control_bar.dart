@@ -16,6 +16,8 @@ class TimerControlBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final texts = AppTexts.of(context);
+
     return Row(
       children: [
         Expanded(
@@ -23,9 +25,7 @@ class TimerControlBar extends StatelessWidget {
             onPressed: onPauseResume,
             icon: Icon(isPaused ? Icons.play_arrow_rounded : Icons.pause),
             label: Text(
-              isPaused
-                  ? AppTexts.common.restartRide
-                  : AppTexts.timer.pauseButton,
+              isPaused ? texts.common.restartRide : texts.timer.pauseButton,
             ),
           ),
         ),
@@ -34,7 +34,7 @@ class TimerControlBar extends StatelessWidget {
           child: FilledButton.icon(
             onPressed: onComplete,
             icon: const Icon(Icons.check_circle_rounded),
-            label: Text(AppTexts.timer.completeMealButton),
+            label: Text(texts.timer.completeMealButton),
           ),
         ),
       ],

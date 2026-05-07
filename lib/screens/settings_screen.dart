@@ -27,8 +27,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final texts = AppTexts.of(context);
+
     return Scaffold(
-      appBar: AppBar(title: Text(AppTexts.settings.title)),
+      appBar: AppBar(title: Text(texts.settings.title)),
       body: ListView(
         padding: const EdgeInsets.all(20),
         children: [
@@ -36,23 +38,23 @@ class _SettingsScreenState extends State<SettingsScreen> {
             child: Column(
               children: [
                 SwitchListTile(
-                  title: Text(AppTexts.settings.showRemainingTime),
+                  title: Text(texts.settings.showRemainingTime),
                   value: _config.showRemainingTime,
                   onChanged: (value) {
                     _update(_config.copyWith(showRemainingTime: value));
                   },
                 ),
                 SwitchListTile(
-                  title: Text(AppTexts.settings.soundEnabled),
-                  subtitle: Text(AppTexts.settings.savedOnlySubtitle),
+                  title: Text(texts.settings.soundEnabled),
+                  subtitle: Text(texts.settings.savedOnlySubtitle),
                   value: _config.soundEnabled,
                   onChanged: (value) {
                     _update(_config.copyWith(soundEnabled: value));
                   },
                 ),
                 SwitchListTile(
-                  title: Text(AppTexts.settings.keepScreenAwake),
-                  subtitle: Text(AppTexts.settings.savedOnlySubtitle),
+                  title: Text(texts.settings.keepScreenAwake),
+                  subtitle: Text(texts.settings.savedOnlySubtitle),
                   value: _config.keepScreenAwake,
                   onChanged: (value) {
                     _update(_config.copyWith(keepScreenAwake: value));
@@ -69,7 +71,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    AppTexts.settings.defaultMealDuration,
+                    texts.settings.defaultMealDuration,
                     style: Theme.of(context).textTheme.titleLarge?.copyWith(
                       fontWeight: FontWeight.w900,
                     ),
@@ -79,15 +81,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     segments: [
                       ButtonSegment(
                         value: 15,
-                        label: Text(AppTexts.settings.durationSegmentLabel(15)),
+                        label: Text(texts.settings.durationSegmentLabel(15)),
                       ),
                       ButtonSegment(
                         value: 25,
-                        label: Text(AppTexts.settings.durationSegmentLabel(25)),
+                        label: Text(texts.settings.durationSegmentLabel(25)),
                       ),
                       ButtonSegment(
                         value: 35,
-                        label: Text(AppTexts.settings.durationSegmentLabel(35)),
+                        label: Text(texts.settings.durationSegmentLabel(35)),
                       ),
                     ],
                     selected: {

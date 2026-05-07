@@ -1,4 +1,8 @@
-class TimerTexts {
+// ignore_for_file: annotate_overrides
+
+import '../text_sets.dart';
+
+class TimerTexts implements TimerTextSet {
   const TimerTexts();
 
   String get courseTitle => '오늘의 냠냠코스';

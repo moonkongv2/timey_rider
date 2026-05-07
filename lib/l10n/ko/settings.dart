@@ -1,4 +1,8 @@
-class SettingsTexts {
+// ignore_for_file: annotate_overrides
+
+import '../text_sets.dart';
+
+class SettingsTexts implements SettingsTextSet {
   const SettingsTexts();
 
   String get title => '설정';

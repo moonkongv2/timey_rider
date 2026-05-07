@@ -127,25 +127,26 @@ class _TimerScreenState extends State<TimerScreen> {
   }
 
   Future<void> _confirmComplete({bool showFailureOnDecline = false}) async {
+    final texts = AppTexts.of(context);
     final confirmed = await showDialog<bool>(
       context: context,
       barrierDismissible: !showFailureOnDecline,
       builder: (context) {
         return AlertDialog(
-          title: Text(AppTexts.timer.completeDialogTitle),
+          title: Text(texts.timer.completeDialogTitle),
           content: Text(
             showFailureOnDecline
-                ? AppTexts.timer.arrivalDialogMessage
-                : AppTexts.timer.completeDialogMessage,
+                ? texts.timer.arrivalDialogMessage
+                : texts.timer.completeDialogMessage,
           ),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(false),
-              child: Text(AppTexts.common.notYet),
+              child: Text(texts.common.notYet),
             ),
             FilledButton(
               onPressed: () => Navigator.of(context).pop(true),
-              child: Text(AppTexts.common.complete),
+              child: Text(texts.common.complete),
             ),
           ],
         );
@@ -183,11 +184,13 @@ class _TimerScreenState extends State<TimerScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final texts = AppTexts.of(context);
+
     return AnimatedBuilder(
       animation: _controller,
       builder: (context, _) {
         return Scaffold(
-          appBar: AppBar(title: Text(AppTexts.timer.courseTitle)),
+          appBar: AppBar(title: Text(texts.timer.courseTitle)),
           body: SafeArea(
             child: Padding(
               padding: const EdgeInsets.fromLTRB(20, 8, 20, 20),
@@ -234,6 +237,8 @@ class _RemainingTimeCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final texts = AppTexts.of(context);
+
     return Card(
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
@@ -243,7 +248,7 @@ class _RemainingTimeCard extends StatelessWidget {
             const Icon(Icons.timer_rounded),
             const SizedBox(width: 8),
             Text(
-              AppTexts.timer.remainingTime(formatDuration(remaining)),
+              texts.timer.remainingTime(formatDuration(remaining)),
               style: Theme.of(
                 context,
               ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w900),

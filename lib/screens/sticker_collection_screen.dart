@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../l10n/app_texts.dart';
 import '../models/meal_progress_snapshot.dart';
 import '../models/reward_item.dart';
 import '../services/local_meal_progress_service.dart';
@@ -12,8 +13,10 @@ class StickerCollectionScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final texts = AppTexts.of(context);
+
     return Scaffold(
-      appBar: AppBar(title: const Text('스티커 보관함')),
+      appBar: AppBar(title: Text(texts.rewards.collectionTitle)),
       body: SafeArea(
         child: FutureBuilder<MealProgressSnapshot>(
           future: mealProgressService.loadSnapshot(),
@@ -66,6 +69,8 @@ class _StickerCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
+    final texts = AppTexts.of(context);
+    final stickerName = texts.rewards.name(sticker.id);
 
     return Card(
       color: _isCollected ? Colors.white : const Color(0xFFFFF8EF),
@@ -76,12 +81,15 @@ class _StickerCard extends StatelessWidget {
           children: [
             RewardStickerImage(
               reward: sticker,
+              semanticLabel: _isCollected
+                  ? stickerName
+                  : texts.rewards.uncollectedSemanticLabel,
               size: 72,
               locked: !_isCollected,
             ),
             const SizedBox(height: 12),
             Text(
-              _isCollected ? sticker.name : '아직 미획득',
+              _isCollected ? stickerName : texts.rewards.lockedSticker,
               textAlign: TextAlign.center,
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
@@ -106,7 +114,9 @@ class _StickerCard extends StatelessWidget {
                   vertical: 6,
                 ),
                 child: Text(
-                  _isCollected ? '$count장' : '잠금',
+                  _isCollected
+                      ? texts.rewards.stickerCount(count)
+                      : texts.rewards.lockedStatus,
                   style: textTheme.labelLarge?.copyWith(
                     fontWeight: FontWeight.w900,
                     color: const Color(0xFF5B4636),

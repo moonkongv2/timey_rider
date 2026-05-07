@@ -4,6 +4,7 @@ import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
 
+import '../l10n/app_texts.dart';
 import 'motorcycle_widget.dart';
 import 'road_painter.dart';
 
@@ -24,6 +25,8 @@ class RoadView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final texts = AppTexts.of(context);
+
     return LayoutBuilder(
       builder: (context, constraints) {
         final size = Size(constraints.maxWidth, constraints.maxHeight);
@@ -76,7 +79,7 @@ class RoadView extends StatelessWidget {
                   size: size,
                 ),
                 _Marker(
-                  label: '출발',
+                  label: texts.common.start,
                   icon: Icons.home_rounded,
                   alignment: Alignment.bottomLeft,
                   margin: const EdgeInsets.only(left: 18, bottom: 16),

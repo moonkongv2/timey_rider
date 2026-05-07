@@ -70,6 +70,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
+    final texts = AppTexts.of(context);
 
     return Scaffold(
       body: SafeArea(
@@ -83,7 +84,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        AppTexts.common.appTitle,
+                        texts.common.appTitle,
                         style: textTheme.headlineLarge?.copyWith(
                           fontWeight: FontWeight.w900,
                           color: const Color(0xFF3D332B),
@@ -91,7 +92,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        AppTexts.home.subtitle,
+                        texts.home.subtitle,
                         style: textTheme.titleMedium?.copyWith(
                           color: const Color(0xFF7A6250),
                           fontWeight: FontWeight.w700,
@@ -103,25 +104,25 @@ class _HomeScreenState extends State<HomeScreen> {
                 IconButton.filledTonal(
                   onPressed: _openSettings,
                   icon: const Icon(Icons.settings_rounded),
-                  tooltip: AppTexts.common.settings,
+                  tooltip: texts.common.settings,
                 ),
               ],
             ),
             const SizedBox(height: 28),
             _PresetButton(
-              label: AppTexts.home.morningCourse,
+              label: texts.home.morningCourse,
               emoji: '🌞',
               onPressed: () => _startTimer(15),
             ),
             const SizedBox(height: 12),
             _PresetButton(
-              label: AppTexts.home.normalCourse,
+              label: texts.home.normalCourse,
               emoji: '🍚',
               onPressed: () => _startTimer(25),
             ),
             const SizedBox(height: 12),
             _PresetButton(
-              label: AppTexts.home.slowCourse,
+              label: texts.home.slowCourse,
               emoji: '🌈',
               onPressed: () => _startTimer(35),
             ),
@@ -133,9 +134,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      AppTexts.home.customSettingMinutes(
-                        _customMinutes.round(),
-                      ),
+                      texts.home.customSettingMinutes(_customMinutes.round()),
                       style: textTheme.titleLarge?.copyWith(
                         fontWeight: FontWeight.w900,
                       ),
@@ -144,7 +143,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       value: _customMinutes,
                       min: 1,
                       max: 60,
-                      label: AppTexts.home.minuteLabel(_customMinutes.round()),
+                      label: texts.home.minuteLabel(_customMinutes.round()),
                       onChanged: (value) {
                         setState(() => _customMinutes = value);
                       },
@@ -184,7 +183,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     FilledButton.icon(
                       onPressed: () => _startTimer(_customMinutes.round()),
                       icon: const Icon(Icons.two_wheeler_rounded),
-                      label: Text(AppTexts.home.customStartButton),
+                      label: Text(texts.home.customStartButton),
                     ),
                   ],
                 ),
@@ -239,6 +238,7 @@ class _ProgressSummary extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
+    final texts = AppTexts.of(context);
     final history = snapshot?.history ?? const [];
     final inventory = snapshot?.inventory ?? const [];
     final recent = history.isEmpty ? null : history.first;
@@ -259,7 +259,7 @@ class _ProgressSummary extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              AppTexts.home.progressTitle(AppTexts.common.defaultChildName),
+              texts.home.progressTitle(texts.common.defaultChildName),
               style: textTheme.titleLarge?.copyWith(
                 fontWeight: FontWeight.w900,
               ),
@@ -270,24 +270,24 @@ class _ProgressSummary extends StatelessWidget {
                 Expanded(
                   child: _SummaryTile(
                     icon: Icons.restaurant_rounded,
-                    label: AppTexts.home.mealSummaryLabel,
-                    value: AppTexts.home.mealCount(history.length),
+                    label: texts.home.mealSummaryLabel,
+                    value: texts.home.mealCount(history.length),
                   ),
                 ),
                 const SizedBox(width: 10),
                 Expanded(
                   child: _SummaryTile(
                     icon: Icons.auto_awesome_rounded,
-                    label: AppTexts.home.stickerKindSummaryLabel,
-                    value: AppTexts.home.stickerKindCount(stickerKindCount),
+                    label: texts.home.stickerKindSummaryLabel,
+                    value: texts.home.stickerKindCount(stickerKindCount),
                   ),
                 ),
                 const SizedBox(width: 10),
                 Expanded(
                   child: _SummaryTile(
                     icon: Icons.stars_rounded,
-                    label: AppTexts.home.stickerSummaryLabel,
-                    value: AppTexts.home.stickerCount(stickerCount),
+                    label: texts.home.stickerSummaryLabel,
+                    value: texts.home.stickerCount(stickerCount),
                   ),
                 ),
               ],
@@ -295,8 +295,8 @@ class _ProgressSummary extends StatelessWidget {
             const SizedBox(height: 14),
             Text(
               recent == null
-                  ? AppTexts.home.noMealHistory
-                  : AppTexts.home.recentMealSummary(
+                  ? texts.home.noMealHistory
+                  : texts.home.recentMealSummary(
                       formatDuration(recent.actualDuration),
                       recent.completedBeforeArrival,
                     ),
@@ -309,7 +309,7 @@ class _ProgressSummary extends StatelessWidget {
             OutlinedButton.icon(
               onPressed: onOpenStickers,
               icon: const Icon(Icons.collections_bookmark_rounded),
-              label: Text(AppTexts.home.openStickerCollection),
+              label: Text(texts.home.openStickerCollection),
             ),
           ],
         ),

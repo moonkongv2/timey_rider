@@ -1,4 +1,8 @@
-class ResultTexts {
+// ignore_for_file: annotate_overrides
+
+import '../text_sets.dart';
+
+class ResultTexts implements ResultTextSet {
   const ResultTexts();
 
   String get rewardLoading => '보상 정리 중...';

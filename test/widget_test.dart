@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -10,8 +11,7 @@ void main() {
   testWidgets('Home screen shows meal timer actions', (tester) async {
     SharedPreferences.setMockInitialValues({});
 
-    await app.main();
-    await tester.pumpAndSettle();
+    await _startApp(tester, const Locale('ko'));
 
     expect(find.text('냠냠 라이더'), findsOneWidget);
     expect(find.text('15분 아침 코스'), findsOneWidget);
@@ -23,8 +23,7 @@ void main() {
   testWidgets('Remaining time setting can be turned off', (tester) async {
     SharedPreferences.setMockInitialValues({});
 
-    await app.main();
-    await tester.pumpAndSettle();
+    await _startApp(tester, const Locale('ko'));
 
     await tester.tap(find.byTooltip('설정'));
     await tester.pumpAndSettle();
@@ -33,13 +32,34 @@ void main() {
     await tester.tap(find.text('남은 시간 보여주기'));
     await tester.pumpAndSettle();
 
-    await tester.pageBack();
+    await tester.tap(find.byType(BackButton));
     await tester.pumpAndSettle();
 
     await tester.tap(find.text('25분 보통 코스'));
     await tester.pump();
 
     expect(find.textContaining('남은 시간'), findsNothing);
+  });
+
+  testWidgets('English locale shows English home copy', (tester) async {
+    SharedPreferences.setMockInitialValues({});
+
+    await _startApp(tester, const Locale('en'));
+
+    expect(find.text('Yamyam Rider'), findsOneWidget);
+    expect(find.text('15-min Morning Ride'), findsOneWidget);
+    expect(find.text('25-min Regular Ride'), findsOneWidget);
+    expect(find.text('35-min Easy Ride'), findsOneWidget);
+    expect(find.text('Start Custom Ride'), findsOneWidget);
+  });
+
+  testWidgets('Unsupported locale falls back to English', (tester) async {
+    SharedPreferences.setMockInitialValues({});
+
+    await _startApp(tester, const Locale('ja'));
+
+    expect(find.text('Yamyam Rider'), findsOneWidget);
+    expect(find.text('Start Custom Ride'), findsOneWidget);
   });
 
   test('Fast meal awards a special sticker with a random sticker', () async {
@@ -97,4 +117,14 @@ void main() {
 
     expect(recordedSession.awardedRewards, isEmpty);
   });
+}
+
+Future<void> _startApp(WidgetTester tester, Locale locale) async {
+  tester.binding.platformDispatcher.localeTestValue = locale;
+  tester.binding.platformDispatcher.localesTestValue = [locale];
+  addTearDown(tester.binding.platformDispatcher.clearLocaleTestValue);
+  addTearDown(tester.binding.platformDispatcher.clearLocalesTestValue);
+
+  await app.main();
+  await tester.pumpAndSettle();
 }

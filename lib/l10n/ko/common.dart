@@ -1,4 +1,8 @@
-class CommonTexts {
+// ignore_for_file: annotate_overrides
+
+import '../text_sets.dart';
+
+class CommonTexts implements CommonTextSet {
   const CommonTexts();
 
   String get appTitle => '냠냠 라이더';
@@ -8,4 +12,5 @@ class CommonTexts {
   String get notYet => '아직이야';
   String get restartRide => '다시 출발';
   String get settings => '설정';
+  String get start => '출발';
 }

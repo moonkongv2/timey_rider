@@ -122,6 +122,7 @@ class _ResultScreenState extends State<ResultScreen> {
   @override
   Widget build(BuildContext context) {
     final mealCompleted = widget.result.mealCompleted;
+    final texts = AppTexts.of(context);
 
     if (!_introFinished) {
       return _ResultIntroScreen(
@@ -151,7 +152,7 @@ class _ResultScreenState extends State<ResultScreen> {
                             child: Column(
                               children: [
                                 Text(
-                                  AppTexts.result.title(mealCompleted),
+                                  texts.result.title(mealCompleted),
                                   textAlign: TextAlign.center,
                                   style: Theme.of(context)
                                       .textTheme
@@ -172,16 +173,14 @@ class _ResultScreenState extends State<ResultScreen> {
                                 ] else
                                   const SizedBox(height: 16),
                                 Text(
-                                  AppTexts.result.primaryMessage(mealCompleted),
+                                  texts.result.primaryMessage(mealCompleted),
                                   textAlign: TextAlign.center,
                                   style: Theme.of(context).textTheme.titleMedium
                                       ?.copyWith(height: 1.4),
                                 ),
                                 const SizedBox(height: 8),
                                 Text(
-                                  AppTexts.result.secondaryMessage(
-                                    mealCompleted,
-                                  ),
+                                  texts.result.secondaryMessage(mealCompleted),
                                   textAlign: TextAlign.center,
                                   style: Theme.of(context).textTheme.titleMedium
                                       ?.copyWith(fontWeight: FontWeight.w800),
@@ -194,13 +193,13 @@ class _ResultScreenState extends State<ResultScreen> {
                         FilledButton.icon(
                           onPressed: () => _restart(context),
                           icon: const Icon(Icons.two_wheeler_rounded),
-                          label: Text(AppTexts.common.restartRide),
+                          label: Text(texts.common.restartRide),
                         ),
                         const SizedBox(height: 12),
                         OutlinedButton.icon(
                           onPressed: () => _goHome(context),
                           icon: const Icon(Icons.home_rounded),
-                          label: Text(AppTexts.common.home),
+                          label: Text(texts.common.home),
                         ),
                       ],
                     ),
@@ -257,6 +256,7 @@ class _RewardResultBox extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final rewards = this.rewards;
+    final texts = AppTexts.of(context);
 
     return DecoratedBox(
       decoration: BoxDecoration(
@@ -267,7 +267,7 @@ class _RewardResultBox extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
         child: rewards == null
             ? Text(
-                AppTexts.result.rewardLoading,
+                texts.result.rewardLoading,
                 textAlign: TextAlign.center,
                 style: Theme.of(
                   context,
@@ -275,7 +275,7 @@ class _RewardResultBox extends StatelessWidget {
               )
             : rewards.isEmpty
             ? Text(
-                AppTexts.result.recordSaved,
+                texts.result.recordSaved,
                 textAlign: TextAlign.center,
                 style: Theme.of(
                   context,
@@ -302,15 +302,22 @@ class _RewardBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final texts = AppTexts.of(context);
+    final rewardName = texts.rewards.name(reward.id);
+
     return SizedBox(
       width: 116,
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          RewardStickerImage(reward: reward, size: 64),
+          RewardStickerImage(
+            reward: reward,
+            semanticLabel: rewardName,
+            size: 64,
+          ),
           const SizedBox(height: 8),
           Text(
-            reward.name,
+            rewardName,
             textAlign: TextAlign.center,
             maxLines: 2,
             overflow: TextOverflow.ellipsis,

@@ -4,16 +4,13 @@ class RewardDefinition {
   const RewardDefinition({
     required this.id,
     required this.type,
-    required this.name,
     required this.emoji,
   });
 
   final String id;
   final RewardType type;
-  final String name;
   final String emoji;
 
-  String get displayLabel => '$emoji $name';
   String get imageAssetPath => 'assets/images/$id.png';
 }
 
@@ -54,80 +51,81 @@ class RewardInventoryItem {
 }
 
 class RewardCatalog {
+  static const finishFlagStickerId = 'sticker_finish_flag';
+  static const twinkleStarStickerId = 'sticker_twinkle_star';
+  static const riderHelmetStickerId = 'sticker_rider_helmet';
+  static const riceBowlStickerId = 'sticker_rice_bowl';
+  static const yumSpoonStickerId = 'sticker_yum_spoon';
+  static const crunchyCarrotStickerId = 'sticker_crunchy_carrot';
+  static const sunnyMealStickerId = 'sticker_sunny_meal';
+  static const rainbowCourseStickerId = 'sticker_rainbow_course';
+  static const rocketBiteStickerId = 'sticker_rocket_bite';
+  static const happyRiderStickerId = 'sticker_happy_rider';
+  static const lightningYumStickerId = 'sticker_lightning_yum';
+
   static const finishFlagSticker = RewardDefinition(
-    id: 'sticker_finish_flag',
+    id: finishFlagStickerId,
     type: RewardType.sticker,
-    name: '도착 깃발 스티커',
     emoji: '🏁',
   );
 
   static const twinkleStarSticker = RewardDefinition(
-    id: 'sticker_twinkle_star',
+    id: twinkleStarStickerId,
     type: RewardType.sticker,
-    name: '반짝 별 스티커',
     emoji: '⭐',
   );
 
   static const riderHelmetSticker = RewardDefinition(
-    id: 'sticker_rider_helmet',
+    id: riderHelmetStickerId,
     type: RewardType.sticker,
-    name: '멋진 헬멧 스티커',
     emoji: '🪖',
   );
 
   static const riceBowlSticker = RewardDefinition(
-    id: 'sticker_rice_bowl',
+    id: riceBowlStickerId,
     type: RewardType.sticker,
-    name: '든든 밥그릇 스티커',
     emoji: '🍚',
   );
 
   static const yumSpoonSticker = RewardDefinition(
-    id: 'sticker_yum_spoon',
+    id: yumSpoonStickerId,
     type: RewardType.sticker,
-    name: '냠냠 숟가락 스티커',
     emoji: '🥄',
   );
 
   static const crunchyCarrotSticker = RewardDefinition(
-    id: 'sticker_crunchy_carrot',
+    id: crunchyCarrotStickerId,
     type: RewardType.sticker,
-    name: '아삭 당근 스티커',
     emoji: '🥕',
   );
 
   static const sunnyMealSticker = RewardDefinition(
-    id: 'sticker_sunny_meal',
+    id: sunnyMealStickerId,
     type: RewardType.sticker,
-    name: '햇살 식사 스티커',
     emoji: '🌞',
   );
 
   static const rainbowCourseSticker = RewardDefinition(
-    id: 'sticker_rainbow_course',
+    id: rainbowCourseStickerId,
     type: RewardType.sticker,
-    name: '무지개 코스 스티커',
     emoji: '🌈',
   );
 
   static const rocketBiteSticker = RewardDefinition(
-    id: 'sticker_rocket_bite',
+    id: rocketBiteStickerId,
     type: RewardType.sticker,
-    name: '로켓 한입 스티커',
     emoji: '🚀',
   );
 
   static const happyRiderSticker = RewardDefinition(
-    id: 'sticker_happy_rider',
+    id: happyRiderStickerId,
     type: RewardType.sticker,
-    name: '신나는 라이더 스티커',
     emoji: '🏍️',
   );
 
   static const lightningYumSticker = RewardDefinition(
-    id: 'sticker_lightning_yum',
+    id: lightningYumStickerId,
     type: RewardType.sticker,
-    name: '번개 냠냠 스티커',
     emoji: '⚡',
   );
 

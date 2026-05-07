@@ -1,4 +1,8 @@
-class HomeTexts {
+// ignore_for_file: annotate_overrides
+
+import '../text_sets.dart';
+
+class HomeTexts implements HomeTextSet {
   const HomeTexts();
 
   String get subtitle => '오늘도 냠냠 코스를 달려볼까?';
