@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'l10n/app_texts.dart';
 import 'models/meal_timer_config.dart';
 import 'screens/home_screen.dart';
 import 'services/local_meal_progress_service.dart';
@@ -38,7 +39,7 @@ class _YamyamRiderAppState extends State<YamyamRiderApp> {
 
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: '냠냠 라이더',
+      title: AppTexts.common.appTitle,
       theme: ThemeData(
         colorScheme: colorScheme,
         scaffoldBackgroundColor: const Color(0xFFFFF8EF),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
 
+import '../l10n/app_texts.dart';
 import '../models/meal_progress_snapshot.dart';
 import '../models/meal_session_result.dart';
 import '../models/meal_timer_config.dart';
@@ -150,7 +151,7 @@ class _ResultScreenState extends State<ResultScreen> {
                             child: Column(
                               children: [
                                 Text(
-                                  mealCompleted ? '식사 완주 성공!' : '아쉽지만 조금 늦었어',
+                                  AppTexts.result.title(mealCompleted),
                                   textAlign: TextAlign.center,
                                   style: Theme.of(context)
                                       .textTheme
@@ -171,18 +172,16 @@ class _ResultScreenState extends State<ResultScreen> {
                                 ] else
                                   const SizedBox(height: 16),
                                 Text(
-                                  mealCompleted
-                                      ? '오늘의 냠냠코스를 끝까지 잘 마쳤어.'
-                                      : '오토바이가 먼저 지나갔어.',
+                                  AppTexts.result.primaryMessage(mealCompleted),
                                   textAlign: TextAlign.center,
                                   style: Theme.of(context).textTheme.titleMedium
                                       ?.copyWith(height: 1.4),
                                 ),
                                 const SizedBox(height: 8),
                                 Text(
-                                  mealCompleted
-                                      ? '지나가기 전에 식사를 잘 마쳐서 선물을 받았어!'
-                                      : '다음 냠냠코스에서 다시 도전해보자.',
+                                  AppTexts.result.secondaryMessage(
+                                    mealCompleted,
+                                  ),
                                   textAlign: TextAlign.center,
                                   style: Theme.of(context).textTheme.titleMedium
                                       ?.copyWith(fontWeight: FontWeight.w800),
@@ -195,13 +194,13 @@ class _ResultScreenState extends State<ResultScreen> {
                         FilledButton.icon(
                           onPressed: () => _restart(context),
                           icon: const Icon(Icons.two_wheeler_rounded),
-                          label: const Text('다시 출발'),
+                          label: Text(AppTexts.common.restartRide),
                         ),
                         const SizedBox(height: 12),
                         OutlinedButton.icon(
                           onPressed: () => _goHome(context),
                           icon: const Icon(Icons.home_rounded),
-                          label: const Text('홈으로'),
+                          label: Text(AppTexts.common.home),
                         ),
                       ],
                     ),
@@ -268,7 +267,7 @@ class _RewardResultBox extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
         child: rewards == null
             ? Text(
-                '보상 정리 중...',
+                AppTexts.result.rewardLoading,
                 textAlign: TextAlign.center,
                 style: Theme.of(
                   context,
@@ -276,7 +275,7 @@ class _RewardResultBox extends StatelessWidget {
               )
             : rewards.isEmpty
             ? Text(
-                '오늘의 기록을 저장했어',
+                AppTexts.result.recordSaved,
                 textAlign: TextAlign.center,
                 style: Theme.of(
                   context,

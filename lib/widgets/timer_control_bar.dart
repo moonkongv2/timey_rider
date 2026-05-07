@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../l10n/app_texts.dart';
+
 class TimerControlBar extends StatelessWidget {
   const TimerControlBar({
     super.key,
@@ -20,7 +22,11 @@ class TimerControlBar extends StatelessWidget {
           child: OutlinedButton.icon(
             onPressed: onPauseResume,
             icon: Icon(isPaused ? Icons.play_arrow_rounded : Icons.pause),
-            label: Text(isPaused ? '다시 출발' : '일시정지'),
+            label: Text(
+              isPaused
+                  ? AppTexts.common.restartRide
+                  : AppTexts.timer.pauseButton,
+            ),
           ),
         ),
         const SizedBox(width: 12),
@@ -28,7 +34,7 @@ class TimerControlBar extends StatelessWidget {
           child: FilledButton.icon(
             onPressed: onComplete,
             icon: const Icon(Icons.check_circle_rounded),
-            label: const Text('식사 완료'),
+            label: Text(AppTexts.timer.completeMealButton),
           ),
         ),
       ],

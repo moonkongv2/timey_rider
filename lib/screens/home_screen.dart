@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../l10n/app_texts.dart';
 import '../models/meal_progress_snapshot.dart';
 import '../models/meal_timer_config.dart';
 import '../models/reward_item.dart';
@@ -82,7 +83,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        '냠냠 라이더',
+                        AppTexts.common.appTitle,
                         style: textTheme.headlineLarge?.copyWith(
                           fontWeight: FontWeight.w900,
                           color: const Color(0xFF3D332B),
@@ -90,7 +91,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        '오늘도 냠냠 코스를 달려볼까?',
+                        AppTexts.home.subtitle,
                         style: textTheme.titleMedium?.copyWith(
                           color: const Color(0xFF7A6250),
                           fontWeight: FontWeight.w700,
@@ -102,25 +103,25 @@ class _HomeScreenState extends State<HomeScreen> {
                 IconButton.filledTonal(
                   onPressed: _openSettings,
                   icon: const Icon(Icons.settings_rounded),
-                  tooltip: '설정',
+                  tooltip: AppTexts.common.settings,
                 ),
               ],
             ),
             const SizedBox(height: 28),
             _PresetButton(
-              label: '15분 아침 코스',
+              label: AppTexts.home.morningCourse,
               emoji: '🌞',
               onPressed: () => _startTimer(15),
             ),
             const SizedBox(height: 12),
             _PresetButton(
-              label: '25분 보통 코스',
+              label: AppTexts.home.normalCourse,
               emoji: '🍚',
               onPressed: () => _startTimer(25),
             ),
             const SizedBox(height: 12),
             _PresetButton(
-              label: '35분 천천히 코스',
+              label: AppTexts.home.slowCourse,
               emoji: '🌈',
               onPressed: () => _startTimer(35),
             ),
@@ -132,7 +133,9 @@ class _HomeScreenState extends State<HomeScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      '직접 설정: ${_customMinutes.round()}분',
+                      AppTexts.home.customSettingMinutes(
+                        _customMinutes.round(),
+                      ),
                       style: textTheme.titleLarge?.copyWith(
                         fontWeight: FontWeight.w900,
                       ),
@@ -141,7 +144,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       value: _customMinutes,
                       min: 1,
                       max: 60,
-                      label: '${_customMinutes.round()}분',
+                      label: AppTexts.home.minuteLabel(_customMinutes.round()),
                       onChanged: (value) {
                         setState(() => _customMinutes = value);
                       },
@@ -181,7 +184,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     FilledButton.icon(
                       onPressed: () => _startTimer(_customMinutes.round()),
                       icon: const Icon(Icons.two_wheeler_rounded),
-                      label: const Text('직접 설정으로 출발'),
+                      label: Text(AppTexts.home.customStartButton),
                     ),
                   ],
                 ),
@@ -256,7 +259,7 @@ class _ProgressSummary extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              '지율이의 냠냠 기록',
+              AppTexts.home.progressTitle(AppTexts.common.defaultChildName),
               style: textTheme.titleLarge?.copyWith(
                 fontWeight: FontWeight.w900,
               ),
@@ -267,24 +270,24 @@ class _ProgressSummary extends StatelessWidget {
                 Expanded(
                   child: _SummaryTile(
                     icon: Icons.restaurant_rounded,
-                    label: '식사',
-                    value: '${history.length}번',
+                    label: AppTexts.home.mealSummaryLabel,
+                    value: AppTexts.home.mealCount(history.length),
                   ),
                 ),
                 const SizedBox(width: 10),
                 Expanded(
                   child: _SummaryTile(
                     icon: Icons.auto_awesome_rounded,
-                    label: '종류',
-                    value: '$stickerKindCount개',
+                    label: AppTexts.home.stickerKindSummaryLabel,
+                    value: AppTexts.home.stickerKindCount(stickerKindCount),
                   ),
                 ),
                 const SizedBox(width: 10),
                 Expanded(
                   child: _SummaryTile(
                     icon: Icons.stars_rounded,
-                    label: '스티커',
-                    value: '$stickerCount장',
+                    label: AppTexts.home.stickerSummaryLabel,
+                    value: AppTexts.home.stickerCount(stickerCount),
                   ),
                 ),
               ],
@@ -292,8 +295,11 @@ class _ProgressSummary extends StatelessWidget {
             const SizedBox(height: 14),
             Text(
               recent == null
-                  ? '아직 저장된 식사 이력이 없어.'
-                  : '최근 식사 ${formatDuration(recent.actualDuration)} · ${recent.completedBeforeArrival ? '도착 전 완료' : '도착 후 완료'}',
+                  ? AppTexts.home.noMealHistory
+                  : AppTexts.home.recentMealSummary(
+                      formatDuration(recent.actualDuration),
+                      recent.completedBeforeArrival,
+                    ),
               style: textTheme.bodyLarge?.copyWith(
                 color: const Color(0xFF7A6250),
                 fontWeight: FontWeight.w700,
@@ -303,7 +309,7 @@ class _ProgressSummary extends StatelessWidget {
             OutlinedButton.icon(
               onPressed: onOpenStickers,
               icon: const Icon(Icons.collections_bookmark_rounded),
-              label: const Text('스티커 보관함 보기'),
+              label: Text(AppTexts.home.openStickerCollection),
             ),
           ],
         ),

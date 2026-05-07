@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../l10n/app_texts.dart';
 import '../models/meal_timer_config.dart';
 
 class SettingsScreen extends StatefulWidget {
@@ -27,7 +28,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('설정')),
+      appBar: AppBar(title: Text(AppTexts.settings.title)),
       body: ListView(
         padding: const EdgeInsets.all(20),
         children: [
@@ -35,23 +36,23 @@ class _SettingsScreenState extends State<SettingsScreen> {
             child: Column(
               children: [
                 SwitchListTile(
-                  title: const Text('남은 시간 보여주기'),
+                  title: Text(AppTexts.settings.showRemainingTime),
                   value: _config.showRemainingTime,
                   onChanged: (value) {
                     _update(_config.copyWith(showRemainingTime: value));
                   },
                 ),
                 SwitchListTile(
-                  title: const Text('효과음 사용'),
-                  subtitle: const Text('MVP에서는 설정만 저장해요'),
+                  title: Text(AppTexts.settings.soundEnabled),
+                  subtitle: Text(AppTexts.settings.savedOnlySubtitle),
                   value: _config.soundEnabled,
                   onChanged: (value) {
                     _update(_config.copyWith(soundEnabled: value));
                   },
                 ),
                 SwitchListTile(
-                  title: const Text('화면 계속 켜두기'),
-                  subtitle: const Text('MVP에서는 설정만 저장해요'),
+                  title: Text(AppTexts.settings.keepScreenAwake),
+                  subtitle: Text(AppTexts.settings.savedOnlySubtitle),
                   value: _config.keepScreenAwake,
                   onChanged: (value) {
                     _update(_config.copyWith(keepScreenAwake: value));
@@ -68,17 +69,26 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    '기본 식사 시간',
+                    AppTexts.settings.defaultMealDuration,
                     style: Theme.of(context).textTheme.titleLarge?.copyWith(
                       fontWeight: FontWeight.w900,
                     ),
                   ),
                   const SizedBox(height: 12),
                   SegmentedButton<int>(
-                    segments: const [
-                      ButtonSegment(value: 15, label: Text('15분')),
-                      ButtonSegment(value: 25, label: Text('25분')),
-                      ButtonSegment(value: 35, label: Text('35분')),
+                    segments: [
+                      ButtonSegment(
+                        value: 15,
+                        label: Text(AppTexts.settings.durationSegmentLabel(15)),
+                      ),
+                      ButtonSegment(
+                        value: 25,
+                        label: Text(AppTexts.settings.durationSegmentLabel(25)),
+                      ),
+                      ButtonSegment(
+                        value: 35,
+                        label: Text(AppTexts.settings.durationSegmentLabel(35)),
+                      ),
                     ],
                     selected: {
                       if ({15, 25, 35}.contains(_config.duration.inMinutes))

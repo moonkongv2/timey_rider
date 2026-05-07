@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../controllers/meal_timer_controller.dart';
+import '../l10n/app_texts.dart';
 import '../models/meal_session_result.dart';
 import '../models/meal_timer_config.dart';
 import '../services/local_meal_progress_service.dart';
@@ -131,18 +132,20 @@ class _TimerScreenState extends State<TimerScreen> {
       barrierDismissible: !showFailureOnDecline,
       builder: (context) {
         return AlertDialog(
-          title: const Text('식사를 완료했어?'),
+          title: Text(AppTexts.timer.completeDialogTitle),
           content: Text(
-            showFailureOnDecline ? '오토바이가 지나갔어. 식사를 마무리했어?' : '오늘의 냠냠코스를 마무리할까?',
+            showFailureOnDecline
+                ? AppTexts.timer.arrivalDialogMessage
+                : AppTexts.timer.completeDialogMessage,
           ),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(false),
-              child: const Text('아직이야'),
+              child: Text(AppTexts.common.notYet),
             ),
             FilledButton(
               onPressed: () => Navigator.of(context).pop(true),
-              child: const Text('완료'),
+              child: Text(AppTexts.common.complete),
             ),
           ],
         );
@@ -184,7 +187,7 @@ class _TimerScreenState extends State<TimerScreen> {
       animation: _controller,
       builder: (context, _) {
         return Scaffold(
-          appBar: AppBar(title: const Text('오늘의 냠냠코스')),
+          appBar: AppBar(title: Text(AppTexts.timer.courseTitle)),
           body: SafeArea(
             child: Padding(
               padding: const EdgeInsets.fromLTRB(20, 8, 20, 20),
@@ -240,7 +243,7 @@ class _RemainingTimeCard extends StatelessWidget {
             const Icon(Icons.timer_rounded),
             const SizedBox(width: 8),
             Text(
-              '남은 시간 ${formatDuration(remaining)}',
+              AppTexts.timer.remainingTime(formatDuration(remaining)),
               style: Theme.of(
                 context,
               ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w900),
