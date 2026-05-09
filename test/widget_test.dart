@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'package:jy_yamyam/catalogs/vehicle_catalog.dart';
 import 'package:jy_yamyam/main.dart' as app;
 import 'package:jy_yamyam/models/meal_session_result.dart';
 import 'package:jy_yamyam/models/reward_item.dart';
 import 'package:jy_yamyam/services/local_meal_progress_service.dart';
+import 'package:jy_yamyam/widgets/vehicle_widget.dart';
 
 void main() {
   testWidgets('Home screen shows meal timer actions', (tester) async {
@@ -41,6 +43,60 @@ void main() {
     expect(find.textContaining('남은 시간'), findsNothing);
   });
 
+  testWidgets('Home screen shows vehicle choices above courses', (
+    tester,
+  ) async {
+    SharedPreferences.setMockInitialValues({});
+
+    await _startApp(tester, const Locale('ko'));
+
+    expect(find.text('빠방 고르기'), findsOneWidget);
+    expect(find.text('🏍️'), findsOneWidget);
+    expect(find.text('오토바이'), findsOneWidget);
+    expect(find.text('🚒'), findsOneWidget);
+    expect(find.text('소방차'), findsOneWidget);
+    expect(find.text('🚓'), findsOneWidget);
+    expect(find.text('경찰차'), findsOneWidget);
+    expect(find.text('🚜'), findsOneWidget);
+    expect(find.text('포크레인'), findsOneWidget);
+
+    final vehicleTitleTop = tester.getTopLeft(find.text('빠방 고르기')).dy;
+    final firstCourseTop = tester.getTopLeft(find.text('15분 아침 코스')).dy;
+    expect(vehicleTitleTop, lessThan(firstCourseTop));
+  });
+
+  testWidgets('Selected vehicle on home is saved to preferences', (
+    tester,
+  ) async {
+    SharedPreferences.setMockInitialValues({});
+
+    await _startApp(tester, const Locale('ko'));
+
+    await tester.tap(
+      find.ancestor(of: find.text('경찰차'), matching: find.byType(ChoiceChip)),
+    );
+    await tester.pump();
+
+    final preferences = await SharedPreferences.getInstance();
+    expect(preferences.getString('motorcycleId'), 'police_car');
+  });
+
+  testWidgets('Vehicle widget falls back to emoji for missing assets', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      const MaterialApp(
+        home: Scaffold(body: VehicleWidget(vehicle: VehicleCatalog.fireTruck)),
+      ),
+    );
+
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 100));
+
+    expect(find.text('🚒'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
   testWidgets('English locale shows English home copy', (tester) async {
     SharedPreferences.setMockInitialValues({});
 
@@ -50,6 +106,8 @@ void main() {
     expect(find.text('15-min Morning Ride'), findsOneWidget);
     expect(find.text('25-min Regular Ride'), findsOneWidget);
     expect(find.text('35-min Easy Ride'), findsOneWidget);
+    await tester.drag(find.byType(ListView), const Offset(0, -500));
+    await tester.pumpAndSettle();
     expect(find.text('Start Custom Ride'), findsOneWidget);
   });
 
@@ -59,6 +117,8 @@ void main() {
     await _startApp(tester, const Locale('ja'));
 
     expect(find.text('Yamyam Rider'), findsOneWidget);
+    await tester.drag(find.byType(ListView), const Offset(0, -500));
+    await tester.pumpAndSettle();
     expect(find.text('Start Custom Ride'), findsOneWidget);
   });
 
@@ -126,5 +186,6 @@ Future<void> _startApp(WidgetTester tester, Locale locale) async {
   addTearDown(tester.binding.platformDispatcher.clearLocalesTestValue);
 
   await app.main();
+  await tester.pump(const Duration(milliseconds: 3500));
   await tester.pumpAndSettle();
 }

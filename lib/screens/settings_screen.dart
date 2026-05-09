@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../l10n/app_texts.dart';
 import '../models/meal_timer_config.dart';
+import '../widgets/vehicle_selection_card.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({
@@ -111,6 +112,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ],
               ),
             ),
+          ),
+          const SizedBox(height: 20),
+          VehicleSelectionCard(
+            title: texts.settings.vehicleSelection,
+            selectedVehicleId: _config.motorcycleId,
+            onVehicleSelected: (vehicleId) {
+              _update(_config.copyWith(motorcycleId: vehicleId));
+            },
           ),
         ],
       ),

@@ -11,6 +11,7 @@ class EnSettingsTexts implements SettingsTextSet {
   String get keepScreenAwake => 'Keep screen awake';
   String get savedOnlySubtitle => 'This setting is saved but not active yet.';
   String get defaultMealDuration => 'Default meal time';
+  String get vehicleSelection => 'Choose vehicle';
 
   String durationSegmentLabel(int minutes) => '$minutes min';
 }

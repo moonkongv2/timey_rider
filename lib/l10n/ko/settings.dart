@@ -11,6 +11,7 @@ class SettingsTexts implements SettingsTextSet {
   String get keepScreenAwake => '화면 계속 켜두기';
   String get savedOnlySubtitle => 'MVP에서는 설정만 저장해요';
   String get defaultMealDuration => '기본 식사 시간';
+  String get vehicleSelection => '빠방 고르기';
 
   String durationSegmentLabel(int minutes) => '$minutes분';
 }

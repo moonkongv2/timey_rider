@@ -15,7 +15,7 @@ class MealTimerConfig {
       soundEnabled: false,
       keepScreenAwake: false,
       courseId: 'park',
-      motorcycleId: 'default',
+      motorcycleId: 'motorcycle',
     );
   }
 

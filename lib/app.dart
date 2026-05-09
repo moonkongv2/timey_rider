@@ -4,6 +4,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'l10n/app_texts.dart';
 import 'models/meal_timer_config.dart';
 import 'screens/home_screen.dart';
+import 'screens/splash_screen.dart';
 import 'services/local_meal_progress_service.dart';
 import 'services/local_settings_service.dart';
 
@@ -25,10 +26,18 @@ class YamyamRiderApp extends StatefulWidget {
 
 class _YamyamRiderAppState extends State<YamyamRiderApp> {
   late MealTimerConfig _config = widget.initialConfig;
+  bool _showSplash = true;
 
   Future<void> _saveConfig(MealTimerConfig config) async {
     setState(() => _config = config);
     await widget.settingsService.saveConfig(config);
+  }
+
+  void _finishSplash() {
+    if (!_showSplash) {
+      return;
+    }
+    setState(() => _showSplash = false);
   }
 
   @override
@@ -89,11 +98,13 @@ class _YamyamRiderAppState extends State<YamyamRiderApp> {
           ),
         ),
       ),
-      home: HomeScreen(
-        config: _config,
-        mealProgressService: widget.mealProgressService,
-        onConfigChanged: _saveConfig,
-      ),
+      home: _showSplash
+          ? SplashScreen(onFinished: _finishSplash)
+          : HomeScreen(
+              config: _config,
+              mealProgressService: widget.mealProgressService,
+              onConfigChanged: _saveConfig,
+            ),
     );
   }
 }

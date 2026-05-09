@@ -5,23 +5,26 @@ import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
 
 import '../l10n/app_texts.dart';
-import 'motorcycle_widget.dart';
+import '../models/vehicle.dart';
 import 'road_painter.dart';
+import 'vehicle_widget.dart';
 
 class RoadView extends StatelessWidget {
   const RoadView({
     super.key,
     required this.progress,
+    required this.vehicle,
     this.motivationVideoAssetPath,
     this.motivationVideoMilestone,
     this.onMotivationVideoFinished,
   });
 
   final double progress;
+  final VehicleDefinition vehicle;
   final String? motivationVideoAssetPath;
   final int? motivationVideoMilestone;
   final VoidCallback? onMotivationVideoFinished;
-  static const double _motorcycleSize = 180;
+  static const double _vehicleSize = 220;
 
   @override
   Widget build(BuildContext context) {
@@ -31,16 +34,13 @@ class RoadView extends StatelessWidget {
       builder: (context, constraints) {
         final size = Size(constraints.maxWidth, constraints.maxHeight);
         final roadBounds = createRoadBounds(size);
-        final motorcycleSize = math
-            .min(
-              _motorcycleSize,
-              math.min(size.width * 0.46, size.height * 0.54),
-            )
+        final vehicleSize = math
+            .min(_vehicleSize, math.min(size.width * 0.56, size.height * 0.62))
             .toDouble();
         final clampedProgress = progress.clamp(0.0, 1.0).toDouble();
         final hasPassed = progress >= 1;
         final travelInset = math.min(
-          motorcycleSize * 0.48,
+          vehicleSize * 0.48,
           roadBounds.width * 0.18,
         );
         final roadX = ui.lerpDouble(
@@ -48,10 +48,10 @@ class RoadView extends StatelessWidget {
           roadBounds.right - travelInset,
           clampedProgress,
         )!;
-        final motorcycleLeft = hasPassed
-            ? size.width + (motorcycleSize * 0.12)
-            : roadX - (motorcycleSize / 2);
-        final motorcycleTop = roadBounds.center.dy - (motorcycleSize * 0.8);
+        final vehicleLeft = hasPassed
+            ? size.width + (vehicleSize * 0.12)
+            : roadX - (vehicleSize / 2);
+        final vehicleTop = roadBounds.center.dy - (vehicleSize * 0.8);
         const videoMargin = 16.0;
         final videoFrameTop = videoMargin;
         final videoFrameLeft = videoMargin;
@@ -75,7 +75,7 @@ class RoadView extends StatelessWidget {
                 ),
                 _SceneryLayer(
                   roadBounds: roadBounds,
-                  motorcycleSize: motorcycleSize,
+                  vehicleSize: vehicleSize,
                   size: size,
                 ),
                 _Marker(
@@ -87,8 +87,8 @@ class RoadView extends StatelessWidget {
                 AnimatedPositioned(
                   duration: const Duration(milliseconds: 850),
                   curve: Curves.easeInOutCubic,
-                  left: motorcycleLeft,
-                  top: motorcycleTop,
+                  left: vehicleLeft,
+                  top: vehicleTop,
                   child: AnimatedOpacity(
                     duration: const Duration(milliseconds: 850),
                     opacity: hasPassed ? 0 : 1,
@@ -96,8 +96,9 @@ class RoadView extends StatelessWidget {
                       duration: const Duration(milliseconds: 850),
                       curve: Curves.easeInOutCubic,
                       scale: hasPassed ? 0.78 : 1,
-                      child: MotorcycleWidget(
-                        size: motorcycleSize,
+                      child: VehicleWidget(
+                        vehicle: vehicle,
+                        size: vehicleSize,
                         isArrived: progress >= 1,
                       ),
                     ),
@@ -128,12 +129,12 @@ class RoadView extends StatelessWidget {
 class _SceneryLayer extends StatefulWidget {
   const _SceneryLayer({
     required this.roadBounds,
-    required this.motorcycleSize,
+    required this.vehicleSize,
     required this.size,
   });
 
   final Rect roadBounds;
-  final double motorcycleSize;
+  final double vehicleSize;
   final Size size;
 
   static const List<_SceneryEmoji> _items = [
@@ -170,9 +171,7 @@ class _SceneryLayerState extends State<_SceneryLayer>
 
   @override
   Widget build(BuildContext context) {
-    final emojiSize = (widget.motorcycleSize * 0.38)
-        .clamp(44.0, 72.0)
-        .toDouble();
+    final emojiSize = (widget.vehicleSize * 0.38).clamp(44.0, 72.0).toDouble();
     final laneTop = (widget.roadBounds.top - emojiSize - 20).clamp(
       12.0,
       widget.size.height - emojiSize - 12,

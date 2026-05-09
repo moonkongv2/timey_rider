@@ -38,6 +38,7 @@ dependencies:
   cupertino_icons: ^1.0.8
   shared_preferences: ^2.3.5
   video_player: ^2.10.0
+  lottie: ^3.3.3
 
 dev_dependencies:
   flutter_test:
@@ -88,7 +89,10 @@ flutter:
   # "family" key with the font family name, and a "fonts" key with a
   # list giving the asset and other descriptors for the font. For
   # example:
-  # fonts:
+  fonts:
+    - family: Cal Sans
+      fonts:
+        - asset: assets/fonts/CalSans-Regular.ttf
   #   - family: Schyler
   #     fonts:
   #       - asset: fonts/Schyler-Regular.ttf

@@ -6,6 +6,7 @@ import '../models/meal_timer_config.dart';
 import '../models/reward_item.dart';
 import '../services/local_meal_progress_service.dart';
 import '../utils/duration_format.dart';
+import '../widgets/vehicle_selection_card.dart';
 import 'settings_screen.dart';
 import 'sticker_collection_screen.dart';
 import 'timer_screen.dart';
@@ -109,6 +110,16 @@ class _HomeScreenState extends State<HomeScreen> {
               ],
             ),
             const SizedBox(height: 28),
+            VehicleSelectionCard(
+              title: texts.settings.vehicleSelection,
+              selectedVehicleId: widget.config.motorcycleId,
+              onVehicleSelected: (vehicleId) {
+                widget.onConfigChanged(
+                  widget.config.copyWith(motorcycleId: vehicleId),
+                );
+              },
+            ),
+            const SizedBox(height: 20),
             _PresetButton(
               label: texts.home.morningCourse,
               emoji: '🌞',

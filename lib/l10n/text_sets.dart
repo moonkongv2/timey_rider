@@ -37,6 +37,7 @@ abstract interface class SettingsTextSet {
   String get keepScreenAwake;
   String get savedOnlySubtitle;
   String get defaultMealDuration;
+  String get vehicleSelection;
 
   String durationSegmentLabel(int minutes);
 }

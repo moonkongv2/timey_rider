@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../catalogs/vehicle_catalog.dart';
 import '../controllers/meal_timer_controller.dart';
 import '../l10n/app_texts.dart';
 import '../models/meal_session_result.dart';
@@ -189,6 +190,8 @@ class _TimerScreenState extends State<TimerScreen> {
     return AnimatedBuilder(
       animation: _controller,
       builder: (context, _) {
+        final vehicle = VehicleCatalog.findById(widget.config.motorcycleId);
+
         return Scaffold(
           appBar: AppBar(title: Text(texts.timer.courseTitle)),
           body: SafeArea(
@@ -199,6 +202,7 @@ class _TimerScreenState extends State<TimerScreen> {
                   Expanded(
                     child: RoadView(
                       progress: _controller.progress,
+                      vehicle: vehicle,
                       motivationVideoAssetPath: _activeMotivationVideoPath,
                       motivationVideoMilestone: _activeMotivationMilestone,
                       onMotivationVideoFinished: _handleMotivationVideoFinished,
