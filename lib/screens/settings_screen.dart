@@ -20,10 +20,36 @@ class SettingsScreen extends StatefulWidget {
 
 class _SettingsScreenState extends State<SettingsScreen> {
   late MealTimerConfig _config = widget.config;
+  late final TextEditingController _childNameController = TextEditingController(
+    text: widget.config.childName,
+  );
+
+  @override
+  void didUpdateWidget(covariant SettingsScreen oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.config.childName != widget.config.childName &&
+        _childNameController.text != widget.config.childName) {
+      _childNameController.text = widget.config.childName;
+    }
+  }
+
+  @override
+  void dispose() {
+    _childNameController.dispose();
+    super.dispose();
+  }
 
   void _update(MealTimerConfig config) {
     setState(() => _config = config);
     widget.onConfigChanged(config);
+  }
+
+  void _saveChildName() {
+    final childName = _childNameController.text.trim();
+    if (childName.isEmpty) {
+      return;
+    }
+    _update(_config.copyWith(childName: childName));
   }
 
   @override
@@ -35,6 +61,39 @@ class _SettingsScreenState extends State<SettingsScreen> {
       body: ListView(
         padding: const EdgeInsets.all(20),
         children: [
+          Card(
+            child: Padding(
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Text(
+                    texts.settings.childNameTitle,
+                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                      fontWeight: FontWeight.w900,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  TextField(
+                    controller: _childNameController,
+                    textInputAction: TextInputAction.done,
+                    decoration: InputDecoration(
+                      labelText: texts.settings.childNameFieldLabel,
+                      hintText: texts.common.defaultChildName,
+                      border: const OutlineInputBorder(),
+                    ),
+                    onSubmitted: (_) => _saveChildName(),
+                  ),
+                  const SizedBox(height: 12),
+                  FilledButton(
+                    onPressed: _saveChildName,
+                    child: Text(texts.settings.saveChildName),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 20),
           Card(
             child: Column(
               children: [

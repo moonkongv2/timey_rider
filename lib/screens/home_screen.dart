@@ -28,19 +28,28 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  late double _customMinutes = widget.config.duration.inMinutes.toDouble();
+  late MealTimerConfig _config = widget.config;
+  late double _customMinutes = _config.duration.inMinutes.toDouble();
 
   @override
   void didUpdateWidget(covariant HomeScreen oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (oldWidget.config.duration != widget.config.duration) {
-      _customMinutes = widget.config.duration.inMinutes.toDouble();
+    if (oldWidget.config != widget.config) {
+      _config = widget.config;
+    }
+    if (oldWidget.config.duration != _config.duration) {
+      _customMinutes = _config.duration.inMinutes.toDouble();
     }
   }
 
-  void _startTimer(int minutes) {
-    final config = widget.config.copyWith(duration: Duration(minutes: minutes));
+  void _updateConfig(MealTimerConfig config) {
+    setState(() => _config = config);
     widget.onConfigChanged(config);
+  }
+
+  void _startTimer(int minutes) {
+    final config = _config.copyWith(duration: Duration(minutes: minutes));
+    _updateConfig(config);
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (_) => TimerScreen(
@@ -60,10 +69,8 @@ class _HomeScreenState extends State<HomeScreen> {
   Future<void> _openSettings() async {
     await Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (_) => SettingsScreen(
-          config: widget.config,
-          onConfigChanged: widget.onConfigChanged,
-        ),
+        builder: (_) =>
+            SettingsScreen(config: _config, onConfigChanged: _updateConfig),
       ),
     );
   }
@@ -72,6 +79,9 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
     final texts = AppTexts.of(context);
+    final childName = _config.childName.trim().isEmpty
+        ? texts.common.defaultChildName
+        : _config.childName.trim();
 
     return Scaffold(
       body: SafeArea(
@@ -112,11 +122,9 @@ class _HomeScreenState extends State<HomeScreen> {
             const SizedBox(height: 28),
             VehicleSelectionCard(
               title: texts.settings.vehicleSelection,
-              selectedVehicleId: widget.config.motorcycleId,
+              selectedVehicleId: _config.motorcycleId,
               onVehicleSelected: (vehicleId) {
-                widget.onConfigChanged(
-                  widget.config.copyWith(motorcycleId: vehicleId),
-                );
+                _updateConfig(_config.copyWith(motorcycleId: vehicleId));
               },
             ),
             const SizedBox(height: 20),
@@ -205,6 +213,7 @@ class _HomeScreenState extends State<HomeScreen> {
               future: widget.mealProgressService.loadSnapshot(),
               builder: (context, snapshot) {
                 return _ProgressSummary(
+                  childName: childName,
                   snapshot: snapshot.data,
                   onOpenStickers: () {
                     Navigator.of(context).push(
@@ -239,10 +248,12 @@ class _MinuteAdjustButton extends StatelessWidget {
 
 class _ProgressSummary extends StatelessWidget {
   const _ProgressSummary({
+    required this.childName,
     required this.snapshot,
     required this.onOpenStickers,
   });
 
+  final String childName;
   final MealProgressSnapshot? snapshot;
   final VoidCallback onOpenStickers;
 
@@ -270,7 +281,7 @@ class _ProgressSummary extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              texts.home.progressTitle(texts.common.defaultChildName),
+              texts.home.progressTitle(childName),
               style: textTheme.titleLarge?.copyWith(
                 fontWeight: FontWeight.w900,
               ),

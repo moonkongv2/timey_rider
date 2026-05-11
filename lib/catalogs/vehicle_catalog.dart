@@ -6,7 +6,8 @@ abstract final class VehicleCatalog {
     labelKo: '오토바이',
     labelEn: 'Motorcycle',
     emoji: '🏍️',
-    assetPath: 'assets/images/jy_the_rider_flipped.png',
+    assetPath: 'assets/images/vehicle_motorcycle.png',
+    selectionAssetPath: 'assets/images/vehicle_motorcycle_chip.png',
   );
 
   static const fireTruck = VehicleDefinition(
@@ -15,6 +16,7 @@ abstract final class VehicleCatalog {
     labelEn: 'Fire truck',
     emoji: '🚒',
     assetPath: 'assets/images/vehicle_fire_truck.png',
+    selectionAssetPath: 'assets/images/vehicle_fire_truck_chip.png',
   );
 
   static const policeCar = VehicleDefinition(
@@ -23,6 +25,7 @@ abstract final class VehicleCatalog {
     labelEn: 'Police car',
     emoji: '🚓',
     assetPath: 'assets/images/vehicle_police_car.png',
+    selectionAssetPath: 'assets/images/vehicle_police_car_chip.png',
   );
 
   static const excavator = VehicleDefinition(
@@ -31,6 +34,7 @@ abstract final class VehicleCatalog {
     labelEn: 'Excavator',
     emoji: '🚜',
     assetPath: 'assets/images/vehicle_excavator.png',
+    selectionAssetPath: 'assets/images/vehicle_excavator_chip.png',
   );
 
   static const all = [motorcycle, fireTruck, policeCar, excavator];

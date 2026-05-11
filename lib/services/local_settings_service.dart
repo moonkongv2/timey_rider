@@ -8,6 +8,7 @@ class LocalSettingsService {
   static const _soundEnabledKey = 'soundEnabled';
   static const _keepScreenAwakeKey = 'keepScreenAwake';
   static const _motorcycleIdKey = 'motorcycleId';
+  static const _childNameKey = 'childName';
 
   Future<MealTimerConfig> loadConfig() async {
     final preferences = await SharedPreferences.getInstance();
@@ -28,6 +29,7 @@ class LocalSettingsService {
           preferences.getBool(_keepScreenAwakeKey) ?? defaults.keepScreenAwake,
       motorcycleId:
           preferences.getString(_motorcycleIdKey) ?? defaults.motorcycleId,
+      childName: preferences.getString(_childNameKey) ?? defaults.childName,
     );
   }
 
@@ -38,5 +40,6 @@ class LocalSettingsService {
     await preferences.setBool(_soundEnabledKey, config.soundEnabled);
     await preferences.setBool(_keepScreenAwakeKey, config.keepScreenAwake);
     await preferences.setString(_motorcycleIdKey, config.motorcycleId);
+    await preferences.setString(_childNameKey, config.childName);
   }
 }

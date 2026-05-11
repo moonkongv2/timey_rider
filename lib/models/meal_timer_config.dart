@@ -6,6 +6,7 @@ class MealTimerConfig {
     required this.keepScreenAwake,
     required this.courseId,
     required this.motorcycleId,
+    required this.childName,
   });
 
   factory MealTimerConfig.defaults() {
@@ -16,6 +17,7 @@ class MealTimerConfig {
       keepScreenAwake: false,
       courseId: 'park',
       motorcycleId: 'motorcycle',
+      childName: '',
     );
   }
 
@@ -25,6 +27,7 @@ class MealTimerConfig {
   final bool keepScreenAwake;
   final String courseId;
   final String motorcycleId;
+  final String childName;
 
   MealTimerConfig copyWith({
     Duration? duration,
@@ -33,6 +36,7 @@ class MealTimerConfig {
     bool? keepScreenAwake,
     String? courseId,
     String? motorcycleId,
+    String? childName,
   }) {
     return MealTimerConfig(
       duration: duration ?? this.duration,
@@ -41,6 +45,7 @@ class MealTimerConfig {
       keepScreenAwake: keepScreenAwake ?? this.keepScreenAwake,
       courseId: courseId ?? this.courseId,
       motorcycleId: motorcycleId ?? this.motorcycleId,
+      childName: childName ?? this.childName,
     );
   }
 }

@@ -8,7 +8,6 @@ import '../models/meal_timer_config.dart';
 import '../models/reward_item.dart';
 import '../services/local_meal_progress_service.dart';
 import '../widgets/reward_sticker_image.dart';
-import 'home_screen.dart';
 import 'timer_screen.dart';
 
 class ResultScreen extends StatefulWidget {
@@ -107,16 +106,7 @@ class _ResultScreenState extends State<ResultScreen> {
   }
 
   void _goHome(BuildContext context) {
-    Navigator.of(context).pushAndRemoveUntil(
-      MaterialPageRoute(
-        builder: (_) => HomeScreen(
-          config: widget.config,
-          mealProgressService: widget.mealProgressService,
-          onConfigChanged: widget.onConfigChanged,
-        ),
-      ),
-      (_) => false,
-    );
+    Navigator.of(context).popUntil((route) => route.isFirst);
   }
 
   @override
@@ -128,7 +118,7 @@ class _ResultScreenState extends State<ResultScreen> {
       return _ResultIntroScreen(
         controller: _introController,
         fallbackImageAssetPath: _introFallbackImagePath,
-        showFallback: _introFallback || !_introController.value.isInitialized,
+        showFallback: _introFallback,
       );
     }
 
@@ -235,6 +225,8 @@ class _ResultIntroScreen extends StatelessWidget {
                 fit: BoxFit.cover,
                 errorBuilder: (_, _, _) => const SizedBox.shrink(),
               )
+            : !controller.value.isInitialized
+            ? const ColoredBox(color: Color(0xFFFFF8EC))
             : FittedBox(
                 fit: BoxFit.cover,
                 child: SizedBox(

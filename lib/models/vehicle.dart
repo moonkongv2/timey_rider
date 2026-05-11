@@ -5,6 +5,7 @@ class VehicleDefinition {
     required this.labelEn,
     required this.emoji,
     required this.assetPath,
+    this.selectionAssetPath,
   });
 
   final String id;
@@ -12,6 +13,9 @@ class VehicleDefinition {
   final String labelEn;
   final String emoji;
   final String assetPath;
+  final String? selectionAssetPath;
+
+  String get selectionImagePath => selectionAssetPath ?? assetPath;
 
   String labelForLanguage(String languageCode) {
     return languageCode == 'ko' ? labelKo : labelEn;

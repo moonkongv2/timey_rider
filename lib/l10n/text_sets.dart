@@ -38,6 +38,11 @@ abstract interface class SettingsTextSet {
   String get savedOnlySubtitle;
   String get defaultMealDuration;
   String get vehicleSelection;
+  String get childNameTitle;
+  String get childNameFieldLabel;
+  String get childNameSetupTitle;
+  String get childNameSetupSubtitle;
+  String get saveChildName;
 
   String durationSegmentLabel(int minutes);
 }

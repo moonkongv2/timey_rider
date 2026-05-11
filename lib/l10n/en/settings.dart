@@ -12,6 +12,11 @@ class EnSettingsTexts implements SettingsTextSet {
   String get savedOnlySubtitle => 'This setting is saved but not active yet.';
   String get defaultMealDuration => 'Default meal time';
   String get vehicleSelection => 'Choose vehicle';
+  String get childNameTitle => "Child's name";
+  String get childNameFieldLabel => 'Name';
+  String get childNameSetupTitle => 'Who is riding today?';
+  String get childNameSetupSubtitle => "Enter your child's name first.";
+  String get saveChildName => 'Save name';
 
   String durationSegmentLabel(int minutes) => '$minutes min';
 }

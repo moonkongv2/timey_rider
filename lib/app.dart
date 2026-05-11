@@ -3,6 +3,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 
 import 'l10n/app_texts.dart';
 import 'models/meal_timer_config.dart';
+import 'screens/child_name_setup_screen.dart';
 import 'screens/home_screen.dart';
 import 'screens/splash_screen.dart';
 import 'services/local_meal_progress_service.dart';
@@ -38,6 +39,12 @@ class _YamyamRiderAppState extends State<YamyamRiderApp> {
       return;
     }
     setState(() => _showSplash = false);
+  }
+
+  bool get _hasChildName => _config.childName.trim().isNotEmpty;
+
+  Future<void> _saveChildName(String name) {
+    return _saveConfig(_config.copyWith(childName: name.trim()));
   }
 
   @override
@@ -100,11 +107,13 @@ class _YamyamRiderAppState extends State<YamyamRiderApp> {
       ),
       home: _showSplash
           ? SplashScreen(onFinished: _finishSplash)
-          : HomeScreen(
+          : _hasChildName
+          ? HomeScreen(
               config: _config,
               mealProgressService: widget.mealProgressService,
               onConfigChanged: _saveConfig,
-            ),
+            )
+          : ChildNameSetupScreen(onNameSaved: _saveChildName),
     );
   }
 }
