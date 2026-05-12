@@ -66,9 +66,16 @@ abstract interface class TimerTextSet {
   String get completeDialogMessage;
   String get pauseButton;
   String get completeMealButton;
-  String get remainingTimeLabel;
+  String get runningArrivalLabel;
+  String get pausedTimeLabel;
+  String get arrivedTimeLabel;
+  String get idleTimeLabel;
+  String get pausedProgressMessage;
+  String get arrivedProgressMessage;
+  String get idleProgressMessage;
 
   String remainingTime(String remaining);
+  String remainingTimeSemanticLabel(String label, String remaining);
 }
 
 abstract interface class ResultTextSet {

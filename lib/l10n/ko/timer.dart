@@ -16,7 +16,16 @@ class TimerTexts implements TimerTextSet {
   String get completeDialogMessage => '오늘의 냠냠코스를 마무리할까?';
   String get pauseButton => '일시정지';
   String get completeMealButton => '식사 완료';
-  String get remainingTimeLabel => '도착까지';
+  String get runningArrivalLabel => '도착까지';
+  String get pausedTimeLabel => '잠깐 쉬는 중';
+  String get arrivedTimeLabel => '도착 완료';
+  String get idleTimeLabel => '준비 중';
+  String get pausedProgressMessage => '잠깐 쉬어가요';
+  String get arrivedProgressMessage => '도착했어요!';
+  String get idleProgressMessage => '출발 준비 중';
 
   String remainingTime(String remaining) => '남은 시간 $remaining';
+  String remainingTimeSemanticLabel(String label, String remaining) {
+    return '$label, 남은 시간 $remaining';
+  }
 }

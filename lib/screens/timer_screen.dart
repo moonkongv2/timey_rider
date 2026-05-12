@@ -52,6 +52,20 @@ class TimerScreen extends StatefulWidget {
   State<TimerScreen> createState() => _TimerScreenState();
 }
 
+class _TimerStatusCopy {
+  const _TimerStatusCopy({
+    required this.progressMessage,
+    required this.timeLabel,
+    required this.icon,
+    required this.iconBackgroundColor,
+  });
+
+  final String progressMessage;
+  final String timeLabel;
+  final IconData icon;
+  final Color iconBackgroundColor;
+}
+
 class _TimerScreenState extends State<TimerScreen> {
   late final MealTimerController _controller;
   final Set<int> _shownMotivationMilestones = {};
@@ -188,7 +202,7 @@ class _TimerScreenState extends State<TimerScreen> {
     );
   }
 
-  String _progressMessage(TimerTextSet texts, double progress) {
+  String _runningProgressMessage(TimerTextSet texts, double progress) {
     if (progress < 0.25) {
       return texts.progressJustStarted;
     }
@@ -204,6 +218,39 @@ class _TimerScreenState extends State<TimerScreen> {
     return texts.progressArrived;
   }
 
+  _TimerStatusCopy _timerStatusCopy(
+    TimerTextSet texts,
+    MealTimerState state,
+    double progress,
+  ) {
+    return switch (state) {
+      MealTimerState.running => _TimerStatusCopy(
+        progressMessage: _runningProgressMessage(texts, progress),
+        timeLabel: texts.runningArrivalLabel,
+        icon: Icons.directions_rounded,
+        iconBackgroundColor: AppColors.surfaceMint,
+      ),
+      MealTimerState.paused => _TimerStatusCopy(
+        progressMessage: texts.pausedProgressMessage,
+        timeLabel: texts.pausedTimeLabel,
+        icon: Icons.local_cafe_rounded,
+        iconBackgroundColor: AppColors.surfaceYellow,
+      ),
+      MealTimerState.arrived || MealTimerState.completed => _TimerStatusCopy(
+        progressMessage: texts.arrivedProgressMessage,
+        timeLabel: texts.arrivedTimeLabel,
+        icon: Icons.flag_rounded,
+        iconBackgroundColor: AppColors.primarySoft,
+      ),
+      MealTimerState.idle => _TimerStatusCopy(
+        progressMessage: texts.idleProgressMessage,
+        timeLabel: texts.idleTimeLabel,
+        icon: Icons.timer_rounded,
+        iconBackgroundColor: AppColors.surfaceWarm,
+      ),
+    };
+  }
+
   @override
   Widget build(BuildContext context) {
     final texts = AppTexts.of(context);
@@ -213,6 +260,11 @@ class _TimerScreenState extends State<TimerScreen> {
       builder: (context, _) {
         final vehicle = VehicleCatalog.findById(widget.config.motorcycleId);
         final progress = _controller.progress.clamp(0.0, 1.0).toDouble();
+        final statusCopy = _timerStatusCopy(
+          texts.timer,
+          _controller.state,
+          progress,
+        );
 
         return Scaffold(
           backgroundColor: AppColors.cream,
@@ -233,7 +285,7 @@ class _TimerScreenState extends State<TimerScreen> {
               child: Column(
                 children: [
                   _ProgressMessageCard(
-                    message: _progressMessage(texts.timer, progress),
+                    message: statusCopy.progressMessage,
                     progress: progress,
                   ),
                   const SizedBox(height: AppSpacing.lg),
@@ -248,7 +300,16 @@ class _TimerScreenState extends State<TimerScreen> {
                   ),
                   if (widget.config.showRemainingTime) ...[
                     const SizedBox(height: AppSpacing.lg),
-                    _RemainingTimeCard(remaining: _controller.remaining),
+                    _RemainingTimeCard(
+                      label: statusCopy.timeLabel,
+                      remaining: _controller.remaining,
+                      icon: statusCopy.icon,
+                      iconBackgroundColor: statusCopy.iconBackgroundColor,
+                      semanticLabel: texts.timer.remainingTimeSemanticLabel(
+                        statusCopy.timeLabel,
+                        formatDuration(_controller.remaining),
+                      ),
+                    ),
                   ],
                   const SizedBox(height: AppSpacing.lg),
                   TimerControlBar(
@@ -349,69 +410,86 @@ class _ProgressMessageCard extends StatelessWidget {
 }
 
 class _RemainingTimeCard extends StatelessWidget {
-  const _RemainingTimeCard({required this.remaining});
+  const _RemainingTimeCard({
+    required this.label,
+    required this.remaining,
+    required this.icon,
+    required this.iconBackgroundColor,
+    required this.semanticLabel,
+  });
 
+  final String label;
   final Duration remaining;
+  final IconData icon;
+  final Color iconBackgroundColor;
+  final String semanticLabel;
 
   @override
   Widget build(BuildContext context) {
-    final texts = AppTexts.of(context);
     final textTheme = Theme.of(context).textTheme;
+    final formattedRemaining = formatDuration(remaining);
 
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        color: AppColors.surfaceWarm,
-        borderRadius: AppRadius.card,
-        border: Border.all(color: AppColors.borderSoft),
-        boxShadow: AppShadows.surface,
-      ),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(
-          horizontal: AppSpacing.lg,
-          vertical: AppSpacing.md,
+    return Semantics(
+      label: semanticLabel,
+      container: true,
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          color: AppColors.surfaceWarm,
+          borderRadius: AppRadius.card,
+          border: Border.all(color: AppColors.borderSoft),
+          boxShadow: AppShadows.surface,
         ),
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(minHeight: 58),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              DecoratedBox(
-                decoration: BoxDecoration(
-                  color: AppColors.surfaceMint,
-                  borderRadius: AppRadius.pill,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppSpacing.lg,
+            vertical: AppSpacing.md,
+          ),
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(minHeight: 58),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                DecoratedBox(
+                  decoration: BoxDecoration(
+                    color: iconBackgroundColor,
+                    borderRadius: AppRadius.pill,
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(AppSpacing.sm),
+                    child: Icon(icon, color: AppColors.brown700),
+                  ),
                 ),
-                child: const Padding(
-                  padding: EdgeInsets.all(AppSpacing.sm),
-                  child: Icon(Icons.timer_rounded, color: AppColors.brown700),
-                ),
-              ),
-              const SizedBox(width: AppSpacing.md),
-              Flexible(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      texts.timer.remainingTimeLabel,
-                      style: textTheme.labelLarge?.copyWith(
-                        color: AppColors.textSecondary,
-                        fontWeight: FontWeight.w700,
-                        height: 1.1,
+                const SizedBox(width: AppSpacing.md),
+                Flexible(
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Flexible(
+                        child: Text(
+                          label,
+                          overflow: TextOverflow.ellipsis,
+                          style: textTheme.headlineSmall?.copyWith(
+                            color: AppColors.textStrong,
+                            fontWeight: FontWeight.w900,
+                            height: 1.04,
+                          ),
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: AppSpacing.xs),
-                    Text(
-                      formatDuration(remaining),
-                      style: textTheme.headlineSmall?.copyWith(
-                        color: AppColors.textStrong,
-                        fontWeight: FontWeight.w900,
-                        height: 1.04,
+                      const SizedBox(width: AppSpacing.sm),
+                      Text(
+                        formattedRemaining,
+                        style: textTheme.headlineSmall?.copyWith(
+                          color: AppColors.textStrong,
+                          fontWeight: FontWeight.w900,
+                          height: 1.04,
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),

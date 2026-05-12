@@ -67,6 +67,7 @@ void main() {
     await tester.pump();
 
     expect(find.textContaining('남은 시간'), findsNothing);
+    expect(find.text('도착까지'), findsNothing);
   });
 
   testWidgets('Home screen shows vehicle choices above courses', (
@@ -315,7 +316,30 @@ void main() {
 
     expect(find.text("Today's Yamyam Ride"), findsOneWidget);
     expect(find.text("We're off!"), findsOneWidget);
+    expect(find.text('Until arrival'), findsOneWidget);
     expect(find.text('출발했어요!'), findsNothing);
+  });
+
+  testWidgets('Paused timer shows paused status copy', (tester) async {
+    SharedPreferences.setMockInitialValues({});
+
+    await tester.pumpWidget(
+      MaterialApp(
+        locale: const Locale('en'),
+        home: TimerScreen(
+          config: MealTimerConfig.defaults(),
+          mealProgressService: LocalMealProgressService(),
+          onConfigChanged: (_) {},
+        ),
+      ),
+    );
+    await tester.pump();
+
+    await tester.tap(find.text('Pause'));
+    await tester.pump();
+
+    expect(find.text('Taking a little break'), findsOneWidget);
+    expect(find.text('Taking a break'), findsOneWidget);
   });
 
   testWidgets('Unsupported locale falls back to English', (tester) async {

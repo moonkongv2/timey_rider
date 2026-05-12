@@ -17,7 +17,16 @@ class EnTimerTexts implements TimerTextSet {
   String get completeDialogMessage => 'Finish this mealtime ride?';
   String get pauseButton => 'Pause';
   String get completeMealButton => 'Meal done';
-  String get remainingTimeLabel => 'Until arrival';
+  String get runningArrivalLabel => 'Until arrival';
+  String get pausedTimeLabel => 'Taking a break';
+  String get arrivedTimeLabel => 'Arrived';
+  String get idleTimeLabel => 'Getting ready';
+  String get pausedProgressMessage => 'Taking a little break';
+  String get arrivedProgressMessage => 'Arrived!';
+  String get idleProgressMessage => 'Getting ready';
 
   String remainingTime(String remaining) => 'Time left $remaining';
+  String remainingTimeSemanticLabel(String label, String remaining) {
+    return '$label, $remaining remaining';
+  }
 }
