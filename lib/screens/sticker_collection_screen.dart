@@ -4,6 +4,9 @@ import '../l10n/app_texts.dart';
 import '../models/meal_progress_snapshot.dart';
 import '../models/reward_item.dart';
 import '../services/local_meal_progress_service.dart';
+import '../theme/app_colors.dart';
+import '../theme/app_radius.dart';
+import '../theme/app_spacing.dart';
 import '../widgets/reward_sticker_image.dart';
 
 class StickerCollectionScreen extends StatelessWidget {
@@ -24,11 +27,16 @@ class StickerCollectionScreen extends StatelessWidget {
             final inventory = snapshot.data?.inventory ?? const [];
 
             return GridView.builder(
-              padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
+              padding: const EdgeInsets.fromLTRB(
+                AppSpacing.xl,
+                AppSpacing.md,
+                AppSpacing.xl,
+                AppSpacing.xxl,
+              ),
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 2,
-                mainAxisSpacing: 12,
-                crossAxisSpacing: 12,
+                mainAxisSpacing: AppSpacing.md,
+                crossAxisSpacing: AppSpacing.md,
                 childAspectRatio: 0.88,
               ),
               itemCount: RewardCatalog.all.length,
@@ -73,9 +81,9 @@ class _StickerCard extends StatelessWidget {
     final stickerName = texts.rewards.name(sticker.id);
 
     return Card(
-      color: _isCollected ? Colors.white : const Color(0xFFFFF8EF),
+      color: _isCollected ? AppColors.white : AppColors.cream,
       child: Padding(
-        padding: const EdgeInsets.all(14),
+        padding: const EdgeInsets.all(AppSpacing.lg),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -87,7 +95,7 @@ class _StickerCard extends StatelessWidget {
               size: 72,
               locked: !_isCollected,
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: AppSpacing.md),
             Text(
               _isCollected ? stickerName : texts.rewards.lockedSticker,
               textAlign: TextAlign.center,
@@ -96,22 +104,22 @@ class _StickerCard extends StatelessWidget {
               style: textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.w900,
                 color: _isCollected
-                    ? const Color(0xFF3D332B)
-                    : const Color(0xFF8D7B6A),
+                    ? AppColors.textStrong
+                    : AppColors.textSecondary,
               ),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: AppSpacing.sm),
             DecoratedBox(
               decoration: BoxDecoration(
                 color: _isCollected
-                    ? const Color(0xFFFFF1B8)
-                    : const Color(0xFFEDE3D8),
-                borderRadius: BorderRadius.circular(999),
+                    ? AppColors.surfaceYellow
+                    : AppColors.borderSoft,
+                borderRadius: AppRadius.pill,
               ),
               child: Padding(
                 padding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 6,
+                  horizontal: AppSpacing.md,
+                  vertical: AppSpacing.xs,
                 ),
                 child: Text(
                   _isCollected
@@ -119,7 +127,7 @@ class _StickerCard extends StatelessWidget {
                       : texts.rewards.lockedStatus,
                   style: textTheme.labelLarge?.copyWith(
                     fontWeight: FontWeight.w900,
-                    color: const Color(0xFF5B4636),
+                    color: AppColors.textPrimary,
                   ),
                 ),
               ),

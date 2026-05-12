@@ -66,6 +66,7 @@ abstract interface class TimerTextSet {
   String get completeDialogMessage;
   String get pauseButton;
   String get completeMealButton;
+  String get remainingTimeLabel;
 
   String remainingTime(String remaining);
 }

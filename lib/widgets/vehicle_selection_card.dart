@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 
 import '../catalogs/vehicle_catalog.dart';
@@ -27,13 +29,13 @@ class VehicleSelectionCard extends StatelessWidget {
 
     return DecoratedBox(
       decoration: BoxDecoration(
-        color: AppColors.white,
+        color: AppColors.surfaceWarm,
         borderRadius: AppRadius.card,
-        border: Border.all(color: AppColors.creamDark),
-        boxShadow: AppShadows.soft,
+        border: Border.all(color: AppColors.borderWarm),
+        boxShadow: AppShadows.surface,
       ),
       child: Padding(
-        padding: const EdgeInsets.all(AppSpacing.lg),
+        padding: const EdgeInsets.all(AppSpacing.md),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -43,17 +45,30 @@ class VehicleSelectionCard extends StatelessWidget {
                   child: Text(
                     title,
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      color: AppColors.brown900,
+                      color: AppColors.textStrong,
                       fontWeight: FontWeight.w800,
                     ),
                   ),
                 ),
                 if (subtitle != null)
-                  Text(
-                    subtitle!,
-                    style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                      color: AppColors.brown500,
-                      fontWeight: FontWeight.w700,
+                  DecoratedBox(
+                    decoration: BoxDecoration(
+                      color: AppColors.white.withValues(alpha: 0.68),
+                      borderRadius: AppRadius.pill,
+                      border: Border.all(color: AppColors.borderSoft),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: AppSpacing.sm,
+                        vertical: AppSpacing.xs,
+                      ),
+                      child: Text(
+                        subtitle!,
+                        style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                          color: AppColors.textSecondary,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
                     ),
                   ),
               ],
@@ -64,20 +79,39 @@ class VehicleSelectionCard extends StatelessWidget {
                 const spacing = AppSpacing.sm;
                 final fourAcrossWidth =
                     (constraints.maxWidth - (spacing * 3)) / 4;
-                final itemWidth = fourAcrossWidth.clamp(72.0, 84.0).toDouble();
+                final itemSize = fourAcrossWidth.clamp(72.0, 84.0).toDouble();
+                final contentWidth =
+                    (itemSize * VehicleCatalog.all.length) +
+                    (spacing * (VehicleCatalog.all.length - 1));
+                final rowWidth = math.max(constraints.maxWidth, contentWidth);
 
-                return Wrap(
-                  spacing: spacing,
-                  runSpacing: spacing,
-                  children: [
-                    for (final vehicle in VehicleCatalog.all)
-                      _VehicleChoiceButton(
-                        width: itemWidth,
-                        vehicle: vehicle,
-                        isSelected: selectedVehicle.id == vehicle.id,
-                        onTap: () => onVehicleSelected(vehicle.id),
-                      ),
-                  ],
+                return SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  clipBehavior: Clip.none,
+                  child: SizedBox(
+                    width: rowWidth,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        for (
+                          var index = 0;
+                          index < VehicleCatalog.all.length;
+                          index++
+                        ) ...[
+                          if (index > 0) const SizedBox(width: spacing),
+                          _VehicleChoiceButton(
+                            size: itemSize,
+                            vehicle: VehicleCatalog.all[index],
+                            isSelected:
+                                selectedVehicle.id ==
+                                VehicleCatalog.all[index].id,
+                            onTap: () =>
+                                onVehicleSelected(VehicleCatalog.all[index].id),
+                          ),
+                        ],
+                      ],
+                    ),
+                  ),
                 );
               },
             ),
@@ -90,28 +124,30 @@ class VehicleSelectionCard extends StatelessWidget {
 
 class _VehicleChoiceButton extends StatelessWidget {
   const _VehicleChoiceButton({
-    required this.width,
+    required this.size,
     required this.vehicle,
     required this.isSelected,
     required this.onTap,
   });
 
-  final double width;
+  final double size;
   final VehicleDefinition vehicle;
   final bool isSelected;
   final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
-    final borderColor = isSelected ? AppColors.skyBlue : AppColors.creamDark;
+    final borderColor = isSelected
+        ? AppColors.primarySoft
+        : AppColors.borderSoft;
     final backgroundColor = isSelected
-        ? AppColors.skyBlue.withValues(alpha: 0.52)
-        : AppColors.cream.withValues(alpha: 0.52);
-    final borderRadius = BorderRadius.circular(AppRadius.lg);
+        ? AppColors.surfaceYellow.withValues(alpha: 0.72)
+        : AppColors.white.withValues(alpha: 0.72);
+    final borderRadius = AppRadius.compactCard;
 
     return SizedBox(
-      width: width,
-      height: 80,
+      width: size,
+      height: size,
       child: Semantics(
         label: vehicle.labelForLanguage(
           Localizations.localeOf(context).languageCode,
@@ -132,8 +168,8 @@ class _VehicleChoiceButton extends StatelessWidget {
               children: [
                 Center(
                   child: SizedBox(
-                    width: 58,
-                    height: 58,
+                    width: size - 20,
+                    height: size - 24,
                     child: Image.asset(
                       vehicle.selectionImagePath,
                       fit: BoxFit.contain,
@@ -155,8 +191,9 @@ class _VehicleChoiceButton extends StatelessWidget {
                     top: 6,
                     child: DecoratedBox(
                       decoration: BoxDecoration(
-                        color: AppColors.brown900,
-                        borderRadius: BorderRadius.circular(999),
+                        color: AppColors.primary,
+                        borderRadius: AppRadius.pill,
+                        boxShadow: AppShadows.buttonSoft,
                       ),
                       child: const Padding(
                         padding: EdgeInsets.all(3),

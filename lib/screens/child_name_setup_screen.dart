@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 import '../l10n/app_texts.dart';
+import '../theme/app_colors.dart';
+import '../theme/app_spacing.dart';
 
 class ChildNameSetupScreen extends StatefulWidget {
   const ChildNameSetupScreen({super.key, required this.onNameSaved});
@@ -41,11 +43,11 @@ class _ChildNameSetupScreenState extends State<ChildNameSetupScreen> {
     return Scaffold(
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.all(24),
+          padding: const EdgeInsets.all(AppSpacing.xxl),
           child: Center(
             child: Card(
               child: Padding(
-                padding: const EdgeInsets.all(24),
+                padding: const EdgeInsets.all(AppSpacing.xxl),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -56,15 +58,15 @@ class _ChildNameSetupScreenState extends State<ChildNameSetupScreen> {
                         fontWeight: FontWeight.w900,
                       ),
                     ),
-                    const SizedBox(height: 8),
+                    const SizedBox(height: AppSpacing.sm),
                     Text(
                       texts.settings.childNameSetupSubtitle,
                       style: textTheme.bodyLarge?.copyWith(
-                        color: const Color(0xFF7A6250),
+                        color: AppColors.textSecondary,
                         fontWeight: FontWeight.w700,
                       ),
                     ),
-                    const SizedBox(height: 20),
+                    const SizedBox(height: AppSpacing.xl),
                     TextField(
                       controller: _controller,
                       autofocus: true,
@@ -77,7 +79,7 @@ class _ChildNameSetupScreenState extends State<ChildNameSetupScreen> {
                       onChanged: (_) => setState(() {}),
                       onSubmitted: (_) => _save(),
                     ),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: AppSpacing.lg),
                     FilledButton(
                       onPressed: _controller.text.trim().isEmpty || _isSaving
                           ? null

@@ -15,8 +15,8 @@ class AppChoiceCard extends StatelessWidget {
     this.subtitle,
     this.leading,
     this.semanticLabel,
-    this.backgroundColor = Colors.white,
-    this.selectedColor = AppColors.yellow,
+    this.backgroundColor = AppColors.white,
+    this.selectedColor = AppColors.primarySoft,
   });
 
   final String title;
@@ -31,7 +31,7 @@ class AppChoiceCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
-    final borderColor = selected ? AppColors.orangeDeep : AppColors.creamDark;
+    final borderColor = selected ? AppColors.primarySoft : AppColors.creamDark;
     final contentColor = selected ? AppColors.brown900 : AppColors.brown700;
 
     return Semantics(
@@ -45,10 +45,10 @@ class AppChoiceCard extends StatelessWidget {
           color: selected ? selectedColor : backgroundColor,
           borderRadius: AppRadius.card,
           border: Border.all(color: borderColor, width: selected ? 2 : 1),
-          boxShadow: selected ? AppShadows.button : AppShadows.soft,
+          boxShadow: selected ? AppShadows.buttonSoft : AppShadows.surface,
         ),
         child: Material(
-          color: Colors.transparent,
+          color: AppColors.transparent,
           borderRadius: AppRadius.card,
           clipBehavior: Clip.antiAlias,
           child: InkWell(
@@ -70,7 +70,7 @@ class AppChoiceCard extends StatelessWidget {
                           title,
                           style: textTheme.titleMedium?.copyWith(
                             color: contentColor,
-                            fontWeight: FontWeight.w900,
+                            fontWeight: FontWeight.w800,
                           ),
                         ),
                         if (subtitle != null) ...[

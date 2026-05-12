@@ -99,9 +99,9 @@ class _HomeScreenState extends State<HomeScreen> {
           cacheExtent: 1200,
           padding: const EdgeInsets.fromLTRB(
             AppSpacing.xl,
-            AppSpacing.xxxl,
+            AppSpacing.xxl,
             AppSpacing.xl,
-            AppSpacing.xxxl,
+            AppSpacing.xxl,
           ),
           children: [
             Row(
@@ -112,7 +112,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     children: [
                       Text(
                         texts.common.appTitle,
-                        style: textTheme.headlineLarge?.copyWith(
+                        style: textTheme.headlineMedium?.copyWith(
                           fontWeight: FontWeight.w900,
                           color: AppColors.brown900,
                         ),
@@ -120,7 +120,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       const SizedBox(height: AppSpacing.xs),
                       Text(
                         texts.home.subtitle,
-                        style: textTheme.titleMedium?.copyWith(
+                        style: textTheme.titleSmall?.copyWith(
                           color: AppColors.brown500,
                           fontWeight: FontWeight.w600,
                         ),
@@ -135,7 +135,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   style: IconButton.styleFrom(
                     backgroundColor: AppColors.white,
                     foregroundColor: AppColors.brown700,
-                    fixedSize: const Size(52, 52),
+                    fixedSize: const Size(48, 48),
                     shape: const CircleBorder(),
                     shadowColor: AppColors.brown700.withValues(alpha: 0.14),
                     elevation: 5,
@@ -143,7 +143,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ],
             ),
-            const SizedBox(height: AppSpacing.xxl),
+            const SizedBox(height: AppSpacing.xl),
             LayoutBuilder(
               builder: (context, constraints) {
                 final vehicleCard = VehicleSelectionCard(
@@ -188,14 +188,14 @@ class _HomeScreenState extends State<HomeScreen> {
                     label: texts.home.morningCourse,
                     emoji: '🌞',
                     subtitle: texts.home.morningCourseSubtitle,
-                    backgroundColor: AppColors.sky,
+                    backgroundColor: AppColors.surfaceYellow,
                     onPressed: () => _startTimer(15),
                   ),
                   _PresetMissionCard(
                     label: texts.home.normalCourse,
                     emoji: '🍚',
                     subtitle: texts.home.normalCourseSubtitle,
-                    backgroundColor: AppColors.skyBlue,
+                    backgroundColor: AppColors.primarySoft,
                     badge: texts.home.recommendedBadge,
                     onPressed: () => _startTimer(25),
                   ),
@@ -203,7 +203,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     label: texts.home.slowCourse,
                     emoji: '🌈',
                     subtitle: texts.home.slowCourseSubtitle,
-                    backgroundColor: AppColors.pink,
+                    backgroundColor: AppColors.surfacePink,
                     onPressed: () => _startTimer(35),
                   ),
                 ];
@@ -287,17 +287,18 @@ class _MinuteAdjustButton extends StatelessWidget {
     return OutlinedButton(
       onPressed: onPressed,
       style: OutlinedButton.styleFrom(
-        backgroundColor: AppColors.white.withValues(alpha: 0.72),
-        foregroundColor: AppColors.brown700,
-        side: const BorderSide(color: AppColors.creamDark, width: 1.4),
+        backgroundColor: AppColors.surfaceWarm,
+        foregroundColor: AppColors.textPrimary,
+        side: const BorderSide(color: AppColors.borderSoft, width: 1.1),
         shape: const StadiumBorder(),
-        minimumSize: const Size.fromHeight(44),
+        minimumSize: const Size.fromHeight(38),
+        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm),
       ),
       child: Text(
         label,
         style: Theme.of(
           context,
-        ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w900),
+        ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w800),
       ),
     );
   }
@@ -321,23 +322,28 @@ class _HeroMissionCard extends StatelessWidget {
 
     return DecoratedBox(
       decoration: BoxDecoration(
-        borderRadius: AppRadius.panel,
+        borderRadius: AppRadius.hero,
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [AppColors.sky, AppColors.skyBlue, AppColors.cream],
+          colors: [
+            AppColors.surfaceWarm,
+            AppColors.surfaceSoft,
+            AppColors.surfaceYellow.withValues(alpha: 0.88),
+            AppColors.primarySoft.withValues(alpha: 0.62),
+          ],
+          stops: const [0, 0.48, 0.78, 1],
         ),
-        boxShadow: [
-          ...AppShadows.soft,
-          BoxShadow(
-            color: AppColors.blue.withValues(alpha: 0.16),
-            blurRadius: 28,
-            offset: const Offset(0, 14),
-          ),
-        ],
+        border: Border.all(color: AppColors.white.withValues(alpha: 0.9)),
+        boxShadow: AppShadows.hero,
       ),
       child: Padding(
-        padding: const EdgeInsets.all(AppSpacing.xl),
+        padding: const EdgeInsets.fromLTRB(
+          AppSpacing.lg,
+          AppSpacing.lg,
+          AppSpacing.lg,
+          AppSpacing.xl,
+        ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -350,17 +356,18 @@ class _HeroMissionCard extends StatelessWidget {
                     children: [
                       Text(
                         texts.home.heroMissionTitle,
-                        style: textTheme.headlineSmall?.copyWith(
-                          color: AppColors.brown900,
-                          fontWeight: FontWeight.w900,
+                        style: textTheme.titleLarge?.copyWith(
+                          color: AppColors.textStrong,
+                          fontWeight: FontWeight.w800,
                         ),
                       ),
-                      const SizedBox(height: AppSpacing.sm),
+                      const SizedBox(height: AppSpacing.xs),
                       Text(
                         texts.home.heroMissionSubtitle,
-                        style: textTheme.bodyLarge?.copyWith(
-                          color: AppColors.brown700,
+                        style: textTheme.bodyMedium?.copyWith(
+                          color: AppColors.textPrimary,
                           fontWeight: FontWeight.w600,
+                          height: 1.38,
                         ),
                       ),
                     ],
@@ -369,14 +376,17 @@ class _HeroMissionCard extends StatelessWidget {
                 const SizedBox(width: AppSpacing.md),
                 DecoratedBox(
                   decoration: BoxDecoration(
-                    color: AppColors.white.withValues(alpha: 0.52),
-                    borderRadius: BorderRadius.circular(999),
+                    color: AppColors.white.withValues(alpha: 0.48),
+                    borderRadius: AppRadius.pill,
+                    border: Border.all(
+                      color: AppColors.white.withValues(alpha: 0.68),
+                    ),
                   ),
                   child: Padding(
-                    padding: const EdgeInsets.all(AppSpacing.sm),
+                    padding: const EdgeInsets.all(AppSpacing.xs),
                     child: SizedBox(
-                      width: 86,
-                      height: 86,
+                      width: 78,
+                      height: 78,
                       child: Image.asset(
                         vehicle.assetPath,
                         fit: BoxFit.contain,
@@ -395,14 +405,13 @@ class _HeroMissionCard extends StatelessWidget {
                 ),
               ],
             ),
-            const SizedBox(height: AppSpacing.xl),
+            const SizedBox(height: AppSpacing.lg),
             AppBouncyButton(
               label: ctaLabel,
-              icon: Icons.flag_rounded,
+              icon: Icons.play_arrow_rounded,
               onPressed: onStart,
-              backgroundColor: AppColors.blue,
-              foregroundColor: AppColors.brown900,
-              minHeight: 56,
+              variant: AppButtonVariant.primary,
+              size: AppButtonSize.large,
             ),
           ],
         ),
@@ -439,13 +448,13 @@ class _PresetMissionCard extends StatelessWidget {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [
-            backgroundColor,
-            backgroundColor.withValues(alpha: 0.72),
-            AppColors.white.withValues(alpha: 0.84),
+            backgroundColor.withValues(alpha: 0.48),
+            AppColors.surfaceWarm.withValues(alpha: 0.72),
+            AppColors.white.withValues(alpha: 0.92),
           ],
         ),
-        border: Border.all(color: AppColors.white.withValues(alpha: 0.76)),
-        boxShadow: AppShadows.soft,
+        border: Border.all(color: AppColors.borderWarm),
+        boxShadow: AppShadows.surface,
       ),
       child: Material(
         color: AppColors.transparent,
@@ -463,11 +472,11 @@ class _PresetMissionCard extends StatelessWidget {
                 DecoratedBox(
                   decoration: BoxDecoration(
                     color: AppColors.white.withValues(alpha: 0.64),
-                    borderRadius: BorderRadius.circular(AppRadius.lg),
+                    borderRadius: AppRadius.compactCard,
                   ),
                   child: SizedBox(
-                    width: 48,
-                    height: 48,
+                    width: 44,
+                    height: 44,
                     child: Center(
                       child: Text(
                         emoji,
@@ -490,7 +499,7 @@ class _PresetMissionCard extends StatelessWidget {
                           Text(
                             label,
                             style: textTheme.titleMedium?.copyWith(
-                              color: AppColors.brown900,
+                              color: AppColors.textStrong,
                               fontWeight: FontWeight.w800,
                             ),
                           ),
@@ -501,8 +510,9 @@ class _PresetMissionCard extends StatelessWidget {
                       Text(
                         subtitle,
                         style: textTheme.bodyMedium?.copyWith(
-                          color: AppColors.brown500,
+                          color: AppColors.textSecondary,
                           fontWeight: FontWeight.w600,
+                          height: 1.34,
                         ),
                       ),
                     ],
@@ -512,10 +522,13 @@ class _PresetMissionCard extends StatelessWidget {
                 DecoratedBox(
                   decoration: BoxDecoration(
                     color: AppColors.white.withValues(alpha: 0.72),
-                    borderRadius: BorderRadius.circular(999),
+                    borderRadius: AppRadius.pill,
+                    border: Border.all(
+                      color: AppColors.borderSoft.withValues(alpha: 0.68),
+                    ),
                   ),
                   child: const Padding(
-                    padding: EdgeInsets.all(AppSpacing.sm),
+                    padding: EdgeInsets.all(AppSpacing.xs),
                     child: Icon(
                       Icons.arrow_forward_rounded,
                       color: AppColors.brown700,
@@ -540,8 +553,9 @@ class _RecommendedBadge extends StatelessWidget {
   Widget build(BuildContext context) {
     return DecoratedBox(
       decoration: BoxDecoration(
-        color: AppColors.skyBlue,
-        borderRadius: BorderRadius.circular(999),
+        color: AppColors.primarySoft.withValues(alpha: 0.62),
+        borderRadius: AppRadius.pill,
+        border: Border.all(color: AppColors.white.withValues(alpha: 0.54)),
       ),
       child: Padding(
         padding: const EdgeInsets.symmetric(
@@ -552,7 +566,7 @@ class _RecommendedBadge extends StatelessWidget {
           label,
           style: Theme.of(context).textTheme.labelSmall?.copyWith(
             color: AppColors.brown700,
-            fontWeight: FontWeight.w900,
+            fontWeight: FontWeight.w800,
           ),
         ),
       ),
@@ -585,36 +599,37 @@ class _CustomMinutesCard extends StatelessWidget {
 
     return DecoratedBox(
       decoration: BoxDecoration(
-        color: AppColors.white,
+        color: AppColors.surfaceWarm,
         borderRadius: AppRadius.panel,
-        border: Border.all(color: AppColors.creamDark),
-        boxShadow: AppShadows.soft,
+        border: Border.all(color: AppColors.borderWarm),
+        boxShadow: AppShadows.surface,
       ),
       child: Padding(
-        padding: const EdgeInsets.all(AppSpacing.xl),
+        padding: const EdgeInsets.all(AppSpacing.lg),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
               title,
-              style: textTheme.titleLarge?.copyWith(
-                color: AppColors.brown900,
+              style: textTheme.titleMedium?.copyWith(
+                color: AppColors.textStrong,
                 fontWeight: FontWeight.w800,
+                height: 1.28,
               ),
             ),
             const SizedBox(height: AppSpacing.md),
             SliderTheme(
               data: SliderTheme.of(context).copyWith(
-                activeTrackColor: AppColors.blue,
-                inactiveTrackColor: AppColors.creamDark,
-                thumbColor: AppColors.skyBlue,
-                overlayColor: AppColors.blue.withValues(alpha: 0.18),
+                activeTrackColor: AppColors.primary,
+                inactiveTrackColor: AppColors.borderSoft,
+                thumbColor: AppColors.primarySoft,
+                overlayColor: AppColors.primary.withValues(alpha: 0.12),
                 valueIndicatorColor: AppColors.brown900,
                 valueIndicatorTextStyle: textTheme.labelMedium?.copyWith(
                   color: AppColors.white,
                   fontWeight: FontWeight.w900,
                 ),
-                trackHeight: 8,
+                trackHeight: 6,
               ),
               child: Slider(
                 value: minutes,
@@ -663,9 +678,8 @@ class _CustomMinutesCard extends StatelessWidget {
                 label: startLabel,
                 icon: Icons.flag_rounded,
                 onPressed: onStart,
-                backgroundColor: AppColors.blue,
-                foregroundColor: AppColors.brown900,
-                minHeight: 56,
+                variant: AppButtonVariant.soft,
+                size: AppButtonSize.medium,
               ),
             ),
           ],
@@ -708,8 +722,8 @@ class _ProgressSummary extends StatelessWidget {
       children: [
         Text(
           texts.home.progressTitle(childName),
-          style: textTheme.titleLarge?.copyWith(
-            color: AppColors.brown900,
+          style: textTheme.titleMedium?.copyWith(
+            color: AppColors.textStrong,
             fontWeight: FontWeight.w900,
           ),
         ),
@@ -721,7 +735,7 @@ class _ProgressSummary extends StatelessWidget {
                 icon: Icons.restaurant_rounded,
                 label: texts.home.mealSummaryLabel,
                 value: texts.home.mealCount(history.length),
-                backgroundColor: AppColors.mint,
+                backgroundColor: AppColors.surfaceMint,
               ),
             ),
             const SizedBox(width: AppSpacing.sm),
@@ -730,7 +744,7 @@ class _ProgressSummary extends StatelessWidget {
                 icon: Icons.auto_awesome_rounded,
                 label: texts.home.stickerKindSummaryLabel,
                 value: texts.home.stickerKindCount(stickerKindCount),
-                backgroundColor: AppColors.sky,
+                backgroundColor: AppColors.surfaceBlue,
               ),
             ),
             const SizedBox(width: AppSpacing.sm),
@@ -739,7 +753,7 @@ class _ProgressSummary extends StatelessWidget {
                 icon: Icons.stars_rounded,
                 label: texts.home.stickerSummaryLabel,
                 value: texts.home.stickerCount(stickerCount),
-                backgroundColor: AppColors.pink,
+                backgroundColor: AppColors.surfacePink,
               ),
             ),
           ],
@@ -747,11 +761,15 @@ class _ProgressSummary extends StatelessWidget {
         const SizedBox(height: AppSpacing.md),
         DecoratedBox(
           decoration: BoxDecoration(
-            color: AppColors.creamDark.withValues(alpha: 0.62),
+            color: AppColors.surfaceWarm,
             borderRadius: AppRadius.card,
+            border: Border.all(color: AppColors.borderWarm),
           ),
           child: Padding(
-            padding: const EdgeInsets.all(AppSpacing.lg),
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppSpacing.lg,
+              vertical: AppSpacing.md,
+            ),
             child: Text(
               recent == null
                   ? texts.home.noMealHistory
@@ -760,8 +778,9 @@ class _ProgressSummary extends StatelessWidget {
                       recent.completedBeforeArrival,
                     ),
               style: textTheme.bodyLarge?.copyWith(
-                color: AppColors.brown500,
-                fontWeight: FontWeight.w800,
+                color: AppColors.textSecondary,
+                fontWeight: FontWeight.w700,
+                height: 1.34,
               ),
             ),
           ),
@@ -790,9 +809,14 @@ class _StickerCollectionCta extends StatelessWidget {
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [AppColors.sky, AppColors.pink],
+          colors: [
+            AppColors.white,
+            AppColors.surfaceWarm,
+            AppColors.primarySoft.withValues(alpha: 0.36),
+          ],
         ),
-        boxShadow: AppShadows.soft,
+        border: Border.all(color: AppColors.borderWarm),
+        boxShadow: AppShadows.surface,
       ),
       child: Material(
         color: AppColors.transparent,
@@ -802,21 +826,21 @@ class _StickerCollectionCta extends StatelessWidget {
           onTap: onPressed,
           child: Padding(
             padding: const EdgeInsets.symmetric(
-              horizontal: AppSpacing.xl,
-              vertical: AppSpacing.lg,
+              horizontal: AppSpacing.lg,
+              vertical: AppSpacing.md,
             ),
             child: Row(
               children: [
                 DecoratedBox(
                   decoration: BoxDecoration(
-                    color: AppColors.white.withValues(alpha: 0.24),
-                    borderRadius: BorderRadius.circular(999),
+                    color: AppColors.primarySoft.withValues(alpha: 0.46),
+                    borderRadius: AppRadius.pill,
                   ),
                   child: const Padding(
                     padding: EdgeInsets.all(AppSpacing.sm),
                     child: Icon(
                       Icons.collections_bookmark_rounded,
-                      color: AppColors.brown700,
+                      color: AppColors.textPrimary,
                     ),
                   ),
                 ),
@@ -825,14 +849,14 @@ class _StickerCollectionCta extends StatelessWidget {
                   child: Text(
                     label,
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      color: AppColors.brown900,
+                      color: AppColors.textStrong,
                       fontWeight: FontWeight.w800,
                     ),
                   ),
                 ),
                 const Icon(
                   Icons.arrow_forward_rounded,
-                  color: AppColors.brown700,
+                  color: AppColors.textPrimary,
                 ),
               ],
             ),

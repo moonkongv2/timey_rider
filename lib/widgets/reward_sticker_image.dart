@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../models/reward_item.dart';
+import '../theme/app_colors.dart';
 
 class RewardStickerImage extends StatelessWidget {
   const RewardStickerImage({
@@ -35,7 +36,10 @@ class RewardStickerImage extends StatelessWidget {
     return Opacity(
       opacity: 0.34,
       child: ColorFiltered(
-        colorFilter: const ColorFilter.mode(Color(0xFF8D7B6A), BlendMode.srcIn),
+        colorFilter: const ColorFilter.mode(
+          AppColors.textSecondary,
+          BlendMode.srcIn,
+        ),
         child: image,
       ),
     );
@@ -62,7 +66,7 @@ class _FallbackStickerIcon extends StatelessWidget {
           locked ? '?' : reward.emoji,
           style: TextStyle(
             fontSize: size * 0.56,
-            color: locked ? const Color(0xFFB9A999) : null,
+            color: locked ? AppColors.textMuted : null,
           ),
         ),
       ),

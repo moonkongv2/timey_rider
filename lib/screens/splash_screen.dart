@@ -3,6 +3,8 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 
+import '../theme/app_colors.dart';
+
 class SplashScreen extends StatefulWidget {
   const SplashScreen({
     super.key,
@@ -10,8 +12,7 @@ class SplashScreen extends StatefulWidget {
     this.assetPath = splashAnimationAssetPath,
   });
 
-  static const splashAnimationAssetPath =
-      'assets/videos/splash_animation.json';
+  static const splashAnimationAssetPath = 'assets/videos/splash_animation.json';
 
   final VoidCallback onFinished;
   final String assetPath;
@@ -80,7 +81,7 @@ class _SplashScreenState extends State<SplashScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFFFF8EF),
+      backgroundColor: AppColors.cream,
       body: ClipRect(
         child: LayoutBuilder(
           builder: (context, constraints) {

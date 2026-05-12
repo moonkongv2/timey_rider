@@ -7,6 +7,9 @@ import '../models/meal_session_result.dart';
 import '../models/meal_timer_config.dart';
 import '../models/reward_item.dart';
 import '../services/local_meal_progress_service.dart';
+import '../theme/app_colors.dart';
+import '../theme/app_radius.dart';
+import '../theme/app_spacing.dart';
 import '../widgets/reward_sticker_image.dart';
 import 'timer_screen.dart';
 
@@ -125,7 +128,7 @@ class _ResultScreenState extends State<ResultScreen> {
     return Scaffold(
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.all(20),
+          padding: const EdgeInsets.all(AppSpacing.xl),
           child: LayoutBuilder(
             builder: (context, constraints) {
               return SingleChildScrollView(
@@ -138,7 +141,7 @@ class _ResultScreenState extends State<ResultScreen> {
                         const Spacer(),
                         Card(
                           child: Padding(
-                            padding: const EdgeInsets.all(24),
+                            padding: const EdgeInsets.all(AppSpacing.xxl),
                             child: Column(
                               children: [
                                 Text(
@@ -150,7 +153,7 @@ class _ResultScreenState extends State<ResultScreen> {
                                       ?.copyWith(fontWeight: FontWeight.w900),
                                 ),
                                 if (mealCompleted) ...[
-                                  const SizedBox(height: 18),
+                                  const SizedBox(height: AppSpacing.xl),
                                   FutureBuilder<RecordedMealSession>(
                                     future: _recordedSession,
                                     builder: (context, snapshot) {
@@ -159,16 +162,16 @@ class _ResultScreenState extends State<ResultScreen> {
                                       );
                                     },
                                   ),
-                                  const SizedBox(height: 18),
+                                  const SizedBox(height: AppSpacing.xl),
                                 ] else
-                                  const SizedBox(height: 16),
+                                  const SizedBox(height: AppSpacing.lg),
                                 Text(
                                   texts.result.primaryMessage(mealCompleted),
                                   textAlign: TextAlign.center,
                                   style: Theme.of(context).textTheme.titleMedium
                                       ?.copyWith(height: 1.4),
                                 ),
-                                const SizedBox(height: 8),
+                                const SizedBox(height: AppSpacing.sm),
                                 Text(
                                   texts.result.secondaryMessage(mealCompleted),
                                   textAlign: TextAlign.center,
@@ -185,7 +188,7 @@ class _ResultScreenState extends State<ResultScreen> {
                           icon: const Icon(Icons.two_wheeler_rounded),
                           label: Text(texts.common.restartRide),
                         ),
-                        const SizedBox(height: 12),
+                        const SizedBox(height: AppSpacing.md),
                         OutlinedButton.icon(
                           onPressed: () => _goHome(context),
                           icon: const Icon(Icons.home_rounded),
@@ -226,7 +229,7 @@ class _ResultIntroScreen extends StatelessWidget {
                 errorBuilder: (_, _, _) => const SizedBox.shrink(),
               )
             : !controller.value.isInitialized
-            ? const ColoredBox(color: Color(0xFFFFF8EC))
+            ? const ColoredBox(color: AppColors.surfaceSoft)
             : FittedBox(
                 fit: BoxFit.cover,
                 child: SizedBox(
@@ -252,11 +255,14 @@ class _RewardResultBox extends StatelessWidget {
 
     return DecoratedBox(
       decoration: BoxDecoration(
-        color: const Color(0xFFFFF1B8),
-        borderRadius: BorderRadius.circular(22),
+        color: AppColors.surfaceYellow,
+        borderRadius: AppRadius.card,
       ),
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.xl,
+          vertical: AppSpacing.lg,
+        ),
         child: rewards == null
             ? Text(
                 texts.result.rewardLoading,
@@ -276,8 +282,8 @@ class _RewardResultBox extends StatelessWidget {
             : Wrap(
                 alignment: WrapAlignment.center,
                 runAlignment: WrapAlignment.center,
-                spacing: 14,
-                runSpacing: 14,
+                spacing: AppSpacing.lg,
+                runSpacing: AppSpacing.lg,
                 children: [
                   for (final reward in rewards) _RewardBadge(reward: reward),
                 ],
@@ -307,7 +313,7 @@ class _RewardBadge extends StatelessWidget {
             semanticLabel: rewardName,
             size: 64,
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: AppSpacing.sm),
           Text(
             rewardName,
             textAlign: TextAlign.center,
@@ -315,7 +321,7 @@ class _RewardBadge extends StatelessWidget {
             overflow: TextOverflow.ellipsis,
             style: Theme.of(context).textTheme.labelLarge?.copyWith(
               fontWeight: FontWeight.w900,
-              color: const Color(0xFF5B4636),
+              color: AppColors.textPrimary,
             ),
           ),
         ],

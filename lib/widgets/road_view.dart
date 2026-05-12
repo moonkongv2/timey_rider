@@ -27,7 +27,7 @@ class RoadView extends StatelessWidget {
   final String? motivationVideoAssetPath;
   final int? motivationVideoMilestone;
   final VoidCallback? onMotivationVideoFinished;
-  static const double _vehicleSize = 116;
+  static const double _vehicleSize = 138;
 
   @override
   Widget build(BuildContext context) {
@@ -37,7 +37,7 @@ class RoadView extends StatelessWidget {
       builder: (context, constraints) {
         final size = Size(constraints.maxWidth, constraints.maxHeight);
         final vehicleSize = math
-            .min(_vehicleSize, math.min(size.width * 0.26, size.height * 0.17))
+            .min(_vehicleSize, math.min(size.width * 0.30, size.height * 0.20))
             .toDouble();
         final clampedProgress = progress.clamp(0.0, 1.0).toDouble();
         final vehiclePosition = roadPointForProgress(size, clampedProgress);
@@ -55,27 +55,26 @@ class RoadView extends StatelessWidget {
 
         return DecoratedBox(
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(34),
-            gradient: const LinearGradient(
+            borderRadius: AppRadius.hero,
+            gradient: LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
-              colors: [AppColors.sky, AppColors.cream, AppColors.pink],
+              colors: [
+                AppColors.surfaceWarm,
+                AppColors.surfaceBlue.withValues(alpha: 0.44),
+                AppColors.surfacePink.withValues(alpha: 0.34),
+                AppColors.cream,
+              ],
+              stops: const [0, 0.48, 0.78, 1],
             ),
             border: Border.all(
-              color: AppColors.white.withValues(alpha: 0.78),
-              width: 1.5,
+              color: AppColors.white.withValues(alpha: 0.72),
+              width: 1.2,
             ),
-            boxShadow: [
-              ...AppShadows.soft,
-              BoxShadow(
-                color: AppColors.blue.withValues(alpha: 0.10),
-                blurRadius: 30,
-                offset: const Offset(0, 16),
-              ),
-            ],
+            boxShadow: AppShadows.hero,
           ),
           child: ClipRRect(
-            borderRadius: BorderRadius.circular(34),
+            borderRadius: AppRadius.hero,
             child: Stack(
               children: [
                 const Positioned.fill(child: _RoadScenery()),
@@ -101,7 +100,7 @@ class RoadView extends StatelessWidget {
                   top: vehicleTop,
                   child: AnimatedOpacity(
                     duration: const Duration(milliseconds: 850),
-                    opacity: 1,
+                    opacity: progress >= 1 ? 0.78 : 1,
                     child: AnimatedScale(
                       duration: const Duration(milliseconds: 850),
                       curve: Curves.easeInOutCubic,
@@ -152,14 +151,16 @@ class _RoadMarker extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final markerColor = isActive ? AppColors.blue : AppColors.white;
-    final iconColor = AppColors.brown700;
+    final markerColor = isActive
+        ? AppColors.surfaceYellow.withValues(alpha: 0.92)
+        : AppColors.white.withValues(alpha: 0.82);
+    final iconColor = isActive ? AppColors.textStrong : AppColors.textPrimary;
 
     return Positioned(
-      left: position.dx - 20,
-      top: position.dy - 20,
-      width: 40,
-      height: 40,
+      left: position.dx - 18,
+      top: position.dy - 18,
+      width: 36,
+      height: 36,
       child: AnimatedScale(
         duration: const Duration(milliseconds: 420),
         curve: Curves.easeOutBack,
@@ -171,20 +172,14 @@ class _RoadMarker extends StatelessWidget {
             color: markerColor,
             shape: BoxShape.circle,
             border: Border.all(
-              color: isActive ? AppColors.blue : AppColors.creamDark,
-              width: 2,
+              color: isActive ? AppColors.primarySoft : AppColors.borderSoft,
+              width: 1.4,
             ),
-            boxShadow: [
-              BoxShadow(
-                color: AppColors.brown700.withValues(alpha: 0.14),
-                blurRadius: 14,
-                offset: const Offset(0, 7),
-              ),
-            ],
+            boxShadow: AppShadows.surface,
           ),
           child: Semantics(
             label: label ?? 'milestone',
-            child: Icon(icon, color: iconColor, size: 23),
+            child: Icon(icon, color: iconColor, size: 20),
           ),
         ),
       ),
@@ -219,18 +214,19 @@ class _SceneryEmoji extends StatelessWidget {
     return Align(
       alignment: alignment,
       child: Opacity(
-        opacity: 0.72,
+        opacity: 0.46,
         child: DecoratedBox(
           decoration: BoxDecoration(
-            color: AppColors.white.withValues(alpha: 0.46),
-            borderRadius: BorderRadius.circular(999),
+            color: AppColors.white.withValues(alpha: 0.34),
+            borderRadius: AppRadius.pill,
+            border: Border.all(color: AppColors.white.withValues(alpha: 0.36)),
           ),
           child: Padding(
-            padding: const EdgeInsets.all(AppSpacing.sm),
+            padding: const EdgeInsets.all(AppSpacing.xs),
             child: Text(
               emoji,
               textScaler: TextScaler.noScaling,
-              style: const TextStyle(fontSize: 22, height: 1),
+              style: const TextStyle(fontSize: 19, height: 1),
             ),
           ),
         ),
@@ -317,18 +313,13 @@ class _MotivationVideoBubbleState extends State<_MotivationVideoBubble> {
       decoration: BoxDecoration(
         color: AppColors.white,
         borderRadius: AppRadius.card,
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.brown700.withValues(alpha: 0.18),
-            blurRadius: 22,
-            offset: const Offset(0, 10),
-          ),
-        ],
+        border: Border.all(color: AppColors.white.withValues(alpha: 0.72)),
+        boxShadow: AppShadows.hero,
       ),
       child: Padding(
         padding: const EdgeInsets.all(AppSpacing.sm),
         child: ClipRRect(
-          borderRadius: BorderRadius.circular(AppRadius.lg),
+          borderRadius: AppRadius.compactCard,
           child: FittedBox(
             fit: BoxFit.cover,
             child: SizedBox(

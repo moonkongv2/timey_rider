@@ -11,7 +11,7 @@ class AppCard extends StatelessWidget {
     required this.child,
     this.padding = const EdgeInsets.all(AppSpacing.xl),
     this.margin = EdgeInsets.zero,
-    this.backgroundColor = Colors.white,
+    this.backgroundColor = AppColors.white,
     this.borderColor,
     this.onTap,
   });
@@ -34,10 +34,10 @@ class AppCard extends StatelessWidget {
           color: backgroundColor,
           borderRadius: borderRadius,
           border: Border.all(color: borderColor ?? AppColors.creamDark),
-          boxShadow: AppShadows.soft,
+          boxShadow: AppShadows.surface,
         ),
         child: Material(
-          color: Colors.transparent,
+          color: AppColors.transparent,
           borderRadius: borderRadius,
           clipBehavior: Clip.antiAlias,
           child: InkWell(

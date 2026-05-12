@@ -226,7 +226,7 @@ class _TimerScreenState extends State<TimerScreen> {
             child: Padding(
               padding: const EdgeInsets.fromLTRB(
                 AppSpacing.xl,
-                AppSpacing.sm,
+                AppSpacing.xs,
                 AppSpacing.xl,
                 AppSpacing.xl,
               ),
@@ -284,30 +284,32 @@ class _ProgressMessageCard extends StatelessWidget {
 
     return DecoratedBox(
       decoration: BoxDecoration(
-        color: AppColors.white,
-        borderRadius: AppRadius.panel,
-        border: Border.all(color: AppColors.creamDark),
-        boxShadow: AppShadows.soft,
+        color: AppColors.surfaceWarm,
+        borderRadius: AppRadius.card,
+        border: Border.all(color: AppColors.borderWarm),
+        boxShadow: AppShadows.surface,
       ),
       child: Padding(
-        padding: const EdgeInsets.all(AppSpacing.lg),
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.md,
+          vertical: AppSpacing.sm,
+        ),
         child: Row(
           children: [
             DecoratedBox(
               decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  colors: [AppColors.sky, AppColors.skyBlue],
-                ),
-                borderRadius: BorderRadius.circular(999),
+                color: AppColors.surfaceYellow.withValues(alpha: 0.78),
+                borderRadius: AppRadius.pill,
+                border: Border.all(color: AppColors.white),
               ),
               child: const SizedBox(
-                width: 46,
-                height: 46,
+                width: 36,
+                height: 36,
                 child: Center(
                   child: Text(
                     '🏁',
                     textScaler: TextScaler.noScaling,
-                    style: TextStyle(fontSize: 24, height: 1),
+                    style: TextStyle(fontSize: 20, height: 1),
                   ),
                 ),
               ),
@@ -319,20 +321,20 @@ class _ProgressMessageCard extends StatelessWidget {
                 children: [
                   Text(
                     message,
-                    style: textTheme.titleLarge?.copyWith(
+                    style: textTheme.titleMedium?.copyWith(
                       color: AppColors.brown900,
-                      fontWeight: FontWeight.w900,
+                      fontWeight: FontWeight.w800,
                     ),
                   ),
-                  const SizedBox(height: AppSpacing.sm),
+                  const SizedBox(height: AppSpacing.xs),
                   ClipRRect(
-                    borderRadius: BorderRadius.circular(999),
+                    borderRadius: AppRadius.pill,
                     child: LinearProgressIndicator(
                       value: progress,
-                      minHeight: 9,
-                      backgroundColor: AppColors.creamDark,
+                      minHeight: 6,
+                      backgroundColor: AppColors.borderSoft,
                       valueColor: const AlwaysStoppedAnimation<Color>(
-                        AppColors.blue,
+                        AppColors.primary,
                       ),
                     ),
                   ),
@@ -358,41 +360,59 @@ class _RemainingTimeCard extends StatelessWidget {
 
     return DecoratedBox(
       decoration: BoxDecoration(
-        color: AppColors.white,
-        borderRadius: AppRadius.panel,
-        border: Border.all(color: AppColors.creamDark),
-        boxShadow: AppShadows.soft,
+        color: AppColors.surfaceWarm,
+        borderRadius: AppRadius.card,
+        border: Border.all(color: AppColors.borderSoft),
+        boxShadow: AppShadows.surface,
       ),
       child: Padding(
         padding: const EdgeInsets.symmetric(
-          horizontal: AppSpacing.xl,
-          vertical: AppSpacing.lg,
+          horizontal: AppSpacing.lg,
+          vertical: AppSpacing.md,
         ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            DecoratedBox(
-              decoration: BoxDecoration(
-                color: AppColors.mint,
-                borderRadius: BorderRadius.circular(999),
-              ),
-              child: const Padding(
-                padding: EdgeInsets.all(AppSpacing.sm),
-                child: Icon(Icons.timer_rounded, color: AppColors.brown700),
-              ),
-            ),
-            const SizedBox(width: AppSpacing.md),
-            Flexible(
-              child: Text(
-                texts.timer.remainingTime(formatDuration(remaining)),
-                textAlign: TextAlign.center,
-                style: textTheme.headlineSmall?.copyWith(
-                  color: AppColors.brown900,
-                  fontWeight: FontWeight.w900,
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(minHeight: 58),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              DecoratedBox(
+                decoration: BoxDecoration(
+                  color: AppColors.surfaceMint,
+                  borderRadius: AppRadius.pill,
+                ),
+                child: const Padding(
+                  padding: EdgeInsets.all(AppSpacing.sm),
+                  child: Icon(Icons.timer_rounded, color: AppColors.brown700),
                 ),
               ),
-            ),
-          ],
+              const SizedBox(width: AppSpacing.md),
+              Flexible(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      texts.timer.remainingTimeLabel,
+                      style: textTheme.labelLarge?.copyWith(
+                        color: AppColors.textSecondary,
+                        fontWeight: FontWeight.w700,
+                        height: 1.1,
+                      ),
+                    ),
+                    const SizedBox(height: AppSpacing.xs),
+                    Text(
+                      formatDuration(remaining),
+                      style: textTheme.headlineSmall?.copyWith(
+                        color: AppColors.textStrong,
+                        fontWeight: FontWeight.w900,
+                        height: 1.04,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

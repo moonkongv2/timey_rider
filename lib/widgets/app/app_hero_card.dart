@@ -13,7 +13,7 @@ class AppHeroCard extends StatelessWidget {
     this.leading,
     this.trailing,
     this.action,
-    this.backgroundColor = AppColors.yellow,
+    this.backgroundColor = AppColors.surfaceYellow,
   });
 
   final String title;
@@ -31,7 +31,7 @@ class AppHeroCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: backgroundColor,
         borderRadius: AppRadius.panel,
-        boxShadow: AppShadows.soft,
+        boxShadow: AppShadows.hero,
       ),
       child: Padding(
         padding: const EdgeInsets.all(AppSpacing.xxl),

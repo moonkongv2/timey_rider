@@ -4,6 +4,9 @@ import 'package:flutter/material.dart';
 
 import '../models/vehicle.dart';
 import '../theme/app_colors.dart';
+import '../theme/app_radius.dart';
+import '../theme/app_shadows.dart';
+import '../theme/app_spacing.dart';
 
 class VehicleWidget extends StatefulWidget {
   const VehicleWidget({
@@ -108,14 +111,9 @@ class _VehicleWidgetState extends State<VehicleWidget>
                     height: widget.size,
                     fit: BoxFit.contain,
                     errorBuilder: (context, error, stackTrace) {
-                      return Transform.flip(
-                        flipX: true,
-                        child: Text(
-                          widget.vehicle.emoji,
-                          textScaler: TextScaler.noScaling,
-                          semanticsLabel: widget.vehicle.labelKo,
-                          style: TextStyle(fontSize: widget.size * 0.58),
-                        ),
+                      return _VehicleFallback(
+                        vehicle: widget.vehicle,
+                        size: widget.size,
                       );
                     },
                   ),
@@ -125,6 +123,41 @@ class _VehicleWidgetState extends State<VehicleWidget>
           ),
         );
       },
+    );
+  }
+}
+
+class _VehicleFallback extends StatelessWidget {
+  const _VehicleFallback({required this.vehicle, required this.size});
+
+  final VehicleDefinition vehicle;
+  final double size;
+
+  @override
+  Widget build(BuildContext context) {
+    // Phase 3: normalize source vehicle asset canvas and visual scale.
+    final padding = (size * 0.08)
+        .clamp(AppSpacing.xs, AppSpacing.md)
+        .toDouble();
+
+    return Center(
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          color: AppColors.white.withValues(alpha: 0.78),
+          borderRadius: AppRadius.pill,
+          border: Border.all(color: AppColors.borderSoft),
+          boxShadow: AppShadows.surface,
+        ),
+        child: Padding(
+          padding: EdgeInsets.all(padding),
+          child: Text(
+            vehicle.emoji,
+            textScaler: TextScaler.noScaling,
+            semanticsLabel: vehicle.labelKo,
+            style: TextStyle(fontSize: size * 0.48, height: 1),
+          ),
+        ),
+      ),
     );
   }
 }

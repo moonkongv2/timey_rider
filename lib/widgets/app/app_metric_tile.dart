@@ -12,7 +12,7 @@ class AppMetricTile extends StatelessWidget {
     required this.label,
     this.icon,
     this.backgroundColor = AppColors.mint,
-    this.iconColor = AppColors.orangeDeep,
+    this.iconColor = AppColors.primary,
   });
 
   final String value;
@@ -29,21 +29,34 @@ class AppMetricTile extends StatelessWidget {
       decoration: BoxDecoration(
         color: backgroundColor,
         borderRadius: AppRadius.card,
-        boxShadow: AppShadows.soft,
+        border: Border.all(color: AppColors.white.withValues(alpha: 0.54)),
+        boxShadow: AppShadows.surface,
       ),
       child: Padding(
-        padding: const EdgeInsets.all(AppSpacing.lg),
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.md,
+          vertical: AppSpacing.sm,
+        ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
           children: [
             if (icon != null) ...[
-              Icon(icon, color: iconColor, size: 28),
-              const SizedBox(height: AppSpacing.md),
+              DecoratedBox(
+                decoration: BoxDecoration(
+                  color: AppColors.white.withValues(alpha: 0.58),
+                  borderRadius: AppRadius.pill,
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(AppSpacing.xs),
+                  child: Icon(icon, color: iconColor, size: 20),
+                ),
+              ),
+              const SizedBox(height: AppSpacing.sm),
             ],
             Text(
               value,
-              style: textTheme.headlineSmall?.copyWith(
+              style: textTheme.titleLarge?.copyWith(
                 color: AppColors.brown900,
                 fontWeight: FontWeight.w900,
               ),
@@ -51,9 +64,10 @@ class AppMetricTile extends StatelessWidget {
             const SizedBox(height: AppSpacing.xs),
             Text(
               label,
-              style: textTheme.bodyMedium?.copyWith(
-                color: AppColors.brown500,
-                fontWeight: FontWeight.w800,
+              style: textTheme.bodySmall?.copyWith(
+                color: AppColors.textSecondary,
+                fontWeight: FontWeight.w600,
+                height: 1.28,
               ),
             ),
           ],

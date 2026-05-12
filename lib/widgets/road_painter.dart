@@ -87,44 +87,44 @@ class RoadPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final roadPath = createRoadPath(size);
-    final roadWidth = (size.shortestSide * 0.075).clamp(28.0, 40.0).toDouble();
+    final roadWidth = (size.shortestSide * 0.058).clamp(22.0, 32.0).toDouble();
     final roadMetric = roadPath.computeMetrics().first;
     final progressDistance =
         roadMetric.length * progress.clamp(0.0, 1.0).toDouble();
     final progressPath = roadMetric.extractPath(0, progressDistance);
 
     final softShadowPaint = Paint()
-      ..color = AppColors.brown700.withValues(alpha: 0.10)
+      ..color = AppColors.brown700.withValues(alpha: 0.055)
       ..style = PaintingStyle.stroke
       ..strokeCap = StrokeCap.round
       ..strokeJoin = StrokeJoin.round
-      ..strokeWidth = roadWidth + 14
-      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 8);
+      ..strokeWidth = roadWidth + 8
+      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 6);
     final rimPaint = Paint()
-      ..color = AppColors.white.withValues(alpha: 0.72)
+      ..color = AppColors.white.withValues(alpha: 0.58)
       ..style = PaintingStyle.stroke
       ..strokeCap = StrokeCap.round
       ..strokeJoin = StrokeJoin.round
-      ..strokeWidth = roadWidth + 8;
+      ..strokeWidth = roadWidth + 5;
     final roadPaint = Paint()
-      ..color = AppColors.mint
+      ..color = AppColors.surfaceMint.withValues(alpha: 0.78)
       ..style = PaintingStyle.stroke
       ..strokeCap = StrokeCap.round
       ..strokeJoin = StrokeJoin.round
       ..strokeWidth = roadWidth;
     final progressPaint = Paint()
-      ..color = AppColors.skyBlue
+      ..color = AppColors.primarySoft.withValues(alpha: 0.74)
       ..style = PaintingStyle.stroke
       ..strokeCap = StrokeCap.round
       ..strokeJoin = StrokeJoin.round
       ..strokeWidth = roadWidth;
     final progressGlowPaint = Paint()
-      ..color = AppColors.blue.withValues(alpha: 0.20)
+      ..color = AppColors.primary.withValues(alpha: 0.07)
       ..style = PaintingStyle.stroke
       ..strokeCap = StrokeCap.round
       ..strokeJoin = StrokeJoin.round
-      ..strokeWidth = roadWidth + 10
-      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 6);
+      ..strokeWidth = roadWidth + 6
+      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 4);
 
     canvas.drawPath(roadPath.shift(const Offset(0, 10)), softShadowPaint);
     canvas.drawPath(roadPath, rimPaint);
@@ -135,17 +135,17 @@ class RoadPainter extends CustomPainter {
     }
 
     final lanePaint = Paint()
-      ..color = AppColors.white.withValues(alpha: 0.88)
+      ..color = AppColors.white.withValues(alpha: 0.52)
       ..style = PaintingStyle.stroke
       ..strokeCap = StrokeCap.round
-      ..strokeWidth = 3.2;
+      ..strokeWidth = 2.1;
 
     _drawDashedPath(canvas, roadPath, lanePaint);
   }
 
   void _drawDashedPath(Canvas canvas, Path path, Paint paint) {
-    const dashWidth = 13.0;
-    const gap = 16.0;
+    const dashWidth = 9.0;
+    const gap = 22.0;
 
     for (final metric in path.computeMetrics()) {
       var distance = 18.0;
