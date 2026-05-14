@@ -1,65 +1,107 @@
 # Yamyam Rider
 
-Yamyam Rider is a playful Flutter meal-timer app that turns eating into a small ride. Pick a meal course, watch the rider move along the road, pause when needed, and finish the session with a friendly reward screen.
+Yamyam Rider is a warm, kid-friendly Flutter meal timer that turns eating into a small ride. Children choose a vehicle and a meal course, then follow the rider along a playful road until the meal mission is complete.
 
-The app is designed around a simple idea: make mealtime pacing feel less like staring at a countdown and more like following a tiny journey.
+The app is built around a simple goal: make mealtime pacing feel like a cozy journey instead of a plain countdown.
 
 ## Highlights
 
+- First-run child name setup
 - Preset meal courses for 15, 25, and 35 minutes
-- Custom meal duration from 5 to 60 minutes
-- Animated rider progress on a curved road
+- Custom meal duration from 1 to 60 minutes
+- Compact vehicle selection with multiple rider vehicles
+- Animated road progress based on timer progress
+- State-aware timer copy for running, paused, arrived, and idle states
 - Pause, resume, and complete controls during a meal session
 - Optional remaining-time display
+- Motivation video overlay during timer milestones
+- Completion result screen with video or image fallback
+- Local meal history, progress summary, and reward sticker inventory
+- Sticker collection screen
+- Korean and English localization
 - Local settings persistence with `shared_preferences`
-- Completion result screen with encouraging feedback and reward stickers
-- Custom launcher icon and bundled rider artwork
+- Phase 2 polished UI system with shared colors, radius, shadows, spacing, and bouncy button variants
 
 ## App Flow
 
-1. Choose a preset course or set a custom meal duration.
-2. Start the ride and follow the rider's progress along the road.
-3. Pause or resume the session whenever needed.
-4. Complete the meal to see whether you finished before the rider arrived.
-5. Restart the same course or return home for another ride.
+1. Launch the app and enter the child's name on first run.
+2. Pick a vehicle on the home screen.
+3. Start a preset course or configure a custom duration.
+4. Watch the selected vehicle move along the road as the timer progresses.
+5. Pause or resume the ride when needed.
+6. Finish the meal from the timer controls or respond to the arrival prompt.
+7. Review the result and earned stickers.
+8. Return home or open the sticker collection.
 
 ## Tech Stack
 
 - Flutter
 - Dart
 - Material 3
-- `shared_preferences` for local configuration
-- `flutter_launcher_icons` for app icon generation
+- Custom local text bundles for Korean and English
+- `shared_preferences` for local settings and progress persistence
+- `video_player` for motivation and result videos
+- `lottie` for splash animation
+- `flutter_launcher_icons` for launcher icon generation
+- Cal Sans bundled font
 
 ## Project Structure
 
 ```text
 lib/
-  app.dart                         # App theme and root configuration
-  main.dart                        # App bootstrap and settings loading
+  app.dart                         # App root, theme, localization, initial routing
+  main.dart                        # App bootstrap and local service initialization
+  catalogs/
+    vehicle_catalog.dart           # Available vehicles and image assets
   controllers/
     meal_timer_controller.dart     # Timer state, progress, pause/resume logic
+  l10n/
+    app_texts.dart                 # Locale selection and text bundle wiring
+    text_sets.dart                 # Text interfaces
+    en/, ko/                       # English and Korean copy
   models/
+    meal_timer_config.dart         # User timer settings
     meal_session_result.dart       # Completed session result data
-    meal_timer_config.dart         # Meal timer preferences
+    meal_progress_snapshot.dart    # Meal progress snapshot
+    meal_history_entry.dart        # Stored meal history entry
+    reward_item.dart               # Reward and sticker models
+    vehicle.dart                   # Vehicle definition
   screens/
-    home_screen.dart               # Course selection and custom duration
+    splash_screen.dart             # Splash animation
+    child_name_setup_screen.dart   # First-run child name setup
+    home_screen.dart               # Course selection, vehicle picker, progress summary
     timer_screen.dart              # Active meal ride experience
-    result_screen.dart             # Completion feedback
+    result_screen.dart             # Completion feedback and rewards
     settings_screen.dart           # Timer and display settings
+    sticker_collection_screen.dart # Sticker inventory
   services/
-    local_settings_service.dart    # SharedPreferences wrapper
+    local_settings_service.dart    # SharedPreferences wrapper for settings
+    local_meal_progress_service.dart # Local history and reward persistence
+  theme/
+    app_colors.dart                # Role-based color tokens
+    app_radius.dart                # Radius tokens
+    app_shadows.dart               # Shadow elevation tokens
+    app_spacing.dart               # Spacing tokens
+    app_motion.dart                # Motion tokens
+    app_theme.dart                 # Material theme
   utils/
     duration_format.dart           # Duration display helper
   widgets/
-    road_view.dart                 # Rider placement along the road path
-    road_painter.dart              # Curved road drawing
-    motorcycle_widget.dart         # Animated rider asset
-    meal_message_card.dart         # Progress message surface
+    app/                           # Reusable UI primitives
+    road_view.dart                 # Road scene, vehicle placement, video bubble
+    road_painter.dart              # Road path drawing and progress highlight
     timer_control_bar.dart         # Pause/resume and complete controls
+    vehicle_selection_card.dart    # Compact home vehicle picker
+    vehicle_widget.dart            # Animated vehicle renderer
+    reward_sticker_image.dart      # Sticker image with fallback
 
 assets/
-  images/                          # App icon and rider artwork
+  fonts/                           # Cal Sans font
+  images/                          # App icon, vehicles, stickers, result fallbacks
+  videos/                          # Splash, motivation, and result media
+
+test/
+  widget_test.dart                 # App flow, localization, timer, vehicle, reward tests
 ```
 
 ## Getting Started
@@ -88,12 +130,22 @@ Run tests:
 flutter test
 ```
 
+Generate launcher icons after changing icon assets:
+
+```bash
+dart run flutter_launcher_icons
+```
+
 ## Development Notes
 
-- The timer calculates elapsed time from wall-clock timestamps, so progress stays accurate even if frame or ticker timing varies.
-- Settings are stored locally and loaded before the app starts.
-- Sound and keep-screen-awake options are currently persisted as settings, but their runtime behavior is intentionally left for a later iteration.
+- `MealTimerController` calculates elapsed time from wall-clock timestamps so progress stays accurate even if frame or ticker timing varies.
+- Timer UI copy is state-aware: running uses progress-based messages, paused shows break copy, and arrived/completed shows arrival copy.
+- The selected vehicle is shared across home, vehicle selector, timer road view, and vehicle rendering through `VehicleDefinition`.
+- Settings and meal progress are stored locally with `SharedPreferences`.
+- Sound and keep-screen-awake settings are persisted, but runtime behavior is still reserved for a later iteration.
+- UI polish should use the shared design tokens in `lib/theme/` and reusable app widgets in `lib/widgets/app/`.
+- Vehicle and sticker assets should keep consistent canvas size, padding, and visual scale when adding new artwork.
 
 ## Status
 
-This is an early Flutter app focused on the core mealtime ride experience: selecting a duration, tracking progress, and celebrating completion.
+This is an active Flutter prototype with a Phase 2 polished kid-friendly UI. Core flows are covered by widget tests, including home actions, vehicle selection, timer copy, road progress, localization fallback, and reward persistence.
