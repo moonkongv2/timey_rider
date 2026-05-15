@@ -22,6 +22,9 @@ class HomeTexts implements HomeTextSet {
   String get stickerSummaryLabel => '스티커';
   String get noMealHistory => '아직 저장된 식사 이력이 없어.';
   String get openStickerCollection => '스티커 보관함 보기';
+  String get avatarCtaTitle => '우리 아이 아바타';
+  String get avatarCtaSubtitle => '아이 사진으로 만든 귀여운 라이더 얼굴을 차량에 태워보세요.';
+  String get avatarCtaButton => '아바타 만들기';
 
   String customSettingMinutes(int minutes) => '직접 설정: $minutes분';
   String minuteLabel(int minutes) => '$minutes분';

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../l10n/app_texts.dart';
 import '../models/meal_timer_config.dart';
 import '../widgets/vehicle_selection_card.dart';
+import 'avatar_setup_screen.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({
@@ -50,6 +51,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
       return;
     }
     _update(_config.copyWith(childName: childName));
+  }
+
+  Future<void> _openAvatarSetup() async {
+    await Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) =>
+            AvatarSetupScreen(config: _config, onConfigChanged: _update),
+      ),
+    );
   }
 
   @override
@@ -179,6 +189,34 @@ class _SettingsScreenState extends State<SettingsScreen> {
             onVehicleSelected: (vehicleId) {
               _update(_config.copyWith(motorcycleId: vehicleId));
             },
+          ),
+          const SizedBox(height: 20),
+          Card(
+            child: Padding(
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Text(
+                    texts.settings.avatarSettingsTitle,
+                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                      fontWeight: FontWeight.w900,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    _config.avatarMode == AvatarImageMode.custom
+                        ? texts.settings.avatarCustomState
+                        : texts.settings.avatarDefaultState,
+                  ),
+                  const SizedBox(height: 12),
+                  FilledButton(
+                    onPressed: _openAvatarSetup,
+                    child: Text(texts.settings.avatarSettingsButton),
+                  ),
+                ],
+              ),
+            ),
           ),
         ],
       ),

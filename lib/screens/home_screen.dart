@@ -15,6 +15,7 @@ import '../utils/duration_format.dart';
 import '../widgets/app/app_bouncy_button.dart';
 import '../widgets/app/app_metric_tile.dart';
 import '../widgets/vehicle_selection_card.dart';
+import 'avatar_setup_screen.dart';
 import 'settings_screen.dart';
 import 'sticker_collection_screen.dart';
 import 'timer_screen.dart';
@@ -79,6 +80,15 @@ class _HomeScreenState extends State<HomeScreen> {
       MaterialPageRoute(
         builder: (_) =>
             SettingsScreen(config: _config, onConfigChanged: _updateConfig),
+      ),
+    );
+  }
+
+  Future<void> _openAvatarSetup() async {
+    await Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) =>
+            AvatarSetupScreen(config: _config, onConfigChanged: _updateConfig),
       ),
     );
   }
@@ -154,6 +164,12 @@ class _HomeScreenState extends State<HomeScreen> {
                     _updateConfig(_config.copyWith(motorcycleId: vehicleId));
                   },
                 );
+                final avatarCard = _AvatarCtaCard(
+                  title: texts.home.avatarCtaTitle,
+                  subtitle: texts.home.avatarCtaSubtitle,
+                  buttonLabel: texts.home.avatarCtaButton,
+                  onPressed: _openAvatarSetup,
+                );
                 final heroCard = _HeroMissionCard(
                   ctaLabel: '${texts.home.normalCourse} ${texts.common.start}',
                   vehicle: selectedVehicle,
@@ -166,7 +182,15 @@ class _HomeScreenState extends State<HomeScreen> {
                     children: [
                       Expanded(child: heroCard),
                       const SizedBox(width: AppSpacing.xl),
-                      Expanded(child: vehicleCard),
+                      Expanded(
+                        child: Column(
+                          children: [
+                            vehicleCard,
+                            const SizedBox(height: AppSpacing.md),
+                            avatarCard,
+                          ],
+                        ),
+                      ),
                     ],
                   );
                 }
@@ -176,6 +200,8 @@ class _HomeScreenState extends State<HomeScreen> {
                     heroCard,
                     const SizedBox(height: AppSpacing.xl),
                     vehicleCard,
+                    const SizedBox(height: AppSpacing.md),
+                    avatarCard,
                   ],
                 );
               },
@@ -268,6 +294,87 @@ class _HomeScreenState extends State<HomeScreen> {
                   },
                 );
               },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _AvatarCtaCard extends StatelessWidget {
+  const _AvatarCtaCard({
+    required this.title,
+    required this.subtitle,
+    required this.buttonLabel,
+    required this.onPressed,
+  });
+
+  final String title;
+  final String subtitle;
+  final String buttonLabel;
+  final VoidCallback onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
+
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: AppColors.surfaceWarm,
+        borderRadius: AppRadius.card,
+        border: Border.all(color: AppColors.borderWarm),
+        boxShadow: AppShadows.surface,
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(AppSpacing.md),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                DecoratedBox(
+                  decoration: BoxDecoration(
+                    color: AppColors.surfacePink.withValues(alpha: 0.72),
+                    borderRadius: AppRadius.pill,
+                  ),
+                  child: const Padding(
+                    padding: EdgeInsets.all(AppSpacing.sm),
+                    child: Icon(
+                      Icons.face_retouching_natural_rounded,
+                      color: AppColors.brown700,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: AppSpacing.md),
+                Expanded(
+                  child: Text(
+                    title,
+                    style: textTheme.titleMedium?.copyWith(
+                      color: AppColors.textStrong,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: AppSpacing.sm),
+            Text(
+              subtitle,
+              style: textTheme.bodyMedium?.copyWith(
+                color: AppColors.textPrimary,
+                fontWeight: FontWeight.w600,
+                height: 1.36,
+              ),
+            ),
+            const SizedBox(height: AppSpacing.md),
+            Align(
+              alignment: Alignment.centerLeft,
+              child: FilledButton.icon(
+                onPressed: onPressed,
+                icon: const Icon(Icons.arrow_forward_rounded),
+                label: Text(buttonLabel),
+              ),
             ),
           ],
         ),

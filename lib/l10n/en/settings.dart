@@ -17,6 +17,10 @@ class EnSettingsTexts implements SettingsTextSet {
   String get childNameSetupTitle => 'Who is riding today?';
   String get childNameSetupSubtitle => "Enter your child's name first.";
   String get saveChildName => 'Save name';
+  String get avatarSettingsTitle => 'Avatar settings';
+  String get avatarDefaultState => 'Using default image';
+  String get avatarCustomState => 'Using custom avatar';
+  String get avatarSettingsButton => 'Open avatar settings';
 
   String durationSegmentLabel(int minutes) => '$minutes min';
 }

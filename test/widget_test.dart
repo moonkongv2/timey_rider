@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -9,6 +10,7 @@ import 'package:jy_yamyam/models/meal_session_result.dart';
 import 'package:jy_yamyam/models/meal_timer_config.dart';
 import 'package:jy_yamyam/models/reward_item.dart';
 import 'package:jy_yamyam/models/vehicle.dart';
+import 'package:jy_yamyam/screens/avatar_setup_screen.dart';
 import 'package:jy_yamyam/screens/home_screen.dart';
 import 'package:jy_yamyam/screens/timer_screen.dart';
 import 'package:jy_yamyam/services/local_meal_progress_service.dart';
@@ -166,12 +168,91 @@ void main() {
     await _startApp(tester, const Locale('ko'));
 
     expect(find.text('냠냠 라이더'), findsOneWidget);
+    expect(find.text('우리 아이 아바타'), findsOneWidget);
+    expect(find.text('아바타 만들기'), findsOneWidget);
     expect(find.text('15분 아침 코스'), findsOneWidget);
     expect(find.text('25분 보통 코스'), findsOneWidget);
     expect(find.text('35분 천천히 코스'), findsOneWidget);
     await tester.drag(find.byType(ListView), const Offset(0, -500));
     await tester.pumpAndSettle();
     expect(find.text('직접 설정으로 출발'), findsOneWidget);
+  });
+
+  testWidgets('Home avatar CTA opens avatar setup screen', (tester) async {
+    SharedPreferences.setMockInitialValues({});
+
+    await _startApp(tester, const Locale('ko'));
+
+    await tester.tap(find.text('아바타 만들기'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('우리 아이 아바타 만들기'), findsOneWidget);
+    expect(
+      find.text('외부 AI 서비스에서 아이 사진을 귀여운 라이더 캐릭터로 만든 뒤 업로드해 주세요.'),
+      findsOneWidget,
+    );
+    expect(find.text('이미지 생성 가이드'), findsOneWidget);
+    await _scrollAvatarPromptIntoView(tester);
+    expect(find.text('프롬프트 복사'), findsOneWidget);
+    expect(find.text('프롬프트 복사하기'), findsOneWidget);
+  });
+
+  testWidgets('Avatar setup screen shows guide text and prompt copy button', (
+    tester,
+  ) async {
+    await _pumpAvatarSetupScreen(tester, MealTimerConfig.defaults());
+
+    expect(find.text('아이 얼굴이 잘 보이는 정면 사진을 사용해 주세요.'), findsOneWidget);
+    expect(find.text('얼굴이 크고 선명할수록 좋아요.'), findsOneWidget);
+    expect(find.text('텍스트, 로고, 워터마크는 없어야 해요.'), findsOneWidget);
+    await _scrollAvatarPromptIntoView(tester);
+    expect(_avatarPromptText(tester), contains('첨부한 아이 사진을 참고'));
+    expect(_avatarPromptText(tester), contains('정사각형 1:1 헤드샷'));
+    expect(find.text('프롬프트 복사하기'), findsOneWidget);
+  });
+
+  testWidgets('Avatar setup fire truck prompt includes firefighter guidance', (
+    tester,
+  ) async {
+    await _pumpAvatarSetupScreen(
+      tester,
+      MealTimerConfig.defaults().copyWith(motorcycleId: 'fire_truck'),
+    );
+
+    await _scrollAvatarPromptIntoView(tester);
+    expect(_avatarPromptText(tester), contains('소방관'));
+  });
+
+  testWidgets('Avatar setup police car prompt includes police guidance', (
+    tester,
+  ) async {
+    await _pumpAvatarSetupScreen(
+      tester,
+      MealTimerConfig.defaults().copyWith(motorcycleId: 'police_car'),
+    );
+
+    await _scrollAvatarPromptIntoView(tester);
+    expect(_avatarPromptText(tester), contains('경찰'));
+  });
+
+  testWidgets('Avatar setup vehicle selection updates prompt and config', (
+    tester,
+  ) async {
+    MealTimerConfig? changedConfig;
+    await _pumpAvatarSetupScreen(
+      tester,
+      MealTimerConfig.defaults(),
+      onConfigChanged: (config) => changedConfig = config,
+    );
+
+    expect(find.text('아바타를 태울 차량'), findsOneWidget);
+
+    await tester.tap(_vehicleChoiceFinder('fire_truck'));
+    await tester.pump();
+    await _scrollAvatarPromptIntoView(tester);
+
+    expect(changedConfig?.motorcycleId, 'fire_truck');
+    expect(_avatarPromptText(tester), contains('소방관'));
   });
 
   testWidgets('Remaining time setting can be turned off', (tester) async {
@@ -194,6 +275,21 @@ void main() {
 
     expect(find.textContaining('남은 시간'), findsNothing);
     expect(find.text('도착까지'), findsNothing);
+  });
+
+  testWidgets('Settings screen shows avatar settings entry', (tester) async {
+    SharedPreferences.setMockInitialValues({});
+
+    await _startApp(tester, const Locale('ko'));
+
+    await tester.tap(find.byTooltip('설정'));
+    await tester.pumpAndSettle();
+    await tester.drag(find.byType(ListView), const Offset(0, -700));
+    await tester.pumpAndSettle();
+
+    expect(find.text('아바타 설정'), findsOneWidget);
+    expect(find.text('기본 이미지 사용 중'), findsOneWidget);
+    expect(find.text('아바타 설정하기'), findsOneWidget);
   });
 
   testWidgets('Home screen shows vehicle choices above courses', (
@@ -559,6 +655,34 @@ Future<void> _startApp(
   await tester.pumpAndSettle();
 }
 
+Future<void> _pumpAvatarSetupScreen(
+  WidgetTester tester,
+  MealTimerConfig config, {
+  ValueChanged<MealTimerConfig>? onConfigChanged,
+}) async {
+  await tester.pumpWidget(
+    MaterialApp(
+      locale: const Locale('ko'),
+      supportedLocales: const [Locale('ko'), Locale('en')],
+      localizationsDelegates: const [
+        GlobalMaterialLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+      ],
+      home: AvatarSetupScreen(
+        config: config,
+        onConfigChanged: onConfigChanged ?? (_) {},
+      ),
+    ),
+  );
+  await tester.pump();
+}
+
+Future<void> _scrollAvatarPromptIntoView(WidgetTester tester) async {
+  await tester.drag(find.byType(ListView), const Offset(0, -700));
+  await tester.pumpAndSettle();
+}
+
 Material _vehicleChoiceMaterial(WidgetTester tester, String vehicleId) {
   return tester.widget<Material>(_vehicleChoiceFinder(vehicleId));
 }
@@ -573,4 +697,10 @@ Finder _assetImage(String assetName) {
         widget.image is AssetImage &&
         (widget.image as AssetImage).assetName == assetName;
   });
+}
+
+String _avatarPromptText(WidgetTester tester) {
+  return tester
+      .widget<SelectableText>(find.byKey(const ValueKey('avatarPromptText')))
+      .data!;
 }

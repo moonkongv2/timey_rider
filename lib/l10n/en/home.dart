@@ -22,6 +22,10 @@ class EnHomeTexts implements HomeTextSet {
   String get stickerSummaryLabel => 'Stickers';
   String get noMealHistory => 'No meal records yet.';
   String get openStickerCollection => 'View Sticker Collection';
+  String get avatarCtaTitle => "Child's avatar";
+  String get avatarCtaSubtitle =>
+      'Put a cute rider face made from a child photo on the vehicle.';
+  String get avatarCtaButton => 'Create avatar';
 
   String customSettingMinutes(int minutes) => 'Custom: $minutes min';
   String minuteLabel(int minutes) => '$minutes min';

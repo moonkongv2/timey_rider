@@ -27,6 +27,9 @@ abstract interface class HomeTextSet {
   String get stickerSummaryLabel;
   String get noMealHistory;
   String get openStickerCollection;
+  String get avatarCtaTitle;
+  String get avatarCtaSubtitle;
+  String get avatarCtaButton;
 
   String customSettingMinutes(int minutes);
   String minuteLabel(int minutes);
@@ -50,6 +53,10 @@ abstract interface class SettingsTextSet {
   String get childNameSetupTitle;
   String get childNameSetupSubtitle;
   String get saveChildName;
+  String get avatarSettingsTitle;
+  String get avatarDefaultState;
+  String get avatarCustomState;
+  String get avatarSettingsButton;
 
   String durationSegmentLabel(int minutes);
 }
