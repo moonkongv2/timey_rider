@@ -22,12 +22,15 @@ class EnHomeTexts implements HomeTextSet {
   String get stickerSummaryLabel => 'Stickers';
   String get noMealHistory => 'No meal records yet.';
   String get openStickerCollection => 'View Sticker Collection';
-  String get avatarCtaSubtitle =>
-      'Put a cute rider face made from a child photo on the vehicle.';
-  String get avatarCtaButton => 'Create avatar';
+  String get avatarCtaSubtitle => "Put your child's face on the ride.";
+  String get avatarCtaButton => 'Create';
   String get avatarCtaEditButton => 'Edit';
+  String get avatarCtaCreateSemantics => 'Create avatar';
+  String get avatarCtaEditSemantics => 'Edit avatar';
+  String get avatarInlineDefaultState => 'Using default face';
   String get avatarInlineCustomState => 'Child face on board';
 
+  String recentCustomMinutes(int minutes) => 'Recent $minutes min';
   String minuteLabel(int minutes) => '$minutes min';
   String progressTitle(String childName) => "$childName's meal records";
   String mealCount(int count) => '$count';

@@ -30,8 +30,12 @@ abstract interface class HomeTextSet {
   String get avatarCtaSubtitle;
   String get avatarCtaButton;
   String get avatarCtaEditButton;
+  String get avatarCtaCreateSemantics;
+  String get avatarCtaEditSemantics;
+  String get avatarInlineDefaultState;
   String get avatarInlineCustomState;
 
+  String recentCustomMinutes(int minutes);
   String minuteLabel(int minutes);
   String progressTitle(String childName);
   String mealCount(int count);

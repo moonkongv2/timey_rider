@@ -58,29 +58,36 @@ class LocalAvatarImageService {
     List<int> bytes, {
     int size = avatarImageSize,
   }) {
-    final image.Image? decodedImage;
     try {
-      decodedImage = image.decodeImage(Uint8List.fromList(bytes));
+      final decodedImage = image.decodeImage(Uint8List.fromList(bytes));
+      if (decodedImage == null) {
+        return null;
+      }
+
+      final squareImage = image.copyResizeCropSquare(decodedImage, size: size);
+      return image.encodePng(squareImage);
     } catch (_) {
       return null;
     }
-    if (decodedImage == null) {
-      return null;
-    }
-
-    final squareImage = image.copyResizeCropSquare(decodedImage, size: size);
-    return image.encodePng(squareImage);
   }
 
   Future<Directory> _avatarDirectory() async {
-    final baseDirectory = directoryProvider == null
-        ? await getApplicationDocumentsDirectory()
-        : await directoryProvider!();
+    final baseDirectory = await _baseDirectory();
     final directory = Directory(
       _joinPath(baseDirectory.path, _avatarDirectoryName),
     );
     await directory.create(recursive: true);
     return directory;
+  }
+
+  Future<Directory> _baseDirectory() async {
+    try {
+      return directoryProvider == null
+          ? await getApplicationDocumentsDirectory()
+          : await directoryProvider!();
+    } catch (_) {
+      return Directory.systemTemp;
+    }
   }
 
   String _safeExtension(String filePath) {

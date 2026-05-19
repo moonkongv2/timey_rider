@@ -22,11 +22,15 @@ class HomeTexts implements HomeTextSet {
   String get stickerSummaryLabel => '스티커';
   String get noMealHistory => '아직 저장된 식사 이력이 없어.';
   String get openStickerCollection => '스티커 보관함 보기';
-  String get avatarCtaSubtitle => '아이 사진으로 만든 귀여운 라이더 얼굴을 차량에 태워보세요.';
-  String get avatarCtaButton => '아바타 만들기';
-  String get avatarCtaEditButton => '편집하기';
+  String get avatarCtaSubtitle => '아이 얼굴을 빠방에 태워보세요.';
+  String get avatarCtaButton => '만들기';
+  String get avatarCtaEditButton => '편집';
+  String get avatarCtaCreateSemantics => '아바타 만들기';
+  String get avatarCtaEditSemantics => '아바타 편집';
+  String get avatarInlineDefaultState => '기본 얼굴 사용 중';
   String get avatarInlineCustomState => '아이 얼굴 탑승 중';
 
+  String recentCustomMinutes(int minutes) => '최근 $minutes분';
   String minuteLabel(int minutes) => '$minutes분';
   String progressTitle(String childName) =>
       '${_casualKoreanName(childName)}의 냠냠 기록';

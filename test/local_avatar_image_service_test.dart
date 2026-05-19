@@ -85,4 +85,28 @@ void main() {
     expect(savedPath.endsWith('.custom'), isTrue);
     expect(await File(savedPath).readAsBytes(), invalidBytes);
   });
+
+  test(
+    'Falls back to system temp when app documents directory fails',
+    () async {
+      final sourceImage = image.Image(width: 12, height: 12, numChannels: 4);
+      image.fill(sourceImage, color: image.ColorRgba8(255, 200, 120, 255));
+      final pickedFile = XFile.fromData(
+        image.encodePng(sourceImage),
+        path: 'picked/avatar_source.png',
+      );
+      final service = LocalAvatarImageService(
+        directoryProvider: () async {
+          throw StateError('documents directory unavailable');
+        },
+      );
+
+      final savedPath = await service.savePickedAvatarImage(pickedFile);
+      addTearDown(() => service.deleteAvatarImage(savedPath));
+
+      expect(savedPath, contains('avatar_images'));
+      expect(savedPath.endsWith('.png'), isTrue);
+      expect(await service.exists(savedPath), isTrue);
+    },
+  );
 }

@@ -142,7 +142,9 @@ class _AvatarSetupScreenState extends State<AvatarSetupScreen> {
         _avatarMode = AvatarImageMode.custom;
         _pendingAvatarImagePath = savedPath;
       });
-    } catch (_) {
+    } catch (error, stackTrace) {
+      debugPrint('Avatar image upload failed: $error');
+      debugPrintStack(stackTrace: stackTrace);
       if (!mounted) {
         return;
       }

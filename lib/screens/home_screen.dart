@@ -257,7 +257,7 @@ class _HomeScreenState extends State<HomeScreen> {
         File(selectedVehicleAvatarImagePath).existsSync();
     final avatarStateText = isUsingCustomAvatar
         ? texts.home.avatarInlineCustomState
-        : texts.settings.avatarDefaultState;
+        : texts.home.avatarInlineDefaultState;
 
     return Scaffold(
       backgroundColor: AppColors.cream,
@@ -305,12 +305,11 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ],
             ),
-            const SizedBox(height: AppSpacing.xl),
+            const SizedBox(height: AppSpacing.lg),
             LayoutBuilder(
               builder: (context, constraints) {
                 final vehicleCard = VehicleSelectionCard(
                   title: texts.home.todayVehicleTitle,
-                  subtitle: texts.settings.vehicleSelection,
                   selectedVehicleId: _config.motorcycleId,
                   onVehicleSelected: (vehicleId) {
                     _updateConfig(_config.copyWith(motorcycleId: vehicleId));
@@ -328,6 +327,9 @@ class _HomeScreenState extends State<HomeScreen> {
                     buttonLabel: isUsingCustomAvatar
                         ? texts.home.avatarCtaEditButton
                         : texts.home.avatarCtaButton,
+                    semanticLabel: isUsingCustomAvatar
+                        ? texts.home.avatarCtaEditSemantics
+                        : texts.home.avatarCtaCreateSemantics,
                     onPressed: _openAvatarSetup,
                   ),
                 );
@@ -360,8 +362,11 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                     _QuickCourseButton(
                       label: texts.home.customSheetTitle,
-                      subtitle: texts.home.minuteLabel(_customMinutes.round()),
+                      subtitle: texts.home.recentCustomMinutes(
+                        _customMinutes.round(),
+                      ),
                       icon: Icons.tune_rounded,
+                      isFullWidthOnNarrow: true,
                       onPressed: _openCustomMinutesSheet,
                     ),
                   ],
@@ -437,31 +442,35 @@ class _HomeLogo extends StatelessWidget {
       label: semanticLabel,
       child: ExcludeSemantics(
         child: SizedBox(
-          width: 220,
-          height: 86,
+          width: 260,
+          height: 88,
           child: Transform.translate(
-            offset: const Offset(-30, 0),
-            child: Image.asset(
-              _homeLogoAssetPath,
-              key: const ValueKey('homeLogo'),
-              fit: BoxFit.cover,
-              alignment: const Alignment(0, -0.05),
-              cacheWidth: 440,
-              errorBuilder: (context, error, stackTrace) {
-                return ColoredBox(
-                  color: AppColors.transparent,
-                  child: Align(
-                    alignment: Alignment.centerLeft,
-                    child: Text(
-                      semanticLabel,
-                      style: textTheme.headlineMedium?.copyWith(
-                        fontWeight: FontWeight.w900,
-                        color: AppColors.brown900,
+            offset: const Offset(-18, 0),
+            child: Transform.scale(
+              scale: 1.42,
+              alignment: Alignment.centerLeft,
+              child: Image.asset(
+                _homeLogoAssetPath,
+                key: const ValueKey('homeLogo'),
+                fit: BoxFit.contain,
+                alignment: Alignment.centerLeft,
+                cacheWidth: 740,
+                errorBuilder: (context, error, stackTrace) {
+                  return ColoredBox(
+                    color: AppColors.transparent,
+                    child: Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        semanticLabel,
+                        style: textTheme.headlineMedium?.copyWith(
+                          fontWeight: FontWeight.w900,
+                          color: AppColors.brown900,
+                        ),
                       ),
                     ),
-                  ),
-                );
-              },
+                  );
+                },
+              ),
             ),
           ),
         ),
@@ -475,103 +484,123 @@ class _AvatarInlineCta extends StatelessWidget {
     required this.stateText,
     required this.description,
     required this.buttonLabel,
+    required this.semanticLabel,
     required this.onPressed,
   });
 
   final String stateText;
   final String description;
   final String buttonLabel;
+  final String semanticLabel;
   final VoidCallback onPressed;
 
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
 
-    return Material(
-      color: AppColors.transparent,
-      borderRadius: AppRadius.compactCard,
-      child: InkWell(
-        onTap: onPressed,
-        borderRadius: AppRadius.compactCard,
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(minHeight: 56),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(
-              horizontal: AppSpacing.xs,
-              vertical: AppSpacing.xs,
-            ),
-            child: Row(
-              children: [
-                DecoratedBox(
-                  decoration: BoxDecoration(
-                    color: AppColors.surfacePink.withValues(alpha: 0.72),
-                    borderRadius: AppRadius.pill,
-                  ),
-                  child: const SizedBox(
-                    width: 40,
-                    height: 40,
-                    child: Icon(
-                      Icons.face_retouching_natural_rounded,
-                      color: AppColors.brown700,
-                      size: 24,
-                    ),
-                  ),
+    return Semantics(
+      button: true,
+      label: semanticLabel,
+      child: ExcludeSemantics(
+        child: Material(
+          color: AppColors.transparent,
+          borderRadius: AppRadius.compactCard,
+          child: InkWell(
+            onTap: onPressed,
+            borderRadius: AppRadius.compactCard,
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(minHeight: 48),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppSpacing.xs,
+                  vertical: AppSpacing.xs,
                 ),
-                const SizedBox(width: AppSpacing.sm),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        stateText,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: textTheme.bodyMedium?.copyWith(
-                          color: AppColors.textStrong,
-                          fontWeight: FontWeight.w800,
+                child: Row(
+                  children: [
+                    DecoratedBox(
+                      decoration: BoxDecoration(
+                        color: AppColors.surfacePink.withValues(alpha: 0.64),
+                        borderRadius: AppRadius.pill,
+                      ),
+                      child: const SizedBox(
+                        width: 34,
+                        height: 34,
+                        child: Icon(
+                          Icons.face_retouching_natural_rounded,
+                          color: AppColors.brown700,
+                          size: 20,
                         ),
                       ),
-                      const SizedBox(height: 2),
-                      Text(
-                        description,
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                        style: textTheme.bodySmall?.copyWith(
-                          color: AppColors.textSecondary,
-                          fontWeight: FontWeight.w600,
-                          height: 1.25,
+                    ),
+                    const SizedBox(width: AppSpacing.sm),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            stateText,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: textTheme.bodySmall?.copyWith(
+                              color: AppColors.textStrong,
+                              fontWeight: FontWeight.w800,
+                            ),
+                          ),
+                          const SizedBox(height: 1),
+                          Text(
+                            description,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: textTheme.labelSmall?.copyWith(
+                              color: AppColors.textSecondary,
+                              fontWeight: FontWeight.w600,
+                              height: 1.2,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(width: AppSpacing.sm),
+                    DecoratedBox(
+                      decoration: BoxDecoration(
+                        color: AppColors.white.withValues(alpha: 0.7),
+                        borderRadius: AppRadius.pill,
+                        border: Border.all(color: AppColors.borderSoft),
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: AppSpacing.sm,
+                          vertical: AppSpacing.xs,
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            ConstrainedBox(
+                              constraints: const BoxConstraints(maxWidth: 56),
+                              child: Text(
+                                buttonLabel,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: textTheme.labelSmall?.copyWith(
+                                  color: AppColors.textPrimary,
+                                  fontWeight: FontWeight.w800,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 2),
+                            const Icon(
+                              Icons.chevron_right_rounded,
+                              color: AppColors.brown700,
+                              size: 16,
+                            ),
+                          ],
                         ),
                       ),
-                    ],
-                  ),
-                ),
-                const SizedBox(width: AppSpacing.sm),
-                ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: 112),
-                  child: OutlinedButton(
-                    onPressed: onPressed,
-                    style: OutlinedButton.styleFrom(
-                      foregroundColor: AppColors.textPrimary,
-                      side: const BorderSide(color: AppColors.borderSoft),
-                      shape: const StadiumBorder(),
-                      minimumSize: const Size(72, 44),
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: AppSpacing.sm,
-                      ),
-                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                     ),
-                    child: Text(
-                      buttonLabel,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: textTheme.labelMedium?.copyWith(
-                        fontWeight: FontWeight.w800,
-                      ),
-                    ),
-                  ),
+                  ],
                 ),
-              ],
+              ),
             ),
           ),
         ),
@@ -750,7 +779,7 @@ class _QuickCourseSection extends StatelessWidget {
   const _QuickCourseSection({required this.title, required this.children});
 
   final String title;
-  final List<_QuickCourseButton> children;
+  final List<Widget> children;
 
   @override
   Widget build(BuildContext context) {
@@ -788,8 +817,14 @@ class _QuickCourseSection extends StatelessWidget {
                   spacing: spacing,
                   runSpacing: spacing,
                   children: [
-                    for (final child in children)
-                      SizedBox(width: itemWidth, child: child),
+                    for (final child in children) ...[
+                      SizedBox(
+                        width: !_fillsNarrowWidth(child) || columns == 3
+                            ? itemWidth
+                            : constraints.maxWidth,
+                        child: child,
+                      ),
+                    ],
                   ],
                 );
               },
@@ -798,6 +833,10 @@ class _QuickCourseSection extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  bool _fillsNarrowWidth(Widget child) {
+    return child is _QuickCourseButton && child.isFullWidthOnNarrow;
   }
 }
 
@@ -808,6 +847,7 @@ class _QuickCourseButton extends StatelessWidget {
     required this.onPressed,
     this.emoji,
     this.icon,
+    this.isFullWidthOnNarrow = false,
   });
 
   final String label;
@@ -815,6 +855,7 @@ class _QuickCourseButton extends StatelessWidget {
   final VoidCallback onPressed;
   final String? emoji;
   final IconData? icon;
+  final bool isFullWidthOnNarrow;
 
   @override
   Widget build(BuildContext context) {
@@ -872,30 +913,51 @@ class _QuickCourseButton extends StatelessWidget {
                       mainAxisSize: MainAxisSize.min,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          label,
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                          style: textTheme.labelLarge?.copyWith(
-                            color: AppColors.textStrong,
-                            fontWeight: FontWeight.w800,
-                            height: 1.15,
+                        if (isFullWidthOnNarrow)
+                          Text(
+                            '$label · $subtitle',
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: textTheme.labelLarge?.copyWith(
+                              color: AppColors.textStrong,
+                              fontWeight: FontWeight.w800,
+                              height: 1.15,
+                            ),
+                          )
+                        else ...[
+                          Text(
+                            label,
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                            style: textTheme.labelLarge?.copyWith(
+                              color: AppColors.textStrong,
+                              fontWeight: FontWeight.w800,
+                              height: 1.15,
+                            ),
                           ),
-                        ),
-                        const SizedBox(height: 2),
-                        Text(
-                          subtitle,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: textTheme.bodySmall?.copyWith(
-                            color: AppColors.textSecondary,
-                            fontWeight: FontWeight.w600,
-                            height: 1.2,
+                          const SizedBox(height: 2),
+                          Text(
+                            subtitle,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: textTheme.bodySmall?.copyWith(
+                              color: AppColors.textSecondary,
+                              fontWeight: FontWeight.w600,
+                              height: 1.2,
+                            ),
                           ),
-                        ),
+                        ],
                       ],
                     ),
                   ),
+                  if (isFullWidthOnNarrow) ...[
+                    const SizedBox(width: AppSpacing.sm),
+                    const Icon(
+                      Icons.chevron_right_rounded,
+                      color: AppColors.brown700,
+                      size: 22,
+                    ),
+                  ],
                 ],
               ),
             ),
