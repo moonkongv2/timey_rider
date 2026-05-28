@@ -53,15 +53,12 @@ class RewardInventoryItem {
 class RewardCatalog {
   static const finishFlagStickerId = 'sticker_finish_flag';
   static const twinkleStarStickerId = 'sticker_twinkle_star';
-  static const riderHelmetStickerId = 'sticker_rider_helmet';
   static const riceBowlStickerId = 'sticker_rice_bowl';
   static const yumSpoonStickerId = 'sticker_yum_spoon';
   static const crunchyCarrotStickerId = 'sticker_crunchy_carrot';
   static const sunnyMealStickerId = 'sticker_sunny_meal';
   static const rainbowCourseStickerId = 'sticker_rainbow_course';
   static const rocketBiteStickerId = 'sticker_rocket_bite';
-  static const happyRiderStickerId = 'sticker_happy_rider';
-  static const lightningYumStickerId = 'sticker_lightning_yum';
 
   static const finishFlagSticker = RewardDefinition(
     id: finishFlagStickerId,
@@ -73,12 +70,6 @@ class RewardCatalog {
     id: twinkleStarStickerId,
     type: RewardType.sticker,
     emoji: '⭐',
-  );
-
-  static const riderHelmetSticker = RewardDefinition(
-    id: riderHelmetStickerId,
-    type: RewardType.sticker,
-    emoji: '🪖',
   );
 
   static const riceBowlSticker = RewardDefinition(
@@ -117,32 +108,18 @@ class RewardCatalog {
     emoji: '🚀',
   );
 
-  static const happyRiderSticker = RewardDefinition(
-    id: happyRiderStickerId,
-    type: RewardType.sticker,
-    emoji: '🏍️',
-  );
-
-  static const lightningYumSticker = RewardDefinition(
-    id: lightningYumStickerId,
-    type: RewardType.sticker,
-    emoji: '⚡',
-  );
-
   static const successStickers = [
     finishFlagSticker,
     twinkleStarSticker,
-    riderHelmetSticker,
     riceBowlSticker,
     yumSpoonSticker,
     crunchyCarrotSticker,
     sunnyMealSticker,
     rainbowCourseSticker,
     rocketBiteSticker,
-    happyRiderSticker,
   ];
 
-  static const all = [...successStickers, lightningYumSticker];
+  static const all = successStickers;
 
   static RewardDefinition? findById(String id) {
     for (final reward in all) {

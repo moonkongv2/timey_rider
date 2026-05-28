@@ -6,6 +6,8 @@ import '../catalogs/vehicle_catalog.dart';
 import '../l10n/app_texts.dart';
 import '../models/meal_progress_snapshot.dart';
 import '../models/meal_timer_config.dart';
+import '../navigation/app_route_observer.dart';
+import '../models/reward_goal.dart';
 import '../models/reward_item.dart';
 import '../models/vehicle.dart';
 import '../services/local_meal_progress_service.dart';
@@ -17,8 +19,10 @@ import '../utils/duration_format.dart';
 import '../widgets/app/app_bouncy_button.dart';
 import '../widgets/app/app_metric_tile.dart';
 import '../widgets/avatar/avatar_composite_preview.dart';
+import '../widgets/reward_sticker_image.dart';
 import '../widgets/vehicle_selection_card.dart';
 import 'avatar_setup_screen.dart';
+import 'reward_goal_screen.dart';
 import 'settings_screen.dart';
 import 'sticker_collection_screen.dart';
 import 'timer_screen.dart';
@@ -45,7 +49,7 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class _HomeScreenState extends State<HomeScreen> with RouteAware {
   late MealTimerConfig _config = widget.config;
   late double _customMinutes = _config.duration.inMinutes.toDouble();
 
@@ -60,15 +64,39 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
+  void _refreshProgressSnapshot() {
+    setState(() {});
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final route = ModalRoute.of(context);
+    if (route is PageRoute) {
+      appRouteObserver.subscribe(this, route);
+    }
+  }
+
+  @override
+  void dispose() {
+    appRouteObserver.unsubscribe(this);
+    super.dispose();
+  }
+
+  @override
+  void didPopNext() {
+    _refreshProgressSnapshot();
+  }
+
   void _updateConfig(MealTimerConfig config) {
     setState(() => _config = config);
     widget.onConfigChanged(config);
   }
 
-  void _startTimer(int minutes) {
+  Future<void> _startTimer(int minutes) async {
     final config = _config.copyWith(duration: Duration(minutes: minutes));
     _updateConfig(config);
-    Navigator.of(context).push(
+    await Navigator.of(context).push(
       MaterialPageRoute(
         builder: (_) => TimerScreen(
           config: config,
@@ -77,6 +105,9 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
       ),
     );
+    if (mounted) {
+      _refreshProgressSnapshot();
+    }
   }
 
   Future<void> _openCustomMinutesSheet() async {
@@ -409,6 +440,18 @@ class _HomeScreenState extends State<HomeScreen> {
                 return _ProgressSummary(
                   childName: childName,
                   snapshot: snapshot.data,
+                  onOpenRewardGoal: () async {
+                    await Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (_) => RewardGoalScreen(
+                          mealProgressService: widget.mealProgressService,
+                        ),
+                      ),
+                    );
+                    if (context.mounted) {
+                      _refreshProgressSnapshot();
+                    }
+                  },
                   onOpenStickers: () {
                     Navigator.of(context).push(
                       MaterialPageRoute(
@@ -1068,11 +1111,13 @@ class _ProgressSummary extends StatelessWidget {
   const _ProgressSummary({
     required this.childName,
     required this.snapshot,
+    required this.onOpenRewardGoal,
     required this.onOpenStickers,
   });
 
   final String childName;
   final MealProgressSnapshot? snapshot;
+  final VoidCallback onOpenRewardGoal;
   final VoidCallback onOpenStickers;
 
   @override
@@ -1081,6 +1126,7 @@ class _ProgressSummary extends StatelessWidget {
     final texts = AppTexts.of(context);
     final history = snapshot?.history ?? const [];
     final inventory = snapshot?.inventory ?? const [];
+    final activeRewardGoal = snapshot?.activeRewardGoal;
     final recent = history.isEmpty ? null : history.first;
     final knownStickers = inventory.where(
       (item) =>
@@ -1161,11 +1207,208 @@ class _ProgressSummary extends StatelessWidget {
           ),
         ),
         const SizedBox(height: AppSpacing.md),
+        _RewardGoalCta(goal: activeRewardGoal, onPressed: onOpenRewardGoal),
+        const SizedBox(height: AppSpacing.md),
         _StickerCollectionCta(
           label: texts.home.openStickerCollection,
           onPressed: onOpenStickers,
         ),
       ],
+    );
+  }
+}
+
+class _RewardGoalCta extends StatelessWidget {
+  const _RewardGoalCta({required this.goal, required this.onPressed});
+
+  final RewardGoal? goal;
+  final VoidCallback onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    final texts = AppTexts.of(context);
+    final goal = this.goal;
+
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: goal?.isReady == true
+            ? AppColors.surfaceYellow
+            : AppColors.white,
+        borderRadius: AppRadius.card,
+        border: Border.all(color: AppColors.borderWarm),
+        boxShadow: AppShadows.surface,
+      ),
+      child: Material(
+        color: AppColors.transparent,
+        borderRadius: AppRadius.card,
+        clipBehavior: Clip.antiAlias,
+        child: InkWell(
+          onTap: onPressed,
+          child: Padding(
+            padding: const EdgeInsets.all(AppSpacing.lg),
+            child: goal == null
+                ? _EmptyRewardGoalCta(label: texts.rewards.createRewardGoal)
+                : _ActiveRewardGoalCta(goal: goal),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _EmptyRewardGoalCta extends StatelessWidget {
+  const _EmptyRewardGoalCta({required this.label});
+
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        DecoratedBox(
+          decoration: BoxDecoration(
+            color: AppColors.surfaceYellow,
+            borderRadius: AppRadius.pill,
+          ),
+          child: const Padding(
+            padding: EdgeInsets.all(AppSpacing.sm),
+            child: Icon(
+              Icons.card_giftcard_rounded,
+              color: AppColors.textPrimary,
+            ),
+          ),
+        ),
+        const SizedBox(width: AppSpacing.md),
+        Expanded(
+          child: Text(
+            label,
+            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+              color: AppColors.textStrong,
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+        ),
+        const Icon(Icons.arrow_forward_rounded, color: AppColors.textPrimary),
+      ],
+    );
+  }
+}
+
+class _ActiveRewardGoalCta extends StatelessWidget {
+  const _ActiveRewardGoalCta({required this.goal});
+
+  final RewardGoal goal;
+
+  @override
+  Widget build(BuildContext context) {
+    final texts = AppTexts.of(context);
+
+    return Row(
+      children: [
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                goal.isReady
+                    ? texts.rewards.rewardGoalReadyMessage
+                    : texts.rewards.rewardGoalPromiseTitle,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                  color: AppColors.textSecondary,
+                  fontWeight: FontWeight.w900,
+                ),
+              ),
+              const SizedBox(height: AppSpacing.xs),
+              Text(
+                goal.rewardText,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                  color: AppColors.textStrong,
+                  fontWeight: FontWeight.w900,
+                ),
+              ),
+              const SizedBox(height: AppSpacing.xs),
+              Text(
+                texts.rewards.rewardGoalProgress(
+                  goal.filledCount,
+                  goal.requiredStickerCount,
+                ),
+                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                  color: AppColors.textPrimary,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(width: AppSpacing.md),
+        _MiniRewardGoalBoard(goal: goal),
+        const SizedBox(width: AppSpacing.sm),
+        const Icon(Icons.arrow_forward_rounded, color: AppColors.textPrimary),
+      ],
+    );
+  }
+}
+
+class _MiniRewardGoalBoard extends StatelessWidget {
+  const _MiniRewardGoalBoard({required this.goal});
+
+  final RewardGoal goal;
+
+  @override
+  Widget build(BuildContext context) {
+    final visibleCount = goal.requiredStickerCount.clamp(1, 5);
+
+    return SizedBox(
+      width: 112,
+      child: Wrap(
+        alignment: WrapAlignment.end,
+        spacing: AppSpacing.xs,
+        runSpacing: AppSpacing.xs,
+        children: [
+          for (var index = 0; index < visibleCount; index += 1)
+            _MiniRewardGoalSlot(
+              slot: index < goal.filledSlots.length
+                  ? goal.filledSlots[index]
+                  : null,
+            ),
+        ],
+      ),
+    );
+  }
+}
+
+class _MiniRewardGoalSlot extends StatelessWidget {
+  const _MiniRewardGoalSlot({required this.slot});
+
+  final RewardGoalSlot? slot;
+
+  @override
+  Widget build(BuildContext context) {
+    final reward = slot == null ? null : RewardCatalog.findById(slot!.rewardId);
+
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: reward == null ? AppColors.surfaceSoft : AppColors.white,
+        borderRadius: AppRadius.compactCard,
+        border: Border.all(color: AppColors.borderWarm),
+      ),
+      child: SizedBox.square(
+        dimension: 32,
+        child: Center(
+          child: reward == null
+              ? const Icon(
+                  Icons.circle_outlined,
+                  size: 16,
+                  color: AppColors.textMuted,
+                )
+              : RewardStickerImage(reward: reward, size: 24),
+        ),
+      ),
     );
   }
 }

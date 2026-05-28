@@ -3,6 +3,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 
 import 'l10n/app_texts.dart';
 import 'models/meal_timer_config.dart';
+import 'navigation/app_route_observer.dart';
 import 'screens/child_name_setup_screen.dart';
 import 'screens/home_screen.dart';
 import 'screens/splash_screen.dart';
@@ -54,6 +55,7 @@ class _YamyamRiderAppState extends State<YamyamRiderApp> {
       debugShowCheckedModeBanner: false,
       onGenerateTitle: (context) => AppTexts.of(context).common.appTitle,
       supportedLocales: AppTexts.supportedLocales,
+      navigatorObservers: [appRouteObserver],
       localizationsDelegates: const [
         GlobalMaterialLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,

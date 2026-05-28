@@ -104,7 +104,25 @@ abstract interface class RewardTextSet {
   String get lockedSticker;
   String get lockedStatus;
   String get uncollectedSemanticLabel;
+  String get rewardGoalTitle;
+  String get createRewardGoal;
+  String get rewardGoalEmptyTitle;
+  String get rewardGoalEmptyBody;
+  String get rewardGoalRewardFieldLabel;
+  String get rewardGoalRequiredStickerCountLabel;
+  String get rewardGoalSaveButton;
+  String get rewardGoalReadyMessage;
+  String get rewardGoalGivenButton;
+  String get rewardGoalCreatedMessage;
+  String get rewardGoalRedeemedMessage;
+  String get rewardGoalProgressTitle;
+  String get rewardGoalEmptySlotSemanticLabel;
+  String get openRewardGoal;
+  String get rewardGoalPromiseTitle;
 
   String stickerCount(int count);
+  String rewardGoalProgress(int filledCount, int requiredCount);
+  String rewardGoalRemaining(int remainingCount);
+  String rewardGoalSlotSemanticLabel(int slotNumber, String rewardName);
   String name(String rewardId);
 }

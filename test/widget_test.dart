@@ -13,10 +13,11 @@ import 'package:jy_yamyam/l10n/app_texts.dart';
 import 'package:jy_yamyam/main.dart' as app;
 import 'package:jy_yamyam/models/meal_session_result.dart';
 import 'package:jy_yamyam/models/meal_timer_config.dart';
-import 'package:jy_yamyam/models/reward_item.dart';
+import 'package:jy_yamyam/models/reward_goal.dart';
 import 'package:jy_yamyam/models/vehicle.dart';
 import 'package:jy_yamyam/screens/avatar_setup_screen.dart';
 import 'package:jy_yamyam/screens/home_screen.dart';
+import 'package:jy_yamyam/screens/reward_goal_screen.dart';
 import 'package:jy_yamyam/screens/result_screen.dart';
 import 'package:jy_yamyam/screens/settings_screen.dart';
 import 'package:jy_yamyam/screens/timer_screen.dart';
@@ -1334,7 +1335,7 @@ void main() {
     expect(find.textContaining('Custom time'), findsOneWidget);
   });
 
-  test('Fast meal awards a special sticker with a random sticker', () async {
+  test('Fast meal awards only one random sticker', () async {
     SharedPreferences.setMockInitialValues({});
 
     final service = LocalMealProgressService();
@@ -1348,11 +1349,7 @@ void main() {
       ),
     );
 
-    expect(recordedSession.awardedRewards, hasLength(2));
-    expect(
-      recordedSession.awardedRewards.map((reward) => reward.id),
-      contains(RewardCatalog.lightningYumSticker.id),
-    );
+    expect(recordedSession.awardedRewards, hasLength(1));
   });
 
   test('Completed overtime meal awards a random sticker', () async {
@@ -1389,6 +1386,190 @@ void main() {
 
     expect(recordedSession.awardedRewards, isEmpty);
   });
+
+  test('Completed meal fills exactly one active reward goal slot', () async {
+    SharedPreferences.setMockInitialValues({});
+
+    final service = LocalMealProgressService();
+    await service.createRewardGoal(
+      requiredStickerCount: 5,
+      rewardText: '아이스크림',
+    );
+
+    final recordedSession = await service.recordMealResult(_mealResult());
+    final snapshot = await service.loadSnapshot();
+
+    expect(recordedSession.updatedRewardGoal?.filledCount, 1);
+    expect(recordedSession.rewardGoalJustReady, isFalse);
+    expect(snapshot.activeRewardGoal?.filledCount, 1);
+  });
+
+  test('Fast meal fills only one reward goal slot', () async {
+    SharedPreferences.setMockInitialValues({});
+
+    final service = LocalMealProgressService();
+    await service.createRewardGoal(
+      requiredStickerCount: 5,
+      rewardText: '아이스크림',
+    );
+
+    final recordedSession = await service.recordMealResult(
+      _mealResult(
+        targetDuration: const Duration(minutes: 20),
+        actualDuration: const Duration(minutes: 13),
+      ),
+    );
+    final snapshot = await service.loadSnapshot();
+
+    expect(recordedSession.awardedRewards, hasLength(1));
+    expect(snapshot.activeRewardGoal?.filledCount, 1);
+  });
+
+  test('Incomplete meal does not fill a reward goal slot', () async {
+    SharedPreferences.setMockInitialValues({});
+
+    final service = LocalMealProgressService();
+    await service.createRewardGoal(
+      requiredStickerCount: 5,
+      rewardText: '아이스크림',
+    );
+
+    final recordedSession = await service.recordMealResult(
+      _mealResult(mealCompleted: false),
+    );
+    final snapshot = await service.loadSnapshot();
+
+    expect(recordedSession.updatedRewardGoal, isNull);
+    expect(snapshot.activeRewardGoal?.filledCount, 0);
+  });
+
+  test('Reward goal becomes ready when required count is reached', () async {
+    SharedPreferences.setMockInitialValues({});
+
+    final service = LocalMealProgressService();
+    await service.createRewardGoal(
+      requiredStickerCount: 2,
+      rewardText: '아이스크림',
+    );
+
+    await service.recordMealResult(
+      _mealResult(endedAt: DateTime(2026, 5, 4, 12)),
+    );
+    final recordedSession = await service.recordMealResult(
+      _mealResult(endedAt: DateTime(2026, 5, 4, 13)),
+    );
+    final snapshot = await service.loadSnapshot();
+
+    expect(recordedSession.rewardGoalJustReady, isTrue);
+    expect(snapshot.activeRewardGoal?.status, RewardGoalStatus.ready);
+    expect(snapshot.activeRewardGoal?.readyAt, isNotNull);
+  });
+
+  test(
+    'Redeeming a ready goal clears active goal and stores redeemed history',
+    () async {
+      SharedPreferences.setMockInitialValues({});
+
+      final service = LocalMealProgressService();
+      await service.createRewardGoal(
+        requiredStickerCount: 1,
+        rewardText: '아이스크림',
+      );
+      await service.recordMealResult(_mealResult());
+
+      final redeemedGoal = await service.redeemActiveRewardGoal();
+      final snapshot = await service.loadSnapshot();
+
+      expect(redeemedGoal?.status, RewardGoalStatus.redeemed);
+      expect(redeemedGoal?.redeemedAt, isNotNull);
+      expect(snapshot.activeRewardGoal, isNull);
+      expect(snapshot.redeemedRewardGoals, hasLength(1));
+      expect(snapshot.redeemedRewardGoals.first.rewardText, '아이스크림');
+    },
+  );
+
+  test('Existing sticker inventory counts still increase', () async {
+    SharedPreferences.setMockInitialValues({});
+
+    final service = LocalMealProgressService();
+    await service.createRewardGoal(
+      requiredStickerCount: 5,
+      rewardText: '아이스크림',
+    );
+
+    final recordedSession = await service.recordMealResult(_mealResult());
+    final snapshot = await service.loadSnapshot();
+    final inventoryCount = snapshot.inventory.fold<int>(
+      0,
+      (total, item) => total + item.count,
+    );
+
+    expect(inventoryCount, recordedSession.awardedRewards.length);
+    expect(snapshot.activeRewardGoal?.filledCount, 1);
+  });
+
+  testWidgets('Home screen shows reward goal CTA', (tester) async {
+    SharedPreferences.setMockInitialValues({});
+
+    await tester.pumpWidget(
+      MaterialApp(
+        locale: const Locale('en'),
+        home: HomeScreen(
+          config: MealTimerConfig.defaults().copyWith(childName: 'Jiyul'),
+          mealProgressService: LocalMealProgressService(),
+          onConfigChanged: (_) {},
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+    await tester.drag(find.byType(ListView), const Offset(0, -700));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Create Reward Promise'), findsOneWidget);
+  });
+
+  testWidgets('Reward goal creation form saves a goal', (tester) async {
+    SharedPreferences.setMockInitialValues({});
+    final service = LocalMealProgressService();
+
+    await tester.pumpWidget(
+      MaterialApp(
+        locale: const Locale('en'),
+        home: RewardGoalScreen(mealProgressService: service),
+      ),
+    );
+    await tester.pump();
+
+    await tester.enterText(find.byType(TextField), 'ice cream');
+    await tester.pump();
+    await tester.tap(find.text('Save Promise'));
+    await tester.pumpAndSettle();
+
+    final snapshot = await service.loadSnapshot();
+    expect(snapshot.activeRewardGoal?.rewardText, 'ice cream');
+    expect(snapshot.activeRewardGoal?.requiredStickerCount, 5);
+  });
+}
+
+MealSessionResult _mealResult({
+  DateTime? startedAt,
+  DateTime? endedAt,
+  Duration targetDuration = const Duration(minutes: 20),
+  Duration actualDuration = const Duration(minutes: 25),
+  bool completedBeforeArrival = false,
+  bool mealCompleted = true,
+}) {
+  final resolvedStartedAt = startedAt ?? DateTime(2026, 5, 4, 12);
+  final resolvedEndedAt = endedAt ?? resolvedStartedAt.add(actualDuration);
+
+  return MealSessionResult(
+    startedAt: resolvedStartedAt,
+    endedAt: resolvedEndedAt,
+    targetDuration: targetDuration,
+    actualDuration: actualDuration,
+    completedBeforeArrival: completedBeforeArrival,
+    mealCompleted: mealCompleted,
+  );
 }
 
 Future<void> _startApp(

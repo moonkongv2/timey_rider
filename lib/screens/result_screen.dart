@@ -5,6 +5,7 @@ import '../l10n/app_texts.dart';
 import '../models/meal_progress_snapshot.dart';
 import '../models/meal_session_result.dart';
 import '../models/meal_timer_config.dart';
+import '../models/reward_goal.dart';
 import '../models/reward_item.dart';
 import '../services/local_meal_progress_service.dart';
 import '../theme/app_colors.dart';
@@ -192,8 +193,28 @@ class _ResultScreenState extends State<ResultScreen> {
                                   FutureBuilder<RecordedMealSession>(
                                     future: _recordedSession,
                                     builder: (context, snapshot) {
-                                      return _RewardResultBox(
-                                        rewards: snapshot.data?.awardedRewards,
+                                      final recordedSession = snapshot.data;
+
+                                      return Column(
+                                        children: [
+                                          _RewardResultBox(
+                                            rewards:
+                                                recordedSession?.awardedRewards,
+                                          ),
+                                          if (recordedSession
+                                                  ?.updatedRewardGoal !=
+                                              null) ...[
+                                            const SizedBox(
+                                              height: AppSpacing.md,
+                                            ),
+                                            _RewardGoalResultBox(
+                                              goal: recordedSession!
+                                                  .updatedRewardGoal!,
+                                              justReady: recordedSession
+                                                  .rewardGoalJustReady,
+                                            ),
+                                          ],
+                                        ],
                                       );
                                     },
                                   ),
@@ -236,6 +257,108 @@ class _ResultScreenState extends State<ResultScreen> {
               );
             },
           ),
+        ),
+      ),
+    );
+  }
+}
+
+class _RewardGoalResultBox extends StatelessWidget {
+  const _RewardGoalResultBox({required this.goal, required this.justReady});
+
+  final RewardGoal goal;
+  final bool justReady;
+
+  @override
+  Widget build(BuildContext context) {
+    final texts = AppTexts.of(context);
+
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: justReady ? AppColors.surfaceYellow : AppColors.surfaceWarm,
+        borderRadius: AppRadius.card,
+        border: Border.all(color: AppColors.borderWarm),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(AppSpacing.lg),
+        child: Column(
+          children: [
+            Text(
+              justReady
+                  ? texts.rewards.rewardGoalReadyMessage
+                  : texts.rewards.rewardGoalProgressTitle,
+              textAlign: TextAlign.center,
+              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.w900,
+                color: AppColors.textStrong,
+              ),
+            ),
+            const SizedBox(height: AppSpacing.xs),
+            Text(
+              '${goal.rewardText} · ${texts.rewards.rewardGoalProgress(goal.filledCount, goal.requiredStickerCount)}',
+              textAlign: TextAlign.center,
+              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                color: AppColors.textPrimary,
+                fontWeight: FontWeight.w800,
+              ),
+            ),
+            const SizedBox(height: AppSpacing.md),
+            _RewardGoalMiniBoard(goal: goal),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _RewardGoalMiniBoard extends StatelessWidget {
+  const _RewardGoalMiniBoard({required this.goal});
+
+  final RewardGoal goal;
+
+  @override
+  Widget build(BuildContext context) {
+    return Wrap(
+      alignment: WrapAlignment.center,
+      spacing: AppSpacing.sm,
+      runSpacing: AppSpacing.sm,
+      children: [
+        for (var index = 0; index < goal.requiredStickerCount; index += 1)
+          _RewardGoalMiniSlot(
+            slot: index < goal.filledSlots.length
+                ? goal.filledSlots[index]
+                : null,
+          ),
+      ],
+    );
+  }
+}
+
+class _RewardGoalMiniSlot extends StatelessWidget {
+  const _RewardGoalMiniSlot({required this.slot});
+
+  final RewardGoalSlot? slot;
+
+  @override
+  Widget build(BuildContext context) {
+    final reward = slot == null ? null : RewardCatalog.findById(slot!.rewardId);
+
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: reward == null ? AppColors.surfaceSoft : AppColors.white,
+        borderRadius: AppRadius.compactCard,
+        border: Border.all(color: AppColors.borderWarm),
+      ),
+      child: SizedBox.square(
+        dimension: 44,
+        child: Center(
+          child: reward == null
+              ? const Icon(
+                  Icons.circle_outlined,
+                  size: 18,
+                  color: AppColors.textMuted,
+                )
+              : RewardStickerImage(reward: reward, size: 34),
         ),
       ),
     );
