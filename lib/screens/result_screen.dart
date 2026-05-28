@@ -12,6 +12,7 @@ import '../theme/app_colors.dart';
 import '../theme/app_radius.dart';
 import '../theme/app_spacing.dart';
 import '../widgets/reward_sticker_image.dart';
+import 'reward_goal_screen.dart';
 import 'timer_screen.dart';
 
 const _fallbackSuccessVideoPath = 'assets/videos/result_motorcycle_success.mp4';
@@ -212,6 +213,8 @@ class _ResultScreenState extends State<ResultScreen> {
                                                   .updatedRewardGoal!,
                                               justReady: recordedSession
                                                   .rewardGoalJustReady,
+                                              mealProgressService:
+                                                  widget.mealProgressService,
                                             ),
                                           ],
                                         ],
@@ -264,10 +267,15 @@ class _ResultScreenState extends State<ResultScreen> {
 }
 
 class _RewardGoalResultBox extends StatelessWidget {
-  const _RewardGoalResultBox({required this.goal, required this.justReady});
+  const _RewardGoalResultBox({
+    required this.goal,
+    required this.justReady,
+    required this.mealProgressService,
+  });
 
   final RewardGoal goal;
   final bool justReady;
+  final LocalMealProgressService mealProgressService;
 
   @override
   Widget build(BuildContext context) {
@@ -304,6 +312,22 @@ class _RewardGoalResultBox extends StatelessWidget {
             ),
             const SizedBox(height: AppSpacing.md),
             _RewardGoalMiniBoard(goal: goal),
+            if (justReady) ...[
+              const SizedBox(height: AppSpacing.md),
+              FilledButton.icon(
+                onPressed: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (_) => RewardGoalScreen(
+                        mealProgressService: mealProgressService,
+                      ),
+                    ),
+                  );
+                },
+                icon: const Icon(Icons.card_giftcard_rounded),
+                label: Text(texts.rewards.openRewardGoal),
+              ),
+            ],
           ],
         ),
       ),

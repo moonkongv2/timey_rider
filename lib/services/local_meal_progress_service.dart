@@ -71,6 +71,44 @@ class LocalMealProgressService {
     return goal;
   }
 
+  Future<RewardGoal?> updateActiveRewardGoal({
+    required int requiredStickerCount,
+    required String rewardText,
+  }) async {
+    final trimmedRewardText = rewardText.trim();
+    if (trimmedRewardText.isEmpty) {
+      throw ArgumentError.value(rewardText, 'rewardText');
+    }
+
+    final preferences = await SharedPreferences.getInstance();
+    final activeGoal = _decodeRewardGoal(preferences);
+    if (activeGoal == null) {
+      return null;
+    }
+
+    final nextRequiredStickerCount = requiredStickerCount.clamp(1, 20).toInt();
+    final isReady = activeGoal.filledCount >= nextRequiredStickerCount;
+    final updatedGoal = activeGoal.copyWith(
+      rewardText: trimmedRewardText,
+      requiredStickerCount: nextRequiredStickerCount,
+      status: isReady ? RewardGoalStatus.ready : RewardGoalStatus.active,
+      readyAt: isReady ? activeGoal.readyAt ?? DateTime.now() : null,
+    );
+    await _saveActiveRewardGoal(preferences, updatedGoal);
+    return updatedGoal;
+  }
+
+  Future<RewardGoal?> cancelActiveRewardGoal() async {
+    final preferences = await SharedPreferences.getInstance();
+    final activeGoal = _decodeRewardGoal(preferences);
+    if (activeGoal == null) {
+      return null;
+    }
+
+    await preferences.remove(_activeRewardGoalKey);
+    return activeGoal;
+  }
+
   Future<RewardGoal?> redeemActiveRewardGoal() async {
     final preferences = await SharedPreferences.getInstance();
     final activeGoal = _decodeRewardGoal(preferences);

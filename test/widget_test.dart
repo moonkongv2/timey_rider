@@ -1488,6 +1488,69 @@ void main() {
     },
   );
 
+  test('Active reward goal can be updated', () async {
+    SharedPreferences.setMockInitialValues({});
+
+    final service = LocalMealProgressService();
+    await service.createRewardGoal(
+      requiredStickerCount: 5,
+      rewardText: '아이스크림',
+    );
+
+    final updatedGoal = await service.updateActiveRewardGoal(
+      requiredStickerCount: 7,
+      rewardText: '딸기',
+    );
+    final snapshot = await service.loadSnapshot();
+
+    expect(updatedGoal?.rewardText, '딸기');
+    expect(updatedGoal?.requiredStickerCount, 7);
+    expect(snapshot.activeRewardGoal?.rewardText, '딸기');
+    expect(snapshot.activeRewardGoal?.requiredStickerCount, 7);
+  });
+
+  test(
+    'Reducing required count to filled count makes reward goal ready',
+    () async {
+      SharedPreferences.setMockInitialValues({});
+
+      final service = LocalMealProgressService();
+      await service.createRewardGoal(
+        requiredStickerCount: 5,
+        rewardText: '아이스크림',
+      );
+      await service.recordMealResult(_mealResult());
+      await service.recordMealResult(
+        _mealResult(endedAt: DateTime(2026, 5, 4, 13)),
+      );
+
+      final updatedGoal = await service.updateActiveRewardGoal(
+        requiredStickerCount: 2,
+        rewardText: '아이스크림',
+      );
+
+      expect(updatedGoal?.status, RewardGoalStatus.ready);
+      expect(updatedGoal?.readyAt, isNotNull);
+    },
+  );
+
+  test('Active reward goal can be canceled', () async {
+    SharedPreferences.setMockInitialValues({});
+
+    final service = LocalMealProgressService();
+    await service.createRewardGoal(
+      requiredStickerCount: 5,
+      rewardText: '아이스크림',
+    );
+
+    final canceledGoal = await service.cancelActiveRewardGoal();
+    final snapshot = await service.loadSnapshot();
+
+    expect(canceledGoal?.rewardText, '아이스크림');
+    expect(snapshot.activeRewardGoal, isNull);
+    expect(snapshot.redeemedRewardGoals, isEmpty);
+  });
+
   test('Existing sticker inventory counts still increase', () async {
     SharedPreferences.setMockInitialValues({});
 
@@ -1540,6 +1603,8 @@ void main() {
     );
     await tester.pump();
 
+    await tester.tap(find.widgetWithText(ChoiceChip, '7'));
+    await tester.pump();
     await tester.enterText(find.byType(TextField), 'ice cream');
     await tester.pump();
     await tester.tap(find.text('Save Promise'));
@@ -1547,7 +1612,42 @@ void main() {
 
     final snapshot = await service.loadSnapshot();
     expect(snapshot.activeRewardGoal?.rewardText, 'ice cream');
-    expect(snapshot.activeRewardGoal?.requiredStickerCount, 5);
+    expect(snapshot.activeRewardGoal?.requiredStickerCount, 7);
+  });
+
+  testWidgets('Reward goal given flow asks for confirmation', (tester) async {
+    SharedPreferences.setMockInitialValues({});
+    final service = LocalMealProgressService();
+    await service.createRewardGoal(
+      requiredStickerCount: 1,
+      rewardText: 'ice cream',
+    );
+    await service.recordMealResult(_mealResult());
+
+    await tester.pumpWidget(
+      MaterialApp(
+        locale: const Locale('en'),
+        home: RewardGoalScreen(mealProgressService: service),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('Reward Given'));
+    await tester.pumpAndSettle();
+    expect(find.text('Was the reward given?'), findsOneWidget);
+
+    await tester.tap(find.text('Keep Promise'));
+    await tester.pumpAndSettle();
+    expect((await service.loadSnapshot()).activeRewardGoal, isNotNull);
+
+    await tester.tap(find.text('Reward Given'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Mark Given'));
+    await tester.pumpAndSettle();
+
+    final snapshot = await service.loadSnapshot();
+    expect(snapshot.activeRewardGoal, isNull);
+    expect(snapshot.redeemedRewardGoals, hasLength(1));
   });
 }
 

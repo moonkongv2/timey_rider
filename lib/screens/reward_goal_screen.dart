@@ -24,6 +24,7 @@ class _RewardGoalScreenState extends State<RewardGoalScreen> {
   final TextEditingController _rewardTextController = TextEditingController();
   int _requiredStickerCount = 5;
   bool _isSaving = false;
+  RewardGoal? _editingGoal;
 
   @override
   void initState() {
@@ -51,7 +52,31 @@ class _RewardGoalScreenState extends State<RewardGoalScreen> {
 
   void _adjustRequiredStickerCount(int delta) {
     setState(() {
-      _requiredStickerCount = (_requiredStickerCount + delta).clamp(1, 20);
+      _requiredStickerCount = (_requiredStickerCount + delta)
+          .clamp(1, 20)
+          .toInt();
+    });
+  }
+
+  void _setRequiredStickerCount(int count) {
+    setState(() {
+      _requiredStickerCount = count.clamp(1, 20).toInt();
+    });
+  }
+
+  void _startEditingGoal(RewardGoal goal) {
+    setState(() {
+      _editingGoal = goal;
+      _rewardTextController.text = goal.rewardText;
+      _requiredStickerCount = goal.requiredStickerCount;
+    });
+  }
+
+  void _stopEditingGoal() {
+    setState(() {
+      _editingGoal = null;
+      _rewardTextController.clear();
+      _requiredStickerCount = 5;
     });
   }
 
@@ -82,8 +107,48 @@ class _RewardGoalScreenState extends State<RewardGoalScreen> {
     }
   }
 
+  Future<void> _updateGoal() async {
+    final editingGoal = _editingGoal;
+    final rewardText = _rewardTextController.text.trim();
+    if (editingGoal == null || rewardText.isEmpty || _isSaving) {
+      return;
+    }
+
+    final texts = AppTexts.of(context);
+    setState(() => _isSaving = true);
+    try {
+      await widget.mealProgressService.updateActiveRewardGoal(
+        requiredStickerCount: _requiredStickerCount,
+        rewardText: rewardText,
+      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(texts.rewards.rewardGoalUpdatedMessage)),
+        );
+        _stopEditingGoal();
+        _refresh();
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isSaving = false);
+      }
+    }
+  }
+
   Future<void> _redeemGoal() async {
     if (_isSaving) {
+      return;
+    }
+
+    final confirmed = await _confirmRewardGoalAction(
+      title: AppTexts.of(context).rewards.confirmRedeemRewardGoalTitle,
+      message: AppTexts.of(context).rewards.confirmRedeemRewardGoalMessage,
+      confirmLabel: AppTexts.of(context).rewards.confirmRewardGiven,
+    );
+    if (!confirmed) {
+      return;
+    }
+    if (!mounted) {
       return;
     }
 
@@ -96,6 +161,7 @@ class _RewardGoalScreenState extends State<RewardGoalScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(texts.rewards.rewardGoalRedeemedMessage)),
         );
+        _stopEditingGoal();
         _refresh();
       }
     } finally {
@@ -103,6 +169,75 @@ class _RewardGoalScreenState extends State<RewardGoalScreen> {
         setState(() => _isSaving = false);
       }
     }
+  }
+
+  Future<void> _cancelGoal() async {
+    if (_isSaving) {
+      return;
+    }
+
+    final texts = AppTexts.of(context);
+    final confirmed = await _confirmRewardGoalAction(
+      title: texts.rewards.confirmCancelRewardGoalTitle,
+      message: texts.rewards.confirmCancelRewardGoalMessage,
+      confirmLabel: texts.rewards.confirmCancelGoal,
+      isDestructive: true,
+    );
+    if (!confirmed) {
+      return;
+    }
+
+    setState(() => _isSaving = true);
+    try {
+      final canceledGoal = await widget.mealProgressService
+          .cancelActiveRewardGoal();
+      if (mounted && canceledGoal != null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(texts.rewards.rewardGoalCanceledMessage)),
+        );
+        _stopEditingGoal();
+        _refresh();
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isSaving = false);
+      }
+    }
+  }
+
+  Future<bool> _confirmRewardGoalAction({
+    required String title,
+    required String message,
+    required String confirmLabel,
+    bool isDestructive = false,
+  }) async {
+    final texts = AppTexts.of(context);
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text(title),
+          content: Text(message),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: Text(texts.rewards.keepRewardGoal),
+            ),
+            FilledButton(
+              onPressed: () => Navigator.of(context).pop(true),
+              style: isDestructive
+                  ? FilledButton.styleFrom(
+                      backgroundColor: AppColors.error,
+                      foregroundColor: AppColors.white,
+                    )
+                  : null,
+              child: Text(confirmLabel),
+            ),
+          ],
+        );
+      },
+    );
+    return confirmed == true;
   }
 
   @override
@@ -116,24 +251,50 @@ class _RewardGoalScreenState extends State<RewardGoalScreen> {
           future: _snapshotFuture,
           builder: (context, snapshot) {
             final activeGoal = snapshot.data?.activeRewardGoal;
+            final redeemedRewardGoals =
+                snapshot.data?.redeemedRewardGoals ?? const <RewardGoal>[];
+            final editingGoal = _editingGoal;
 
             return ListView(
               padding: const EdgeInsets.all(AppSpacing.xl),
               children: [
-                if (activeGoal == null)
+                if (activeGoal == null) ...[
                   _RewardGoalCreationForm(
+                    title: texts.rewards.rewardGoalEmptyTitle,
+                    body: texts.rewards.rewardGoalEmptyBody,
+                    saveLabel: texts.rewards.rewardGoalSaveButton,
                     rewardTextController: _rewardTextController,
                     requiredStickerCount: _requiredStickerCount,
                     isSaving: _isSaving,
                     onAdjustRequiredStickerCount: _adjustRequiredStickerCount,
+                    onSelectRequiredStickerCount: _setRequiredStickerCount,
                     onSave: _createGoal,
-                  )
-                else
+                  ),
+                ] else if (editingGoal != null &&
+                    editingGoal.id == activeGoal.id) ...[
+                  _RewardGoalCreationForm(
+                    title: texts.rewards.editRewardGoal,
+                    body: texts.rewards.rewardGoalEmptyBody,
+                    saveLabel: texts.rewards.editRewardGoal,
+                    rewardTextController: _rewardTextController,
+                    requiredStickerCount: _requiredStickerCount,
+                    isSaving: _isSaving,
+                    onAdjustRequiredStickerCount: _adjustRequiredStickerCount,
+                    onSelectRequiredStickerCount: _setRequiredStickerCount,
+                    onSave: _updateGoal,
+                    onCancel: _stopEditingGoal,
+                  ),
+                ] else ...[
                   _ActiveRewardGoalView(
                     goal: activeGoal,
                     isSaving: _isSaving,
+                    onEdit: () => _startEditingGoal(activeGoal),
+                    onCancel: _cancelGoal,
                     onRedeem: _redeemGoal,
                   ),
+                ],
+                const SizedBox(height: AppSpacing.xl),
+                _RewardGoalHistorySection(goals: redeemedRewardGoals),
               ],
             );
           },
@@ -145,18 +306,28 @@ class _RewardGoalScreenState extends State<RewardGoalScreen> {
 
 class _RewardGoalCreationForm extends StatelessWidget {
   const _RewardGoalCreationForm({
+    required this.title,
+    required this.body,
+    required this.saveLabel,
     required this.rewardTextController,
     required this.requiredStickerCount,
     required this.isSaving,
     required this.onAdjustRequiredStickerCount,
+    required this.onSelectRequiredStickerCount,
     required this.onSave,
+    this.onCancel,
   });
 
+  final String title;
+  final String body;
+  final String saveLabel;
   final TextEditingController rewardTextController;
   final int requiredStickerCount;
   final bool isSaving;
   final ValueChanged<int> onAdjustRequiredStickerCount;
+  final ValueChanged<int> onSelectRequiredStickerCount;
   final VoidCallback onSave;
+  final VoidCallback? onCancel;
 
   @override
   Widget build(BuildContext context) {
@@ -170,7 +341,7 @@ class _RewardGoalCreationForm extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Text(
-              texts.rewards.rewardGoalEmptyTitle,
+              title,
               style: Theme.of(context).textTheme.titleLarge?.copyWith(
                 fontWeight: FontWeight.w900,
                 color: AppColors.textStrong,
@@ -178,7 +349,7 @@ class _RewardGoalCreationForm extends StatelessWidget {
             ),
             const SizedBox(height: AppSpacing.sm),
             Text(
-              texts.rewards.rewardGoalEmptyBody,
+              body,
               style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                 color: AppColors.textSecondary,
                 fontWeight: FontWeight.w700,
@@ -203,13 +374,23 @@ class _RewardGoalCreationForm extends StatelessWidget {
             _StickerCountSelector(
               count: requiredStickerCount,
               onAdjust: onAdjustRequiredStickerCount,
+              onSelect: onSelectRequiredStickerCount,
             ),
             const SizedBox(height: AppSpacing.xl),
             FilledButton.icon(
               onPressed: canSave ? onSave : null,
               icon: const Icon(Icons.flag_rounded),
-              label: Text(texts.rewards.rewardGoalSaveButton),
+              label: Text(saveLabel),
             ),
+            if (onCancel != null) ...[
+              const SizedBox(height: AppSpacing.sm),
+              OutlinedButton(
+                onPressed: isSaving ? null : onCancel,
+                child: Text(
+                  MaterialLocalizations.of(context).cancelButtonLabel,
+                ),
+              ),
+            ],
           ],
         ),
       ),
@@ -218,56 +399,79 @@ class _RewardGoalCreationForm extends StatelessWidget {
 }
 
 class _StickerCountSelector extends StatelessWidget {
-  const _StickerCountSelector({required this.count, required this.onAdjust});
+  const _StickerCountSelector({
+    required this.count,
+    required this.onAdjust,
+    required this.onSelect,
+  });
 
   final int count;
   final ValueChanged<int> onAdjust;
+  final ValueChanged<int> onSelect;
 
   @override
   Widget build(BuildContext context) {
     final texts = AppTexts.of(context);
 
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        color: AppColors.surfaceWarm,
-        borderRadius: AppRadius.card,
-        border: Border.all(color: AppColors.borderWarm),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(AppSpacing.md),
-        child: Row(
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        DecoratedBox(
+          decoration: BoxDecoration(
+            color: AppColors.surfaceWarm,
+            borderRadius: AppRadius.card,
+            border: Border.all(color: AppColors.borderWarm),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(AppSpacing.md),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    texts.rewards.rewardGoalRequiredStickerCountLabel,
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.w800,
+                      color: AppColors.textStrong,
+                    ),
+                  ),
+                ),
+                IconButton.filledTonal(
+                  onPressed: count <= 1 ? null : () => onAdjust(-1),
+                  icon: const Icon(Icons.remove_rounded),
+                ),
+                SizedBox(
+                  width: 52,
+                  child: Text(
+                    '$count',
+                    textAlign: TextAlign.center,
+                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                      fontWeight: FontWeight.w900,
+                      color: AppColors.textStrong,
+                    ),
+                  ),
+                ),
+                IconButton.filledTonal(
+                  onPressed: count >= 20 ? null : () => onAdjust(1),
+                  icon: const Icon(Icons.add_rounded),
+                ),
+              ],
+            ),
+          ),
+        ),
+        const SizedBox(height: AppSpacing.sm),
+        Wrap(
+          spacing: AppSpacing.sm,
+          runSpacing: AppSpacing.sm,
           children: [
-            Expanded(
-              child: Text(
-                texts.rewards.rewardGoalRequiredStickerCountLabel,
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.w800,
-                  color: AppColors.textStrong,
-                ),
+            for (final value in const [3, 5, 7, 10])
+              ChoiceChip(
+                label: Text('$value'),
+                selected: count == value,
+                onSelected: (_) => onSelect(value),
               ),
-            ),
-            IconButton.filledTonal(
-              onPressed: count <= 1 ? null : () => onAdjust(-1),
-              icon: const Icon(Icons.remove_rounded),
-            ),
-            SizedBox(
-              width: 52,
-              child: Text(
-                '$count',
-                textAlign: TextAlign.center,
-                style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                  fontWeight: FontWeight.w900,
-                  color: AppColors.textStrong,
-                ),
-              ),
-            ),
-            IconButton.filledTonal(
-              onPressed: count >= 20 ? null : () => onAdjust(1),
-              icon: const Icon(Icons.add_rounded),
-            ),
           ],
         ),
-      ),
+      ],
     );
   }
 }
@@ -276,11 +480,15 @@ class _ActiveRewardGoalView extends StatelessWidget {
   const _ActiveRewardGoalView({
     required this.goal,
     required this.isSaving,
+    required this.onEdit,
+    required this.onCancel,
     required this.onRedeem,
   });
 
   final RewardGoal goal;
   final bool isSaving;
+  final VoidCallback onEdit;
+  final VoidCallback onCancel;
   final VoidCallback onRedeem;
 
   @override
@@ -331,6 +539,29 @@ class _ActiveRewardGoalView extends StatelessWidget {
             ],
             const SizedBox(height: AppSpacing.xl),
             _RewardGoalBoard(goal: goal),
+            const SizedBox(height: AppSpacing.lg),
+            Row(
+              children: [
+                Expanded(
+                  child: OutlinedButton.icon(
+                    onPressed: isSaving ? null : onEdit,
+                    icon: const Icon(Icons.edit_rounded),
+                    label: Text(texts.rewards.editRewardGoal),
+                  ),
+                ),
+                const SizedBox(width: AppSpacing.sm),
+                Expanded(
+                  child: OutlinedButton.icon(
+                    onPressed: isSaving ? null : onCancel,
+                    icon: const Icon(Icons.delete_outline_rounded),
+                    label: Text(texts.rewards.cancelRewardGoal),
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: AppColors.error,
+                    ),
+                  ),
+                ),
+              ],
+            ),
             if (goal.isReady) ...[
               const SizedBox(height: AppSpacing.xl),
               DecoratedBox(
@@ -363,6 +594,133 @@ class _ActiveRewardGoalView extends StatelessWidget {
       ),
     );
   }
+}
+
+class _RewardGoalHistorySection extends StatelessWidget {
+  const _RewardGoalHistorySection({required this.goals});
+
+  final List<RewardGoal> goals;
+
+  @override
+  Widget build(BuildContext context) {
+    final texts = AppTexts.of(context);
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Text(
+          texts.rewards.rewardGoalHistoryTitle,
+          style: Theme.of(context).textTheme.titleMedium?.copyWith(
+            fontWeight: FontWeight.w900,
+            color: AppColors.textStrong,
+          ),
+        ),
+        const SizedBox(height: AppSpacing.md),
+        if (goals.isEmpty)
+          DecoratedBox(
+            decoration: BoxDecoration(
+              color: AppColors.surfaceWarm,
+              borderRadius: AppRadius.card,
+              border: Border.all(color: AppColors.borderWarm),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(AppSpacing.lg),
+              child: Text(
+                texts.rewards.rewardGoalNoHistory,
+                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                  color: AppColors.textSecondary,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ),
+          )
+        else
+          for (final goal in goals) ...[
+            _RewardGoalHistoryTile(goal: goal),
+            const SizedBox(height: AppSpacing.sm),
+          ],
+      ],
+    );
+  }
+}
+
+class _RewardGoalHistoryTile extends StatelessWidget {
+  const _RewardGoalHistoryTile({required this.goal});
+
+  final RewardGoal goal;
+
+  @override
+  Widget build(BuildContext context) {
+    final texts = AppTexts.of(context);
+
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: AppColors.white,
+        borderRadius: AppRadius.card,
+        border: Border.all(color: AppColors.borderSoft),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(AppSpacing.lg),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              goal.rewardText,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.w900,
+                color: AppColors.textStrong,
+              ),
+            ),
+            const SizedBox(height: AppSpacing.xs),
+            Text(
+              texts.rewards.rewardGoalProgress(
+                goal.filledCount,
+                goal.requiredStickerCount,
+              ),
+              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                color: AppColors.textPrimary,
+                fontWeight: FontWeight.w800,
+              ),
+            ),
+            if (goal.readyAt != null) ...[
+              const SizedBox(height: AppSpacing.xs),
+              Text(
+                texts.rewards.rewardGoalReadyAt(_formatDateLabel(goal.readyAt)),
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: AppColors.textSecondary,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ],
+            if (goal.redeemedAt != null) ...[
+              const SizedBox(height: AppSpacing.xs),
+              Text(
+                texts.rewards.rewardGoalRedeemedAt(
+                  _formatDateLabel(goal.redeemedAt),
+                ),
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: AppColors.textSecondary,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+String _formatDateLabel(DateTime? dateTime) {
+  if (dateTime == null) {
+    return '';
+  }
+
+  final month = dateTime.month.toString().padLeft(2, '0');
+  final day = dateTime.day.toString().padLeft(2, '0');
+  return '${dateTime.year}.$month.$day';
 }
 
 class _RewardGoalBoard extends StatelessWidget {

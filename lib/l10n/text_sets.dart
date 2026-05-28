@@ -114,15 +114,30 @@ abstract interface class RewardTextSet {
   String get rewardGoalReadyMessage;
   String get rewardGoalGivenButton;
   String get rewardGoalCreatedMessage;
+  String get rewardGoalUpdatedMessage;
+  String get rewardGoalCanceledMessage;
   String get rewardGoalRedeemedMessage;
   String get rewardGoalProgressTitle;
   String get rewardGoalEmptySlotSemanticLabel;
   String get openRewardGoal;
   String get rewardGoalPromiseTitle;
+  String get editRewardGoal;
+  String get cancelRewardGoal;
+  String get rewardGoalHistoryTitle;
+  String get rewardGoalNoHistory;
+  String get confirmRedeemRewardGoalTitle;
+  String get confirmRedeemRewardGoalMessage;
+  String get confirmCancelRewardGoalTitle;
+  String get confirmCancelRewardGoalMessage;
+  String get keepRewardGoal;
+  String get confirmRewardGiven;
+  String get confirmCancelGoal;
 
   String stickerCount(int count);
   String rewardGoalProgress(int filledCount, int requiredCount);
   String rewardGoalRemaining(int remainingCount);
   String rewardGoalSlotSemanticLabel(int slotNumber, String rewardName);
+  String rewardGoalReadyAt(String dateLabel);
+  String rewardGoalRedeemedAt(String dateLabel);
   String name(String rewardId);
 }
