@@ -1076,7 +1076,7 @@ void main() {
     expect(sideChanges, greaterThanOrEqualTo(7));
     expect(
       roadPointForProgress(roadSize, 1).dx,
-      lessThan(roadBounds.center.dx),
+      greaterThan(roadBounds.center.dx),
     );
 
     await tester.pumpWidget(

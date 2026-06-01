@@ -23,7 +23,7 @@ Path createRoadPath(Size size) {
   final top = bounds.top;
   final bottom = bounds.bottom;
   final height = bounds.height;
-  final rowHeight = height / 9;
+  final rowHeight = height / 10;
 
   return Path()
     ..moveTo(left, bottom)
@@ -44,8 +44,10 @@ Path createRoadPath(Size size) {
     ..lineTo(left, bottom - (rowHeight * 7))
     ..lineTo(left, bottom - (rowHeight * 8))
     ..lineTo(right, bottom - (rowHeight * 8))
-    ..lineTo(right, top)
-    ..lineTo(left, top);
+    ..lineTo(right, bottom - (rowHeight * 9))
+    ..lineTo(left, bottom - (rowHeight * 9))
+    ..lineTo(left, top)
+    ..lineTo(right, top);
 }
 
 PathMetric _roadMetric(Size size) {
