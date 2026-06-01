@@ -38,7 +38,6 @@ dependencies:
   cupertino_icons: ^1.0.8
   shared_preferences: ^2.3.5
   video_player: ^2.10.0
-  lottie: ^3.3.3
   image_picker: ^1.2.2
   path_provider: ^2.1.5
   image: ^4.8.0
