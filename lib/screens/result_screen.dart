@@ -21,6 +21,10 @@ const _resultVideoPathsByVehicle = {
   'fire_truck': 'assets/videos/result_fire_truck_success.mp4',
   'police_car': 'assets/videos/result_police_car_success.mp4',
   'excavator': 'assets/videos/result_excavator_success.mp4',
+  'airplane': 'assets/videos/result_airplane_success.mp4',
+  'bus': 'assets/videos/result_bus_success.mp4',
+  'supercar': 'assets/videos/result_supercar_success.mp4',
+  'train': 'assets/videos/result_train_success.mp4',
 };
 
 String resultVideoAssetPathForVehicle({required String vehicleId}) {

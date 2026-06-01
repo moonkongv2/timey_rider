@@ -143,6 +143,10 @@ void main() {
         'fire_truck',
         'police_car',
         'excavator',
+        'airplane',
+        'bus',
+        'supercar',
+        'train',
       };
 
       for (final vehicle in VehicleCatalog.all) {
