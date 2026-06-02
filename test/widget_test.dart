@@ -1023,6 +1023,9 @@ void main() {
     expect(find.text('아이 이름'), findsOneWidget);
     await tester.enterText(find.byType(TextField), '서아');
     await tester.tap(find.text('이름 저장'));
+    await tester.pump();
+
+    expect(find.text('이름을 저장했어요.'), findsOneWidget);
     await tester.pumpAndSettle();
 
     final preferences = await SharedPreferences.getInstance();
@@ -1034,6 +1037,26 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('서아의 냠냠 기록'), findsOneWidget);
+  });
+
+  testWidgets('Empty child name in settings shows validation message', (
+    tester,
+  ) async {
+    SharedPreferences.setMockInitialValues({});
+
+    await _startApp(tester, const Locale('ko'));
+
+    await tester.tap(find.byTooltip('설정'));
+    await tester.pumpAndSettle();
+
+    await tester.enterText(find.byType(TextField), '   ');
+    await tester.tap(find.text('이름 저장'));
+    await tester.pump();
+
+    expect(find.text('아이 이름을 입력해 주세요.'), findsOneWidget);
+
+    final preferences = await SharedPreferences.getInstance();
+    expect(preferences.getString('childName'), '지율');
   });
 
   testWidgets('Vehicle widget falls back to emoji for missing assets', (

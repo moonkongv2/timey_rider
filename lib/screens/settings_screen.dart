@@ -48,11 +48,18 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   void _saveChildName() {
+    final texts = AppTexts.of(context);
     final childName = _childNameController.text.trim();
     if (childName.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(texts.settings.childNameRequiredMessage)),
+      );
       return;
     }
     _update(_config.copyWith(childName: childName));
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(texts.settings.childNameSavedMessage)),
+    );
   }
 
   Future<void> _openAvatarSetup() async {

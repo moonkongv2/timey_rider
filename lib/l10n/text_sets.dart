@@ -58,6 +58,8 @@ abstract interface class SettingsTextSet {
   String get childNameSetupTitle;
   String get childNameSetupSubtitle;
   String get saveChildName;
+  String get childNameRequiredMessage;
+  String get childNameSavedMessage;
   String get avatarSettingsTitle;
   String get avatarDefaultState;
   String get avatarCustomState;

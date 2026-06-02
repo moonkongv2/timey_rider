@@ -18,6 +18,8 @@ class SettingsTexts implements SettingsTextSet {
   String get childNameSetupTitle => '누가 냠냠 라이더를 탈까?';
   String get childNameSetupSubtitle => '아이 이름을 먼저 알려줘.';
   String get saveChildName => '이름 저장';
+  String get childNameRequiredMessage => '아이 이름을 입력해 주세요.';
+  String get childNameSavedMessage => '이름을 저장했어요.';
   String get avatarSettingsTitle => '아바타 설정';
   String get avatarDefaultState => '기본 이미지 사용 중';
   String get avatarCustomState => '직접 만든 아바타 사용 중';
