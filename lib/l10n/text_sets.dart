@@ -16,7 +16,6 @@ abstract interface class HomeTextSet {
   String get todayVehicleTitle;
   String get morningCourse;
   String get morningCourseSubtitle;
-  String get normalCourse;
   String get slowCourse;
   String get slowCourseSubtitle;
   String get quickCourseTitle;
@@ -37,6 +36,9 @@ abstract interface class HomeTextSet {
 
   String recentCustomMinutes(int minutes);
   String minuteLabel(int minutes);
+  String normalCourse(int minutes);
+  String alternateCourse(int minutes);
+  String alternateCourseSubtitle(int minutes);
   String progressTitle(String childName);
   String mealCount(int count);
   String stickerKindCount(int count);

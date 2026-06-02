@@ -29,6 +29,7 @@ import 'timer_screen.dart';
 
 const _homeLogoAssetPath = 'assets/images/logo_eng.png';
 const _settingsIconAssetPath = 'assets/images/icon_setting_rgba.png';
+const _mealCoursePresetMinutes = [15, 25, 35];
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({
@@ -89,13 +90,17 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
   }
 
   void _updateConfig(MealTimerConfig config) {
-    setState(() => _config = config);
+    setState(() {
+      if (_config.duration != config.duration) {
+        _customMinutes = config.duration.inMinutes.toDouble();
+      }
+      _config = config;
+    });
     widget.onConfigChanged(config);
   }
 
   Future<void> _startTimer(int minutes) async {
     final config = _config.copyWith(duration: Duration(minutes: minutes));
-    _updateConfig(config);
     await Navigator.of(context).push(
       MaterialPageRoute(
         builder: (_) => TimerScreen(
@@ -289,6 +294,10 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
     final avatarStateText = isUsingCustomAvatar
         ? texts.home.avatarInlineCustomState
         : texts.home.avatarInlineDefaultState;
+    final defaultMealMinutes = _config.duration.inMinutes;
+    final alternateCourseMinutes = _mealCoursePresetMinutes
+        .where((minutes) => minutes != defaultMealMinutes)
+        .toList();
 
     return Scaffold(
       backgroundColor: AppColors.cream,
@@ -365,7 +374,8 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
                   ),
                 );
                 final heroCard = _HeroMissionCard(
-                  ctaLabel: '${texts.home.normalCourse} ${texts.common.start}',
+                  ctaLabel:
+                      '${texts.home.normalCourse(defaultMealMinutes)} ${texts.common.start}',
                   vehicle: selectedVehicle,
                   avatarMode: selectedVehicleAvatarMode,
                   customAvatarImagePath: selectedVehicleAvatarImagePath,
@@ -374,23 +384,18 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
                   avatarOffsetY: _config.avatarOffsetY,
                   avatarRotationDegrees: _config.avatarRotationDegrees,
                   avatarImageBuilder: widget.avatarImageBuilder,
-                  onStart: () => _startTimer(25),
+                  onStart: () => _startTimer(defaultMealMinutes),
                 );
                 final quickCourses = _QuickCourseSection(
                   title: texts.home.quickCourseTitle,
                   children: [
-                    _QuickCourseButton(
-                      label: texts.home.morningCourse,
-                      subtitle: texts.home.morningCourseSubtitle,
-                      emoji: '🌞',
-                      onPressed: () => _startTimer(15),
-                    ),
-                    _QuickCourseButton(
-                      label: texts.home.slowCourse,
-                      subtitle: texts.home.slowCourseSubtitle,
-                      emoji: '🌈',
-                      onPressed: () => _startTimer(35),
-                    ),
+                    for (final minutes in alternateCourseMinutes)
+                      _QuickCourseButton(
+                        label: texts.home.alternateCourse(minutes),
+                        subtitle: texts.home.alternateCourseSubtitle(minutes),
+                        emoji: _quickCourseEmoji(minutes),
+                        onPressed: () => _startTimer(minutes),
+                      ),
                     _QuickCourseButton(
                       label: texts.home.customSheetTitle,
                       subtitle: texts.home.recentCustomMinutes(
@@ -469,6 +474,15 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
       ),
     );
   }
+}
+
+String? _quickCourseEmoji(int minutes) {
+  return switch (minutes) {
+    15 => '🌞',
+    25 => '⭐',
+    35 => '🌈',
+    _ => null,
+  };
 }
 
 class _HomeLogo extends StatelessWidget {

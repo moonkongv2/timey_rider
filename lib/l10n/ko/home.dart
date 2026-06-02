@@ -11,7 +11,6 @@ class HomeTexts implements HomeTextSet {
   String get todayVehicleTitle => '오늘의 빠방';
   String get morningCourse => '15분 코스';
   String get morningCourseSubtitle => '가볍게 워밍업';
-  String get normalCourse => '25분 보통 코스';
   String get slowCourse => '35분 코스';
   String get slowCourseSubtitle => '천천히 완주하기';
   String get quickCourseTitle => '다른 코스';
@@ -32,6 +31,17 @@ class HomeTexts implements HomeTextSet {
 
   String recentCustomMinutes(int minutes) => '최근 $minutes분';
   String minuteLabel(int minutes) => '$minutes분';
+  String normalCourse(int minutes) => '$minutes분 보통 코스';
+  String alternateCourse(int minutes) => '$minutes분 코스';
+  String alternateCourseSubtitle(int minutes) {
+    return switch (minutes) {
+      15 => '가볍게 워밍업',
+      25 => '기본 리듬으로 완주',
+      35 => '천천히 완주하기',
+      _ => '$minutes분으로 달리기',
+    };
+  }
+
   String progressTitle(String childName) =>
       '${_casualKoreanName(childName)}의 냠냠 기록';
   String mealCount(int count) => '$count번';

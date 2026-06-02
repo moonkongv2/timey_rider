@@ -27,6 +27,7 @@ import 'package:jy_yamyam/services/local_avatar_image_service.dart';
 import 'package:jy_yamyam/services/local_meal_progress_service.dart';
 import 'package:jy_yamyam/services/local_settings_service.dart';
 import 'package:jy_yamyam/services/screen_awake_service.dart';
+import 'package:jy_yamyam/widgets/app/app_bouncy_button.dart';
 import 'package:jy_yamyam/widgets/avatar/avatar_composite_preview.dart';
 import 'package:jy_yamyam/widgets/road_painter.dart';
 import 'package:jy_yamyam/widgets/road_view.dart';
@@ -381,6 +382,123 @@ void main() {
     expect(find.textContaining('25분 보통 코스'), findsOneWidget);
     expect(find.text('35분 코스'), findsOneWidget);
     expect(find.textContaining('직접 설정'), findsOneWidget);
+  });
+
+  testWidgets('Home regular course uses saved default meal duration', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        locale: const Locale('ko'),
+        supportedLocales: const [Locale('ko'), Locale('en')],
+        localizationsDelegates: const [
+          GlobalMaterialLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+        ],
+        home: HomeScreen(
+          config: MealTimerConfig.defaults().copyWith(
+            childName: '지율',
+            duration: const Duration(minutes: 35),
+          ),
+          mealProgressService: LocalMealProgressService(),
+          onConfigChanged: (_) {},
+        ),
+      ),
+    );
+    await tester.pump();
+
+    expect(find.textContaining('35분 보통 코스'), findsOneWidget);
+
+    final regularCourseButton = tester.widget<AppBouncyButton>(
+      find.ancestor(
+        of: find.textContaining('35분 보통 코스'),
+        matching: find.byType(AppBouncyButton),
+      ),
+    );
+    regularCourseButton.onPressed!();
+    expect(tester.takeException(), isNull);
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 400));
+
+    expect(find.byType(TimerScreen), findsOneWidget);
+    expect(
+      tester.widget<TimerScreen>(find.byType(TimerScreen)).config.duration,
+      const Duration(minutes: 35),
+    );
+  });
+
+  testWidgets('Alternate courses exclude the selected default duration', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        locale: const Locale('ko'),
+        supportedLocales: const [Locale('ko'), Locale('en')],
+        localizationsDelegates: const [
+          GlobalMaterialLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+        ],
+        home: HomeScreen(
+          config: MealTimerConfig.defaults().copyWith(
+            childName: '지율',
+            duration: const Duration(minutes: 15),
+          ),
+          mealProgressService: LocalMealProgressService(),
+          onConfigChanged: (_) {},
+        ),
+      ),
+    );
+    await tester.pump();
+
+    expect(find.textContaining('15분 보통 코스'), findsOneWidget);
+    expect(find.text('15분 코스'), findsNothing);
+    expect(find.text('25분 코스'), findsOneWidget);
+    expect(find.text('35분 코스'), findsOneWidget);
+  });
+
+  testWidgets('Quick courses do not overwrite default meal duration', (
+    tester,
+  ) async {
+    MealTimerConfig? changedConfig;
+
+    await tester.pumpWidget(
+      MaterialApp(
+        locale: const Locale('ko'),
+        supportedLocales: const [Locale('ko'), Locale('en')],
+        localizationsDelegates: const [
+          GlobalMaterialLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+        ],
+        home: HomeScreen(
+          config: MealTimerConfig.defaults().copyWith(
+            childName: '지율',
+            duration: const Duration(minutes: 35),
+          ),
+          mealProgressService: LocalMealProgressService(),
+          onConfigChanged: (config) => changedConfig = config,
+        ),
+      ),
+    );
+    await tester.pump();
+
+    final quickCourseButton = tester.widget<InkWell>(
+      find
+          .ancestor(of: find.text('25분 코스'), matching: find.byType(InkWell))
+          .first,
+    );
+    quickCourseButton.onTap!();
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 400));
+
+    expect(find.byType(TimerScreen), findsOneWidget);
+    expect(
+      tester.widget<TimerScreen>(find.byType(TimerScreen)).config.duration,
+      const Duration(minutes: 25),
+    );
+    expect(changedConfig, isNull);
   });
 
   testWidgets('Home screen vehicle sections render confirmed custom avatar', (

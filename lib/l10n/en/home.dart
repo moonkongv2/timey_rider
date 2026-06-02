@@ -11,7 +11,6 @@ class EnHomeTexts implements HomeTextSet {
   String get todayVehicleTitle => "Today's vehicle";
   String get morningCourse => '15-min Ride';
   String get morningCourseSubtitle => 'A light warm-up';
-  String get normalCourse => '25-min Regular Ride';
   String get slowCourse => '35-min Ride';
   String get slowCourseSubtitle => 'Cruise to the finish';
   String get quickCourseTitle => 'Other rides';
@@ -32,6 +31,17 @@ class EnHomeTexts implements HomeTextSet {
 
   String recentCustomMinutes(int minutes) => 'Recent $minutes min';
   String minuteLabel(int minutes) => '$minutes min';
+  String normalCourse(int minutes) => '$minutes-min Regular Ride';
+  String alternateCourse(int minutes) => '$minutes-min Ride';
+  String alternateCourseSubtitle(int minutes) {
+    return switch (minutes) {
+      15 => 'A light warm-up',
+      25 => 'A steady everyday pace',
+      35 => 'Cruise to the finish',
+      _ => 'Ride for $minutes min',
+    };
+  }
+
   String progressTitle(String childName) => "$childName's meal records";
   String mealCount(int count) => '$count';
   String stickerKindCount(int count) => '$count';
