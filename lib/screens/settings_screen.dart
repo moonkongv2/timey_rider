@@ -74,10 +74,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
   @override
   Widget build(BuildContext context) {
     final texts = AppTexts.of(context);
+    final vehicleAvatarConfig = _config.customAvatarConfigForVehicle(
+      _config.motorcycleId,
+    );
     final isUsingCustomAvatar =
         _config.hasCustomAvatarForVehicle(_config.motorcycleId) &&
-        _config.customAvatarImagePath != null &&
-        File(_config.customAvatarImagePath!).existsSync();
+        vehicleAvatarConfig != null &&
+        File(vehicleAvatarConfig.imagePath).existsSync();
     final avatarStateText = isUsingCustomAvatar
         ? texts.settings.avatarCustomState
         : texts.settings.avatarDefaultState;
@@ -209,10 +212,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
             customAvatarImagePath: _config.customAvatarImagePathForVehicle(
               _config.motorcycleId,
             ),
-            avatarScale: _config.avatarScale,
-            avatarOffsetX: _config.avatarOffsetX,
-            avatarOffsetY: _config.avatarOffsetY,
-            avatarRotationDegrees: _config.avatarRotationDegrees,
+            avatarScale: vehicleAvatarConfig?.scale ?? 1.0,
+            avatarOffsetX: vehicleAvatarConfig?.offsetX ?? 0.0,
+            avatarOffsetY: vehicleAvatarConfig?.offsetY ?? 0.0,
+            avatarRotationDegrees: vehicleAvatarConfig?.rotationDegrees ?? 0.0,
           ),
           const SizedBox(height: 20),
           Card(

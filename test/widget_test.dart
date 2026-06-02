@@ -598,8 +598,15 @@ void main() {
           config: MealTimerConfig.defaults().copyWith(
             childName: '지율',
             avatarMode: AvatarImageMode.custom,
-            customAvatarImagePath: avatarFile.path,
-            customAvatarVehicleId: 'motorcycle',
+            customAvatarsByVehicle: {
+              'motorcycle': VehicleAvatarConfig(
+                imagePath: avatarFile.path,
+                scale: 1.25,
+                offsetX: 0.07,
+                offsetY: -0.03,
+                rotationDegrees: 5.0,
+              ),
+            },
           ),
           mealProgressService: LocalMealProgressService(),
           onConfigChanged: (_) {},
@@ -621,6 +628,14 @@ void main() {
       find.byKey(const ValueKey('avatarCompositeOverlayImage')),
       findsNWidgets(2),
     );
+    final customAvatarPreview = find.byWidgetPredicate((widget) {
+      return widget is AvatarCompositePreview &&
+          widget.avatarScale == 1.25 &&
+          widget.avatarOffsetX == 0.07 &&
+          widget.avatarOffsetY == -0.03 &&
+          widget.avatarRotationDegrees == 5.0;
+    });
+    expect(customAvatarPreview, findsNWidgets(2));
 
     await tester.pumpWidget(const SizedBox.shrink());
     await tester.pump();
@@ -964,6 +979,14 @@ void main() {
     expect(changedConfig?.avatarOffsetX, 0.1);
     expect(changedConfig?.avatarOffsetY, -0.05);
     expect(changedConfig?.avatarRotationDegrees, 7.0);
+    final savedAvatar = changedConfig?.customAvatarConfigForVehicle(
+      'motorcycle',
+    );
+    expect(savedAvatar?.imagePath, avatarFile.path);
+    expect(savedAvatar?.scale, 1.3);
+    expect(savedAvatar?.offsetX, 0.1);
+    expect(savedAvatar?.offsetY, -0.05);
+    expect(savedAvatar?.rotationDegrees, 7.0);
     expect(find.text('아바타를 저장했어요.'), findsOneWidget);
   });
 
@@ -994,14 +1017,124 @@ void main() {
     await tester.pump();
 
     expect(changedConfig?.avatarMode, AvatarImageMode.defaultImage);
-    expect(changedConfig?.customAvatarImagePath, avatarFile.path);
-    expect(changedConfig?.customAvatarVehicleId, 'motorcycle');
-    expect(changedConfig?.avatarScale, 1.2);
-    expect(changedConfig?.avatarOffsetX, 0.1);
-    expect(changedConfig?.avatarOffsetY, -0.1);
-    expect(changedConfig?.avatarRotationDegrees, 6.0);
+    expect(changedConfig?.customAvatarImagePath, isNull);
+    expect(changedConfig?.customAvatarVehicleId, isNull);
+    expect(changedConfig?.avatarScale, 1.0);
+    expect(changedConfig?.avatarOffsetX, 0.0);
+    expect(changedConfig?.avatarOffsetY, 0.0);
+    expect(changedConfig?.avatarRotationDegrees, 0.0);
+    expect(changedConfig?.customAvatarConfigForVehicle('motorcycle'), isNull);
     expect(find.text('기본 이미지로 변경했어요.'), findsOneWidget);
   });
+
+  testWidgets('Avatar setup stores custom avatars per vehicle', (tester) async {
+    MealTimerConfig? changedConfig;
+    final busAvatarFile = _createTemporaryAvatarImage();
+    final fireTruckAvatarFile = _createTemporaryAvatarImage();
+    await _pumpAvatarSetupScreen(
+      tester,
+      MealTimerConfig.defaults().copyWith(
+        motorcycleId: 'bus',
+        avatarMode: AvatarImageMode.custom,
+        customAvatarsByVehicle: {
+          'bus': VehicleAvatarConfig(
+            imagePath: busAvatarFile.path,
+            scale: 1.2,
+            offsetX: 0.08,
+            offsetY: -0.04,
+            rotationDegrees: 4.0,
+          ),
+          'fire_truck': VehicleAvatarConfig(
+            imagePath: fireTruckAvatarFile.path,
+            scale: 1.35,
+            offsetX: -0.06,
+            offsetY: 0.03,
+            rotationDegrees: -8.0,
+          ),
+        },
+      ),
+      onConfigChanged: (config) => changedConfig = config,
+    );
+
+    await _scrollAvatarAdjustmentIntoView(tester);
+    expect(_avatarSliderValue(tester, 'avatarScaleSlider'), 1.2);
+
+    await _scrollAvatarVehicleSelectionIntoView(tester);
+    await _tapVisible(tester, _vehicleChoiceFinder('fire_truck'));
+    await tester.pump();
+    await _scrollAvatarAdjustmentBackIntoView(tester);
+
+    expect(_avatarSliderValue(tester, 'avatarScaleSlider'), 1.35);
+    _avatarSlider(tester, 'avatarScaleSlider').onChanged!(1.45);
+    await tester.pump();
+
+    await _tapVisible(
+      tester,
+      find.byKey(const ValueKey('avatarConfirmButton')),
+    );
+    await tester.pump();
+
+    expect(
+      changedConfig?.customAvatarConfigForVehicle('bus')?.imagePath,
+      busAvatarFile.path,
+    );
+    expect(changedConfig?.customAvatarConfigForVehicle('bus')?.scale, 1.2);
+    expect(
+      changedConfig?.customAvatarConfigForVehicle('fire_truck')?.imagePath,
+      fireTruckAvatarFile.path,
+    );
+    expect(
+      changedConfig?.customAvatarConfigForVehicle('fire_truck')?.scale,
+      1.45,
+    );
+  });
+
+  testWidgets(
+    'Avatar setup default image clears only selected vehicle avatar',
+    (tester) async {
+      MealTimerConfig? changedConfig;
+      final busAvatarFile = _createTemporaryAvatarImage();
+      final fireTruckAvatarFile = _createTemporaryAvatarImage();
+      await _pumpAvatarSetupScreen(
+        tester,
+        MealTimerConfig.defaults().copyWith(
+          motorcycleId: 'fire_truck',
+          avatarMode: AvatarImageMode.custom,
+          customAvatarsByVehicle: {
+            'bus': VehicleAvatarConfig(
+              imagePath: busAvatarFile.path,
+              scale: 1.2,
+              offsetX: 0.08,
+              offsetY: -0.04,
+              rotationDegrees: 4.0,
+            ),
+            'fire_truck': VehicleAvatarConfig(
+              imagePath: fireTruckAvatarFile.path,
+              scale: 1.35,
+              offsetX: -0.06,
+              offsetY: 0.03,
+              rotationDegrees: -8.0,
+            ),
+          },
+        ),
+        onConfigChanged: (config) => changedConfig = config,
+      );
+
+      await _scrollAvatarAdjustmentIntoView(tester);
+      await _tapVisible(
+        tester,
+        find.byKey(const ValueKey('avatarUseDefaultButton')),
+      );
+      await tester.pump();
+
+      expect(
+        changedConfig?.customAvatarConfigForVehicle('bus')?.imagePath,
+        busAvatarFile.path,
+      );
+      expect(changedConfig?.customAvatarConfigForVehicle('fire_truck'), isNull);
+      expect(changedConfig?.avatarMode, AvatarImageMode.custom);
+    },
+  );
 
   testWidgets('Avatar setup default mode save keeps default avatar mode', (
     tester,
@@ -1451,6 +1584,44 @@ void main() {
 
     await tester.pumpWidget(const SizedBox.shrink());
     await tester.pump();
+  });
+
+  testWidgets('Timer screen applies avatar config for selected vehicle', (
+    tester,
+  ) async {
+    final avatarFile = _createTemporaryAvatarImage();
+
+    await tester.pumpWidget(
+      MaterialApp(
+        locale: const Locale('ko'),
+        home: TimerScreen(
+          config: MealTimerConfig.defaults().copyWith(
+            motorcycleId: 'fire_truck',
+            avatarMode: AvatarImageMode.custom,
+            customAvatarsByVehicle: {
+              'fire_truck': VehicleAvatarConfig(
+                imagePath: avatarFile.path,
+                scale: 1.4,
+                offsetX: 0.11,
+                offsetY: -0.07,
+                rotationDegrees: 9.0,
+              ),
+            },
+          ),
+          mealProgressService: LocalMealProgressService(),
+          onConfigChanged: (_) {},
+        ),
+      ),
+    );
+    await tester.pump();
+
+    final roadView = tester.widget<RoadView>(find.byType(RoadView));
+    expect(roadView.avatarMode, AvatarImageMode.custom);
+    expect(roadView.customAvatarImagePath, avatarFile.path);
+    expect(roadView.avatarScale, 1.4);
+    expect(roadView.avatarOffsetX, 0.11);
+    expect(roadView.avatarOffsetY, -0.07);
+    expect(roadView.avatarRotationDegrees, 9.0);
   });
 
   testWidgets('Timer screen keeps screen awake only when setting is enabled', (
@@ -2143,6 +2314,16 @@ Future<void> _scrollAvatarAdjustmentIntoView(WidgetTester tester) async {
       return;
     }
     await tester.drag(find.byType(ListView), const Offset(0, -500));
+    await tester.pumpAndSettle();
+  }
+}
+
+Future<void> _scrollAvatarAdjustmentBackIntoView(WidgetTester tester) async {
+  for (var index = 0; index < 6; index += 1) {
+    if (find.byKey(const ValueKey('avatarScaleSlider')).evaluate().isNotEmpty) {
+      return;
+    }
+    await tester.drag(find.byType(ListView), const Offset(0, 500));
     await tester.pumpAndSettle();
   }
 }

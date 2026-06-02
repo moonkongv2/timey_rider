@@ -287,6 +287,9 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
     );
     final selectedVehicleAvatarImagePath = _config
         .customAvatarImagePathForVehicle(selectedVehicle.id);
+    final selectedVehicleAvatarConfig = _config.customAvatarConfigForVehicle(
+      selectedVehicle.id,
+    );
     final isUsingCustomAvatar =
         selectedVehicleAvatarMode == AvatarImageMode.custom &&
         selectedVehicleAvatarImagePath != null &&
@@ -356,10 +359,11 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
                   },
                   avatarMode: selectedVehicleAvatarMode,
                   customAvatarImagePath: selectedVehicleAvatarImagePath,
-                  avatarScale: _config.avatarScale,
-                  avatarOffsetX: _config.avatarOffsetX,
-                  avatarOffsetY: _config.avatarOffsetY,
-                  avatarRotationDegrees: _config.avatarRotationDegrees,
+                  avatarScale: selectedVehicleAvatarConfig?.scale ?? 1.0,
+                  avatarOffsetX: selectedVehicleAvatarConfig?.offsetX ?? 0.0,
+                  avatarOffsetY: selectedVehicleAvatarConfig?.offsetY ?? 0.0,
+                  avatarRotationDegrees:
+                      selectedVehicleAvatarConfig?.rotationDegrees ?? 0.0,
                   avatarImageBuilder: widget.avatarImageBuilder,
                   footer: _AvatarInlineCta(
                     stateText: avatarStateText,
@@ -379,10 +383,11 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
                   vehicle: selectedVehicle,
                   avatarMode: selectedVehicleAvatarMode,
                   customAvatarImagePath: selectedVehicleAvatarImagePath,
-                  avatarScale: _config.avatarScale,
-                  avatarOffsetX: _config.avatarOffsetX,
-                  avatarOffsetY: _config.avatarOffsetY,
-                  avatarRotationDegrees: _config.avatarRotationDegrees,
+                  avatarScale: selectedVehicleAvatarConfig?.scale ?? 1.0,
+                  avatarOffsetX: selectedVehicleAvatarConfig?.offsetX ?? 0.0,
+                  avatarOffsetY: selectedVehicleAvatarConfig?.offsetY ?? 0.0,
+                  avatarRotationDegrees:
+                      selectedVehicleAvatarConfig?.rotationDegrees ?? 0.0,
                   avatarImageBuilder: widget.avatarImageBuilder,
                   onStart: () => _startTimer(defaultMealMinutes),
                 );

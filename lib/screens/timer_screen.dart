@@ -388,6 +388,9 @@ class _TimerScreenState extends State<TimerScreen> {
         );
         final vehicleAvatarImagePath = widget.config
             .customAvatarImagePathForVehicle(vehicle.id);
+        final vehicleAvatarConfig = widget.config.customAvatarConfigForVehicle(
+          vehicle.id,
+        );
         final progress = _controller.progress.clamp(0.0, 1.0).toDouble();
         final statusCopy = _timerStatusCopy(
           texts.timer,
@@ -431,11 +434,11 @@ class _TimerScreenState extends State<TimerScreen> {
                         vehicle: vehicle,
                         avatarMode: vehicleAvatarMode,
                         customAvatarImagePath: vehicleAvatarImagePath,
-                        avatarScale: widget.config.avatarScale,
-                        avatarOffsetX: widget.config.avatarOffsetX,
-                        avatarOffsetY: widget.config.avatarOffsetY,
+                        avatarScale: vehicleAvatarConfig?.scale ?? 1.0,
+                        avatarOffsetX: vehicleAvatarConfig?.offsetX ?? 0.0,
+                        avatarOffsetY: vehicleAvatarConfig?.offsetY ?? 0.0,
                         avatarRotationDegrees:
-                            widget.config.avatarRotationDegrees,
+                            vehicleAvatarConfig?.rotationDegrees ?? 0.0,
                         motivationVideoAssetPath: _activeMotivationVideoPath,
                         motivationVideoMilestone: _activeMotivationMilestone,
                         onMotivationVideoFinished:

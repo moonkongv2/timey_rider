@@ -38,10 +38,12 @@ class _AvatarSetupScreenState extends State<AvatarSetupScreen> {
   late MealTimerConfig _config = widget.config;
   late AvatarImageMode _avatarMode = _avatarModeForConfig(widget.config);
   String? _pendingAvatarImagePath;
-  late double _avatarScale = widget.config.avatarScale;
-  late double _avatarOffsetX = widget.config.avatarOffsetX;
-  late double _avatarOffsetY = widget.config.avatarOffsetY;
-  late double _avatarRotationDegrees = widget.config.avatarRotationDegrees;
+  late double _avatarScale = _avatarConfigForVehicle(widget.config).scale;
+  late double _avatarOffsetX = _avatarConfigForVehicle(widget.config).offsetX;
+  late double _avatarOffsetY = _avatarConfigForVehicle(widget.config).offsetY;
+  late double _avatarRotationDegrees = _avatarConfigForVehicle(
+    widget.config,
+  ).rotationDegrees;
   bool _isUploadingAvatar = false;
   static const _guideItems = [
     '아이 얼굴이 잘 보이는 정면 사진을 사용해 주세요.',
@@ -65,18 +67,21 @@ class _AvatarSetupScreenState extends State<AvatarSetupScreen> {
             widget.config.customAvatarImagePath ||
         oldWidget.config.customAvatarVehicleId !=
             widget.config.customAvatarVehicleId ||
+        oldWidget.config.customAvatarsByVehicle !=
+            widget.config.customAvatarsByVehicle ||
         oldWidget.config.avatarScale != widget.config.avatarScale ||
         oldWidget.config.avatarOffsetX != widget.config.avatarOffsetX ||
         oldWidget.config.avatarOffsetY != widget.config.avatarOffsetY ||
         oldWidget.config.avatarRotationDegrees !=
             widget.config.avatarRotationDegrees;
     if (avatarConfigChanged) {
+      final avatarConfig = _avatarConfigForVehicle(widget.config);
       _avatarMode = _avatarModeForConfig(widget.config);
       _pendingAvatarImagePath = null;
-      _avatarScale = widget.config.avatarScale;
-      _avatarOffsetX = widget.config.avatarOffsetX;
-      _avatarOffsetY = widget.config.avatarOffsetY;
-      _avatarRotationDegrees = widget.config.avatarRotationDegrees;
+      _avatarScale = avatarConfig.scale;
+      _avatarOffsetX = avatarConfig.offsetX;
+      _avatarOffsetY = avatarConfig.offsetY;
+      _avatarRotationDegrees = avatarConfig.rotationDegrees;
     }
   }
 
@@ -87,6 +92,17 @@ class _AvatarSetupScreenState extends State<AvatarSetupScreen> {
 
   AvatarImageMode _avatarModeForConfig(MealTimerConfig config) {
     return config.avatarModeForVehicle(config.motorcycleId);
+  }
+
+  VehicleAvatarConfig _avatarConfigForVehicle(MealTimerConfig config) {
+    return config.customAvatarConfigForVehicle(config.motorcycleId) ??
+        const VehicleAvatarConfig(
+          imagePath: '',
+          scale: 1.0,
+          offsetX: 0.0,
+          offsetY: 0.0,
+          rotationDegrees: 0.0,
+        );
   }
 
   String get _avatarModeLabel {
@@ -173,6 +189,15 @@ class _AvatarSetupScreenState extends State<AvatarSetupScreen> {
       return;
     }
 
+    final nextAvatarsByVehicle =
+        Map<String, VehicleAvatarConfig>.from(_config.customAvatarsByVehicle)
+          ..[_config.motorcycleId] = VehicleAvatarConfig(
+            imagePath: selectedPath,
+            scale: _avatarScale,
+            offsetX: _avatarOffsetX,
+            offsetY: _avatarOffsetY,
+            rotationDegrees: _avatarRotationDegrees,
+          );
     setState(() => _avatarMode = AvatarImageMode.custom);
     _updateConfig(
       _config.copyWith(
@@ -183,6 +208,7 @@ class _AvatarSetupScreenState extends State<AvatarSetupScreen> {
         avatarOffsetX: _avatarOffsetX,
         avatarOffsetY: _avatarOffsetY,
         avatarRotationDegrees: _avatarRotationDegrees,
+        customAvatarsByVehicle: nextAvatarsByVehicle,
       ),
     );
     ScaffoldMessenger.of(
@@ -191,8 +217,24 @@ class _AvatarSetupScreenState extends State<AvatarSetupScreen> {
   }
 
   void _useDefaultAvatarImage() {
+    final nextAvatarsByVehicle = Map<String, VehicleAvatarConfig>.from(
+      _config.customAvatarsByVehicle,
+    )..remove(_config.motorcycleId);
     setState(() => _avatarMode = AvatarImageMode.defaultImage);
-    _updateConfig(_config.copyWith(avatarMode: AvatarImageMode.defaultImage));
+    _updateConfig(
+      _config.copyWith(
+        avatarMode: nextAvatarsByVehicle.isEmpty
+            ? AvatarImageMode.defaultImage
+            : AvatarImageMode.custom,
+        customAvatarImagePath: null,
+        customAvatarVehicleId: null,
+        avatarScale: 1.0,
+        avatarOffsetX: 0.0,
+        avatarOffsetY: 0.0,
+        avatarRotationDegrees: 0.0,
+        customAvatarsByVehicle: nextAvatarsByVehicle,
+      ),
+    );
     ScaffoldMessenger.of(
       context,
     ).showSnackBar(const SnackBar(content: Text('기본 이미지로 변경했어요.')));
@@ -200,17 +242,16 @@ class _AvatarSetupScreenState extends State<AvatarSetupScreen> {
 
   void _handleVehicleSelected(String vehicleId) {
     final nextConfig = _config.copyWith(motorcycleId: vehicleId);
-    final nextAvatarMode = _avatarMode == AvatarImageMode.custom
-        ? AvatarImageMode.custom
-        : _avatarModeForConfig(nextConfig);
+    final nextAvatarConfig = _avatarConfigForVehicle(nextConfig);
+    final nextAvatarMode = _avatarModeForConfig(nextConfig);
     setState(() {
       _config = nextConfig;
       _avatarMode = nextAvatarMode;
       _pendingAvatarImagePath = null;
-      _avatarScale = nextConfig.avatarScale;
-      _avatarOffsetX = nextConfig.avatarOffsetX;
-      _avatarOffsetY = nextConfig.avatarOffsetY;
-      _avatarRotationDegrees = nextConfig.avatarRotationDegrees;
+      _avatarScale = nextAvatarConfig.scale;
+      _avatarOffsetX = nextAvatarConfig.offsetX;
+      _avatarOffsetY = nextAvatarConfig.offsetY;
+      _avatarRotationDegrees = nextAvatarConfig.rotationDegrees;
     });
     widget.onConfigChanged(nextConfig);
   }
@@ -227,6 +268,9 @@ class _AvatarSetupScreenState extends State<AvatarSetupScreen> {
       Localizations.localeOf(context).languageCode,
     );
     final previewAvatarImagePath = _selectedAvatarImagePath;
+    final vehicleAvatarConfig = _config.customAvatarConfigForVehicle(
+      _config.motorcycleId,
+    );
     final hasPreviewAvatarImage =
         previewAvatarImagePath != null &&
         File(previewAvatarImagePath).existsSync();
@@ -355,6 +399,14 @@ class _AvatarSetupScreenState extends State<AvatarSetupScreen> {
               subtitle: '프롬프트 기준',
               selectedVehicleId: _config.motorcycleId,
               onVehicleSelected: _handleVehicleSelected,
+              avatarMode: _avatarMode,
+              customAvatarImagePath: previewAvatarImagePath,
+              avatarScale: vehicleAvatarConfig?.scale ?? _avatarScale,
+              avatarOffsetX: vehicleAvatarConfig?.offsetX ?? _avatarOffsetX,
+              avatarOffsetY: vehicleAvatarConfig?.offsetY ?? _avatarOffsetY,
+              avatarRotationDegrees:
+                  vehicleAvatarConfig?.rotationDegrees ??
+                  _avatarRotationDegrees,
             ),
             if (_avatarMode == AvatarImageMode.custom) ...[
               const SizedBox(height: AppSpacing.xl),
