@@ -27,6 +27,7 @@ import 'package:jy_yamyam/services/local_avatar_image_service.dart';
 import 'package:jy_yamyam/services/local_meal_progress_service.dart';
 import 'package:jy_yamyam/services/local_settings_service.dart';
 import 'package:jy_yamyam/services/screen_awake_service.dart';
+import 'package:jy_yamyam/widgets/avatar/avatar_composite_preview.dart';
 import 'package:jy_yamyam/widgets/road_painter.dart';
 import 'package:jy_yamyam/widgets/road_view.dart';
 import 'package:jy_yamyam/widgets/vehicle_widget.dart';
@@ -915,6 +916,7 @@ void main() {
 
     expect(find.text('아바타 설정'), findsOneWidget);
     expect(find.text('직접 만든 아바타 사용 중'), findsOneWidget);
+    expect(find.byType(AvatarCompositePreview), findsOneWidget);
   });
 
   testWidgets('Home screen shows quick courses above vehicle choices', (

@@ -205,6 +205,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
             onVehicleSelected: (vehicleId) {
               _update(_config.copyWith(motorcycleId: vehicleId));
             },
+            avatarMode: _config.avatarModeForVehicle(_config.motorcycleId),
+            customAvatarImagePath: _config.customAvatarImagePathForVehicle(
+              _config.motorcycleId,
+            ),
+            avatarScale: _config.avatarScale,
+            avatarOffsetX: _config.avatarOffsetX,
+            avatarOffsetY: _config.avatarOffsetY,
+            avatarRotationDegrees: _config.avatarRotationDegrees,
           ),
           const SizedBox(height: 20),
           Card(
