@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart' show ScrollCacheExtent;
 
 import '../catalogs/vehicle_catalog.dart';
 import '../l10n/app_texts.dart';
@@ -306,7 +307,7 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
       backgroundColor: AppColors.cream,
       body: SafeArea(
         child: ListView(
-          cacheExtent: 1200,
+          scrollCacheExtent: const ScrollCacheExtent.pixels(1200),
           padding: const EdgeInsets.fromLTRB(
             AppSpacing.xl,
             AppSpacing.xxl,
