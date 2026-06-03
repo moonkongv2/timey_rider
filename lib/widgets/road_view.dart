@@ -28,6 +28,8 @@ class RoadView extends StatelessWidget {
     this.motivationVideoAssetPath,
     this.motivationVideoMilestone,
     this.onMotivationVideoFinished,
+    this.showVehicle = true,
+    this.showMotivationVideo = true,
   });
 
   final double progress;
@@ -43,6 +45,8 @@ class RoadView extends StatelessWidget {
   final String? motivationVideoAssetPath;
   final int? motivationVideoMilestone;
   final VoidCallback? onMotivationVideoFinished;
+  final bool showVehicle;
+  final bool showMotivationVideo;
   static const double _vehicleSize = 138;
 
   @override
@@ -52,8 +56,15 @@ class RoadView extends StatelessWidget {
     return LayoutBuilder(
       builder: (context, constraints) {
         final size = Size(constraints.maxWidth, constraints.maxHeight);
+        final isLandscape = size.width > size.height;
         final vehicleSize = math
-            .min(_vehicleSize, math.min(size.width * 0.30, size.height * 0.20))
+            .min(
+              isLandscape ? 124.0 : _vehicleSize,
+              math.min(
+                size.width * (isLandscape ? 0.16 : 0.30),
+                size.height * (isLandscape ? 0.23 : 0.20),
+              ),
+            )
             .toDouble();
         final clampedProgress = progress.clamp(0.0, 1.0).toDouble();
         final vehiclePosition = roadPointForProgress(size, clampedProgress);
@@ -64,15 +75,22 @@ class RoadView extends StatelessWidget {
         final vehicleLeft = vehiclePosition.dx - (vehicleSize / 2);
         final vehicleTop = vehiclePosition.dy - (vehicleSize / 2);
         const videoMargin = 16.0;
-        final videoFrameTop = videoMargin;
-        final videoFrameLeft = videoMargin;
-        final videoFrameWidth = math.max(0.0, size.width - (videoMargin * 2));
-        final preferredVideoFrameHeight = videoFrameWidth * 0.62;
-        final maxVideoFrameHeight = math.max(140.0, size.height * 0.44);
-        final videoFrameHeight = preferredVideoFrameHeight.clamp(
-          132.0,
-          maxVideoFrameHeight,
-        );
+        final videoFrameWidth = isLandscape
+            ? math
+                  .min(size.width * 0.36, 460.0)
+                  .clamp(320.0, size.width - (videoMargin * 2))
+                  .toDouble()
+            : math.max(0.0, size.width - (videoMargin * 2));
+        final videoFrameHeight = isLandscape
+            ? videoFrameWidth * 9 / 16
+            : (videoFrameWidth * 0.62).clamp(
+                132.0,
+                math.max(140.0, size.height * 0.44),
+              );
+        final videoFrameLeft = isLandscape
+            ? size.width - videoFrameWidth - videoMargin
+            : videoMargin;
+        final videoFrameTop = isLandscape ? size.height * 0.18 : videoMargin;
 
         return DecoratedBox(
           decoration: BoxDecoration(
@@ -106,42 +124,33 @@ class RoadView extends StatelessWidget {
                   icon: Icons.home_rounded,
                   label: texts.common.start,
                   isActive: true,
+                  size: isLandscape ? 42 : 36,
                 ),
                 _RoadMarker(
                   position: roadPointForProgress(size, 1),
                   icon: Icons.flag_rounded,
                   label: texts.common.complete,
                   isActive: clampedProgress >= 1,
+                  size: isLandscape ? 42 : 36,
                 ),
-                AnimatedPositioned(
-                  duration: const Duration(milliseconds: 850),
-                  curve: Curves.easeInOutCubic,
-                  left: vehicleLeft,
-                  top: vehicleTop,
-                  child: AnimatedOpacity(
-                    duration: const Duration(milliseconds: 850),
-                    opacity: progress >= 1 ? 0.78 : 1,
-                    child: AnimatedScale(
-                      duration: const Duration(milliseconds: 850),
-                      curve: Curves.easeInOutCubic,
-                      scale: progress >= 1 ? 0.92 : 1,
-                      child: VehicleWidget(
-                        vehicle: vehicle,
-                        size: vehicleSize,
-                        isFacingLeft: isVehicleFacingLeft,
-                        isArrived: progress >= 1,
-                        avatarMode: avatarMode,
-                        customAvatarImagePath: customAvatarImagePath,
-                        avatarScale: avatarScale,
-                        avatarOffsetX: avatarOffsetX,
-                        avatarOffsetY: avatarOffsetY,
-                        avatarRotationDegrees: avatarRotationDegrees,
-                        avatarImageBuilder: avatarImageBuilder,
-                      ),
-                    ),
+                if (showVehicle)
+                  _PositionedRoadVehicle(
+                    progress: progress,
+                    vehicle: vehicle,
+                    vehicleSize: vehicleSize,
+                    vehicleLeft: vehicleLeft,
+                    vehicleTop: vehicleTop,
+                    isVehicleFacingLeft: isVehicleFacingLeft,
+                    avatarMode: avatarMode,
+                    customAvatarImagePath: customAvatarImagePath,
+                    avatarScale: avatarScale,
+                    avatarOffsetX: avatarOffsetX,
+                    avatarOffsetY: avatarOffsetY,
+                    avatarRotationDegrees: avatarRotationDegrees,
+                    avatarImageBuilder: avatarImageBuilder,
                   ),
-                ),
-                if (motivationVideoAssetPath != null &&
+                if (showMotivationVideo &&
+                    motivationVideoAssetPath != null &&
                     motivationVideoMilestone != null)
                   Positioned(
                     left: videoFrameLeft,
@@ -149,7 +158,9 @@ class RoadView extends StatelessWidget {
                     width: videoFrameWidth,
                     height: videoFrameHeight.toDouble(),
                     child: _MotivationVideoBubble(
-                      key: ValueKey(motivationVideoMilestone),
+                      key: ValueKey(
+                        'motivationVideoBubble_$motivationVideoMilestone',
+                      ),
                       assetPath: motivationVideoAssetPath!,
                       onFinished: onMotivationVideoFinished,
                     ),
@@ -163,17 +174,217 @@ class RoadView extends StatelessWidget {
   }
 }
 
+class RoadMotivationVideoLayer extends StatelessWidget {
+  const RoadMotivationVideoLayer({
+    super.key,
+    required this.assetPath,
+    required this.milestone,
+    this.onFinished,
+  });
+
+  final String assetPath;
+  final int milestone;
+  final VoidCallback? onFinished;
+
+  @override
+  Widget build(BuildContext context) {
+    return IgnorePointer(
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final size = Size(constraints.maxWidth, constraints.maxHeight);
+          final isLandscape = size.width > size.height;
+          const videoMargin = 16.0;
+          final videoFrameWidth = isLandscape
+              ? math
+                    .min(size.width * 0.36, 460.0)
+                    .clamp(320.0, size.width - (videoMargin * 2))
+                    .toDouble()
+              : math.max(0.0, size.width - (videoMargin * 2));
+          final videoFrameHeight = isLandscape
+              ? videoFrameWidth * 9 / 16
+              : (videoFrameWidth * 0.62).clamp(
+                  132.0,
+                  math.max(140.0, size.height * 0.44),
+                );
+          final videoFrameLeft = isLandscape
+              ? size.width - videoFrameWidth - videoMargin
+              : videoMargin;
+          final videoFrameTop = isLandscape ? size.height * 0.18 : videoMargin;
+
+          return Stack(
+            children: [
+              Positioned(
+                left: videoFrameLeft,
+                top: videoFrameTop,
+                width: videoFrameWidth,
+                height: videoFrameHeight.toDouble(),
+                child: _MotivationVideoBubble(
+                  key: ValueKey('motivationVideoBubble_$milestone'),
+                  assetPath: assetPath,
+                  onFinished: onFinished,
+                ),
+              ),
+            ],
+          );
+        },
+      ),
+    );
+  }
+}
+
+class RoadVehicleLayer extends StatelessWidget {
+  const RoadVehicleLayer({
+    super.key,
+    required this.progress,
+    required this.vehicle,
+    this.avatarMode = AvatarImageMode.defaultImage,
+    this.customAvatarImagePath,
+    this.avatarScale = 1.0,
+    this.avatarOffsetX = 0.0,
+    this.avatarOffsetY = 0.0,
+    this.avatarRotationDegrees = 0.0,
+    this.avatarImageBuilder,
+  });
+
+  final double progress;
+  final VehicleDefinition vehicle;
+  final AvatarImageMode avatarMode;
+  final String? customAvatarImagePath;
+  final double avatarScale;
+  final double avatarOffsetX;
+  final double avatarOffsetY;
+  final double avatarRotationDegrees;
+  final Widget Function(BuildContext context, String imagePath)?
+  avatarImageBuilder;
+
+  @override
+  Widget build(BuildContext context) {
+    return IgnorePointer(
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final size = Size(constraints.maxWidth, constraints.maxHeight);
+          final isLandscape = size.width > size.height;
+          final vehicleSize = math
+              .min(
+                isLandscape ? 124.0 : RoadView._vehicleSize,
+                math.min(
+                  size.width * (isLandscape ? 0.16 : 0.30),
+                  size.height * (isLandscape ? 0.23 : 0.20),
+                ),
+              )
+              .toDouble();
+          final clampedProgress = progress.clamp(0.0, 1.0).toDouble();
+          final vehiclePosition = roadPointForProgress(size, clampedProgress);
+          final isVehicleFacingLeft = roadIsFacingLeftForProgress(
+            size,
+            clampedProgress,
+          );
+          final vehicleLeft = vehiclePosition.dx - (vehicleSize / 2);
+          final vehicleTop = vehiclePosition.dy - (vehicleSize / 2);
+
+          return Stack(
+            children: [
+              _PositionedRoadVehicle(
+                progress: progress,
+                vehicle: vehicle,
+                vehicleSize: vehicleSize,
+                vehicleLeft: vehicleLeft,
+                vehicleTop: vehicleTop,
+                isVehicleFacingLeft: isVehicleFacingLeft,
+                avatarMode: avatarMode,
+                customAvatarImagePath: customAvatarImagePath,
+                avatarScale: avatarScale,
+                avatarOffsetX: avatarOffsetX,
+                avatarOffsetY: avatarOffsetY,
+                avatarRotationDegrees: avatarRotationDegrees,
+                avatarImageBuilder: avatarImageBuilder,
+              ),
+            ],
+          );
+        },
+      ),
+    );
+  }
+}
+
+class _PositionedRoadVehicle extends StatelessWidget {
+  const _PositionedRoadVehicle({
+    required this.progress,
+    required this.vehicle,
+    required this.vehicleSize,
+    required this.vehicleLeft,
+    required this.vehicleTop,
+    required this.isVehicleFacingLeft,
+    required this.avatarMode,
+    required this.avatarScale,
+    required this.avatarOffsetX,
+    required this.avatarOffsetY,
+    required this.avatarRotationDegrees,
+    required this.avatarImageBuilder,
+    this.customAvatarImagePath,
+  });
+
+  final double progress;
+  final VehicleDefinition vehicle;
+  final double vehicleSize;
+  final double vehicleLeft;
+  final double vehicleTop;
+  final bool isVehicleFacingLeft;
+  final AvatarImageMode avatarMode;
+  final String? customAvatarImagePath;
+  final double avatarScale;
+  final double avatarOffsetX;
+  final double avatarOffsetY;
+  final double avatarRotationDegrees;
+  final Widget Function(BuildContext context, String imagePath)?
+  avatarImageBuilder;
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedPositioned(
+      duration: const Duration(milliseconds: 850),
+      curve: Curves.easeInOutCubic,
+      left: vehicleLeft,
+      top: vehicleTop,
+      child: AnimatedOpacity(
+        duration: const Duration(milliseconds: 850),
+        opacity: progress >= 1 ? 0.78 : 1,
+        child: AnimatedScale(
+          duration: const Duration(milliseconds: 850),
+          curve: Curves.easeInOutCubic,
+          scale: progress >= 1 ? 0.92 : 1,
+          child: VehicleWidget(
+            vehicle: vehicle,
+            size: vehicleSize,
+            isFacingLeft: isVehicleFacingLeft,
+            isArrived: progress >= 1,
+            avatarMode: avatarMode,
+            customAvatarImagePath: customAvatarImagePath,
+            avatarScale: avatarScale,
+            avatarOffsetX: avatarOffsetX,
+            avatarOffsetY: avatarOffsetY,
+            avatarRotationDegrees: avatarRotationDegrees,
+            avatarImageBuilder: avatarImageBuilder,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 class _RoadMarker extends StatelessWidget {
   const _RoadMarker({
     required this.position,
     required this.icon,
     required this.isActive,
+    required this.size,
     this.label,
   });
 
   final Offset position;
   final IconData icon;
   final bool isActive;
+  final double size;
   final String? label;
 
   @override
@@ -184,10 +395,10 @@ class _RoadMarker extends StatelessWidget {
     final iconColor = isActive ? AppColors.textStrong : AppColors.textPrimary;
 
     return Positioned(
-      left: position.dx - 18,
-      top: position.dy - 18,
-      width: 36,
-      height: 36,
+      left: position.dx - (size / 2),
+      top: position.dy - (size / 2),
+      width: size,
+      height: size,
       child: AnimatedScale(
         duration: const Duration(milliseconds: 420),
         curve: Curves.easeOutBack,
@@ -206,7 +417,7 @@ class _RoadMarker extends StatelessWidget {
           ),
           child: Semantics(
             label: label ?? 'milestone',
-            child: Icon(icon, color: iconColor, size: 20),
+            child: Icon(icon, color: iconColor, size: size * 0.56),
           ),
         ),
       ),

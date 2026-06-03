@@ -31,6 +31,7 @@ import 'package:jy_yamyam/widgets/app/app_bouncy_button.dart';
 import 'package:jy_yamyam/widgets/avatar/avatar_composite_preview.dart';
 import 'package:jy_yamyam/widgets/road_painter.dart';
 import 'package:jy_yamyam/widgets/road_view.dart';
+import 'package:jy_yamyam/widgets/timer_control_bar.dart';
 import 'package:jy_yamyam/widgets/vehicle_selection_card.dart';
 import 'package:jy_yamyam/widgets/vehicle_widget.dart';
 
@@ -270,6 +271,11 @@ void main() {
 
     expect(find.text('아쉽지만 조금 늦었어'), findsOneWidget);
     expect(find.text('오토바이가 먼저 지나갔어.'), findsOneWidget);
+  });
+
+  test('Result intro video contains in landscape and covers in portrait', () {
+    expect(resultIntroMediaFitForSize(const Size(844, 390)), BoxFit.contain);
+    expect(resultIntroMediaFitForSize(const Size(390, 844)), BoxFit.cover);
   });
 
   test(
@@ -1619,6 +1625,90 @@ void main() {
     await tester.pump();
   });
 
+  testWidgets('Road view limits motivation video to 16:9 in landscape', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: SizedBox(
+            width: 1200,
+            height: 520,
+            child: RoadView(
+              progress: 0.5,
+              vehicle: VehicleCatalog.fireTruck,
+              motivationVideoAssetPath: 'assets/videos/motivation_10.mp4',
+              motivationVideoMilestone: 10,
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.pump();
+
+    final videoSize = tester.getSize(
+      find.byKey(const ValueKey('motivationVideoBubble_10')),
+    );
+    expect(videoSize.width, lessThanOrEqualTo(460));
+    expect(videoSize.width / videoSize.height, closeTo(16 / 9, 0.01));
+
+    await tester.pumpWidget(const SizedBox.shrink());
+    await tester.pump();
+  });
+
+  testWidgets('Motivation video can render as a separate road layer', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: SizedBox(
+            width: 1200,
+            height: 520,
+            child: RoadView(
+              progress: 0.5,
+              vehicle: VehicleCatalog.fireTruck,
+              motivationVideoAssetPath: 'assets/videos/motivation_10.mp4',
+              motivationVideoMilestone: 10,
+              showMotivationVideo: false,
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.pump();
+
+    expect(
+      find.byKey(const ValueKey('motivationVideoBubble_10')),
+      findsNothing,
+    );
+
+    await tester.pumpWidget(
+      const MaterialApp(
+        home: Scaffold(
+          body: SizedBox(
+            width: 1200,
+            height: 520,
+            child: RoadMotivationVideoLayer(
+              assetPath: 'assets/videos/motivation_10.mp4',
+              milestone: 10,
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.pump();
+
+    final videoSize = tester.getSize(
+      find.byKey(const ValueKey('motivationVideoBubble_10')),
+    );
+    expect(videoSize.width, lessThanOrEqualTo(460));
+    expect(videoSize.width / videoSize.height, closeTo(16 / 9, 0.01));
+
+    await tester.pumpWidget(const SizedBox.shrink());
+    await tester.pump();
+  });
+
   testWidgets('Timer screen does not apply avatar saved for another vehicle', (
     tester,
   ) async {
@@ -1689,6 +1779,109 @@ void main() {
     expect(roadView.avatarRotationDegrees, 9.0);
   });
 
+  testWidgets('Timer screen gives the route primary space in landscape', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(1200, 600);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(() {
+      tester.view.resetPhysicalSize();
+      tester.view.resetDevicePixelRatio();
+    });
+
+    await tester.pumpWidget(
+      MaterialApp(
+        locale: const Locale('ko'),
+        home: TimerScreen(
+          config: MealTimerConfig.defaults(),
+          mealProgressService: LocalMealProgressService(),
+          onConfigChanged: (_) {},
+        ),
+      ),
+    );
+    await tester.pump();
+
+    final roadSize = tester.getSize(find.byType(RoadView));
+    expect(roadSize, const Size(1200, 520));
+    expect(roadSize.width, greaterThan(760));
+    expect(roadSize.height, greaterThan(460));
+    expect(roadSize.height, lessThanOrEqualTo(560));
+    final roadRect = tester.getRect(find.byType(RoadView));
+    expect(
+      roadRect.contains(tester.getCenter(find.byIcon(Icons.home_rounded))),
+      isTrue,
+    );
+    expect(
+      roadRect.contains(tester.getCenter(find.byIcon(Icons.flag_rounded))),
+      isTrue,
+    );
+    expect(
+      roadRect.contains(tester.getCenter(find.byType(VehicleWidget))),
+      isTrue,
+    );
+    expect(
+      find.descendant(
+        of: find.byType(RoadView),
+        matching: find.byType(VehicleWidget),
+      ),
+      findsNothing,
+    );
+    expect(find.byType(VehicleWidget), findsOneWidget);
+    expect(
+      tester.getSize(find.byKey(const ValueKey('remainingTimeBadge'))).width,
+      360,
+    );
+    expect(
+      tester.getSize(find.byKey(const ValueKey('remainingTimeBadge'))).height,
+      lessThanOrEqualTo(
+        tester
+            .getSize(find.byKey(const ValueKey('timerProgressMessageCard')))
+            .height,
+      ),
+    );
+    final roadBounds = createRoadBounds(const Size(1200, 520));
+    final expectedRoadRight =
+        roadRect.left + (roadRect.width * roadBounds.right / 1200);
+    final expectedRoadLeft =
+        roadRect.left + (roadRect.width * roadBounds.left / 1200);
+    expect(
+      tester.getRect(find.byKey(const ValueKey('remainingTimeBadge'))).right,
+      closeTo(expectedRoadRight, 1),
+    );
+    expect(
+      tester
+          .getRect(find.byKey(const ValueKey('timerProgressMessageCard')))
+          .left,
+      greaterThanOrEqualTo(expectedRoadLeft),
+    );
+    expect(
+      tester
+          .getSize(find.byKey(const ValueKey('timerProgressIndicator')))
+          .width,
+      greaterThan(250),
+    );
+    expect(
+      tester
+          .getRect(find.byKey(const ValueKey('timerProgressMessageCard')))
+          .right,
+      lessThanOrEqualTo(
+        tester.getRect(find.byKey(const ValueKey('remainingTimeBadge'))).left,
+      ),
+    );
+    expect(find.byType(SingleChildScrollView), findsOneWidget);
+    expect(find.text('오늘의 냠냠코스'), findsNothing);
+    expect(find.byIcon(Icons.arrow_back_rounded), findsOneWidget);
+    expect(
+      tester.widget<TimerControlBar>(find.byType(TimerControlBar)).isVertical,
+      isFalse,
+    );
+
+    tester.view.physicalSize = const Size(900, 500);
+    await tester.pump();
+
+    expect(tester.getSize(find.byType(RoadView)), roadSize);
+  });
+
   testWidgets('Timer screen keeps screen awake only when setting is enabled', (
     tester,
   ) async {
@@ -1744,6 +1937,12 @@ void main() {
     tester,
   ) async {
     SharedPreferences.setMockInitialValues({});
+    tester.view.physicalSize = const Size(600, 900);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(() {
+      tester.view.resetPhysicalSize();
+      tester.view.resetDevicePixelRatio();
+    });
     final navigatorKey = GlobalKey<NavigatorState>();
 
     await tester.pumpWidget(
@@ -1823,6 +2022,12 @@ void main() {
     tester,
   ) async {
     SharedPreferences.setMockInitialValues({});
+    tester.view.physicalSize = const Size(600, 900);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(() {
+      tester.view.resetPhysicalSize();
+      tester.view.resetDevicePixelRatio();
+    });
 
     await tester.pumpWidget(
       MaterialApp(
@@ -1857,6 +2062,8 @@ void main() {
     );
     await tester.pump();
 
+    await tester.ensureVisible(find.text('Pause'));
+    await tester.pump();
     await tester.tap(find.text('Pause'));
     await tester.pump();
 

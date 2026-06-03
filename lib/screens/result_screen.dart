@@ -31,6 +31,10 @@ String resultVideoAssetPathForVehicle({required String vehicleId}) {
   return _resultVideoPathsByVehicle[vehicleId] ?? _fallbackSuccessVideoPath;
 }
 
+BoxFit resultIntroMediaFitForSize(Size size) {
+  return size.width > size.height ? BoxFit.contain : BoxFit.cover;
+}
+
 class ResultScreen extends StatefulWidget {
   const ResultScreen({
     super.key,
@@ -395,23 +399,35 @@ class _ResultIntroScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SizedBox.expand(
-        child: showFallback
-            ? Image.asset(
-                fallbackImageAssetPath,
-                fit: BoxFit.cover,
-                errorBuilder: (_, _, _) => const SizedBox.shrink(),
-              )
-            : !controller.value.isInitialized
-            ? const ColoredBox(color: AppColors.surfaceSoft)
-            : FittedBox(
-                fit: BoxFit.cover,
-                child: SizedBox(
-                  width: controller.value.size.width,
-                  height: controller.value.size.height,
-                  child: VideoPlayer(controller),
-                ),
-              ),
+      backgroundColor: AppColors.surfaceSoft,
+      body: LayoutBuilder(
+        builder: (context, constraints) {
+          final fit = resultIntroMediaFitForSize(
+            Size(constraints.maxWidth, constraints.maxHeight),
+          );
+
+          return SizedBox.expand(
+            child: ColoredBox(
+              color: AppColors.surfaceSoft,
+              child: showFallback
+                  ? Image.asset(
+                      fallbackImageAssetPath,
+                      fit: fit,
+                      errorBuilder: (_, _, _) => const SizedBox.shrink(),
+                    )
+                  : !controller.value.isInitialized
+                  ? const SizedBox.shrink()
+                  : FittedBox(
+                      fit: fit,
+                      child: SizedBox(
+                        width: controller.value.size.width,
+                        height: controller.value.size.height,
+                        child: VideoPlayer(controller),
+                      ),
+                    ),
+            ),
+          );
+        },
       ),
     );
   }
