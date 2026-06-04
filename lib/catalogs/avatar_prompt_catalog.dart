@@ -78,6 +78,16 @@ Avoid full-body images, multiple people, or complex backgrounds.
 귀여운 선원 모자 또는 바다 테마 소품을 아주 약하게 넣어 주세요.
 밝고 장난기 있는 표정으로 만들어 주세요.
 ''',
+    'brachio': '''
+브라키오 공룡 탐험가 컨셉으로 만들어 주세요.
+귀여운 사파리 모자 또는 초록 공룡 테마 소품을 아주 약하게 넣어 주세요.
+차분하고 다정한 표정으로 만들어 주세요.
+''',
+    'pteranodon': '''
+프테라노돈 하늘 탐험가 컨셉으로 만들어 주세요.
+귀여운 파일럿 고글 또는 하늘 테마 소품을 아주 약하게 넣어 주세요.
+밝고 용감한 표정으로 만들어 주세요.
+''',
   };
 
   static const _englishAdditionsByVehicleId = {
@@ -132,6 +142,16 @@ Use an excited, brave expression.
 Use a shark ocean explorer concept.
 Add a cute sailor hat or very subtle ocean-themed detail.
 Use a bright, playful expression.
+''',
+    'brachio': '''
+Use a brachio dinosaur explorer concept.
+Add a cute safari hat or very subtle green dinosaur-themed detail.
+Use a calm, kind expression.
+''',
+    'pteranodon': '''
+Use a pteranodon sky explorer concept.
+Add cute pilot goggles or very subtle sky-themed detail.
+Use a bright, brave expression.
 ''',
   };
 

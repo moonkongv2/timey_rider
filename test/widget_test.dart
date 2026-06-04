@@ -234,6 +234,8 @@ void main() {
         'train',
         't_rex',
         'shark',
+        'brachio',
+        'pteranodon',
       };
 
       for (final vehicle in VehicleCatalog.all) {
@@ -304,6 +306,8 @@ void main() {
       'train',
       't_rex',
       'shark',
+      'brachio',
+      'pteranodon',
     };
 
     expect(
@@ -335,6 +339,10 @@ void main() {
       'assets/videos/motivation/motivation_airplane_1.mp4',
     );
     expect(
+      motivationVideoAssetPathForVehicle(vehicleId: 'brachio', milestone: 10),
+      'assets/videos/motivation/motivation_brachio_1.mp4',
+    );
+    expect(
       motivationVideoAssetPathForVehicle(
         vehicleId: 'missing_vehicle',
         milestone: 10,
@@ -359,6 +367,14 @@ void main() {
         nextInt: (_) => 2,
       ),
       'assets/videos/motivation/motivation_motorcycle_3.mp4',
+    );
+    expect(
+      motivationVideoAssetPathForVehicle(
+        vehicleId: 'pteranodon',
+        milestone: 10,
+        nextInt: (_) => 1,
+      ),
+      'assets/videos/motivation/motivation_pteranodon_2.mp4',
     );
     expect(
       motivationVideoAssetPathForVehicle(
@@ -542,6 +558,14 @@ void main() {
       VehicleCatalog.train,
       'ko',
     );
+    final brachioPrompt = AvatarPromptCatalog.promptForVehicle(
+      VehicleCatalog.brachio,
+      'ko',
+    );
+    final pteranodonPrompt = AvatarPromptCatalog.promptForVehicle(
+      VehicleCatalog.pteranodon,
+      'ko',
+    );
 
     expect(
       motorcyclePrompt.contains('오토바이') || motorcyclePrompt.contains('라이더'),
@@ -557,6 +581,8 @@ void main() {
     expect(busPrompt, contains('버스 기사'));
     expect(supercarPrompt, contains('레이서'));
     expect(trainPrompt, contains('기관사'));
+    expect(brachioPrompt, contains('브라키오'));
+    expect(pteranodonPrompt, contains('프테라노돈'));
   });
 
   testWidgets('First launch asks for child name before home', (tester) async {
@@ -1429,6 +1455,11 @@ void main() {
     final thirdRowTop = tester.getTopLeft(_vehicleChoiceFinder('t_rex')).dy;
     expect(thirdRowTop, greaterThan(secondRowTop));
     expect(tester.getTopLeft(_vehicleChoiceFinder('shark')).dy, thirdRowTop);
+    expect(tester.getTopLeft(_vehicleChoiceFinder('brachio')).dy, thirdRowTop);
+    expect(
+      tester.getTopLeft(_vehicleChoiceFinder('pteranodon')).dy,
+      thirdRowTop,
+    );
     expect(
       tester.getSize(_vehicleChoiceFinder('motorcycle')).width,
       tester.getSize(_vehicleChoiceFinder('fire_truck')).width,
@@ -1439,7 +1470,7 @@ void main() {
         2;
     final thirdRowCenterX =
         (_vehicleChoiceRect(tester, 't_rex').left +
-            _vehicleChoiceRect(tester, 'shark').right) /
+            _vehicleChoiceRect(tester, 'pteranodon').right) /
         2;
     expect((thirdRowCenterX - firstRowCenterX).abs(), lessThan(1.0));
 

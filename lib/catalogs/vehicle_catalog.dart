@@ -142,6 +142,34 @@ abstract final class VehicleCatalog {
     ),
   );
 
+  static const brachio = VehicleDefinition(
+    id: 'brachio',
+    labelKo: '브라키오',
+    labelEn: 'Brachio',
+    emoji: '🦕',
+    assetPath: 'assets/images/vehicle_brachio.png',
+    selectionAssetPath: 'assets/images/vehicle_brachio_chip.png',
+    avatarSlot: VehicleAvatarSlot(
+      centerX: 0.52,
+      centerY: 0.33,
+      sizeRatio: 0.25,
+    ),
+  );
+
+  static const pteranodon = VehicleDefinition(
+    id: 'pteranodon',
+    labelKo: '프테라노돈',
+    labelEn: 'Pteranodon',
+    emoji: '🪽',
+    assetPath: 'assets/images/vehicle_pteranodon.png',
+    selectionAssetPath: 'assets/images/vehicle_pteranodon_chip.png',
+    avatarSlot: VehicleAvatarSlot(
+      centerX: 0.50,
+      centerY: 0.32,
+      sizeRatio: 0.24,
+    ),
+  );
+
   static const all = [
     motorcycle,
     fireTruck,
@@ -153,6 +181,8 @@ abstract final class VehicleCatalog {
     train,
     tRex,
     shark,
+    brachio,
+    pteranodon,
   ];
 
   static VehicleDefinition findById(String id) {

@@ -47,6 +47,11 @@ abstract final class MotivationAssetCatalog {
       'assets/videos/motivation/motivation_shark_1.mp4',
       'assets/videos/motivation/motivation_shark_2.mp4',
     ],
+    'brachio': ['assets/videos/motivation/motivation_brachio_1.mp4'],
+    'pteranodon': [
+      'assets/videos/motivation/motivation_pteranodon_1.mp4',
+      'assets/videos/motivation/motivation_pteranodon_2.mp4',
+    ],
   };
 
   static const _voicePathsByLanguageCode = {
