@@ -1,6 +1,7 @@
 // ignore_for_file: annotate_overrides
 
 import '../text_sets.dart';
+import '../../models/meal_completion_status.dart';
 
 class EnMealHistoryTexts implements MealHistoryTextSet {
   const EnMealHistoryTexts();
@@ -10,13 +11,14 @@ class EnMealHistoryTexts implements MealHistoryTextSet {
   String get emptyBody => 'Completed timer sessions will appear here.';
   String get targetTimeLabel => 'Target';
   String get actualTimeLabel => 'Actual';
+  String get overrunTimeLabel => 'Over';
   String get rewardLabel => 'Stickers earned';
   String get noRewardLabel => 'No stickers';
 
-  String completedStatus(bool completedBeforeArrival) {
-    return completedBeforeArrival
-        ? 'Finished before arrival'
-        : 'Finished after arrival';
+  String completedStatus(MealCompletionStatus completionStatus) {
+    return completionStatus == MealCompletionStatus.notCompleted
+        ? 'Incomplete'
+        : 'Complete';
   }
 
   String dateLabel(DateTime dateTime) {
@@ -24,4 +26,6 @@ class EnMealHistoryTexts implements MealHistoryTextSet {
     final minute = dateTime.minute.toString().padLeft(2, '0');
     return '${dateTime.month}/${dateTime.day} $hour:$minute';
   }
+
+  String overrunTime(String duration) => 'Over +$duration';
 }

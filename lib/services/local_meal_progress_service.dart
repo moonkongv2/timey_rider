@@ -220,6 +220,8 @@ class LocalMealProgressService {
       targetDuration: result.targetDuration,
       actualDuration: result.actualDuration,
       completedBeforeArrival: result.completedBeforeArrival,
+      mealCompleted: result.mealCompleted,
+      completionStatus: result.completionStatus,
       rewardIds: awardedRewards.map((reward) => reward.id).toList(),
     );
 

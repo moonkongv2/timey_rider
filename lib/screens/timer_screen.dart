@@ -8,6 +8,7 @@ import '../catalogs/vehicle_catalog.dart';
 import '../controllers/meal_timer_controller.dart';
 import '../l10n/app_texts.dart';
 import '../l10n/text_sets.dart';
+import '../models/meal_completion_status.dart';
 import '../models/meal_session_result.dart';
 import '../models/meal_timer_config.dart';
 import '../services/local_meal_progress_service.dart';
@@ -373,13 +374,20 @@ class _TimerScreenState extends State<TimerScreen> {
 
     if (confirmed != true) {
       if (showFailureOnDecline) {
-        final result = _controller.complete(mealCompleted: false);
+        final result = _controller.complete(
+          mealCompleted: false,
+          completionStatus: MealCompletionStatus.notCompleted,
+        );
         _openResult(result);
       }
       return;
     }
 
-    final result = _controller.complete();
+    final result = _controller.complete(
+      completionStatus: showFailureOnDecline
+          ? MealCompletionStatus.completedAtArrival
+          : null,
+    );
     _openResult(result);
   }
 

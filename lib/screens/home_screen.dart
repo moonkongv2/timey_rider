@@ -1168,6 +1168,12 @@ class _ProgressSummary extends StatelessWidget {
     final activeRewardGoals = snapshot?.activeRewardGoals ?? const [];
     final earnedRewardCount = snapshot?.earnedRewardGoals.length ?? 0;
     final recent = history.isEmpty ? null : history.first;
+    final recentDisplayDuration = recent == null
+        ? Duration.zero
+        : capDuration(recent.actualDuration, recent.targetDuration);
+    final recentOverrun = recent == null
+        ? Duration.zero
+        : overrunDuration(recent.actualDuration, recent.targetDuration);
     final knownStickers = inventory.where(
       (item) =>
           RewardCatalog.findById(item.rewardId)?.type == RewardType.sticker,
@@ -1188,10 +1194,17 @@ class _ProgressSummary extends StatelessWidget {
           stickerValue: texts.home.stickerCount(stickerCount),
           recentSummary: recent == null
               ? texts.home.noMealHistory
-              : texts.home.recentMealSummary(
-                  formatDuration(recent.actualDuration),
-                  recent.completedBeforeArrival,
-                ),
+              : [
+                  texts.home.recentMealSummary(
+                    formatDuration(recentDisplayDuration),
+                    recent.completionStatus,
+                  ),
+                  if (!recent.mealCompleted) texts.mealHistory.noRewardLabel,
+                  if (!recent.mealCompleted && recentOverrun > Duration.zero)
+                    texts.mealHistory.overrunTime(
+                      formatDuration(recentOverrun),
+                    ),
+                ].join(' · '),
           onPressed: onOpenMealHistory,
         ),
         const SizedBox(height: AppSpacing.md),

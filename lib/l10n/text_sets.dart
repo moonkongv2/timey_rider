@@ -1,3 +1,5 @@
+import '../models/meal_completion_status.dart';
+
 abstract interface class CommonTextSet {
   String get appTitle;
   String get defaultChildName;
@@ -43,7 +45,10 @@ abstract interface class HomeTextSet {
   String mealCount(int count);
   String stickerKindCount(int count);
   String stickerCount(int count);
-  String recentMealSummary(String actualDuration, bool completedBeforeArrival);
+  String recentMealSummary(
+    String actualDuration,
+    MealCompletionStatus completionStatus,
+  );
 }
 
 abstract interface class MealHistoryTextSet {
@@ -52,11 +57,13 @@ abstract interface class MealHistoryTextSet {
   String get emptyBody;
   String get targetTimeLabel;
   String get actualTimeLabel;
+  String get overrunTimeLabel;
   String get rewardLabel;
   String get noRewardLabel;
 
-  String completedStatus(bool completedBeforeArrival);
+  String completedStatus(MealCompletionStatus completionStatus);
   String dateLabel(DateTime dateTime);
+  String overrunTime(String duration);
 }
 
 abstract interface class SettingsTextSet {

@@ -13,6 +13,7 @@ import 'package:jy_yamyam/catalogs/motivation_asset_catalog.dart';
 import 'package:jy_yamyam/catalogs/vehicle_catalog.dart';
 import 'package:jy_yamyam/l10n/app_texts.dart';
 import 'package:jy_yamyam/main.dart' as app;
+import 'package:jy_yamyam/models/meal_completion_status.dart';
 import 'package:jy_yamyam/models/meal_session_result.dart';
 import 'package:jy_yamyam/models/meal_timer_config.dart';
 import 'package:jy_yamyam/models/reward_goal.dart';
@@ -253,6 +254,7 @@ void main() {
 
   testWidgets('Failed result screen skips the intro video', (tester) async {
     SharedPreferences.setMockInitialValues({});
+    final service = LocalMealProgressService();
 
     await tester.pumpWidget(
       MaterialApp(
@@ -266,15 +268,23 @@ void main() {
         home: ResultScreen(
           result: _mealResult(mealCompleted: false),
           config: MealTimerConfig.defaults(),
-          mealProgressService: LocalMealProgressService(),
+          mealProgressService: service,
           onConfigChanged: (_) {},
         ),
       ),
     );
-    await tester.pump();
+    await tester.pumpAndSettle();
 
     expect(find.text('아쉽지만 조금 늦었어'), findsOneWidget);
     expect(find.text('오토바이가 먼저 지나갔어.'), findsOneWidget);
+
+    final snapshot = await service.loadSnapshot();
+    expect(snapshot.history, hasLength(1));
+    expect(snapshot.history.single.mealCompleted, isFalse);
+    expect(
+      snapshot.history.single.completionStatus,
+      MealCompletionStatus.notCompleted,
+    );
   });
 
   test('Result intro video contains in landscape and covers in portrait', () {
@@ -2259,6 +2269,35 @@ void main() {
     );
 
     expect(recordedSession.awardedRewards, isEmpty);
+    expect(recordedSession.entry.mealCompleted, isFalse);
+    expect(
+      recordedSession.entry.completionStatus,
+      MealCompletionStatus.notCompleted,
+    );
+    expect(recordedSession.entry.rewardIds, isEmpty);
+  });
+
+  test('Arrival-completed meal records at-arrival status', () async {
+    SharedPreferences.setMockInitialValues({});
+
+    final service = LocalMealProgressService();
+    final recordedSession = await service.recordMealResult(
+      _mealResult(
+        actualDuration: const Duration(minutes: 20),
+        completedBeforeArrival: false,
+        completionStatus: MealCompletionStatus.completedAtArrival,
+      ),
+    );
+    final snapshot = await service.loadSnapshot();
+
+    expect(
+      recordedSession.entry.completionStatus,
+      MealCompletionStatus.completedAtArrival,
+    );
+    expect(
+      snapshot.history.single.completionStatus,
+      MealCompletionStatus.completedAtArrival,
+    );
   });
 
   test('Completed meal fills exactly one active reward goal slot', () async {
@@ -2352,6 +2391,30 @@ void main() {
       expect(snapshot.usedRewardGoals.first.status, RewardGoalStatus.used);
     },
   );
+
+  test('Legacy meal history loads with completion status fallback', () async {
+    SharedPreferences.setMockInitialValues({
+      'mealHistory': [
+        jsonEncode({
+          'id': 'legacy-meal',
+          'startedAt': DateTime(2026, 5, 4, 12).toIso8601String(),
+          'endedAt': DateTime(2026, 5, 4, 12, 25).toIso8601String(),
+          'targetMs': const Duration(minutes: 20).inMilliseconds,
+          'actualMs': const Duration(minutes: 25).inMilliseconds,
+          'completedBeforeArrival': false,
+          'rewardIds': <String>[],
+        }),
+      ],
+    });
+
+    final snapshot = await LocalMealProgressService().loadSnapshot();
+
+    expect(snapshot.history.single.mealCompleted, isTrue);
+    expect(
+      snapshot.history.single.completionStatus,
+      MealCompletionStatus.completedAfterArrival,
+    );
+  });
 
   test('Fast meal fills only one reward goal slot', () async {
     SharedPreferences.setMockInitialValues({});
@@ -2547,13 +2610,20 @@ void main() {
     tester,
   ) async {
     SharedPreferences.setMockInitialValues({});
+    final service = LocalMealProgressService();
+    await service.recordMealResult(
+      _mealResult(
+        targetDuration: const Duration(minutes: 20),
+        actualDuration: const Duration(minutes: 25),
+      ),
+    );
 
     await tester.pumpWidget(
       MaterialApp(
         locale: const Locale('en'),
         home: HomeScreen(
           config: MealTimerConfig.defaults().copyWith(childName: 'Jiyul'),
-          mealProgressService: LocalMealProgressService(),
+          mealProgressService: service,
           onConfigChanged: (_) {},
         ),
       ),
@@ -2562,11 +2632,46 @@ void main() {
     await tester.drag(find.byType(ListView), const Offset(0, -700));
     await tester.pumpAndSettle();
 
+    expect(find.text('Recent meal 20:00 · complete'), findsOneWidget);
+
     await tester.tap(find.text("Jiyul's meal records"));
     await tester.pumpAndSettle();
 
     expect(find.byType(MealHistoryScreen), findsOneWidget);
     expect(find.text('Meal Records'), findsOneWidget);
+  });
+
+  testWidgets('Home meal records summary shows incomplete status', (
+    tester,
+  ) async {
+    SharedPreferences.setMockInitialValues({});
+    final service = LocalMealProgressService();
+    await service.recordMealResult(
+      _mealResult(
+        targetDuration: const Duration(minutes: 20),
+        actualDuration: const Duration(minutes: 25),
+        mealCompleted: false,
+        completionStatus: MealCompletionStatus.notCompleted,
+      ),
+    );
+
+    await tester.pumpWidget(
+      MaterialApp(
+        locale: const Locale('ko'),
+        localizationsDelegates: GlobalMaterialLocalizations.delegates,
+        supportedLocales: AppTexts.supportedLocales,
+        home: HomeScreen(
+          config: MealTimerConfig.defaults().copyWith(childName: '강우'),
+          mealProgressService: service,
+          onConfigChanged: (_) {},
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+    await tester.drag(find.byType(ListView), const Offset(0, -700));
+    await tester.pumpAndSettle();
+
+    expect(find.text('최근 식사 20:00 · 미완료 · 스티커 없음 · 초과 +05:00'), findsOneWidget);
   });
 
   testWidgets('Reward goal creation form saves a goal', (tester) async {
@@ -2680,11 +2785,42 @@ void main() {
 
     expect(find.textContaining('12:25'), findsOneWidget);
     expect(find.text('목표'), findsOneWidget);
-    expect(find.text('20:00'), findsOneWidget);
+    expect(find.text('20:00'), findsNWidgets(2));
     expect(find.text('실제'), findsOneWidget);
-    expect(find.text('25:00'), findsOneWidget);
-    expect(find.text('도착 후 완료'), findsOneWidget);
+    expect(find.text('25:00'), findsNothing);
+    expect(find.text('초과 +05:00'), findsNothing);
+    expect(find.text('완료'), findsOneWidget);
     expect(find.text('받은 스티커'), findsOneWidget);
+  });
+
+  testWidgets('Meal history screen shows incomplete meal records', (
+    tester,
+  ) async {
+    SharedPreferences.setMockInitialValues({});
+    final service = LocalMealProgressService();
+    await service.recordMealResult(
+      _mealResult(
+        startedAt: DateTime(2026, 5, 4, 12),
+        targetDuration: const Duration(minutes: 20),
+        actualDuration: const Duration(minutes: 25),
+        mealCompleted: false,
+        completionStatus: MealCompletionStatus.notCompleted,
+      ),
+    );
+
+    await tester.pumpWidget(
+      MaterialApp(
+        locale: const Locale('ko'),
+        localizationsDelegates: GlobalMaterialLocalizations.delegates,
+        supportedLocales: AppTexts.supportedLocales,
+        home: MealHistoryScreen(mealProgressService: service),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('미완료'), findsOneWidget);
+    expect(find.text('스티커 없음'), findsOneWidget);
+    expect(find.text('초과 +05:00'), findsOneWidget);
   });
 }
 
@@ -2695,6 +2831,7 @@ MealSessionResult _mealResult({
   Duration actualDuration = const Duration(minutes: 25),
   bool completedBeforeArrival = false,
   bool mealCompleted = true,
+  MealCompletionStatus? completionStatus,
 }) {
   final resolvedStartedAt = startedAt ?? DateTime(2026, 5, 4, 12);
   final resolvedEndedAt = endedAt ?? resolvedStartedAt.add(actualDuration);
@@ -2706,6 +2843,7 @@ MealSessionResult _mealResult({
     actualDuration: actualDuration,
     completedBeforeArrival: completedBeforeArrival,
     mealCompleted: mealCompleted,
+    completionStatus: completionStatus,
   );
 }
 

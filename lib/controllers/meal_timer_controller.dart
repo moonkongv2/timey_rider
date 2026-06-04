@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 
+import '../models/meal_completion_status.dart';
 import '../models/meal_session_result.dart';
 import '../models/meal_timer_config.dart';
 
@@ -71,19 +72,24 @@ class MealTimerController extends ChangeNotifier {
     notifyListeners();
   }
 
-  MealSessionResult complete({bool mealCompleted = true}) {
+  MealSessionResult complete({
+    bool mealCompleted = true,
+    MealCompletionStatus? completionStatus,
+  }) {
     _updateElapsed();
     _state = MealTimerState.completed;
     _ticker?.cancel();
 
     final endedAt = _now();
+    final completedBeforeArrival = progress < 1;
     return MealSessionResult(
       startedAt: _startedAt ?? endedAt,
       endedAt: endedAt,
       targetDuration: config.duration,
       actualDuration: _elapsed,
-      completedBeforeArrival: progress < 1,
+      completedBeforeArrival: completedBeforeArrival,
       mealCompleted: mealCompleted,
+      completionStatus: completionStatus,
     );
   }
 

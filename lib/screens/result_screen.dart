@@ -59,15 +59,16 @@ class _ResultScreenState extends State<ResultScreen> {
   static const _successImagePath = 'assets/images/result_success.png';
 
   VideoPlayerController? _introController;
-  late final Future<RecordedMealSession> _recordedSession = widget
-      .mealProgressService
-      .recordMealResult(widget.result);
+  late final Future<RecordedMealSession> _recordedSession;
   bool _introFinished = false;
   bool _introFallback = false;
 
   @override
   void initState() {
     super.initState();
+    _recordedSession = widget.mealProgressService.recordMealResult(
+      widget.result,
+    );
     if (!widget.result.mealCompleted) {
       _introFinished = true;
       return;

@@ -108,6 +108,11 @@ class _MealHistoryCard extends StatelessWidget {
     final textTheme = Theme.of(context).textTheme;
     final texts = AppTexts.of(context);
     final historyTexts = texts.mealHistory;
+    final cappedActualDuration = capDuration(
+      entry.actualDuration,
+      entry.targetDuration,
+    );
+    final overrun = overrunDuration(entry.actualDuration, entry.targetDuration);
 
     return Card(
       color: AppColors.white,
@@ -130,9 +135,8 @@ class _MealHistoryCard extends StatelessWidget {
                 ),
                 const SizedBox(width: AppSpacing.sm),
                 _StatusChip(
-                  label: historyTexts.completedStatus(
-                    entry.completedBeforeArrival,
-                  ),
+                  label: historyTexts.completedStatus(entry.completionStatus),
+                  isIncomplete: !entry.mealCompleted,
                 ),
               ],
             ),
@@ -149,11 +153,17 @@ class _MealHistoryCard extends StatelessWidget {
                 Expanded(
                   child: _DurationTile(
                     label: historyTexts.actualTimeLabel,
-                    value: formatDuration(entry.actualDuration),
+                    value: formatDuration(cappedActualDuration),
                   ),
                 ),
               ],
             ),
+            if (!entry.mealCompleted && overrun > Duration.zero) ...[
+              const SizedBox(height: AppSpacing.sm),
+              _OverrunChip(
+                label: historyTexts.overrunTime(formatDuration(overrun)),
+              ),
+            ],
             const SizedBox(height: AppSpacing.md),
             Text(
               historyTexts.rewardLabel,
@@ -171,8 +181,8 @@ class _MealHistoryCard extends StatelessWidget {
   }
 }
 
-class _StatusChip extends StatelessWidget {
-  const _StatusChip({required this.label});
+class _OverrunChip extends StatelessWidget {
+  const _OverrunChip({required this.label});
 
   final String label;
 
@@ -180,9 +190,59 @@ class _StatusChip extends StatelessWidget {
   Widget build(BuildContext context) {
     return DecoratedBox(
       decoration: BoxDecoration(
-        color: AppColors.surfaceYellow,
+        color: AppColors.surfaceWarm,
         borderRadius: AppRadius.pill,
         border: Border.all(color: AppColors.borderWarm),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.md,
+          vertical: AppSpacing.xs,
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(
+              Icons.timer_outlined,
+              color: AppColors.textSecondary,
+              size: 18,
+            ),
+            const SizedBox(width: AppSpacing.xs),
+            Text(
+              label,
+              style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                color: AppColors.textSecondary,
+                fontWeight: FontWeight.w900,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _StatusChip extends StatelessWidget {
+  const _StatusChip({required this.label, required this.isIncomplete});
+
+  final String label;
+  final bool isIncomplete;
+
+  @override
+  Widget build(BuildContext context) {
+    final backgroundColor = isIncomplete
+        ? AppColors.errorContainer
+        : AppColors.surfaceYellow;
+    final borderColor = isIncomplete ? AppColors.error : AppColors.borderWarm;
+    final textColor = isIncomplete
+        ? AppColors.onErrorContainer
+        : AppColors.textStrong;
+
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: backgroundColor,
+        borderRadius: AppRadius.pill,
+        border: Border.all(color: borderColor),
       ),
       child: Padding(
         padding: const EdgeInsets.symmetric(
@@ -192,7 +252,7 @@ class _StatusChip extends StatelessWidget {
         child: Text(
           label,
           style: Theme.of(context).textTheme.labelMedium?.copyWith(
-            color: AppColors.textStrong,
+            color: textColor,
             fontWeight: FontWeight.w900,
           ),
         ),

@@ -1,6 +1,7 @@
 // ignore_for_file: annotate_overrides
 
 import '../text_sets.dart';
+import '../../models/meal_completion_status.dart';
 
 class MealHistoryTexts implements MealHistoryTextSet {
   const MealHistoryTexts();
@@ -10,11 +11,12 @@ class MealHistoryTexts implements MealHistoryTextSet {
   String get emptyBody => '타이머를 완료하면 기록이 여기에 쌓여요.';
   String get targetTimeLabel => '목표';
   String get actualTimeLabel => '실제';
+  String get overrunTimeLabel => '초과';
   String get rewardLabel => '받은 스티커';
   String get noRewardLabel => '스티커 없음';
 
-  String completedStatus(bool completedBeforeArrival) {
-    return completedBeforeArrival ? '도착 전 완료' : '도착 후 완료';
+  String completedStatus(MealCompletionStatus completionStatus) {
+    return completionStatus == MealCompletionStatus.notCompleted ? '미완료' : '완료';
   }
 
   String dateLabel(DateTime dateTime) {
@@ -22,4 +24,6 @@ class MealHistoryTexts implements MealHistoryTextSet {
     final minute = dateTime.minute.toString().padLeft(2, '0');
     return '${dateTime.month}월 ${dateTime.day}일 $hour:$minute';
   }
+
+  String overrunTime(String duration) => '초과 +$duration';
 }
