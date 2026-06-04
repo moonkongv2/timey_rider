@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
@@ -22,16 +23,33 @@ import '../widgets/timer_control_bar.dart';
 import 'result_screen.dart';
 
 const _landscapeCourseCanvasSize = Size(1200, 520);
+const motivationMinimumVideoInterval = Duration(seconds: 90);
 
 String? motivationVideoAssetPathForVehicle({
   required String vehicleId,
   required int milestone,
+  int Function(int max)? nextInt,
 }) {
   if (milestone < 10 || milestone > 90 || milestone % 10 != 0) {
     return null;
   }
 
-  return MotivationAssetCatalog.videoPathForVehicle(vehicleId);
+  return MotivationAssetCatalog.videoPathForVehicle(
+    vehicleId,
+    nextInt: nextInt,
+  );
+}
+
+bool canShowMotivationVideoAt({
+  required Duration elapsed,
+  required Duration? lastShownAt,
+  Duration minimumInterval = motivationMinimumVideoInterval,
+}) {
+  if (lastShownAt == null) {
+    return elapsed >= minimumInterval;
+  }
+
+  return elapsed - lastShownAt >= minimumInterval;
 }
 
 int? nextMotivationMilestoneForProgress(
@@ -96,6 +114,7 @@ class _TimerStatusCopy {
 
 class _TimerScreenState extends State<TimerScreen> {
   late final MealTimerController _controller;
+  final math.Random _motivationRandom = math.Random();
   final Set<int> _shownMotivationMilestones = {};
   bool _arrivalPromptShown = false;
   bool _screenAwakeEnabled = false;
@@ -103,6 +122,7 @@ class _TimerScreenState extends State<TimerScreen> {
   bool _allowExit = false;
   int? _activeMotivationMilestone;
   String? _activeMotivationVideoPath;
+  Duration? _lastMotivationVideoShownAt;
 
   @override
   void initState() {
@@ -173,16 +193,24 @@ class _TimerScreenState extends State<TimerScreen> {
     if (milestone == null) {
       return;
     }
+    if (!canShowMotivationVideoAt(
+      elapsed: _controller.elapsed,
+      lastShownAt: _lastMotivationVideoShownAt,
+    )) {
+      return;
+    }
 
     final videoPath = motivationVideoAssetPathForVehicle(
       vehicleId: widget.config.motorcycleId,
       milestone: milestone,
+      nextInt: _motivationRandom.nextInt,
     );
     if (videoPath == null) {
       return;
     }
 
     _shownMotivationMilestones.add(milestone);
+    _lastMotivationVideoShownAt = _controller.elapsed;
     setState(() {
       _activeMotivationMilestone = milestone;
       _activeMotivationVideoPath = videoPath;

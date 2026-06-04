@@ -342,6 +342,25 @@ void main() {
     expect(File(fallbackPath).existsSync(), isTrue, reason: fallbackPath);
   });
 
+  test('Motivation video selection can pick a vehicle candidate by index', () {
+    expect(
+      motivationVideoAssetPathForVehicle(
+        vehicleId: 'motorcycle',
+        milestone: 10,
+        nextInt: (_) => 2,
+      ),
+      'assets/videos/motivation/motivation_motorcycle_3.mp4',
+    );
+    expect(
+      motivationVideoAssetPathForVehicle(
+        vehicleId: 'missing_vehicle',
+        milestone: 10,
+        nextInt: (_) => 4,
+      ),
+      MotivationAssetCatalog.fallbackVideoPath,
+    );
+  });
+
   test('Motivation asset catalog has locale voice files', () {
     expect(MotivationAssetCatalog.voicePathsForLanguage('ko'), [
       'assets/audio/motivation/ko_1.mp3',
@@ -371,6 +390,37 @@ void main() {
     expect(nextMotivationMilestoneForProgress(0.24, {}), 10);
     expect(nextMotivationMilestoneForProgress(0.24, {10}), 20);
     expect(nextMotivationMilestoneForProgress(1.0, {}), isNull);
+  });
+
+  test('Motivation video interval requires at least 90 seconds', () {
+    expect(
+      canShowMotivationVideoAt(
+        elapsed: const Duration(seconds: 89),
+        lastShownAt: null,
+      ),
+      isFalse,
+    );
+    expect(
+      canShowMotivationVideoAt(
+        elapsed: const Duration(seconds: 90),
+        lastShownAt: null,
+      ),
+      isTrue,
+    );
+    expect(
+      canShowMotivationVideoAt(
+        elapsed: const Duration(seconds: 150),
+        lastShownAt: const Duration(seconds: 70),
+      ),
+      isFalse,
+    );
+    expect(
+      canShowMotivationVideoAt(
+        elapsed: const Duration(seconds: 160),
+        lastShownAt: const Duration(seconds: 70),
+      ),
+      isTrue,
+    );
   });
 
   test('Arrival dialog copy uses the selected vehicle label', () {

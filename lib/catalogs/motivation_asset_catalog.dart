@@ -43,8 +43,13 @@ abstract final class MotivationAssetCatalog {
     return _videoPathsByVehicleId[vehicleId] ?? const [fallbackVideoPath];
   }
 
-  static String videoPathForVehicle(String vehicleId) {
-    return videoPathsForVehicle(vehicleId).first;
+  static String videoPathForVehicle(
+    String vehicleId, {
+    int Function(int max)? nextInt,
+  }) {
+    final paths = videoPathsForVehicle(vehicleId);
+    final index = nextInt == null ? 0 : nextInt(paths.length);
+    return paths[index.clamp(0, paths.length - 1)];
   }
 
   static List<String> voicePathsForLanguage(String languageCode) {
