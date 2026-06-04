@@ -9,6 +9,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:jy_yamyam/catalogs/avatar_prompt_catalog.dart';
+import 'package:jy_yamyam/catalogs/motivation_asset_catalog.dart';
 import 'package:jy_yamyam/catalogs/vehicle_catalog.dart';
 import 'package:jy_yamyam/l10n/app_texts.dart';
 import 'package:jy_yamyam/main.dart' as app;
@@ -280,49 +281,48 @@ void main() {
     expect(resultIntroMediaFitForSize(const Size(390, 844)), BoxFit.cover);
   });
 
-  test(
-    'Motivation video catalog has vehicle videos for supported vehicles',
-    () {
-      const vehiclesWithMotivationVideos = {
-        'motorcycle',
-        'fire_truck',
-        'police_car',
-        'excavator',
-      };
+  test('Motivation asset catalog has vehicle video files', () {
+    const vehiclesWithMotivationVideos = {
+      'motorcycle',
+      'fire_truck',
+      'police_car',
+      'excavator',
+      'airplane',
+      'supercar',
+      't_rex',
+      'shark',
+    };
 
-      for (final vehicle in VehicleCatalog.all.where(
-        (vehicle) => vehiclesWithMotivationVideos.contains(vehicle.id),
+    expect(
+      MotivationAssetCatalog.vehicleVideoIds,
+      unorderedEquals(vehiclesWithMotivationVideos),
+    );
+    for (final vehicleId in MotivationAssetCatalog.vehicleVideoIds) {
+      for (final path in MotivationAssetCatalog.videoPathsForVehicle(
+        vehicleId,
       )) {
-        for (var milestone = 10; milestone <= 90; milestone += 10) {
-          final videoNumber = milestone ~/ 10;
-          final path = motivationVideoAssetPathForVehicle(
-            vehicleId: vehicle.id,
-            milestone: milestone,
-          );
-
-          expect(
-            path,
-            'assets/videos/motivation_${vehicle.id}_$videoNumber.mp4',
-            reason: '${vehicle.id} $milestone%',
-          );
-          expect(File(path!).existsSync(), isTrue, reason: path);
-        }
+        expect(File(path).existsSync(), isTrue, reason: path);
       }
-    },
-  );
+    }
+    expect(File(MotivationAssetCatalog.fallbackVideoPath).existsSync(), isTrue);
+  });
 
-  test('Motivation video catalog falls back for missing vehicle videos', () {
-    const fallbackPath = 'assets/videos/motivation_10.mp4';
+  test('Motivation asset catalog falls back for missing vehicle videos', () {
+    const fallbackPath = MotivationAssetCatalog.fallbackVideoPath;
 
     expect(
       motivationVideoAssetPathForVehicle(
         vehicleId: 'fire_truck',
         milestone: 20,
       ),
-      'assets/videos/motivation_fire_truck_2.mp4',
+      'assets/videos/motivation/motivation_fire_truck_1.mp4',
     );
     expect(
       motivationVideoAssetPathForVehicle(vehicleId: 'airplane', milestone: 10),
+      'assets/videos/motivation/motivation_airplane_1.mp4',
+    );
+    expect(
+      motivationVideoAssetPathForVehicle(vehicleId: 'bus', milestone: 10),
       fallbackPath,
     );
     expect(
@@ -340,6 +340,29 @@ void main() {
       isNull,
     );
     expect(File(fallbackPath).existsSync(), isTrue, reason: fallbackPath);
+  });
+
+  test('Motivation asset catalog has locale voice files', () {
+    expect(MotivationAssetCatalog.voicePathsForLanguage('ko'), [
+      'assets/audio/motivation/ko_1.mp3',
+      'assets/audio/motivation/ko_2.mp3',
+    ]);
+    expect(MotivationAssetCatalog.voicePathsForLanguage('en'), [
+      'assets/audio/motivation/en_1.mp3',
+      'assets/audio/motivation/en_2.mp3',
+    ]);
+    expect(
+      MotivationAssetCatalog.voicePathsForLanguage('ja'),
+      MotivationAssetCatalog.voicePathsForLanguage('en'),
+    );
+
+    for (final languageCode in const ['ko', 'en']) {
+      for (final path in MotivationAssetCatalog.voicePathsForLanguage(
+        languageCode,
+      )) {
+        expect(File(path).existsSync(), isTrue, reason: path);
+      }
+    }
   });
 
   test('Motivation milestone selection keeps the first crossed milestone', () {
@@ -1651,7 +1674,8 @@ void main() {
             child: RoadView(
               progress: 0.5,
               vehicle: VehicleCatalog.fireTruck,
-              motivationVideoAssetPath: 'assets/videos/motivation_10.mp4',
+              motivationVideoAssetPath:
+                  MotivationAssetCatalog.fallbackVideoPath,
               motivationVideoMilestone: 10,
             ),
           ),
@@ -1682,7 +1706,8 @@ void main() {
             child: RoadView(
               progress: 0.5,
               vehicle: VehicleCatalog.fireTruck,
-              motivationVideoAssetPath: 'assets/videos/motivation_10.mp4',
+              motivationVideoAssetPath:
+                  MotivationAssetCatalog.fallbackVideoPath,
               motivationVideoMilestone: 10,
               showMotivationVideo: false,
             ),
@@ -1704,7 +1729,7 @@ void main() {
             width: 1200,
             height: 520,
             child: RoadMotivationVideoLayer(
-              assetPath: 'assets/videos/motivation_10.mp4',
+              assetPath: MotivationAssetCatalog.fallbackVideoPath,
               milestone: 10,
             ),
           ),

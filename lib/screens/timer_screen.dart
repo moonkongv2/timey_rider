@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
+import '../catalogs/motivation_asset_catalog.dart';
 import '../catalogs/vehicle_catalog.dart';
 import '../controllers/meal_timer_controller.dart';
 import '../l10n/app_texts.dart';
@@ -20,15 +21,7 @@ import '../widgets/road_view.dart';
 import '../widgets/timer_control_bar.dart';
 import 'result_screen.dart';
 
-const _fallbackMotivationVideoPath = 'assets/videos/motivation_10.mp4';
 const _landscapeCourseCanvasSize = Size(1200, 520);
-
-const _motivationVideoVehicleIds = {
-  'motorcycle',
-  'fire_truck',
-  'police_car',
-  'excavator',
-};
 
 String? motivationVideoAssetPathForVehicle({
   required String vehicleId,
@@ -38,12 +31,7 @@ String? motivationVideoAssetPathForVehicle({
     return null;
   }
 
-  final videoNumber = milestone ~/ 10;
-  if (!_motivationVideoVehicleIds.contains(vehicleId)) {
-    return _fallbackMotivationVideoPath;
-  }
-
-  return 'assets/videos/motivation_${vehicleId}_$videoNumber.mp4';
+  return MotivationAssetCatalog.videoPathForVehicle(vehicleId);
 }
 
 int? nextMotivationMilestoneForProgress(
