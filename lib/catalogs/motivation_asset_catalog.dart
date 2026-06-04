@@ -18,7 +18,9 @@ abstract final class MotivationAssetCatalog {
       'assets/videos/motivation/motivation_excavator_2.mp4',
     ],
     'airplane': ['assets/videos/motivation/motivation_airplane_1.mp4'],
+    'bus': ['assets/videos/motivation/motivation_bus_1.mp4'],
     'supercar': ['assets/videos/motivation/motivation_supercar_1.mp4'],
+    'train': ['assets/videos/motivation/motivation_train_1.mp4'],
     't_rex': ['assets/videos/motivation/motivation_t_rex_1.mp4'],
     'shark': ['assets/videos/motivation/motivation_shark_1.mp4'],
   };
@@ -63,5 +65,18 @@ abstract final class MotivationAssetCatalog {
   }) {
     return _voicePathOverridesByVehicleId[vehicleId]?[languageCode] ??
         voicePathsForLanguage(languageCode);
+  }
+
+  static String voicePathForVehicle({
+    required String vehicleId,
+    required String languageCode,
+    int Function(int max)? nextInt,
+  }) {
+    final paths = voicePathsForVehicle(
+      vehicleId: vehicleId,
+      languageCode: languageCode,
+    );
+    final index = nextInt == null ? 0 : nextInt(paths.length);
+    return paths[index.clamp(0, paths.length - 1)];
   }
 }

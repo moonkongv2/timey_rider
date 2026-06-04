@@ -11,6 +11,7 @@ import '../l10n/text_sets.dart';
 import '../models/meal_session_result.dart';
 import '../models/meal_timer_config.dart';
 import '../services/local_meal_progress_service.dart';
+import '../services/motivation_audio_service.dart';
 import '../services/screen_awake_service.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_radius.dart';
@@ -52,6 +53,23 @@ bool canShowMotivationVideoAt({
   return elapsed - lastShownAt >= minimumInterval;
 }
 
+String? motivationVoiceAssetPathForVehicle({
+  required bool soundEnabled,
+  required String vehicleId,
+  required String languageCode,
+  int Function(int max)? nextInt,
+}) {
+  if (!soundEnabled) {
+    return null;
+  }
+
+  return MotivationAssetCatalog.voicePathForVehicle(
+    vehicleId: vehicleId,
+    languageCode: languageCode,
+    nextInt: nextInt,
+  );
+}
+
 int? nextMotivationMilestoneForProgress(
   double progress,
   Set<int> shownMilestones,
@@ -87,12 +105,14 @@ class TimerScreen extends StatefulWidget {
     required this.mealProgressService,
     required this.onConfigChanged,
     this.screenAwakeService = const WakelockScreenAwakeService(),
+    this.motivationAudioService,
   });
 
   final MealTimerConfig config;
   final LocalMealProgressService mealProgressService;
   final ValueChanged<MealTimerConfig> onConfigChanged;
   final ScreenAwakeService screenAwakeService;
+  final MotivationAudioService? motivationAudioService;
 
   @override
   State<TimerScreen> createState() => _TimerScreenState();
@@ -114,6 +134,8 @@ class _TimerStatusCopy {
 
 class _TimerScreenState extends State<TimerScreen> {
   late final MealTimerController _controller;
+  late final MotivationAudioService _motivationAudioService;
+  late final bool _ownsMotivationAudioService;
   final math.Random _motivationRandom = math.Random();
   final Set<int> _shownMotivationMilestones = {};
   bool _arrivalPromptShown = false;
@@ -127,6 +149,9 @@ class _TimerScreenState extends State<TimerScreen> {
   @override
   void initState() {
     super.initState();
+    _motivationAudioService =
+        widget.motivationAudioService ?? AudioplayersMotivationAudioService();
+    _ownsMotivationAudioService = widget.motivationAudioService == null;
     _controller = MealTimerController(config: widget.config);
     _controller.addListener(_handleTimerChanged);
     _controller.start();
@@ -146,11 +171,19 @@ class _TimerScreenState extends State<TimerScreen> {
 
   @override
   void dispose() {
+    unawaited(_disposeMotivationAudioService());
     if (_screenAwakeEnabled) {
       unawaited(widget.screenAwakeService.setEnabled(false));
     }
     _controller.dispose();
     super.dispose();
+  }
+
+  Future<void> _disposeMotivationAudioService() async {
+    await _motivationAudioService.stop();
+    if (_ownsMotivationAudioService) {
+      await _motivationAudioService.dispose();
+    }
   }
 
   void _applyScreenAwakeSetting() {
@@ -211,10 +244,29 @@ class _TimerScreenState extends State<TimerScreen> {
 
     _shownMotivationMilestones.add(milestone);
     _lastMotivationVideoShownAt = _controller.elapsed;
+    _maybePlayMotivationVoice();
     setState(() {
       _activeMotivationMilestone = milestone;
       _activeMotivationVideoPath = videoPath;
     });
+  }
+
+  void _maybePlayMotivationVoice() {
+    if (!widget.config.soundEnabled) {
+      return;
+    }
+
+    final languageCode = Localizations.localeOf(context).languageCode;
+    final voicePath = motivationVoiceAssetPathForVehicle(
+      soundEnabled: widget.config.soundEnabled,
+      vehicleId: widget.config.motorcycleId,
+      languageCode: languageCode,
+      nextInt: _motivationRandom.nextInt,
+    );
+    if (voicePath == null) {
+      return;
+    }
+    unawaited(_motivationAudioService.playAsset(voicePath));
   }
 
   void _handleMotivationVideoFinished() {

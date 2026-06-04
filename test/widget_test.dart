@@ -288,7 +288,9 @@ void main() {
       'police_car',
       'excavator',
       'airplane',
+      'bus',
       'supercar',
+      'train',
       't_rex',
       'shark',
     };
@@ -320,10 +322,6 @@ void main() {
     expect(
       motivationVideoAssetPathForVehicle(vehicleId: 'airplane', milestone: 10),
       'assets/videos/motivation/motivation_airplane_1.mp4',
-    );
-    expect(
-      motivationVideoAssetPathForVehicle(vehicleId: 'bus', milestone: 10),
-      fallbackPath,
     );
     expect(
       motivationVideoAssetPathForVehicle(
@@ -382,6 +380,45 @@ void main() {
         expect(File(path).existsSync(), isTrue, reason: path);
       }
     }
+  });
+
+  test('Motivation voice selection follows sound and locale settings', () {
+    expect(
+      motivationVoiceAssetPathForVehicle(
+        soundEnabled: false,
+        vehicleId: 'motorcycle',
+        languageCode: 'ko',
+        nextInt: (_) => 1,
+      ),
+      isNull,
+    );
+    expect(
+      motivationVoiceAssetPathForVehicle(
+        soundEnabled: true,
+        vehicleId: 'motorcycle',
+        languageCode: 'ko',
+        nextInt: (_) => 1,
+      ),
+      'assets/audio/motivation/ko_2.mp3',
+    );
+    expect(
+      motivationVoiceAssetPathForVehicle(
+        soundEnabled: true,
+        vehicleId: 'shark',
+        languageCode: 'en',
+        nextInt: (_) => 0,
+      ),
+      'assets/audio/motivation/en_1.mp3',
+    );
+    expect(
+      motivationVoiceAssetPathForVehicle(
+        soundEnabled: true,
+        vehicleId: 'shark',
+        languageCode: 'ja',
+        nextInt: (_) => 1,
+      ),
+      'assets/audio/motivation/en_2.mp3',
+    );
   });
 
   test('Motivation milestone selection keeps the first crossed milestone', () {
