@@ -10,43 +10,49 @@ class TimerControlBar extends StatelessWidget {
     required this.isPaused,
     required this.onPauseResume,
     required this.onComplete,
+    this.isVertical = false,
   });
 
   final bool isPaused;
   final VoidCallback onPauseResume;
   final VoidCallback onComplete;
+  final bool isVertical;
 
   @override
   Widget build(BuildContext context) {
     final texts = AppTexts.of(context);
+    final pauseResumeButton = AppBouncyButton(
+      label: isPaused ? texts.common.restartRide : texts.timer.pauseButton,
+      icon: isPaused ? Icons.play_arrow_rounded : Icons.pause_rounded,
+      onPressed: onPauseResume,
+      variant: AppButtonVariant.outline,
+      size: AppButtonSize.large,
+      minHeight: 58,
+    );
+    final completeButton = AppBouncyButton(
+      label: texts.timer.completeMealButton,
+      icon: Icons.check_circle_rounded,
+      onPressed: onComplete,
+      variant: AppButtonVariant.primary,
+      size: AppButtonSize.large,
+      minHeight: 58,
+    );
+
+    if (isVertical) {
+      return Column(
+        children: [
+          pauseResumeButton,
+          const SizedBox(height: AppSpacing.md),
+          completeButton,
+        ],
+      );
+    }
 
     return Row(
       children: [
-        Flexible(
-          flex: 9,
-          child: AppBouncyButton(
-            label: isPaused
-                ? texts.common.restartRide
-                : texts.timer.pauseButton,
-            icon: isPaused ? Icons.play_arrow_rounded : Icons.pause_rounded,
-            onPressed: onPauseResume,
-            variant: AppButtonVariant.outline,
-            size: AppButtonSize.large,
-            minHeight: 58,
-          ),
-        ),
+        Flexible(flex: 9, child: pauseResumeButton),
         const SizedBox(width: AppSpacing.md),
-        Flexible(
-          flex: 11,
-          child: AppBouncyButton(
-            label: texts.timer.completeMealButton,
-            icon: Icons.check_circle_rounded,
-            onPressed: onComplete,
-            variant: AppButtonVariant.primary,
-            size: AppButtonSize.large,
-            minHeight: 58,
-          ),
-        ),
+        Flexible(flex: 11, child: completeButton),
       ],
     );
   }

@@ -5,8 +5,12 @@ import 'package:flutter/material.dart';
 import '../theme/app_colors.dart';
 
 Rect createRoadBounds(Size size) {
-  final horizontalPadding = (size.width * 0.13).clamp(46.0, 62.0).toDouble();
-  final verticalPadding = size.height * 0.06;
+  final isLandscape = size.width > size.height;
+  final horizontalPadding =
+      (isLandscape ? size.width * 0.10 : size.width * 0.13)
+          .clamp(isLandscape ? 84.0 : 46.0, isLandscape ? 118.0 : 62.0)
+          .toDouble();
+  final verticalPadding = isLandscape ? size.height * 0.18 : size.height * 0.06;
 
   return Rect.fromLTWH(
     horizontalPadding,
@@ -23,31 +27,25 @@ Path createRoadPath(Size size) {
   final top = bounds.top;
   final bottom = bounds.bottom;
   final height = bounds.height;
-  final rowHeight = height / 10;
+  final rowCount = size.width > size.height ? 5 : 10;
+  final rowHeight = height / rowCount;
+  final path = Path()..moveTo(left, bottom);
 
-  return Path()
-    ..moveTo(left, bottom)
-    ..lineTo(right, bottom)
-    ..lineTo(right, bottom - rowHeight)
-    ..lineTo(left, bottom - rowHeight)
-    ..lineTo(left, bottom - (rowHeight * 2))
-    ..lineTo(right, bottom - (rowHeight * 2))
-    ..lineTo(right, bottom - (rowHeight * 3))
-    ..lineTo(left, bottom - (rowHeight * 3))
-    ..lineTo(left, bottom - (rowHeight * 4))
-    ..lineTo(right, bottom - (rowHeight * 4))
-    ..lineTo(right, bottom - (rowHeight * 5))
-    ..lineTo(left, bottom - (rowHeight * 5))
-    ..lineTo(left, bottom - (rowHeight * 6))
-    ..lineTo(right, bottom - (rowHeight * 6))
-    ..lineTo(right, bottom - (rowHeight * 7))
-    ..lineTo(left, bottom - (rowHeight * 7))
-    ..lineTo(left, bottom - (rowHeight * 8))
-    ..lineTo(right, bottom - (rowHeight * 8))
-    ..lineTo(right, bottom - (rowHeight * 9))
-    ..lineTo(left, bottom - (rowHeight * 9))
-    ..lineTo(left, top)
-    ..lineTo(right, top);
+  for (var row = 0; row < rowCount; row += 1) {
+    final currentY = bottom - (rowHeight * row);
+    final nextY = bottom - (rowHeight * (row + 1));
+    if (row.isEven) {
+      path
+        ..lineTo(right, currentY)
+        ..lineTo(right, nextY);
+    } else {
+      path
+        ..lineTo(left, currentY)
+        ..lineTo(left, nextY);
+    }
+  }
+
+  return path..lineTo(rowCount.isEven ? right : left, top);
 }
 
 PathMetric _roadMetric(Size size) {
@@ -90,7 +88,11 @@ class RoadPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final roadPath = createRoadPath(size);
-    final roadWidth = (size.shortestSide * 0.058).clamp(22.0, 32.0).toDouble();
+    final isLandscape = size.width > size.height;
+    final roadWidth =
+        (isLandscape ? size.height * 0.085 : size.shortestSide * 0.058)
+            .clamp(isLandscape ? 30.0 : 22.0, isLandscape ? 44.0 : 32.0)
+            .toDouble();
     final roadMetric = roadPath.computeMetrics().first;
     final progressDistance =
         roadMetric.length * progress.clamp(0.0, 1.0).toDouble();

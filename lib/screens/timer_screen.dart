@@ -15,11 +15,13 @@ import '../theme/app_radius.dart';
 import '../theme/app_shadows.dart';
 import '../theme/app_spacing.dart';
 import '../utils/duration_format.dart';
+import '../widgets/road_painter.dart';
 import '../widgets/road_view.dart';
 import '../widgets/timer_control_bar.dart';
 import 'result_screen.dart';
 
 const _fallbackMotivationVideoPath = 'assets/videos/motivation_10.mp4';
+const _landscapeCourseCanvasSize = Size(1200, 520);
 
 const _motivationVideoVehicleIds = {
   'motorcycle',
@@ -397,6 +399,16 @@ class _TimerScreenState extends State<TimerScreen> {
           _controller.state,
           progress,
         );
+        void handlePauseResume() {
+          if (_controller.isPaused) {
+            _controller.resume();
+          } else {
+            _controller.pause();
+          }
+        }
+
+        final isScreenLandscape =
+            MediaQuery.orientationOf(context) == Orientation.landscape;
 
         return PopScope(
           canPop: _allowExit,
@@ -407,71 +419,134 @@ class _TimerScreenState extends State<TimerScreen> {
           },
           child: Scaffold(
             backgroundColor: AppColors.cream,
-            appBar: AppBar(
-              title: Text(texts.timer.courseTitle),
-              backgroundColor: AppColors.cream,
-              foregroundColor: AppColors.brown900,
-              elevation: 0,
-            ),
+            appBar: isScreenLandscape
+                ? null
+                : AppBar(
+                    title: Text(texts.timer.courseTitle),
+                    backgroundColor: AppColors.cream,
+                    foregroundColor: AppColors.brown900,
+                    elevation: 0,
+                  ),
             body: SafeArea(
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(
-                  AppSpacing.xl,
-                  AppSpacing.xs,
-                  AppSpacing.xl,
-                  AppSpacing.xl,
-                ),
-                child: Column(
-                  children: [
-                    _ProgressMessageCard(
-                      message: statusCopy.progressMessage,
-                      progress: progress,
-                    ),
-                    const SizedBox(height: AppSpacing.lg),
-                    Expanded(
-                      child: RoadView(
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  final isLandscape =
+                      constraints.maxWidth > constraints.maxHeight;
+                  final roadView = RoadView(
+                    progress: progress,
+                    vehicle: vehicle,
+                    avatarMode: vehicleAvatarMode,
+                    customAvatarImagePath: vehicleAvatarImagePath,
+                    avatarScale: vehicleAvatarConfig?.scale ?? 1.0,
+                    avatarOffsetX: vehicleAvatarConfig?.offsetX ?? 0.0,
+                    avatarOffsetY: vehicleAvatarConfig?.offsetY ?? 0.0,
+                    avatarRotationDegrees:
+                        vehicleAvatarConfig?.rotationDegrees ?? 0.0,
+                    motivationVideoAssetPath: _activeMotivationVideoPath,
+                    motivationVideoMilestone: _activeMotivationMilestone,
+                    onMotivationVideoFinished: _handleMotivationVideoFinished,
+                    showVehicle: !isLandscape,
+                    showMotivationVideo: !isLandscape,
+                  );
+                  final landscapeVehicleLayer = isLandscape
+                      ? RoadVehicleLayer(
+                          progress: progress,
+                          vehicle: vehicle,
+                          avatarMode: vehicleAvatarMode,
+                          customAvatarImagePath: vehicleAvatarImagePath,
+                          avatarScale: vehicleAvatarConfig?.scale ?? 1.0,
+                          avatarOffsetX: vehicleAvatarConfig?.offsetX ?? 0.0,
+                          avatarOffsetY: vehicleAvatarConfig?.offsetY ?? 0.0,
+                          avatarRotationDegrees:
+                              vehicleAvatarConfig?.rotationDegrees ?? 0.0,
+                        )
+                      : null;
+                  final landscapeMotivationVideoLayer =
+                      isLandscape &&
+                          _activeMotivationVideoPath != null &&
+                          _activeMotivationMilestone != null
+                      ? RoadMotivationVideoLayer(
+                          assetPath: _activeMotivationVideoPath!,
+                          milestone: _activeMotivationMilestone!,
+                          onFinished: _handleMotivationVideoFinished,
+                        )
+                      : null;
+                  final remainingTimeCard = widget.config.showRemainingTime
+                      ? _RemainingTimeCard(
+                          label: statusCopy.timeLabel,
+                          remaining: _controller.remaining,
+                          icon: statusCopy.icon,
+                          iconBackgroundColor: statusCopy.iconBackgroundColor,
+                          semanticLabel: texts.timer.remainingTimeSemanticLabel(
+                            statusCopy.timeLabel,
+                            formatDuration(_controller.remaining),
+                          ),
+                          isCompact: isLandscape,
+                        )
+                      : null;
+
+                  if (isLandscape) {
+                    return _LandscapeTimerLayout(
+                      progressCard: _ProgressMessageCard(
+                        message: statusCopy.progressMessage,
                         progress: progress,
-                        vehicle: vehicle,
-                        avatarMode: vehicleAvatarMode,
-                        customAvatarImagePath: vehicleAvatarImagePath,
-                        avatarScale: vehicleAvatarConfig?.scale ?? 1.0,
-                        avatarOffsetX: vehicleAvatarConfig?.offsetX ?? 0.0,
-                        avatarOffsetY: vehicleAvatarConfig?.offsetY ?? 0.0,
-                        avatarRotationDegrees:
-                            vehicleAvatarConfig?.rotationDegrees ?? 0.0,
-                        motivationVideoAssetPath: _activeMotivationVideoPath,
-                        motivationVideoMilestone: _activeMotivationMilestone,
-                        onMotivationVideoFinished:
-                            _handleMotivationVideoFinished,
+                        isCompact: true,
                       ),
+                      remainingTimeBadge: widget.config.showRemainingTime
+                          ? _RemainingTimeBadge(
+                              label: statusCopy.timeLabel,
+                              remaining: _controller.remaining,
+                              icon: statusCopy.icon,
+                              iconBackgroundColor:
+                                  statusCopy.iconBackgroundColor,
+                              semanticLabel: texts.timer
+                                  .remainingTimeSemanticLabel(
+                                    statusCopy.timeLabel,
+                                    formatDuration(_controller.remaining),
+                                  ),
+                            )
+                          : null,
+                      roadView: roadView,
+                      vehicleLayer: landscapeVehicleLayer,
+                      motivationVideoLayer: landscapeMotivationVideoLayer,
+                      onBack: _confirmExit,
+                      controls: TimerControlBar(
+                        isPaused: _controller.isPaused,
+                        onPauseResume: handlePauseResume,
+                        onComplete: _confirmComplete,
+                      ),
+                    );
+                  }
+
+                  return Padding(
+                    padding: const EdgeInsets.fromLTRB(
+                      AppSpacing.xl,
+                      AppSpacing.xs,
+                      AppSpacing.xl,
+                      AppSpacing.xl,
                     ),
-                    if (widget.config.showRemainingTime) ...[
-                      const SizedBox(height: AppSpacing.lg),
-                      _RemainingTimeCard(
-                        label: statusCopy.timeLabel,
-                        remaining: _controller.remaining,
-                        icon: statusCopy.icon,
-                        iconBackgroundColor: statusCopy.iconBackgroundColor,
-                        semanticLabel: texts.timer.remainingTimeSemanticLabel(
-                          statusCopy.timeLabel,
-                          formatDuration(_controller.remaining),
+                    child: Column(
+                      children: [
+                        _ProgressMessageCard(
+                          message: statusCopy.progressMessage,
+                          progress: progress,
                         ),
-                      ),
-                    ],
-                    const SizedBox(height: AppSpacing.lg),
-                    TimerControlBar(
-                      isPaused: _controller.isPaused,
-                      onPauseResume: () {
-                        if (_controller.isPaused) {
-                          _controller.resume();
-                        } else {
-                          _controller.pause();
-                        }
-                      },
-                      onComplete: _confirmComplete,
+                        const SizedBox(height: AppSpacing.lg),
+                        Expanded(child: roadView),
+                        if (remainingTimeCard != null) ...[
+                          const SizedBox(height: AppSpacing.lg),
+                          remainingTimeCard,
+                        ],
+                        const SizedBox(height: AppSpacing.lg),
+                        TimerControlBar(
+                          isPaused: _controller.isPaused,
+                          onPauseResume: handlePauseResume,
+                          onComplete: _confirmComplete,
+                        ),
+                      ],
                     ),
-                  ],
-                ),
+                  );
+                },
               ),
             ),
           ),
@@ -481,15 +556,258 @@ class _TimerScreenState extends State<TimerScreen> {
   }
 }
 
+class _LandscapeTimerLayout extends StatelessWidget {
+  const _LandscapeTimerLayout({
+    required this.progressCard,
+    required this.remainingTimeBadge,
+    required this.roadView,
+    required this.vehicleLayer,
+    required this.motivationVideoLayer,
+    required this.onBack,
+    required this.controls,
+  });
+
+  final Widget progressCard;
+  final Widget? remainingTimeBadge;
+  final Widget roadView;
+  final Widget? vehicleLayer;
+  final Widget? motivationVideoLayer;
+  final VoidCallback onBack;
+  final Widget controls;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(
+        AppSpacing.md,
+        AppSpacing.xs,
+        AppSpacing.md,
+        AppSpacing.md,
+      ),
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final courseViewportHeight = (constraints.maxHeight - AppSpacing.xl)
+              .clamp(360.0, 620.0)
+              .toDouble();
+
+          return SingleChildScrollView(
+            child: Column(
+              children: [
+                SizedBox(
+                  width: double.infinity,
+                  height: courseViewportHeight,
+                  child: Center(
+                    child: _LandscapeCourseCanvas(
+                      progressCard: progressCard,
+                      remainingTimeBadge: remainingTimeBadge,
+                      roadView: roadView,
+                      vehicleLayer: vehicleLayer,
+                      motivationVideoLayer: motivationVideoLayer,
+                      onBack: onBack,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: AppSpacing.md),
+                controls,
+                const SizedBox(height: AppSpacing.md),
+              ],
+            ),
+          );
+        },
+      ),
+    );
+  }
+}
+
+class _LandscapeCourseCanvas extends StatelessWidget {
+  const _LandscapeCourseCanvas({
+    required this.progressCard,
+    required this.remainingTimeBadge,
+    required this.roadView,
+    required this.vehicleLayer,
+    required this.motivationVideoLayer,
+    required this.onBack,
+  });
+
+  final Widget progressCard;
+  final Widget? remainingTimeBadge;
+  final Widget roadView;
+  final Widget? vehicleLayer;
+  final Widget? motivationVideoLayer;
+  final VoidCallback onBack;
+
+  @override
+  Widget build(BuildContext context) {
+    final roadBounds = createRoadBounds(_landscapeCourseCanvasSize);
+
+    return FittedBox(
+      fit: BoxFit.contain,
+      child: SizedBox(
+        width: _landscapeCourseCanvasSize.width,
+        height: _landscapeCourseCanvasSize.height,
+        child: Stack(
+          children: [
+            Positioned.fill(child: roadView),
+            if (remainingTimeBadge == null)
+              Positioned(
+                left: roadBounds.left,
+                top: AppSpacing.md,
+                right: _landscapeCourseCanvasSize.width - roadBounds.right,
+                child: Center(
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 588),
+                    child: progressCard,
+                  ),
+                ),
+              )
+            else
+              Positioned(
+                left: roadBounds.left,
+                right:
+                    _landscapeCourseCanvasSize.width -
+                    roadBounds.right +
+                    360 +
+                    AppSpacing.md,
+                top: AppSpacing.md,
+                child: Align(
+                  alignment: Alignment.centerRight,
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 588),
+                    child: progressCard,
+                  ),
+                ),
+              ),
+            if (vehicleLayer != null) Positioned.fill(child: vehicleLayer!),
+            if (motivationVideoLayer != null)
+              Positioned.fill(child: motivationVideoLayer!),
+            Positioned(
+              left: AppSpacing.md,
+              top: AppSpacing.md,
+              child: _LandscapeBackButton(onPressed: onBack),
+            ),
+            if (remainingTimeBadge != null)
+              Positioned(
+                right: _landscapeCourseCanvasSize.width - roadBounds.right,
+                top: AppSpacing.md,
+                child: remainingTimeBadge!,
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _LandscapeBackButton extends StatelessWidget {
+  const _LandscapeBackButton({required this.onPressed});
+
+  final VoidCallback onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: AppColors.surfaceWarm.withValues(alpha: 0.92),
+        borderRadius: AppRadius.pill,
+        border: Border.all(color: AppColors.borderSoft),
+        boxShadow: AppShadows.surface,
+      ),
+      child: IconButton(
+        tooltip: MaterialLocalizations.of(context).backButtonTooltip,
+        icon: const Icon(Icons.arrow_back_rounded),
+        color: AppColors.brown700,
+        iconSize: 24,
+        onPressed: onPressed,
+      ),
+    );
+  }
+}
+
 class _ProgressMessageCard extends StatelessWidget {
-  const _ProgressMessageCard({required this.message, required this.progress});
+  const _ProgressMessageCard({
+    required this.message,
+    required this.progress,
+    this.isCompact = false,
+  });
 
   final String message;
   final double progress;
+  final bool isCompact;
 
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
+    final iconSize = isCompact ? 40.0 : 36.0;
+    final messageStyle = textTheme.titleMedium?.copyWith(
+      color: AppColors.brown900,
+      fontSize: isCompact ? 23 : null,
+      fontWeight: FontWeight.w800,
+    );
+
+    if (isCompact) {
+      return DecoratedBox(
+        key: const ValueKey('timerProgressMessageCard'),
+        decoration: BoxDecoration(
+          color: AppColors.surfaceWarm,
+          borderRadius: AppRadius.card,
+          border: Border.all(color: AppColors.borderWarm),
+          boxShadow: AppShadows.surface,
+        ),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppSpacing.md,
+            vertical: AppSpacing.sm,
+          ),
+          child: Row(
+            children: [
+              DecoratedBox(
+                decoration: BoxDecoration(
+                  color: AppColors.surfaceYellow.withValues(alpha: 0.78),
+                  borderRadius: AppRadius.pill,
+                  border: Border.all(color: AppColors.white),
+                ),
+                child: SizedBox(
+                  width: iconSize,
+                  height: iconSize,
+                  child: const Center(
+                    child: Text(
+                      '🏁',
+                      textScaler: TextScaler.noScaling,
+                      style: TextStyle(fontSize: 26, height: 1),
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(width: AppSpacing.md),
+              ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 220),
+                child: Text(
+                  message,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: messageStyle,
+                ),
+              ),
+              const SizedBox(width: AppSpacing.md),
+              Expanded(
+                child: ClipRRect(
+                  borderRadius: AppRadius.pill,
+                  child: LinearProgressIndicator(
+                    key: const ValueKey('timerProgressIndicator'),
+                    value: progress,
+                    minHeight: 7,
+                    backgroundColor: AppColors.borderSoft,
+                    valueColor: const AlwaysStoppedAnimation<Color>(
+                      AppColors.primary,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
 
     return DecoratedBox(
       decoration: BoxDecoration(
@@ -499,9 +817,9 @@ class _ProgressMessageCard extends StatelessWidget {
         boxShadow: AppShadows.surface,
       ),
       child: Padding(
-        padding: const EdgeInsets.symmetric(
-          horizontal: AppSpacing.md,
-          vertical: AppSpacing.sm,
+        padding: EdgeInsets.symmetric(
+          horizontal: isCompact ? AppSpacing.md : AppSpacing.md,
+          vertical: isCompact ? AppSpacing.md : AppSpacing.sm,
         ),
         child: Row(
           children: [
@@ -511,36 +829,30 @@ class _ProgressMessageCard extends StatelessWidget {
                 borderRadius: AppRadius.pill,
                 border: Border.all(color: AppColors.white),
               ),
-              child: const SizedBox(
-                width: 36,
-                height: 36,
+              child: SizedBox(
+                width: iconSize,
+                height: iconSize,
                 child: Center(
                   child: Text(
                     '🏁',
                     textScaler: TextScaler.noScaling,
-                    style: TextStyle(fontSize: 20, height: 1),
+                    style: TextStyle(fontSize: isCompact ? 26 : 20, height: 1),
                   ),
                 ),
               ),
             ),
-            const SizedBox(width: AppSpacing.md),
+            SizedBox(width: isCompact ? AppSpacing.sm : AppSpacing.md),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    message,
-                    style: textTheme.titleMedium?.copyWith(
-                      color: AppColors.brown900,
-                      fontWeight: FontWeight.w800,
-                    ),
-                  ),
+                  Text(message, style: messageStyle),
                   const SizedBox(height: AppSpacing.xs),
                   ClipRRect(
                     borderRadius: AppRadius.pill,
                     child: LinearProgressIndicator(
                       value: progress,
-                      minHeight: 6,
+                      minHeight: isCompact ? 7 : 6,
                       backgroundColor: AppColors.borderSoft,
                       valueColor: const AlwaysStoppedAnimation<Color>(
                         AppColors.primary,
@@ -557,8 +869,8 @@ class _ProgressMessageCard extends StatelessWidget {
   }
 }
 
-class _RemainingTimeCard extends StatelessWidget {
-  const _RemainingTimeCard({
+class _RemainingTimeBadge extends StatelessWidget {
+  const _RemainingTimeBadge({
     required this.label,
     required this.remaining,
     required this.icon,
@@ -580,6 +892,90 @@ class _RemainingTimeCard extends StatelessWidget {
     return Semantics(
       label: semanticLabel,
       container: true,
+      child: SizedBox(
+        key: const ValueKey('remainingTimeBadge'),
+        width: 360,
+        child: DecoratedBox(
+          decoration: BoxDecoration(
+            color: AppColors.surfaceWarm.withValues(alpha: 0.68),
+            borderRadius: AppRadius.pill,
+            border: Border.all(color: AppColors.white.withValues(alpha: 0.72)),
+            boxShadow: AppShadows.surface,
+          ),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppSpacing.lg,
+              vertical: AppSpacing.sm,
+            ),
+            child: Row(
+              children: [
+                DecoratedBox(
+                  decoration: BoxDecoration(
+                    color: iconBackgroundColor,
+                    borderRadius: AppRadius.pill,
+                  ),
+                  child: SizedBox(
+                    width: 40,
+                    height: 40,
+                    child: Icon(icon, color: AppColors.brown700, size: 26),
+                  ),
+                ),
+                const SizedBox(width: AppSpacing.md),
+                Expanded(
+                  child: Text(
+                    label,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: textTheme.titleMedium?.copyWith(
+                      color: AppColors.textStrong,
+                      fontSize: 23,
+                      fontWeight: FontWeight.w900,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: AppSpacing.sm),
+                Text(
+                  formattedRemaining,
+                  style: textTheme.titleMedium?.copyWith(
+                    color: AppColors.textStrong,
+                    fontSize: 23,
+                    fontWeight: FontWeight.w900,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _RemainingTimeCard extends StatelessWidget {
+  const _RemainingTimeCard({
+    required this.label,
+    required this.remaining,
+    required this.icon,
+    required this.iconBackgroundColor,
+    required this.semanticLabel,
+    this.isCompact = false,
+  });
+
+  final String label;
+  final Duration remaining;
+  final IconData icon;
+  final Color iconBackgroundColor;
+  final String semanticLabel;
+  final bool isCompact;
+
+  @override
+  Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
+    final formattedRemaining = formatDuration(remaining);
+
+    return Semantics(
+      label: semanticLabel,
+      container: true,
       child: DecoratedBox(
         decoration: BoxDecoration(
           color: AppColors.surfaceWarm,
@@ -588,12 +984,12 @@ class _RemainingTimeCard extends StatelessWidget {
           boxShadow: AppShadows.surface,
         ),
         child: Padding(
-          padding: const EdgeInsets.symmetric(
-            horizontal: AppSpacing.lg,
-            vertical: AppSpacing.md,
+          padding: EdgeInsets.symmetric(
+            horizontal: isCompact ? AppSpacing.md : AppSpacing.lg,
+            vertical: isCompact ? AppSpacing.sm : AppSpacing.md,
           ),
           child: ConstrainedBox(
-            constraints: const BoxConstraints(minHeight: 58),
+            constraints: BoxConstraints(minHeight: isCompact ? 48 : 58),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -603,11 +999,17 @@ class _RemainingTimeCard extends StatelessWidget {
                     borderRadius: AppRadius.pill,
                   ),
                   child: Padding(
-                    padding: const EdgeInsets.all(AppSpacing.sm),
-                    child: Icon(icon, color: AppColors.brown700),
+                    padding: EdgeInsets.all(
+                      isCompact ? AppSpacing.xs : AppSpacing.sm,
+                    ),
+                    child: Icon(
+                      icon,
+                      color: AppColors.brown700,
+                      size: isCompact ? 22 : 24,
+                    ),
                   ),
                 ),
-                const SizedBox(width: AppSpacing.md),
+                SizedBox(width: isCompact ? AppSpacing.sm : AppSpacing.md),
                 Flexible(
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
@@ -617,21 +1019,31 @@ class _RemainingTimeCard extends StatelessWidget {
                         child: Text(
                           label,
                           overflow: TextOverflow.ellipsis,
-                          style: textTheme.headlineSmall?.copyWith(
-                            color: AppColors.textStrong,
-                            fontWeight: FontWeight.w900,
-                            height: 1.04,
-                          ),
+                          style:
+                              (isCompact
+                                      ? textTheme.titleMedium
+                                      : textTheme.headlineSmall)
+                                  ?.copyWith(
+                                    color: AppColors.textStrong,
+                                    fontWeight: FontWeight.w900,
+                                    height: 1.04,
+                                  ),
                         ),
                       ),
-                      const SizedBox(width: AppSpacing.sm),
+                      SizedBox(
+                        width: isCompact ? AppSpacing.xs : AppSpacing.sm,
+                      ),
                       Text(
                         formattedRemaining,
-                        style: textTheme.headlineSmall?.copyWith(
-                          color: AppColors.textStrong,
-                          fontWeight: FontWeight.w900,
-                          height: 1.04,
-                        ),
+                        style:
+                            (isCompact
+                                    ? textTheme.titleMedium
+                                    : textTheme.headlineSmall)
+                                ?.copyWith(
+                                  color: AppColors.textStrong,
+                                  fontWeight: FontWeight.w900,
+                                  height: 1.04,
+                                ),
                       ),
                     ],
                   ),
