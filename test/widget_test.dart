@@ -19,6 +19,7 @@ import 'package:jy_yamyam/models/reward_goal.dart';
 import 'package:jy_yamyam/models/vehicle.dart';
 import 'package:jy_yamyam/screens/avatar_setup_screen.dart';
 import 'package:jy_yamyam/screens/home_screen.dart';
+import 'package:jy_yamyam/screens/meal_history_screen.dart';
 import 'package:jy_yamyam/screens/reward_goal_screen.dart';
 import 'package:jy_yamyam/screens/result_screen.dart';
 import 'package:jy_yamyam/screens/settings_screen.dart';
@@ -2607,6 +2608,57 @@ void main() {
     final snapshot = await service.loadSnapshot();
     expect(snapshot.earnedRewardGoals, isEmpty);
     expect(snapshot.usedRewardGoals, hasLength(1));
+  });
+
+  testWidgets('Meal history screen shows empty state', (tester) async {
+    SharedPreferences.setMockInitialValues({});
+
+    await tester.pumpWidget(
+      MaterialApp(
+        locale: const Locale('ko'),
+        localizationsDelegates: GlobalMaterialLocalizations.delegates,
+        supportedLocales: AppTexts.supportedLocales,
+        home: MealHistoryScreen(
+          mealProgressService: LocalMealProgressService(),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('식사 기록'), findsOneWidget);
+    expect(find.text('아직 식사 기록이 없어요'), findsOneWidget);
+    expect(find.text('타이머를 완료하면 기록이 여기에 쌓여요.'), findsOneWidget);
+  });
+
+  testWidgets('Meal history screen lists saved meal records', (tester) async {
+    SharedPreferences.setMockInitialValues({});
+    final service = LocalMealProgressService();
+    await service.recordMealResult(
+      _mealResult(
+        startedAt: DateTime(2026, 5, 4, 12),
+        targetDuration: const Duration(minutes: 20),
+        actualDuration: const Duration(minutes: 25),
+        completedBeforeArrival: false,
+      ),
+    );
+
+    await tester.pumpWidget(
+      MaterialApp(
+        locale: const Locale('ko'),
+        localizationsDelegates: GlobalMaterialLocalizations.delegates,
+        supportedLocales: AppTexts.supportedLocales,
+        home: MealHistoryScreen(mealProgressService: service),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.textContaining('12:25'), findsOneWidget);
+    expect(find.text('목표'), findsOneWidget);
+    expect(find.text('20:00'), findsOneWidget);
+    expect(find.text('실제'), findsOneWidget);
+    expect(find.text('25:00'), findsOneWidget);
+    expect(find.text('도착 후 완료'), findsOneWidget);
+    expect(find.text('받은 스티커'), findsOneWidget);
   });
 }
 

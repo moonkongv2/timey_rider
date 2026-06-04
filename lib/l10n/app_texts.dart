@@ -2,12 +2,14 @@ import 'package:flutter/widgets.dart';
 
 import 'en/common.dart';
 import 'en/home.dart';
+import 'en/meal_history.dart';
 import 'en/result.dart';
 import 'en/rewards.dart';
 import 'en/settings.dart';
 import 'en/timer.dart';
 import 'ko/common.dart';
 import 'ko/home.dart';
+import 'ko/meal_history.dart';
 import 'ko/result.dart';
 import 'ko/rewards.dart';
 import 'ko/settings.dart';
@@ -18,6 +20,7 @@ class AppTextBundle {
   const AppTextBundle({
     required this.common,
     required this.home,
+    required this.mealHistory,
     required this.result,
     required this.rewards,
     required this.settings,
@@ -26,6 +29,7 @@ class AppTextBundle {
 
   final CommonTextSet common;
   final HomeTextSet home;
+  final MealHistoryTextSet mealHistory;
   final ResultTextSet result;
   final RewardTextSet rewards;
   final SettingsTextSet settings;
@@ -38,6 +42,7 @@ abstract final class AppTexts {
   static const ko = AppTextBundle(
     common: CommonTexts(),
     home: HomeTexts(),
+    mealHistory: MealHistoryTexts(),
     result: ResultTexts(),
     rewards: RewardTexts(),
     settings: SettingsTexts(),
@@ -47,6 +52,7 @@ abstract final class AppTexts {
   static const en = AppTextBundle(
     common: EnCommonTexts(),
     home: EnHomeTexts(),
+    mealHistory: EnMealHistoryTexts(),
     result: EnResultTexts(),
     rewards: EnRewardTexts(),
     settings: EnSettingsTexts(),

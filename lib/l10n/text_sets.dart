@@ -46,6 +46,19 @@ abstract interface class HomeTextSet {
   String recentMealSummary(String actualDuration, bool completedBeforeArrival);
 }
 
+abstract interface class MealHistoryTextSet {
+  String get title;
+  String get emptyTitle;
+  String get emptyBody;
+  String get targetTimeLabel;
+  String get actualTimeLabel;
+  String get rewardLabel;
+  String get noRewardLabel;
+
+  String completedStatus(bool completedBeforeArrival);
+  String dateLabel(DateTime dateTime);
+}
+
 abstract interface class SettingsTextSet {
   String get title;
   String get showRemainingTime;
