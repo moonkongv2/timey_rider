@@ -10,7 +10,7 @@ The app is designed around one simple goal: make mealtime pacing feel like a coz
 - Preset meal courses for 15, 25, and 35 minutes
 - Custom meal duration from 1 to 60 minutes
 - Home course suggestions that adapt to the saved default duration
-- 10 selectable rider vehicles: motorcycle, fire truck, police car, excavator, airplane, bus, supercar, train, T-rex, and shark
+- 12 selectable rider vehicles: motorcycle, fire truck, police car, excavator, airplane, bus, supercar, train, T-rex, shark, brachio, and pteranodon
 - Vehicle-specific custom avatar storage and preview
 - Custom avatar setup flow with image upload, per-vehicle adjustment controls, and prompt guidance
 - Animated road progress based on timer progress
@@ -94,6 +94,7 @@ lib/
   main.dart                          # App bootstrap and local service initialization
   catalogs/
     avatar_prompt_catalog.dart       # Vehicle-specific avatar generation prompt copy
+    meal_course_catalog.dart         # Preset and custom meal course constants
     motivation_asset_catalog.dart    # Motivation video and voice asset catalogs
     vehicle_catalog.dart             # Available vehicles and image assets
   controllers/

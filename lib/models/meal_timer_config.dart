@@ -1,3 +1,5 @@
+import '../catalogs/meal_course_catalog.dart';
+
 enum AvatarImageMode { defaultImage, custom }
 
 const Object _customAvatarImagePathUnset = Object();
@@ -62,7 +64,7 @@ class MealTimerConfig {
 
   factory MealTimerConfig.defaults() {
     return const MealTimerConfig(
-      duration: Duration(minutes: 25),
+      duration: MealCourseCatalog.defaultDuration,
       showRemainingTime: true,
       soundEnabled: false,
       keepScreenAwake: false,

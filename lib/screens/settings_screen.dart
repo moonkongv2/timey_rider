@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 
+import '../catalogs/meal_course_catalog.dart';
 import '../l10n/app_texts.dart';
 import '../models/meal_timer_config.dart';
 import '../widgets/vehicle_selection_card.dart';
@@ -168,21 +169,18 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   const SizedBox(height: 12),
                   SegmentedButton<int>(
                     segments: [
-                      ButtonSegment(
-                        value: 15,
-                        label: Text(texts.settings.durationSegmentLabel(15)),
-                      ),
-                      ButtonSegment(
-                        value: 25,
-                        label: Text(texts.settings.durationSegmentLabel(25)),
-                      ),
-                      ButtonSegment(
-                        value: 35,
-                        label: Text(texts.settings.durationSegmentLabel(35)),
-                      ),
+                      for (final minutes in MealCourseCatalog.presetMinutes)
+                        ButtonSegment(
+                          value: minutes,
+                          label: Text(
+                            texts.settings.durationSegmentLabel(minutes),
+                          ),
+                        ),
                     ],
                     selected: {
-                      if ({15, 25, 35}.contains(_config.duration.inMinutes))
+                      if (MealCourseCatalog.isPresetMinutes(
+                        _config.duration.inMinutes,
+                      ))
                         _config.duration.inMinutes,
                     },
                     emptySelectionAllowed: true,

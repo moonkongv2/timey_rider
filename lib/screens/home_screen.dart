@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart' show ScrollCacheExtent;
 
+import '../catalogs/meal_course_catalog.dart';
 import '../catalogs/vehicle_catalog.dart';
 import '../l10n/app_texts.dart';
 import '../models/meal_progress_snapshot.dart';
@@ -31,7 +32,6 @@ import 'timer_screen.dart';
 
 const _homeLogoAssetPath = 'assets/images/logo_eng.png';
 const _settingsIconAssetPath = 'assets/images/icon_setting_rgba.png';
-const _mealCoursePresetMinutes = [15, 25, 35];
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({
@@ -129,7 +129,10 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
         return StatefulBuilder(
           builder: (context, setSheetState) {
             void updateSheetMinutes(double value) {
-              final minutes = value.clamp(1.0, 60.0);
+              final minutes = value.clamp(
+                MealCourseCatalog.minCustomMinutes.toDouble(),
+                MealCourseCatalog.maxCustomMinutes.toDouble(),
+              );
               setState(() => _customMinutes = minutes);
               setSheetState(() => sheetMinutes = minutes);
             }
@@ -300,7 +303,7 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
         ? texts.home.avatarInlineCustomState
         : texts.home.avatarInlineDefaultState;
     final defaultMealMinutes = _config.duration.inMinutes;
-    final alternateCourseMinutes = _mealCoursePresetMinutes
+    final alternateCourseMinutes = MealCourseCatalog.presetMinutes
         .where((minutes) => minutes != defaultMealMinutes)
         .toList();
 
@@ -1090,8 +1093,8 @@ class _CustomMinutesSheetContent extends StatelessWidget {
             ),
             child: Slider(
               value: minutes,
-              min: 1,
-              max: 60,
+              min: MealCourseCatalog.minCustomMinutes.toDouble(),
+              max: MealCourseCatalog.maxCustomMinutes.toDouble(),
               label: sliderLabel,
               onChanged: onChanged,
             ),
