@@ -404,18 +404,16 @@ void main() {
   });
 
   test('Motivation asset catalog has locale voice files', () {
-    expect(MotivationAssetCatalog.voicePathsForLanguage('ko'), [
-      'assets/audio/motivation/ko_1.mp3',
-      'assets/audio/motivation/ko_2.mp3',
-    ]);
-    expect(MotivationAssetCatalog.voicePathsForLanguage('en'), [
-      'assets/audio/motivation/en_1.mp3',
-      'assets/audio/motivation/en_2.mp3',
-    ]);
-    expect(
-      MotivationAssetCatalog.voicePathsForLanguage('ja'),
-      MotivationAssetCatalog.voicePathsForLanguage('en'),
-    );
+    final koVoicePaths = MotivationAssetCatalog.voicePathsForLanguage('ko');
+    final enVoicePaths = MotivationAssetCatalog.voicePathsForLanguage('en');
+
+    expect(koVoicePaths, hasLength(22));
+    expect(koVoicePaths.first, 'assets/audio/motivation/ko_1.mp3');
+    expect(koVoicePaths.last, 'assets/audio/motivation/ko_22.mp3');
+    expect(enVoicePaths, hasLength(24));
+    expect(enVoicePaths.first, 'assets/audio/motivation/en_1.mp3');
+    expect(enVoicePaths.last, 'assets/audio/motivation/en_24.mp3');
+    expect(MotivationAssetCatalog.voicePathsForLanguage('ja'), enVoicePaths);
 
     for (final languageCode in const ['ko', 'en']) {
       for (final path in MotivationAssetCatalog.voicePathsForLanguage(
@@ -459,9 +457,9 @@ void main() {
         soundEnabled: true,
         vehicleId: 'shark',
         languageCode: 'ja',
-        nextInt: (_) => 1,
+        nextInt: (_) => 23,
       ),
-      'assets/audio/motivation/en_2.mp3',
+      'assets/audio/motivation/en_24.mp3',
     );
   });
 
