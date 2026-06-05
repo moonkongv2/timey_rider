@@ -235,7 +235,7 @@ class _TimerScreenState extends State<TimerScreen> {
     }
 
     final videoPath = motivationVideoAssetPathForVehicle(
-      vehicleId: widget.config.motorcycleId,
+      vehicleId: widget.config.vehicleId,
       milestone: milestone,
       nextInt: _motivationRandom.nextInt,
     );
@@ -260,7 +260,7 @@ class _TimerScreenState extends State<TimerScreen> {
     final languageCode = Localizations.localeOf(context).languageCode;
     final voicePath = motivationVoiceAssetPathForVehicle(
       soundEnabled: widget.config.soundEnabled,
-      vehicleId: widget.config.motorcycleId,
+      vehicleId: widget.config.vehicleId,
       languageCode: languageCode,
       nextInt: _motivationRandom.nextInt,
     );
@@ -340,7 +340,7 @@ class _TimerScreenState extends State<TimerScreen> {
     final texts = AppTexts.of(context);
     final arrivalDialogMessage = timerArrivalDialogMessage(
       texts: texts.timer,
-      vehicleId: widget.config.motorcycleId,
+      vehicleId: widget.config.vehicleId,
       languageCode: Localizations.localeOf(context).languageCode,
     );
     final confirmed = await showDialog<bool>(
@@ -460,7 +460,7 @@ class _TimerScreenState extends State<TimerScreen> {
     return AnimatedBuilder(
       animation: _controller,
       builder: (context, _) {
-        final vehicle = VehicleCatalog.findById(widget.config.motorcycleId);
+        final vehicle = VehicleCatalog.findById(widget.config.vehicleId);
         final vehicleAvatarMode = widget.config.avatarModeForVehicle(
           vehicle.id,
         );

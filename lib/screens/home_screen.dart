@@ -286,7 +286,7 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
     final childName = _config.childName.trim().isEmpty
         ? texts.common.defaultChildName
         : _config.childName.trim();
-    final selectedVehicle = VehicleCatalog.findById(_config.motorcycleId);
+    final selectedVehicle = VehicleCatalog.findById(_config.vehicleId);
     final selectedVehicleAvatarMode = _config.avatarModeForVehicle(
       selectedVehicle.id,
     );
@@ -358,9 +358,9 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
               builder: (context, constraints) {
                 final vehicleCard = VehicleSelectionCard(
                   title: texts.home.todayVehicleTitle,
-                  selectedVehicleId: _config.motorcycleId,
+                  selectedVehicleId: _config.vehicleId,
                   onVehicleSelected: (vehicleId) {
-                    _updateConfig(_config.copyWith(motorcycleId: vehicleId));
+                    _updateConfig(_config.copyWith(vehicleId: vehicleId));
                   },
                   avatarMode: selectedVehicleAvatarMode,
                   customAvatarImagePath: selectedVehicleAvatarImagePath,

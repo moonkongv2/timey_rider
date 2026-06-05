@@ -83,7 +83,7 @@ class _ResultScreenState extends State<ResultScreen> {
   }
 
   String get _introVideoPath =>
-      resultVideoAssetPathForVehicle(vehicleId: widget.config.motorcycleId);
+      resultVideoAssetPathForVehicle(vehicleId: widget.config.vehicleId);
 
   void _handleIntroChanged() {
     final controller = _introController;

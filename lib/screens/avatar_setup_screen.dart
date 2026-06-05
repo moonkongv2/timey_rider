@@ -61,7 +61,7 @@ class _AvatarSetupScreenState extends State<AvatarSetupScreen> {
       _config = widget.config;
     }
     final avatarConfigChanged =
-        oldWidget.config.motorcycleId != widget.config.motorcycleId ||
+        oldWidget.config.vehicleId != widget.config.vehicleId ||
         oldWidget.config.avatarMode != widget.config.avatarMode ||
         oldWidget.config.customAvatarImagePath !=
             widget.config.customAvatarImagePath ||
@@ -91,11 +91,11 @@ class _AvatarSetupScreenState extends State<AvatarSetupScreen> {
   }
 
   AvatarImageMode _avatarModeForConfig(MealTimerConfig config) {
-    return config.avatarModeForVehicle(config.motorcycleId);
+    return config.avatarModeForVehicle(config.vehicleId);
   }
 
   VehicleAvatarConfig _avatarConfigForVehicle(MealTimerConfig config) {
-    return config.customAvatarConfigForVehicle(config.motorcycleId) ??
+    return config.customAvatarConfigForVehicle(config.vehicleId) ??
         const VehicleAvatarConfig(
           imagePath: '',
           scale: 1.0,
@@ -106,7 +106,7 @@ class _AvatarSetupScreenState extends State<AvatarSetupScreen> {
   }
 
   VehicleAvatarConfig? _avatarConfigForVehicleChoice(String vehicleId) {
-    if (vehicleId == _config.motorcycleId &&
+    if (vehicleId == _config.vehicleId &&
         _avatarMode == AvatarImageMode.custom) {
       final imagePath = _selectedAvatarImagePath;
       if (imagePath != null && imagePath.trim().isNotEmpty) {
@@ -137,7 +137,7 @@ class _AvatarSetupScreenState extends State<AvatarSetupScreen> {
     }
 
     final savedPath = _config.customAvatarImagePathForVehicle(
-      _config.motorcycleId,
+      _config.vehicleId,
     );
     if (savedPath != null && savedPath.trim().isNotEmpty) {
       return savedPath;
@@ -209,7 +209,7 @@ class _AvatarSetupScreenState extends State<AvatarSetupScreen> {
 
     final nextAvatarsByVehicle =
         Map<String, VehicleAvatarConfig>.from(_config.customAvatarsByVehicle)
-          ..[_config.motorcycleId] = VehicleAvatarConfig(
+          ..[_config.vehicleId] = VehicleAvatarConfig(
             imagePath: selectedPath,
             scale: _avatarScale,
             offsetX: _avatarOffsetX,
@@ -221,7 +221,7 @@ class _AvatarSetupScreenState extends State<AvatarSetupScreen> {
       _config.copyWith(
         avatarMode: AvatarImageMode.custom,
         customAvatarImagePath: selectedPath,
-        customAvatarVehicleId: _config.motorcycleId,
+        customAvatarVehicleId: _config.vehicleId,
         avatarScale: _avatarScale,
         avatarOffsetX: _avatarOffsetX,
         avatarOffsetY: _avatarOffsetY,
@@ -237,7 +237,7 @@ class _AvatarSetupScreenState extends State<AvatarSetupScreen> {
   void _useDefaultAvatarImage() {
     final nextAvatarsByVehicle = Map<String, VehicleAvatarConfig>.from(
       _config.customAvatarsByVehicle,
-    )..remove(_config.motorcycleId);
+    )..remove(_config.vehicleId);
     setState(() => _avatarMode = AvatarImageMode.defaultImage);
     _updateConfig(
       _config.copyWith(
@@ -259,7 +259,7 @@ class _AvatarSetupScreenState extends State<AvatarSetupScreen> {
   }
 
   void _handleVehicleSelected(String vehicleId) {
-    final nextConfig = _config.copyWith(motorcycleId: vehicleId);
+    final nextConfig = _config.copyWith(vehicleId: vehicleId);
     final nextAvatarConfig = _avatarConfigForVehicle(nextConfig);
     final nextAvatarMode = _avatarMode == AvatarImageMode.custom
         ? AvatarImageMode.custom
@@ -279,7 +279,7 @@ class _AvatarSetupScreenState extends State<AvatarSetupScreen> {
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
-    final vehicle = VehicleCatalog.findById(_config.motorcycleId);
+    final vehicle = VehicleCatalog.findById(_config.vehicleId);
     final vehicleLabel = vehicle.labelForLanguage(
       Localizations.localeOf(context).languageCode,
     );
@@ -289,7 +289,7 @@ class _AvatarSetupScreenState extends State<AvatarSetupScreen> {
     );
     final previewAvatarImagePath = _selectedAvatarImagePath;
     final vehicleAvatarConfig = _config.customAvatarConfigForVehicle(
-      _config.motorcycleId,
+      _config.vehicleId,
     );
     final hasPreviewAvatarImage =
         previewAvatarImagePath != null &&
@@ -417,7 +417,7 @@ class _AvatarSetupScreenState extends State<AvatarSetupScreen> {
             VehicleSelectionCard(
               title: '아바타를 태울 차량',
               subtitle: '프롬프트 기준',
-              selectedVehicleId: _config.motorcycleId,
+              selectedVehicleId: _config.vehicleId,
               onVehicleSelected: _handleVehicleSelected,
               avatarMode: _avatarMode,
               customAvatarImagePath: previewAvatarImagePath,

@@ -9,6 +9,7 @@ class LocalSettingsService {
   static const _showRemainingTimeKey = 'showRemainingTime';
   static const _soundEnabledKey = 'soundEnabled';
   static const _keepScreenAwakeKey = 'keepScreenAwake';
+  static const _vehicleIdKey = 'vehicleId';
   static const _motorcycleIdKey = 'motorcycleId';
   static const _childNameKey = 'childName';
   static const _avatarModeKey = 'avatarMode';
@@ -23,8 +24,10 @@ class LocalSettingsService {
   Future<MealTimerConfig> loadConfig() async {
     final preferences = await SharedPreferences.getInstance();
     final defaults = MealTimerConfig.defaults();
-    final motorcycleId =
-        preferences.getString(_motorcycleIdKey) ?? defaults.motorcycleId;
+    final vehicleId =
+        preferences.getString(_vehicleIdKey) ??
+        preferences.getString(_motorcycleIdKey) ??
+        defaults.vehicleId;
     final avatarMode = _avatarModeFromString(
       preferences.getString(_avatarModeKey),
     );
@@ -45,7 +48,7 @@ class LocalSettingsService {
         (avatarMode == AvatarImageMode.custom &&
                 customAvatarImagePath != null &&
                 customAvatarImagePath.trim().isNotEmpty
-            ? motorcycleId
+            ? vehicleId
             : null);
     final customAvatarsByVehicle = _loadCustomAvatarsByVehicle(
       preferences,
@@ -57,9 +60,8 @@ class LocalSettingsService {
       legacyOffsetY: avatarOffsetY,
       legacyRotationDegrees: avatarRotationDegrees,
     );
-    final activeAvatarVehicleId =
-        customAvatarsByVehicle.containsKey(motorcycleId)
-        ? motorcycleId
+    final activeAvatarVehicleId = customAvatarsByVehicle.containsKey(vehicleId)
+        ? vehicleId
         : customAvatarVehicleId;
     final activeAvatarConfig = activeAvatarVehicleId == null
         ? null
@@ -78,7 +80,7 @@ class LocalSettingsService {
           preferences.getBool(_soundEnabledKey) ?? defaults.soundEnabled,
       keepScreenAwake:
           preferences.getBool(_keepScreenAwakeKey) ?? defaults.keepScreenAwake,
-      motorcycleId: motorcycleId,
+      vehicleId: vehicleId,
       childName: preferences.getString(_childNameKey) ?? defaults.childName,
       avatarMode: avatarMode,
       customAvatarImagePath:
@@ -99,7 +101,8 @@ class LocalSettingsService {
     await preferences.setBool(_showRemainingTimeKey, config.showRemainingTime);
     await preferences.setBool(_soundEnabledKey, config.soundEnabled);
     await preferences.setBool(_keepScreenAwakeKey, config.keepScreenAwake);
-    await preferences.setString(_motorcycleIdKey, config.motorcycleId);
+    await preferences.setString(_vehicleIdKey, config.vehicleId);
+    await preferences.setString(_motorcycleIdKey, config.vehicleId);
     await preferences.setString(_childNameKey, config.childName);
     await preferences.setString(
       _avatarModeKey,

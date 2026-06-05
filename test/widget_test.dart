@@ -45,6 +45,9 @@ void main() {
     expect(config.avatarMode, AvatarImageMode.defaultImage);
     expect(config.customAvatarImagePath, isNull);
     expect(config.customAvatarVehicleId, isNull);
+    expect(config.vehicleId, 'motorcycle');
+    // ignore: deprecated_member_use_from_same_package
+    expect(config.motorcycleId, config.vehicleId);
     expect(config.avatarScale, 1.0);
     expect(config.avatarOffsetX, 0.0);
     expect(config.avatarOffsetY, 0.0);
@@ -59,7 +62,7 @@ void main() {
     await service.saveConfig(
       MealTimerConfig.defaults().copyWith(
         childName: '지율',
-        motorcycleId: 'police_car',
+        vehicleId: 'police_car',
         avatarMode: AvatarImageMode.custom,
         customAvatarImagePath: '/local/avatar.png',
         customAvatarVehicleId: 'police_car',
@@ -71,8 +74,11 @@ void main() {
     );
 
     final loadedConfig = await service.loadConfig();
+    final preferences = await SharedPreferences.getInstance();
     expect(loadedConfig.childName, '지율');
-    expect(loadedConfig.motorcycleId, 'police_car');
+    expect(loadedConfig.vehicleId, 'police_car');
+    expect(preferences.getString('vehicleId'), 'police_car');
+    expect(preferences.getString('motorcycleId'), 'police_car');
     expect(loadedConfig.avatarMode, AvatarImageMode.custom);
     expect(loadedConfig.customAvatarImagePath, '/local/avatar.png');
     expect(loadedConfig.customAvatarVehicleId, 'police_car');
@@ -97,7 +103,7 @@ void main() {
     await service.saveConfig(
       MealTimerConfig.defaults().copyWith(
         avatarMode: AvatarImageMode.custom,
-        motorcycleId: 'bus',
+        vehicleId: 'bus',
         customAvatarsByVehicle: const {
           'bus': VehicleAvatarConfig(
             imagePath: '/local/bus.png',
@@ -165,12 +171,23 @@ void main() {
       final config = await LocalSettingsService().loadConfig();
 
       expect(config.childName, '민준');
-      expect(config.motorcycleId, 'fire_truck');
+      expect(config.vehicleId, 'fire_truck');
       expect(config.avatarMode, AvatarImageMode.defaultImage);
       expect(config.customAvatarImagePath, isNull);
       expect(config.customAvatarVehicleId, isNull);
     },
   );
+
+  test('New vehicle id preference takes precedence over legacy key', () async {
+    SharedPreferences.setMockInitialValues({
+      'vehicleId': 'bus',
+      'motorcycleId': 'fire_truck',
+    });
+
+    final config = await LocalSettingsService().loadConfig();
+
+    expect(config.vehicleId, 'bus');
+  });
 
   test(
     'Existing custom avatar settings infer vehicle id when missing',
@@ -815,7 +832,7 @@ void main() {
         home: HomeScreen(
           config: MealTimerConfig.defaults().copyWith(
             childName: '지율',
-            motorcycleId: 'excavator',
+            vehicleId: 'excavator',
             avatarMode: AvatarImageMode.custom,
             customAvatarImagePath: avatarFile.path,
             customAvatarVehicleId: 'police_car',
@@ -898,7 +915,7 @@ void main() {
   ) async {
     await _pumpAvatarSetupScreen(
       tester,
-      MealTimerConfig.defaults().copyWith(motorcycleId: 'fire_truck'),
+      MealTimerConfig.defaults().copyWith(vehicleId: 'fire_truck'),
     );
 
     await tester.tap(find.text('직접 만든 아바타 사용'));
@@ -912,7 +929,7 @@ void main() {
   ) async {
     await _pumpAvatarSetupScreen(
       tester,
-      MealTimerConfig.defaults().copyWith(motorcycleId: 'police_car'),
+      MealTimerConfig.defaults().copyWith(vehicleId: 'police_car'),
     );
 
     await tester.tap(find.text('직접 만든 아바타 사용'));
@@ -940,7 +957,7 @@ void main() {
     await tester.pump();
     await _scrollAvatarPromptIntoView(tester);
 
-    expect(changedConfig?.motorcycleId, 'fire_truck');
+    expect(changedConfig?.vehicleId, 'fire_truck');
     expect(_avatarPromptText(tester), contains('소방관'));
   });
 
@@ -1198,7 +1215,7 @@ void main() {
     await _pumpAvatarSetupScreen(
       tester,
       MealTimerConfig.defaults().copyWith(
-        motorcycleId: 'bus',
+        vehicleId: 'bus',
         avatarMode: AvatarImageMode.custom,
         customAvatarsByVehicle: {
           'bus': VehicleAvatarConfig(
@@ -1262,7 +1279,7 @@ void main() {
       await _pumpAvatarSetupScreen(
         tester,
         MealTimerConfig.defaults().copyWith(
-          motorcycleId: 'fire_truck',
+          vehicleId: 'fire_truck',
           avatarMode: AvatarImageMode.custom,
           customAvatarsByVehicle: {
             'bus': VehicleAvatarConfig(
@@ -1546,6 +1563,7 @@ void main() {
     await tester.pump();
 
     final preferences = await SharedPreferences.getInstance();
+    expect(preferences.getString('vehicleId'), 'police_car');
     expect(preferences.getString('motorcycleId'), 'police_car');
   });
 
@@ -1560,7 +1578,7 @@ void main() {
         home: HomeScreen(
           config: MealTimerConfig.defaults().copyWith(
             childName: '지율',
-            motorcycleId: 'fire_truck',
+            vehicleId: 'fire_truck',
           ),
           mealProgressService: LocalMealProgressService(),
           onConfigChanged: (config) => changedConfig = config,
@@ -1575,7 +1593,7 @@ void main() {
     await tester.tap(_vehicleChoiceFinder('police_car'));
     await tester.pump();
 
-    expect(changedConfig?.motorcycleId, 'police_car');
+    expect(changedConfig?.vehicleId, 'police_car');
     expect(_vehicleChoiceMaterial(tester, 'fire_truck').color, unselectedColor);
     expect(_vehicleChoiceMaterial(tester, 'police_car').color, selectedColor);
   });
@@ -1887,7 +1905,7 @@ void main() {
         locale: const Locale('ko'),
         home: TimerScreen(
           config: MealTimerConfig.defaults().copyWith(
-            motorcycleId: 'excavator',
+            vehicleId: 'excavator',
             avatarMode: AvatarImageMode.custom,
             customAvatarImagePath: avatarFile.path,
             customAvatarVehicleId: 'police_car',
@@ -1919,7 +1937,7 @@ void main() {
         locale: const Locale('ko'),
         home: TimerScreen(
           config: MealTimerConfig.defaults().copyWith(
-            motorcycleId: 'fire_truck',
+            vehicleId: 'fire_truck',
             avatarMode: AvatarImageMode.custom,
             customAvatarsByVehicle: {
               'fire_truck': VehicleAvatarConfig(

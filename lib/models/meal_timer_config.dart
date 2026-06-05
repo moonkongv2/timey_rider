@@ -50,7 +50,7 @@ class MealTimerConfig {
     required this.soundEnabled,
     required this.keepScreenAwake,
     required this.courseId,
-    required this.motorcycleId,
+    required this.vehicleId,
     required this.childName,
     required this.avatarMode,
     required this.customAvatarImagePath,
@@ -69,7 +69,7 @@ class MealTimerConfig {
       soundEnabled: false,
       keepScreenAwake: false,
       courseId: 'park',
-      motorcycleId: 'motorcycle',
+      vehicleId: 'motorcycle',
       childName: '',
       avatarMode: AvatarImageMode.defaultImage,
       customAvatarImagePath: null,
@@ -87,7 +87,7 @@ class MealTimerConfig {
   final bool soundEnabled;
   final bool keepScreenAwake;
   final String courseId;
-  final String motorcycleId;
+  final String vehicleId;
   final String childName;
   final AvatarImageMode avatarMode;
   final String? customAvatarImagePath;
@@ -98,13 +98,16 @@ class MealTimerConfig {
   final double avatarRotationDegrees;
   final Map<String, VehicleAvatarConfig> customAvatarsByVehicle;
 
+  @Deprecated('Use vehicleId instead.')
+  String get motorcycleId => vehicleId;
+
   MealTimerConfig copyWith({
     Duration? duration,
     bool? showRemainingTime,
     bool? soundEnabled,
     bool? keepScreenAwake,
     String? courseId,
-    String? motorcycleId,
+    String? vehicleId,
     String? childName,
     AvatarImageMode? avatarMode,
     Object? customAvatarImagePath = _customAvatarImagePathUnset,
@@ -153,7 +156,7 @@ class MealTimerConfig {
       soundEnabled: soundEnabled ?? this.soundEnabled,
       keepScreenAwake: keepScreenAwake ?? this.keepScreenAwake,
       courseId: courseId ?? this.courseId,
-      motorcycleId: motorcycleId ?? this.motorcycleId,
+      vehicleId: vehicleId ?? this.vehicleId,
       childName: childName ?? this.childName,
       avatarMode: nextAvatarMode,
       customAvatarImagePath: nextCustomAvatarImagePath,
