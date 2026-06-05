@@ -7,6 +7,7 @@ import '../catalogs/avatar_prompt_catalog.dart';
 import '../catalogs/vehicle_catalog.dart';
 import '../models/meal_timer_config.dart';
 import '../models/vehicle.dart';
+import '../models/vehicle_avatar_presentation.dart';
 import '../services/avatar_image_picker.dart';
 import '../services/local_avatar_image_service.dart';
 import '../theme/app_colors.dart';
@@ -105,22 +106,33 @@ class _AvatarSetupScreenState extends State<AvatarSetupScreen> {
         );
   }
 
-  VehicleAvatarConfig? _avatarConfigForVehicleChoice(String vehicleId) {
-    if (vehicleId == _config.vehicleId &&
-        _avatarMode == AvatarImageMode.custom) {
-      final imagePath = _selectedAvatarImagePath;
-      if (imagePath != null && imagePath.trim().isNotEmpty) {
-        return VehicleAvatarConfig(
-          imagePath: imagePath,
-          scale: _avatarScale,
-          offsetX: _avatarOffsetX,
-          offsetY: _avatarOffsetY,
-          rotationDegrees: _avatarRotationDegrees,
-        );
-      }
+  VehicleAvatarPresentation _currentEditingAvatarPresentation() {
+    final imagePath = _selectedAvatarImagePath;
+    if (_avatarMode == AvatarImageMode.custom &&
+        imagePath != null &&
+        imagePath.trim().isNotEmpty) {
+      return VehicleAvatarPresentation(
+        mode: AvatarImageMode.custom,
+        imagePath: imagePath,
+        scale: _avatarScale,
+        offsetX: _avatarOffsetX,
+        offsetY: _avatarOffsetY,
+        rotationDegrees: _avatarRotationDegrees,
+      );
     }
 
-    return _config.customAvatarConfigForVehicle(vehicleId);
+    return VehicleAvatarPresentation.defaultImage;
+  }
+
+  VehicleAvatarPresentation? _avatarPresentationForVehicleChoice(
+    String vehicleId,
+  ) {
+    if (vehicleId == _config.vehicleId &&
+        _avatarMode == AvatarImageMode.custom) {
+      return _currentEditingAvatarPresentation();
+    }
+
+    return _config.avatarPresentationForVehicle(vehicleId);
   }
 
   String get _avatarModeLabel {
@@ -288,9 +300,7 @@ class _AvatarSetupScreenState extends State<AvatarSetupScreen> {
       Localizations.localeOf(context).languageCode,
     );
     final previewAvatarImagePath = _selectedAvatarImagePath;
-    final vehicleAvatarConfig = _config.customAvatarConfigForVehicle(
-      _config.vehicleId,
-    );
+    final currentEditingAvatar = _currentEditingAvatarPresentation();
     final hasPreviewAvatarImage =
         previewAvatarImagePath != null &&
         File(previewAvatarImagePath).existsSync();
@@ -374,11 +384,7 @@ class _AvatarSetupScreenState extends State<AvatarSetupScreen> {
               if (shouldShowCompositePreview) ...[
                 _AvatarCompositePreviewCard(
                   vehicle: vehicle,
-                  imagePath: previewAvatarImagePath,
-                  avatarScale: _avatarScale,
-                  avatarOffsetX: _avatarOffsetX,
-                  avatarOffsetY: _avatarOffsetY,
-                  avatarRotationDegrees: _avatarRotationDegrees,
+                  avatar: currentEditingAvatar,
                 ),
                 const SizedBox(height: AppSpacing.md),
               ],
@@ -419,15 +425,8 @@ class _AvatarSetupScreenState extends State<AvatarSetupScreen> {
               subtitle: '프롬프트 기준',
               selectedVehicleId: _config.vehicleId,
               onVehicleSelected: _handleVehicleSelected,
-              avatarMode: _avatarMode,
-              customAvatarImagePath: previewAvatarImagePath,
-              avatarScale: vehicleAvatarConfig?.scale ?? _avatarScale,
-              avatarOffsetX: vehicleAvatarConfig?.offsetX ?? _avatarOffsetX,
-              avatarOffsetY: vehicleAvatarConfig?.offsetY ?? _avatarOffsetY,
-              avatarRotationDegrees:
-                  vehicleAvatarConfig?.rotationDegrees ??
-                  _avatarRotationDegrees,
-              avatarConfigForVehicle: _avatarConfigForVehicleChoice,
+              avatar: currentEditingAvatar,
+              avatarForVehicle: _avatarPresentationForVehicleChoice,
             ),
             if (_avatarMode == AvatarImageMode.custom) ...[
               const SizedBox(height: AppSpacing.xl),
@@ -456,19 +455,11 @@ class _AvatarSetupScreenState extends State<AvatarSetupScreen> {
 class _AvatarCompositePreviewCard extends StatelessWidget {
   const _AvatarCompositePreviewCard({
     required this.vehicle,
-    required this.imagePath,
-    required this.avatarScale,
-    required this.avatarOffsetX,
-    required this.avatarOffsetY,
-    required this.avatarRotationDegrees,
+    required this.avatar,
   });
 
   final VehicleDefinition vehicle;
-  final String imagePath;
-  final double avatarScale;
-  final double avatarOffsetX;
-  final double avatarOffsetY;
-  final double avatarRotationDegrees;
+  final VehicleAvatarPresentation avatar;
 
   @override
   Widget build(BuildContext context) {
@@ -513,12 +504,7 @@ class _AvatarCompositePreviewCard extends StatelessWidget {
             Center(
               child: AvatarCompositePreview(
                 vehicle: vehicle,
-                avatarMode: AvatarImageMode.custom,
-                customAvatarImagePath: imagePath,
-                avatarScale: avatarScale,
-                avatarOffsetX: avatarOffsetX,
-                avatarOffsetY: avatarOffsetY,
-                avatarRotationDegrees: avatarRotationDegrees,
+                avatar: avatar,
                 size: 220,
               ),
             ),
@@ -573,12 +559,7 @@ class _DefaultAvatarPreviewCard extends StatelessWidget {
             Center(
               child: AvatarCompositePreview(
                 vehicle: vehicle,
-                avatarMode: AvatarImageMode.defaultImage,
-                customAvatarImagePath: null,
-                avatarScale: 1.0,
-                avatarOffsetX: 0.0,
-                avatarOffsetY: 0.0,
-                avatarRotationDegrees: 0.0,
+                avatar: VehicleAvatarPresentation.defaultImage,
                 size: 180,
               ),
             ),

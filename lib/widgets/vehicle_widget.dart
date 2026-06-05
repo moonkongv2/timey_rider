@@ -2,8 +2,8 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
-import '../models/meal_timer_config.dart';
 import '../models/vehicle.dart';
+import '../models/vehicle_avatar_presentation.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_radius.dart';
 import '../theme/app_shadows.dart';
@@ -18,12 +18,7 @@ class VehicleWidget extends StatefulWidget {
     this.angle = 0,
     this.isFacingLeft = false,
     this.isArrived = false,
-    this.avatarMode = AvatarImageMode.defaultImage,
-    this.customAvatarImagePath,
-    this.avatarScale = 1.0,
-    this.avatarOffsetX = 0.0,
-    this.avatarOffsetY = 0.0,
-    this.avatarRotationDegrees = 0.0,
+    this.avatar = VehicleAvatarPresentation.defaultImage,
     this.avatarImageBuilder,
   });
 
@@ -32,12 +27,7 @@ class VehicleWidget extends StatefulWidget {
   final double angle;
   final bool isFacingLeft;
   final bool isArrived;
-  final AvatarImageMode avatarMode;
-  final String? customAvatarImagePath;
-  final double avatarScale;
-  final double avatarOffsetX;
-  final double avatarOffsetY;
-  final double avatarRotationDegrees;
+  final VehicleAvatarPresentation avatar;
   final Widget Function(BuildContext context, String imagePath)?
   avatarImageBuilder;
 
@@ -124,12 +114,7 @@ class _VehicleWidgetState extends State<VehicleWidget>
                   vehicle: widget.vehicle,
                   size: widget.size,
                   isFacingLeft: widget.isFacingLeft,
-                  avatarMode: widget.avatarMode,
-                  customAvatarImagePath: widget.customAvatarImagePath,
-                  avatarScale: widget.avatarScale,
-                  avatarOffsetX: widget.avatarOffsetX,
-                  avatarOffsetY: widget.avatarOffsetY,
-                  avatarRotationDegrees: widget.avatarRotationDegrees,
+                  avatar: widget.avatar,
                   avatarImageBuilder: widget.avatarImageBuilder,
                 ),
               ),
@@ -146,38 +131,23 @@ class _VehicleImage extends StatelessWidget {
     required this.vehicle,
     required this.size,
     required this.isFacingLeft,
-    required this.avatarMode,
-    required this.customAvatarImagePath,
-    required this.avatarScale,
-    required this.avatarOffsetX,
-    required this.avatarOffsetY,
-    required this.avatarRotationDegrees,
+    required this.avatar,
     this.avatarImageBuilder,
   });
 
   final VehicleDefinition vehicle;
   final double size;
   final bool isFacingLeft;
-  final AvatarImageMode avatarMode;
-  final String? customAvatarImagePath;
-  final double avatarScale;
-  final double avatarOffsetX;
-  final double avatarOffsetY;
-  final double avatarRotationDegrees;
+  final VehicleAvatarPresentation avatar;
   final Widget Function(BuildContext context, String imagePath)?
   avatarImageBuilder;
 
   @override
   Widget build(BuildContext context) {
-    if (avatarMode == AvatarImageMode.custom) {
+    if (avatar.isCustom) {
       return AvatarCompositePreview(
         vehicle: vehicle,
-        avatarMode: avatarMode,
-        customAvatarImagePath: customAvatarImagePath,
-        avatarScale: avatarScale,
-        avatarOffsetX: avatarOffsetX,
-        avatarOffsetY: avatarOffsetY,
-        avatarRotationDegrees: avatarRotationDegrees,
+        avatar: avatar,
         size: size,
         isFacingLeft: isFacingLeft,
         avatarImageBuilder: avatarImageBuilder,

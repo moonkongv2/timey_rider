@@ -5,8 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
 
 import '../l10n/app_texts.dart';
-import '../models/meal_timer_config.dart';
 import '../models/vehicle.dart';
+import '../models/vehicle_avatar_presentation.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_radius.dart';
 import '../theme/app_shadows.dart';
@@ -19,12 +19,7 @@ class RoadView extends StatelessWidget {
     super.key,
     required this.progress,
     required this.vehicle,
-    this.avatarMode = AvatarImageMode.defaultImage,
-    this.customAvatarImagePath,
-    this.avatarScale = 1.0,
-    this.avatarOffsetX = 0.0,
-    this.avatarOffsetY = 0.0,
-    this.avatarRotationDegrees = 0.0,
+    this.avatar = VehicleAvatarPresentation.defaultImage,
     this.avatarImageBuilder,
     this.motivationVideoAssetPath,
     this.motivationVideoMilestone,
@@ -35,12 +30,7 @@ class RoadView extends StatelessWidget {
 
   final double progress;
   final VehicleDefinition vehicle;
-  final AvatarImageMode avatarMode;
-  final String? customAvatarImagePath;
-  final double avatarScale;
-  final double avatarOffsetX;
-  final double avatarOffsetY;
-  final double avatarRotationDegrees;
+  final VehicleAvatarPresentation avatar;
   final Widget Function(BuildContext context, String imagePath)?
   avatarImageBuilder;
   final String? motivationVideoAssetPath;
@@ -142,12 +132,7 @@ class RoadView extends StatelessWidget {
                     vehicleLeft: vehicleLeft,
                     vehicleTop: vehicleTop,
                     isVehicleFacingLeft: isVehicleFacingLeft,
-                    avatarMode: avatarMode,
-                    customAvatarImagePath: customAvatarImagePath,
-                    avatarScale: avatarScale,
-                    avatarOffsetX: avatarOffsetX,
-                    avatarOffsetY: avatarOffsetY,
-                    avatarRotationDegrees: avatarRotationDegrees,
+                    avatar: avatar,
                     avatarImageBuilder: avatarImageBuilder,
                   ),
                 if (showMotivationVideo &&
@@ -238,23 +223,13 @@ class RoadVehicleLayer extends StatelessWidget {
     super.key,
     required this.progress,
     required this.vehicle,
-    this.avatarMode = AvatarImageMode.defaultImage,
-    this.customAvatarImagePath,
-    this.avatarScale = 1.0,
-    this.avatarOffsetX = 0.0,
-    this.avatarOffsetY = 0.0,
-    this.avatarRotationDegrees = 0.0,
+    this.avatar = VehicleAvatarPresentation.defaultImage,
     this.avatarImageBuilder,
   });
 
   final double progress;
   final VehicleDefinition vehicle;
-  final AvatarImageMode avatarMode;
-  final String? customAvatarImagePath;
-  final double avatarScale;
-  final double avatarOffsetX;
-  final double avatarOffsetY;
-  final double avatarRotationDegrees;
+  final VehicleAvatarPresentation avatar;
   final Widget Function(BuildContext context, String imagePath)?
   avatarImageBuilder;
 
@@ -292,12 +267,7 @@ class RoadVehicleLayer extends StatelessWidget {
                 vehicleLeft: vehicleLeft,
                 vehicleTop: vehicleTop,
                 isVehicleFacingLeft: isVehicleFacingLeft,
-                avatarMode: avatarMode,
-                customAvatarImagePath: customAvatarImagePath,
-                avatarScale: avatarScale,
-                avatarOffsetX: avatarOffsetX,
-                avatarOffsetY: avatarOffsetY,
-                avatarRotationDegrees: avatarRotationDegrees,
+                avatar: avatar,
                 avatarImageBuilder: avatarImageBuilder,
               ),
             ],
@@ -316,13 +286,8 @@ class _PositionedRoadVehicle extends StatelessWidget {
     required this.vehicleLeft,
     required this.vehicleTop,
     required this.isVehicleFacingLeft,
-    required this.avatarMode,
-    required this.avatarScale,
-    required this.avatarOffsetX,
-    required this.avatarOffsetY,
-    required this.avatarRotationDegrees,
+    required this.avatar,
     required this.avatarImageBuilder,
-    this.customAvatarImagePath,
   });
 
   final double progress;
@@ -331,12 +296,7 @@ class _PositionedRoadVehicle extends StatelessWidget {
   final double vehicleLeft;
   final double vehicleTop;
   final bool isVehicleFacingLeft;
-  final AvatarImageMode avatarMode;
-  final String? customAvatarImagePath;
-  final double avatarScale;
-  final double avatarOffsetX;
-  final double avatarOffsetY;
-  final double avatarRotationDegrees;
+  final VehicleAvatarPresentation avatar;
   final Widget Function(BuildContext context, String imagePath)?
   avatarImageBuilder;
 
@@ -359,12 +319,7 @@ class _PositionedRoadVehicle extends StatelessWidget {
             size: vehicleSize,
             isFacingLeft: isVehicleFacingLeft,
             isArrived: progress >= 1,
-            avatarMode: avatarMode,
-            customAvatarImagePath: customAvatarImagePath,
-            avatarScale: avatarScale,
-            avatarOffsetX: avatarOffsetX,
-            avatarOffsetY: avatarOffsetY,
-            avatarRotationDegrees: avatarRotationDegrees,
+            avatar: avatar,
             avatarImageBuilder: avatarImageBuilder,
           ),
         ),

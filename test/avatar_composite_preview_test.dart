@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:jy_yamyam/catalogs/vehicle_catalog.dart';
 import 'package:jy_yamyam/models/meal_timer_config.dart';
+import 'package:jy_yamyam/models/vehicle_avatar_presentation.dart';
 import 'package:jy_yamyam/widgets/avatar/avatar_composite_preview.dart';
 
 void main() {
@@ -68,12 +69,10 @@ Future<void> _pumpCompositePreview(
         body: Center(
           child: AvatarCompositePreview(
             vehicle: VehicleCatalog.motorcycle,
-            avatarMode: avatarMode,
-            customAvatarImagePath: customAvatarImagePath,
-            avatarScale: 1,
-            avatarOffsetX: 0,
-            avatarOffsetY: 0,
-            avatarRotationDegrees: 0,
+            avatar: VehicleAvatarPresentation(
+              mode: avatarMode,
+              imagePath: customAvatarImagePath,
+            ),
             size: 180,
             avatarImageBuilder: (context, imagePath) {
               return const ColoredBox(

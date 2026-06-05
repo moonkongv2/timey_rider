@@ -5,17 +5,13 @@ import 'package:flutter/material.dart';
 
 import '../../models/meal_timer_config.dart';
 import '../../models/vehicle.dart';
+import '../../models/vehicle_avatar_presentation.dart';
 
 class AvatarCompositePreview extends StatelessWidget {
   const AvatarCompositePreview({
     super.key,
     required this.vehicle,
-    required this.avatarMode,
-    required this.customAvatarImagePath,
-    required this.avatarScale,
-    required this.avatarOffsetX,
-    required this.avatarOffsetY,
-    required this.avatarRotationDegrees,
+    required this.avatar,
     required this.size,
     this.isFacingLeft = false,
     this.avatarImageBuilder,
@@ -23,12 +19,7 @@ class AvatarCompositePreview extends StatelessWidget {
   });
 
   final VehicleDefinition vehicle;
-  final AvatarImageMode avatarMode;
-  final String? customAvatarImagePath;
-  final double avatarScale;
-  final double avatarOffsetX;
-  final double avatarOffsetY;
-  final double avatarRotationDegrees;
+  final VehicleAvatarPresentation avatar;
   final double size;
   final bool isFacingLeft;
   final Widget Function(BuildContext context, String imagePath)?
@@ -40,12 +31,24 @@ class AvatarCompositePreview extends StatelessWidget {
   )?
   vehicleFallbackBuilder;
 
+  AvatarImageMode get avatarMode => avatar.mode;
+
+  String? get customAvatarImagePath => avatar.imagePath;
+
+  double get avatarScale => avatar.scale;
+
+  double get avatarOffsetX => avatar.offsetX;
+
+  double get avatarOffsetY => avatar.offsetY;
+
+  double get avatarRotationDegrees => avatar.rotationDegrees;
+
   @override
   Widget build(BuildContext context) {
     final avatarSlot = vehicle.avatarSlot;
-    final avatarPath = customAvatarImagePath;
+    final avatarPath = avatar.imagePath;
     final shouldShowAvatar =
-        avatarMode == AvatarImageMode.custom &&
+        avatar.mode == AvatarImageMode.custom &&
         avatarSlot != null &&
         avatarPath != null &&
         avatarPath.trim().isNotEmpty &&
@@ -81,10 +84,10 @@ class AvatarCompositePreview extends StatelessWidget {
                 imagePath: avatarPath,
                 size: size,
                 slot: avatarSlot,
-                avatarScale: avatarScale,
-                avatarOffsetX: avatarOffsetX,
-                avatarOffsetY: avatarOffsetY,
-                avatarRotationDegrees: avatarRotationDegrees,
+                avatarScale: avatar.scale,
+                avatarOffsetX: avatar.offsetX,
+                avatarOffsetY: avatar.offsetY,
+                avatarRotationDegrees: avatar.rotationDegrees,
                 avatarImageBuilder: avatarImageBuilder,
               ),
           ],

@@ -8,6 +8,7 @@ import '../catalogs/vehicle_catalog.dart';
 import '../l10n/app_texts.dart';
 import '../models/meal_progress_snapshot.dart';
 import '../models/meal_timer_config.dart';
+import '../models/vehicle_avatar_presentation.dart';
 import '../navigation/app_route_observer.dart';
 import '../models/reward_goal.dart';
 import '../models/reward_item.dart';
@@ -287,16 +288,12 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
         ? texts.common.defaultChildName
         : _config.childName.trim();
     final selectedVehicle = VehicleCatalog.findById(_config.vehicleId);
-    final selectedVehicleAvatarMode = _config.avatarModeForVehicle(
+    final selectedVehicleAvatar = _config.avatarPresentationForVehicle(
       selectedVehicle.id,
     );
-    final selectedVehicleAvatarImagePath = _config
-        .customAvatarImagePathForVehicle(selectedVehicle.id);
-    final selectedVehicleAvatarConfig = _config.customAvatarConfigForVehicle(
-      selectedVehicle.id,
-    );
+    final selectedVehicleAvatarImagePath = selectedVehicleAvatar.imagePath;
     final isUsingCustomAvatar =
-        selectedVehicleAvatarMode == AvatarImageMode.custom &&
+        selectedVehicleAvatar.isCustom &&
         selectedVehicleAvatarImagePath != null &&
         File(selectedVehicleAvatarImagePath).existsSync();
     final avatarStateText = isUsingCustomAvatar
@@ -362,14 +359,8 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
                   onVehicleSelected: (vehicleId) {
                     _updateConfig(_config.copyWith(vehicleId: vehicleId));
                   },
-                  avatarMode: selectedVehicleAvatarMode,
-                  customAvatarImagePath: selectedVehicleAvatarImagePath,
-                  avatarScale: selectedVehicleAvatarConfig?.scale ?? 1.0,
-                  avatarOffsetX: selectedVehicleAvatarConfig?.offsetX ?? 0.0,
-                  avatarOffsetY: selectedVehicleAvatarConfig?.offsetY ?? 0.0,
-                  avatarRotationDegrees:
-                      selectedVehicleAvatarConfig?.rotationDegrees ?? 0.0,
-                  avatarConfigForVehicle: _config.customAvatarConfigForVehicle,
+                  avatar: selectedVehicleAvatar,
+                  avatarForVehicle: _config.avatarPresentationForVehicle,
                   avatarImageBuilder: widget.avatarImageBuilder,
                   footer: _AvatarInlineCta(
                     stateText: avatarStateText,
@@ -387,13 +378,7 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
                   ctaLabel:
                       '${texts.home.normalCourse(defaultMealMinutes)} ${texts.common.start}',
                   vehicle: selectedVehicle,
-                  avatarMode: selectedVehicleAvatarMode,
-                  customAvatarImagePath: selectedVehicleAvatarImagePath,
-                  avatarScale: selectedVehicleAvatarConfig?.scale ?? 1.0,
-                  avatarOffsetX: selectedVehicleAvatarConfig?.offsetX ?? 0.0,
-                  avatarOffsetY: selectedVehicleAvatarConfig?.offsetY ?? 0.0,
-                  avatarRotationDegrees:
-                      selectedVehicleAvatarConfig?.rotationDegrees ?? 0.0,
+                  avatar: selectedVehicleAvatar,
                   avatarImageBuilder: widget.avatarImageBuilder,
                   onStart: () => _startTimer(defaultMealMinutes),
                 );
@@ -718,24 +703,14 @@ class _HeroMissionCard extends StatelessWidget {
   const _HeroMissionCard({
     required this.ctaLabel,
     required this.vehicle,
-    required this.avatarMode,
-    required this.customAvatarImagePath,
-    required this.avatarScale,
-    required this.avatarOffsetX,
-    required this.avatarOffsetY,
-    required this.avatarRotationDegrees,
+    required this.avatar,
     this.avatarImageBuilder,
     required this.onStart,
   });
 
   final String ctaLabel;
   final VehicleDefinition vehicle;
-  final AvatarImageMode avatarMode;
-  final String? customAvatarImagePath;
-  final double avatarScale;
-  final double avatarOffsetX;
-  final double avatarOffsetY;
-  final double avatarRotationDegrees;
+  final VehicleAvatarPresentation avatar;
   final Widget Function(BuildContext context, String imagePath)?
   avatarImageBuilder;
   final VoidCallback onStart;
@@ -823,12 +798,7 @@ class _HeroMissionCard extends StatelessWidget {
                       height: 78,
                       child: AvatarCompositePreview(
                         vehicle: vehicle,
-                        avatarMode: avatarMode,
-                        customAvatarImagePath: customAvatarImagePath,
-                        avatarScale: avatarScale,
-                        avatarOffsetX: avatarOffsetX,
-                        avatarOffsetY: avatarOffsetY,
-                        avatarRotationDegrees: avatarRotationDegrees,
+                        avatar: avatar,
                         size: 78,
                         avatarImageBuilder: avatarImageBuilder,
                       ),

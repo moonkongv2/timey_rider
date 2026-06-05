@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 
 import '../catalogs/vehicle_catalog.dart';
-import '../models/meal_timer_config.dart';
 import '../models/vehicle.dart';
+import '../models/vehicle_avatar_presentation.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_radius.dart';
 import '../theme/app_shadows.dart';
 import '../theme/app_spacing.dart';
 import 'avatar/avatar_composite_preview.dart';
 
-typedef VehicleAvatarConfigResolver =
-    VehicleAvatarConfig? Function(String vehicleId);
+typedef VehicleAvatarPresentationResolver =
+    VehicleAvatarPresentation? Function(String vehicleId);
 
 class VehicleSelectionCard extends StatelessWidget {
   const VehicleSelectionCard({
@@ -19,13 +19,8 @@ class VehicleSelectionCard extends StatelessWidget {
     this.subtitle,
     required this.selectedVehicleId,
     required this.onVehicleSelected,
-    this.avatarMode = AvatarImageMode.defaultImage,
-    this.customAvatarImagePath,
-    this.avatarScale = 1.0,
-    this.avatarOffsetX = 0.0,
-    this.avatarOffsetY = 0.0,
-    this.avatarRotationDegrees = 0.0,
-    this.avatarConfigForVehicle,
+    this.avatar = VehicleAvatarPresentation.defaultImage,
+    this.avatarForVehicle,
     this.avatarImageBuilder,
     this.footer,
   });
@@ -34,13 +29,8 @@ class VehicleSelectionCard extends StatelessWidget {
   final String? subtitle;
   final String selectedVehicleId;
   final ValueChanged<String> onVehicleSelected;
-  final AvatarImageMode avatarMode;
-  final String? customAvatarImagePath;
-  final double avatarScale;
-  final double avatarOffsetX;
-  final double avatarOffsetY;
-  final double avatarRotationDegrees;
-  final VehicleAvatarConfigResolver? avatarConfigForVehicle;
+  final VehicleAvatarPresentation avatar;
+  final VehicleAvatarPresentationResolver? avatarForVehicle;
   final Widget Function(BuildContext context, String imagePath)?
   avatarImageBuilder;
   final Widget? footer;
@@ -120,13 +110,8 @@ class VehicleSelectionCard extends StatelessWidget {
                         vehicle: vehicle,
                         isSelected: selectedVehicle.id == vehicle.id,
                         onTap: () => onVehicleSelected(vehicle.id),
-                        avatarConfig: avatarConfigForVehicle?.call(vehicle.id),
-                        avatarMode: avatarMode,
-                        customAvatarImagePath: customAvatarImagePath,
-                        avatarScale: avatarScale,
-                        avatarOffsetX: avatarOffsetX,
-                        avatarOffsetY: avatarOffsetY,
-                        avatarRotationDegrees: avatarRotationDegrees,
+                        avatar: avatar,
+                        resolvedAvatar: avatarForVehicle?.call(vehicle.id),
                         avatarImageBuilder: avatarImageBuilder,
                       ),
                   ],
@@ -156,13 +141,8 @@ class _VehicleChoiceButton extends StatelessWidget {
     required this.vehicle,
     required this.isSelected,
     required this.onTap,
-    required this.avatarConfig,
-    required this.avatarMode,
-    required this.customAvatarImagePath,
-    required this.avatarScale,
-    required this.avatarOffsetX,
-    required this.avatarOffsetY,
-    required this.avatarRotationDegrees,
+    required this.avatar,
+    required this.resolvedAvatar,
     this.avatarImageBuilder,
   });
 
@@ -170,13 +150,8 @@ class _VehicleChoiceButton extends StatelessWidget {
   final VehicleDefinition vehicle;
   final bool isSelected;
   final VoidCallback onTap;
-  final VehicleAvatarConfig? avatarConfig;
-  final AvatarImageMode avatarMode;
-  final String? customAvatarImagePath;
-  final double avatarScale;
-  final double avatarOffsetX;
-  final double avatarOffsetY;
-  final double avatarRotationDegrees;
+  final VehicleAvatarPresentation avatar;
+  final VehicleAvatarPresentation? resolvedAvatar;
   final Widget Function(BuildContext context, String imagePath)?
   avatarImageBuilder;
 
@@ -189,22 +164,13 @@ class _VehicleChoiceButton extends StatelessWidget {
         ? AppColors.surfaceYellow.withValues(alpha: 0.72)
         : AppColors.white.withValues(alpha: 0.72);
     final borderRadius = AppRadius.compactCard;
-    final choiceAvatarMode = avatarConfig != null
-        ? AvatarImageMode.custom
+    final resolvedChoiceAvatar = resolvedAvatar;
+    final choiceAvatar =
+        resolvedChoiceAvatar != null && resolvedChoiceAvatar.isCustom
+        ? resolvedChoiceAvatar
         : isSelected
-        ? avatarMode
-        : AvatarImageMode.defaultImage;
-    final choiceAvatarImagePath =
-        avatarConfig?.imagePath ?? (isSelected ? customAvatarImagePath : null);
-    final choiceAvatarScale =
-        avatarConfig?.scale ?? (isSelected ? avatarScale : 1.0);
-    final choiceAvatarOffsetX =
-        avatarConfig?.offsetX ?? (isSelected ? avatarOffsetX : 0.0);
-    final choiceAvatarOffsetY =
-        avatarConfig?.offsetY ?? (isSelected ? avatarOffsetY : 0.0);
-    final choiceAvatarRotationDegrees =
-        avatarConfig?.rotationDegrees ??
-        (isSelected ? avatarRotationDegrees : 0.0);
+        ? avatar
+        : VehicleAvatarPresentation.defaultImage;
 
     return SizedBox(
       width: size,
@@ -234,12 +200,7 @@ class _VehicleChoiceButton extends StatelessWidget {
                     child: _VehicleChoiceImage(
                       vehicle: vehicle,
                       size: size - 20,
-                      avatarMode: choiceAvatarMode,
-                      customAvatarImagePath: choiceAvatarImagePath,
-                      avatarScale: choiceAvatarScale,
-                      avatarOffsetX: choiceAvatarOffsetX,
-                      avatarOffsetY: choiceAvatarOffsetY,
-                      avatarRotationDegrees: choiceAvatarRotationDegrees,
+                      avatar: choiceAvatar,
                       avatarImageBuilder: avatarImageBuilder,
                     ),
                   ),
@@ -277,37 +238,22 @@ class _VehicleChoiceImage extends StatelessWidget {
   const _VehicleChoiceImage({
     required this.vehicle,
     required this.size,
-    required this.avatarMode,
-    required this.customAvatarImagePath,
-    required this.avatarScale,
-    required this.avatarOffsetX,
-    required this.avatarOffsetY,
-    required this.avatarRotationDegrees,
+    required this.avatar,
     this.avatarImageBuilder,
   });
 
   final VehicleDefinition vehicle;
   final double size;
-  final AvatarImageMode avatarMode;
-  final String? customAvatarImagePath;
-  final double avatarScale;
-  final double avatarOffsetX;
-  final double avatarOffsetY;
-  final double avatarRotationDegrees;
+  final VehicleAvatarPresentation avatar;
   final Widget Function(BuildContext context, String imagePath)?
   avatarImageBuilder;
 
   @override
   Widget build(BuildContext context) {
-    if (avatarMode == AvatarImageMode.custom) {
+    if (avatar.isCustom) {
       return AvatarCompositePreview(
         vehicle: vehicle,
-        avatarMode: avatarMode,
-        customAvatarImagePath: customAvatarImagePath,
-        avatarScale: avatarScale,
-        avatarOffsetX: avatarOffsetX,
-        avatarOffsetY: avatarOffsetY,
-        avatarRotationDegrees: avatarRotationDegrees,
+        avatar: avatar,
         size: size,
         avatarImageBuilder: avatarImageBuilder,
       );

@@ -11,6 +11,7 @@ import '../l10n/text_sets.dart';
 import '../models/meal_completion_status.dart';
 import '../models/meal_session_result.dart';
 import '../models/meal_timer_config.dart';
+import '../models/vehicle_avatar_presentation.dart';
 import '../services/local_meal_progress_service.dart';
 import '../services/motivation_audio_service.dart';
 import '../services/screen_awake_service.dart';
@@ -461,12 +462,7 @@ class _TimerScreenState extends State<TimerScreen> {
       animation: _controller,
       builder: (context, _) {
         final vehicle = VehicleCatalog.findById(widget.config.vehicleId);
-        final vehicleAvatarMode = widget.config.avatarModeForVehicle(
-          vehicle.id,
-        );
-        final vehicleAvatarImagePath = widget.config
-            .customAvatarImagePathForVehicle(vehicle.id);
-        final vehicleAvatarConfig = widget.config.customAvatarConfigForVehicle(
+        final vehicleAvatar = widget.config.avatarPresentationForVehicle(
           vehicle.id,
         );
         final progress = _controller.progress.clamp(0.0, 1.0).toDouble();
@@ -511,13 +507,7 @@ class _TimerScreenState extends State<TimerScreen> {
                   final roadView = RoadView(
                     progress: progress,
                     vehicle: vehicle,
-                    avatarMode: vehicleAvatarMode,
-                    customAvatarImagePath: vehicleAvatarImagePath,
-                    avatarScale: vehicleAvatarConfig?.scale ?? 1.0,
-                    avatarOffsetX: vehicleAvatarConfig?.offsetX ?? 0.0,
-                    avatarOffsetY: vehicleAvatarConfig?.offsetY ?? 0.0,
-                    avatarRotationDegrees:
-                        vehicleAvatarConfig?.rotationDegrees ?? 0.0,
+                    avatar: vehicleAvatar,
                     motivationVideoAssetPath: _activeMotivationVideoPath,
                     motivationVideoMilestone: _activeMotivationMilestone,
                     onMotivationVideoFinished: _handleMotivationVideoFinished,
@@ -528,13 +518,7 @@ class _TimerScreenState extends State<TimerScreen> {
                       ? RoadVehicleLayer(
                           progress: progress,
                           vehicle: vehicle,
-                          avatarMode: vehicleAvatarMode,
-                          customAvatarImagePath: vehicleAvatarImagePath,
-                          avatarScale: vehicleAvatarConfig?.scale ?? 1.0,
-                          avatarOffsetX: vehicleAvatarConfig?.offsetX ?? 0.0,
-                          avatarOffsetY: vehicleAvatarConfig?.offsetY ?? 0.0,
-                          avatarRotationDegrees:
-                              vehicleAvatarConfig?.rotationDegrees ?? 0.0,
+                          avatar: vehicleAvatar,
                         )
                       : null;
                   final landscapeMotivationVideoLayer =

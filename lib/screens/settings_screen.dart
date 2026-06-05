@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import '../catalogs/meal_course_catalog.dart';
 import '../l10n/app_texts.dart';
 import '../models/meal_timer_config.dart';
+import '../models/vehicle_avatar_presentation.dart';
 import '../widgets/vehicle_selection_card.dart';
 import 'avatar_setup_screen.dart';
 
@@ -75,13 +76,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
   @override
   Widget build(BuildContext context) {
     final texts = AppTexts.of(context);
-    final vehicleAvatarConfig = _config.customAvatarConfigForVehicle(
+    final vehicleAvatar = _config.avatarPresentationForVehicle(
       _config.vehicleId,
     );
     final isUsingCustomAvatar =
-        _config.hasCustomAvatarForVehicle(_config.vehicleId) &&
-        vehicleAvatarConfig != null &&
-        File(vehicleAvatarConfig.imagePath).existsSync();
+        vehicleAvatar.isCustom &&
+        vehicleAvatar.imagePath != null &&
+        File(vehicleAvatar.imagePath!).existsSync();
     final avatarStateText = isUsingCustomAvatar
         ? texts.settings.avatarCustomState
         : texts.settings.avatarDefaultState;
@@ -206,15 +207,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
             onVehicleSelected: (vehicleId) {
               _update(_config.copyWith(vehicleId: vehicleId));
             },
-            avatarMode: _config.avatarModeForVehicle(_config.vehicleId),
-            customAvatarImagePath: _config.customAvatarImagePathForVehicle(
-              _config.vehicleId,
-            ),
-            avatarScale: vehicleAvatarConfig?.scale ?? 1.0,
-            avatarOffsetX: vehicleAvatarConfig?.offsetX ?? 0.0,
-            avatarOffsetY: vehicleAvatarConfig?.offsetY ?? 0.0,
-            avatarRotationDegrees: vehicleAvatarConfig?.rotationDegrees ?? 0.0,
-            avatarConfigForVehicle: _config.customAvatarConfigForVehicle,
+            avatar: vehicleAvatar,
+            avatarForVehicle: _config.avatarPresentationForVehicle,
           ),
           const SizedBox(height: 20),
           Card(

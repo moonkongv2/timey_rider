@@ -18,6 +18,7 @@ import 'package:jy_yamyam/models/meal_session_result.dart';
 import 'package:jy_yamyam/models/meal_timer_config.dart';
 import 'package:jy_yamyam/models/reward_goal.dart';
 import 'package:jy_yamyam/models/vehicle.dart';
+import 'package:jy_yamyam/models/vehicle_avatar_presentation.dart';
 import 'package:jy_yamyam/screens/avatar_setup_screen.dart';
 import 'package:jy_yamyam/screens/home_screen.dart';
 import 'package:jy_yamyam/screens/meal_history_screen.dart';
@@ -1512,7 +1513,21 @@ void main() {
                 title: '차량 선택',
                 selectedVehicleId: 'motorcycle',
                 onVehicleSelected: (_) {},
-                avatarConfigForVehicle: (vehicleId) => avatarConfigs[vehicleId],
+                avatarForVehicle: (vehicleId) {
+                  final avatarConfig = avatarConfigs[vehicleId];
+                  if (avatarConfig == null) {
+                    return null;
+                  }
+
+                  return VehicleAvatarPresentation(
+                    mode: AvatarImageMode.custom,
+                    imagePath: avatarConfig.imagePath,
+                    scale: avatarConfig.scale,
+                    offsetX: avatarConfig.offsetX,
+                    offsetY: avatarConfig.offsetY,
+                    rotationDegrees: avatarConfig.rotationDegrees,
+                  );
+                },
                 avatarImageBuilder: (context, imagePath) {
                   return ColoredBox(
                     key: ValueKey('customAvatar.$imagePath'),
@@ -1726,12 +1741,14 @@ void main() {
             child: RoadView(
               progress: 0.5,
               vehicle: VehicleCatalog.fireTruck,
-              avatarMode: AvatarImageMode.custom,
-              customAvatarImagePath: avatarFile.path,
-              avatarScale: 1.2,
-              avatarOffsetX: 0.05,
-              avatarOffsetY: -0.04,
-              avatarRotationDegrees: 6,
+              avatar: VehicleAvatarPresentation(
+                mode: AvatarImageMode.custom,
+                imagePath: avatarFile.path,
+                scale: 1.2,
+                offsetX: 0.05,
+                offsetY: -0.04,
+                rotationDegrees: 6,
+              ),
               avatarImageBuilder: (context, imagePath) {
                 return const ColoredBox(
                   key: ValueKey('avatarCompositeOverlayImage'),
@@ -1768,12 +1785,14 @@ void main() {
             child: RoadView(
               progress: 0.5,
               vehicle: VehicleCatalog.fireTruck,
-              avatarMode: AvatarImageMode.custom,
-              customAvatarImagePath: '/missing/avatar.png',
-              avatarScale: 1.2,
-              avatarOffsetX: 0.05,
-              avatarOffsetY: -0.04,
-              avatarRotationDegrees: 6,
+              avatar: const VehicleAvatarPresentation(
+                mode: AvatarImageMode.custom,
+                imagePath: '/missing/avatar.png',
+                scale: 1.2,
+                offsetX: 0.05,
+                offsetY: -0.04,
+                rotationDegrees: 6,
+              ),
             ),
           ),
         ),
@@ -1902,7 +1921,7 @@ void main() {
 
     expect(find.byType(RoadView), findsOneWidget);
     expect(
-      tester.widget<RoadView>(find.byType(RoadView)).avatarMode,
+      tester.widget<RoadView>(find.byType(RoadView)).avatar.mode,
       AvatarImageMode.defaultImage,
     );
 
@@ -1940,12 +1959,12 @@ void main() {
     await tester.pump();
 
     final roadView = tester.widget<RoadView>(find.byType(RoadView));
-    expect(roadView.avatarMode, AvatarImageMode.custom);
-    expect(roadView.customAvatarImagePath, avatarFile.path);
-    expect(roadView.avatarScale, 1.4);
-    expect(roadView.avatarOffsetX, 0.11);
-    expect(roadView.avatarOffsetY, -0.07);
-    expect(roadView.avatarRotationDegrees, 9.0);
+    expect(roadView.avatar.mode, AvatarImageMode.custom);
+    expect(roadView.avatar.imagePath, avatarFile.path);
+    expect(roadView.avatar.scale, 1.4);
+    expect(roadView.avatar.offsetX, 0.11);
+    expect(roadView.avatar.offsetY, -0.07);
+    expect(roadView.avatar.rotationDegrees, 9.0);
   });
 
   testWidgets('Timer screen gives the route primary space in landscape', (
