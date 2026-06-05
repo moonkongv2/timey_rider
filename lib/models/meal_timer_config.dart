@@ -98,9 +98,6 @@ class MealTimerConfig {
   final double avatarRotationDegrees;
   final Map<String, VehicleAvatarConfig> customAvatarsByVehicle;
 
-  @Deprecated('Use vehicleId instead.')
-  String get motorcycleId => vehicleId;
-
   MealTimerConfig copyWith({
     Duration? duration,
     bool? showRemainingTime,

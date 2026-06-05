@@ -10,7 +10,6 @@ class LocalSettingsService {
   static const _soundEnabledKey = 'soundEnabled';
   static const _keepScreenAwakeKey = 'keepScreenAwake';
   static const _vehicleIdKey = 'vehicleId';
-  static const _motorcycleIdKey = 'motorcycleId';
   static const _childNameKey = 'childName';
   static const _avatarModeKey = 'avatarMode';
   static const _customAvatarImagePathKey = 'customAvatarImagePath';
@@ -25,9 +24,7 @@ class LocalSettingsService {
     final preferences = await SharedPreferences.getInstance();
     final defaults = MealTimerConfig.defaults();
     final vehicleId =
-        preferences.getString(_vehicleIdKey) ??
-        preferences.getString(_motorcycleIdKey) ??
-        defaults.vehicleId;
+        preferences.getString(_vehicleIdKey) ?? defaults.vehicleId;
     final avatarMode = _avatarModeFromString(
       preferences.getString(_avatarModeKey),
     );
@@ -102,7 +99,6 @@ class LocalSettingsService {
     await preferences.setBool(_soundEnabledKey, config.soundEnabled);
     await preferences.setBool(_keepScreenAwakeKey, config.keepScreenAwake);
     await preferences.setString(_vehicleIdKey, config.vehicleId);
-    await preferences.setString(_motorcycleIdKey, config.vehicleId);
     await preferences.setString(_childNameKey, config.childName);
     await preferences.setString(
       _avatarModeKey,

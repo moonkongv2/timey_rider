@@ -46,8 +46,6 @@ void main() {
     expect(config.customAvatarImagePath, isNull);
     expect(config.customAvatarVehicleId, isNull);
     expect(config.vehicleId, 'motorcycle');
-    // ignore: deprecated_member_use_from_same_package
-    expect(config.motorcycleId, config.vehicleId);
     expect(config.avatarScale, 1.0);
     expect(config.avatarOffsetX, 0.0);
     expect(config.avatarOffsetY, 0.0);
@@ -78,7 +76,6 @@ void main() {
     expect(loadedConfig.childName, '지율');
     expect(loadedConfig.vehicleId, 'police_car');
     expect(preferences.getString('vehicleId'), 'police_car');
-    expect(preferences.getString('motorcycleId'), 'police_car');
     expect(loadedConfig.avatarMode, AvatarImageMode.custom);
     expect(loadedConfig.customAvatarImagePath, '/local/avatar.png');
     expect(loadedConfig.customAvatarVehicleId, 'police_car');
@@ -164,36 +161,25 @@ void main() {
     'Existing child name and vehicle settings load without avatar keys',
     () async {
       SharedPreferences.setMockInitialValues({
+        'vehicleId': 'bus',
         'childName': '민준',
-        'motorcycleId': 'fire_truck',
       });
 
       final config = await LocalSettingsService().loadConfig();
 
       expect(config.childName, '민준');
-      expect(config.vehicleId, 'fire_truck');
+      expect(config.vehicleId, 'bus');
       expect(config.avatarMode, AvatarImageMode.defaultImage);
       expect(config.customAvatarImagePath, isNull);
       expect(config.customAvatarVehicleId, isNull);
     },
   );
 
-  test('New vehicle id preference takes precedence over legacy key', () async {
-    SharedPreferences.setMockInitialValues({
-      'vehicleId': 'bus',
-      'motorcycleId': 'fire_truck',
-    });
-
-    final config = await LocalSettingsService().loadConfig();
-
-    expect(config.vehicleId, 'bus');
-  });
-
   test(
     'Existing custom avatar settings infer vehicle id when missing',
     () async {
       SharedPreferences.setMockInitialValues({
-        'motorcycleId': 'police_car',
+        'vehicleId': 'police_car',
         'avatarMode': 'custom',
         'customAvatarImagePath': '/local/avatar.png',
       });
@@ -214,7 +200,7 @@ void main() {
     'Malformed vehicle avatar map falls back to legacy avatar keys',
     () async {
       SharedPreferences.setMockInitialValues({
-        'motorcycleId': 'fire_truck',
+        'vehicleId': 'fire_truck',
         'avatarMode': 'custom',
         'customAvatarImagePath': '/local/fire-truck.png',
         'customAvatarVehicleId': 'fire_truck',
@@ -1562,7 +1548,6 @@ void main() {
 
     final preferences = await SharedPreferences.getInstance();
     expect(preferences.getString('vehicleId'), 'police_car');
-    expect(preferences.getString('motorcycleId'), 'police_car');
   });
 
   testWidgets('Vehicle selection updates even without parent rebuild', (
