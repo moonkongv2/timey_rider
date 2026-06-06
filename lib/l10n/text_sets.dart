@@ -105,6 +105,15 @@ abstract interface class MealHistoryTextSet {
   String overrunTime(String duration);
 }
 
+abstract interface class MealIngredientTextSet {
+  String get title;
+  String get subtitle;
+  String get randomStartButton;
+  String get selectedStartButton;
+
+  String selectedCount(int selectedCount, int maxCount);
+}
+
 abstract interface class SettingsTextSet {
   String get title;
   String get showRemainingTime;

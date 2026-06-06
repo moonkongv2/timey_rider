@@ -3,6 +3,8 @@ import 'dart:math' as math;
 import '../models/meal_ingredient.dart';
 
 abstract final class MealIngredientCatalog {
+  static const maxSelectableIngredientCount = 5;
+
   static const carrot = MealIngredientDefinition(
     id: 'carrot',
     labelKo: '당근',
@@ -143,7 +145,10 @@ abstract final class MealIngredientCatalog {
     return null;
   }
 
-  static List<String> randomSelectionIds({int count = 5, math.Random? random}) {
+  static List<String> randomSelectionIds({
+    int count = maxSelectableIngredientCount,
+    math.Random? random,
+  }) {
     if (count <= 0) {
       return const [];
     }

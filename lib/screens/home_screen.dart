@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart' show ScrollCacheExtent;
 
+import '../catalogs/meal_ingredient_catalog.dart';
 import '../catalogs/meal_course_catalog.dart';
 import '../catalogs/vehicle_catalog.dart';
 import '../l10n/app_texts.dart';
@@ -22,6 +23,7 @@ import '../utils/duration_format.dart';
 import '../widgets/app/app_bouncy_button.dart';
 import '../widgets/app/app_metric_tile.dart';
 import '../widgets/avatar/avatar_composite_preview.dart';
+import '../widgets/meal_ingredient_picker_sheet.dart';
 import '../widgets/reward_sticker_image.dart';
 import '../widgets/vehicle_selection_card.dart';
 import 'avatar_setup_screen.dart';
@@ -103,7 +105,25 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
   }
 
   Future<void> _startTimer(int minutes) async {
-    final config = _config.copyWith(duration: Duration(minutes: minutes));
+    final ingredientResult =
+        await showModalBottomSheet<MealIngredientPickerResult>(
+          context: context,
+          isScrollControlled: true,
+          backgroundColor: AppColors.transparent,
+          builder: (_) => const MealIngredientPickerSheet(),
+        );
+    if (!mounted || ingredientResult == null) {
+      return;
+    }
+
+    final courseIngredientIds = switch (ingredientResult) {
+      RandomMealIngredients() => MealIngredientCatalog.randomSelectionIds(),
+      SelectedMealIngredients(:final ingredientIds) => ingredientIds,
+    };
+    final config = _config.copyWith(
+      duration: Duration(minutes: minutes),
+      courseIngredientIds: courseIngredientIds,
+    );
     await Navigator.of(context).push(
       MaterialPageRoute(
         builder: (_) => TimerScreen(

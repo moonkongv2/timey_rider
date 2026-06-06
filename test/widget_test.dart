@@ -708,7 +708,7 @@ void main() {
     expect(find.textContaining('직접 설정'), findsOneWidget);
   });
 
-  testWidgets('Home regular course uses saved default meal duration', (
+  testWidgets('Starting a course opens the ingredient picker first', (
     tester,
   ) async {
     await tester.pumpWidget(
@@ -745,11 +745,156 @@ void main() {
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 400));
 
+    expect(
+      find.byKey(const ValueKey('mealIngredientPickerSheet')),
+      findsOneWidget,
+    );
+    expect(find.byType(TimerScreen), findsNothing);
+  });
+
+  testWidgets('Tapping random start opens timer screen', (tester) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        locale: const Locale('ko'),
+        supportedLocales: const [Locale('ko'), Locale('en')],
+        localizationsDelegates: const [
+          GlobalMaterialLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+        ],
+        home: HomeScreen(
+          config: MealTimerConfig.defaults().copyWith(
+            childName: '지율',
+            duration: const Duration(minutes: 35),
+          ),
+          mealProgressService: LocalMealProgressService(),
+          onConfigChanged: (_) {},
+        ),
+      ),
+    );
+    await tester.pump();
+
+    final regularCourseButton = tester.widget<AppBouncyButton>(
+      find.ancestor(
+        of: find.textContaining('35분 보통 코스'),
+        matching: find.byType(AppBouncyButton),
+      ),
+    );
+    regularCourseButton.onPressed!();
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 400));
+
+    await tester.tap(
+      find.byKey(const ValueKey('randomStartMealIngredientsButton')),
+    );
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 400));
+
     expect(find.byType(TimerScreen), findsOneWidget);
     expect(
       tester.widget<TimerScreen>(find.byType(TimerScreen)).config.duration,
       const Duration(minutes: 35),
     );
+    expect(
+      tester
+          .widget<TimerScreen>(find.byType(TimerScreen))
+          .config
+          .courseIngredientIds,
+      hasLength(MealIngredientCatalog.maxSelectableIngredientCount),
+    );
+  });
+
+  testWidgets(
+    'Selecting carrot and egg opens timer with selected ingredients',
+    (tester) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          locale: const Locale('ko'),
+          supportedLocales: const [Locale('ko'), Locale('en')],
+          localizationsDelegates: const [
+            GlobalMaterialLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+          ],
+          home: HomeScreen(
+            config: MealTimerConfig.defaults().copyWith(childName: '지율'),
+            mealProgressService: LocalMealProgressService(),
+            onConfigChanged: (_) {},
+          ),
+        ),
+      );
+      await tester.pump();
+
+      final regularCourseButton = tester.widget<AppBouncyButton>(
+        find.ancestor(
+          of: find.textContaining('25분 보통 코스'),
+          matching: find.byType(AppBouncyButton),
+        ),
+      );
+      regularCourseButton.onPressed!();
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 400));
+
+      await tester.tap(find.byKey(const ValueKey('mealIngredientChip_carrot')));
+      await tester.pump();
+      await tester.tap(find.byKey(const ValueKey('mealIngredientChip_egg')));
+      await tester.pump();
+      await tester.tap(
+        find.byKey(const ValueKey('startSelectedMealIngredientsButton')),
+      );
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 400));
+
+      expect(
+        tester
+            .widget<TimerScreen>(find.byType(TimerScreen))
+            .config
+            .courseIngredientIds,
+        ['carrot', 'egg'],
+      );
+    },
+  );
+
+  testWidgets('Dismissing the ingredient picker does not open timer screen', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        locale: const Locale('ko'),
+        supportedLocales: const [Locale('ko'), Locale('en')],
+        localizationsDelegates: const [
+          GlobalMaterialLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+        ],
+        home: HomeScreen(
+          config: MealTimerConfig.defaults().copyWith(childName: '지율'),
+          mealProgressService: LocalMealProgressService(),
+          onConfigChanged: (_) {},
+        ),
+      ),
+    );
+    await tester.pump();
+
+    final regularCourseButton = tester.widget<AppBouncyButton>(
+      find.ancestor(
+        of: find.textContaining('25분 보통 코스'),
+        matching: find.byType(AppBouncyButton),
+      ),
+    );
+    regularCourseButton.onPressed!();
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 400));
+
+    await tester.tapAt(const Offset(10, 10));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 400));
+
+    expect(
+      find.byKey(const ValueKey('mealIngredientPickerSheet')),
+      findsNothing,
+    );
+    expect(find.byType(TimerScreen), findsNothing);
   });
 
   testWidgets('Alternate courses exclude the selected default duration', (
@@ -814,6 +959,18 @@ void main() {
           .first,
     );
     quickCourseButton.onTap!();
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 400));
+
+    expect(
+      find.byKey(const ValueKey('mealIngredientPickerSheet')),
+      findsOneWidget,
+    );
+    expect(find.byType(TimerScreen), findsNothing);
+
+    await tester.tap(
+      find.byKey(const ValueKey('randomStartMealIngredientsButton')),
+    );
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 400));
 
