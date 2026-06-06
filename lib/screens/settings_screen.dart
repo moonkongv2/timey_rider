@@ -6,7 +6,6 @@ import '../catalogs/meal_course_catalog.dart';
 import '../l10n/app_texts.dart';
 import '../models/meal_timer_config.dart';
 import '../models/vehicle_avatar_presentation.dart';
-import '../widgets/vehicle_selection_card.dart';
 import 'avatar_setup_screen.dart';
 
 class SettingsScreen extends StatefulWidget {
@@ -199,16 +198,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ],
               ),
             ),
-          ),
-          const SizedBox(height: 20),
-          VehicleSelectionCard(
-            title: texts.settings.vehicleSelection,
-            selectedVehicleId: _config.vehicleId,
-            onVehicleSelected: (vehicleId) {
-              _update(_config.copyWith(vehicleId: vehicleId));
-            },
-            avatar: vehicleAvatar,
-            avatarForVehicle: _config.avatarPresentationForVehicle,
           ),
           const SizedBox(height: 20),
           Card(

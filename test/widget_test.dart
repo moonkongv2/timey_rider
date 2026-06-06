@@ -1402,6 +1402,8 @@ void main() {
     expect(find.text('아바타 설정'), findsOneWidget);
     expect(find.text('기본 이미지 사용 중'), findsOneWidget);
     expect(find.text('아바타 설정하기'), findsOneWidget);
+    expect(find.text('빠방 고르기'), findsNothing);
+    expect(_vehicleChoiceFinder('motorcycle'), findsNothing);
   });
 
   testWidgets('Settings screen shows custom avatar state when active', (
@@ -1434,7 +1436,8 @@ void main() {
 
     expect(find.text('아바타 설정'), findsOneWidget);
     expect(find.text('직접 만든 아바타 사용 중'), findsOneWidget);
-    expect(find.byType(AvatarCompositePreview), findsOneWidget);
+    expect(find.text('빠방 고르기'), findsNothing);
+    expect(find.byType(VehicleSelectionCard), findsNothing);
   });
 
   testWidgets('Home screen shows quick courses above vehicle choices', (
