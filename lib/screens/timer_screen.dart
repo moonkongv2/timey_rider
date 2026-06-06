@@ -31,6 +31,12 @@ const _landscapeCourseCanvasSize = Size(1200, 520);
 const motivationMinimumVideoInterval = Duration(seconds: 10);
 const motivationVoiceStartDelay = Duration(milliseconds: 350);
 
+Duration finishDriveDurationForProgress(double startProgress) {
+  final remainingProgress = 1 - startProgress.clamp(0.0, 1.0).toDouble();
+  final milliseconds = 800 + (3200 * remainingProgress);
+  return Duration(milliseconds: milliseconds.round());
+}
+
 String? motivationVideoAssetPathForVehicle({
   required String vehicleId,
   required int milestone,
@@ -141,8 +147,10 @@ class _TimerStatusCopy {
   final Color iconBackgroundColor;
 }
 
-class _TimerScreenState extends State<TimerScreen> {
+class _TimerScreenState extends State<TimerScreen>
+    with SingleTickerProviderStateMixin {
   late final MealTimerController _controller;
+  late final AnimationController _finishDriveController;
   late final MotivationAudioService _motivationAudioService;
   late final bool _ownsMotivationAudioService;
   final math.Random _motivationRandom = math.Random();
@@ -155,6 +163,11 @@ class _TimerScreenState extends State<TimerScreen> {
   String? _activeMotivationVideoPath;
   Duration? _lastMotivationVideoShownAt;
   Timer? _motivationVoiceTimer;
+  Timer? _arrivalPromptTimer;
+  bool _isFinishDriving = false;
+  Animation<double>? _finishDriveAnimation;
+  MealSessionResult? _pendingFinishDriveResult;
+  double _finishDriveStartProgress = 0;
 
   @override
   void initState() {
@@ -164,6 +177,8 @@ class _TimerScreenState extends State<TimerScreen> {
     _ownsMotivationAudioService = widget.motivationAudioService == null;
     _controller = MealTimerController(config: widget.config, now: widget.now);
     _controller.addListener(_handleTimerChanged);
+    _finishDriveController = AnimationController(vsync: this)
+      ..addStatusListener(_handleFinishDriveStatusChanged);
     _controller.start();
     unawaited(widget.orientationService.allowTimerOrientations());
     _applyScreenAwakeSetting();
@@ -183,11 +198,15 @@ class _TimerScreenState extends State<TimerScreen> {
   @override
   void dispose() {
     _motivationVoiceTimer?.cancel();
+    _arrivalPromptTimer?.cancel();
     unawaited(_disposeMotivationAudioService());
     unawaited(widget.orientationService.lockPortrait());
     if (_screenAwakeEnabled) {
       unawaited(widget.screenAwakeService.setEnabled(false));
     }
+    _finishDriveController
+      ..removeStatusListener(_handleFinishDriveStatusChanged)
+      ..dispose();
     _controller.dispose();
     super.dispose();
   }
@@ -209,6 +228,10 @@ class _TimerScreenState extends State<TimerScreen> {
   }
 
   void _handleTimerChanged() {
+    if (_isFinishDriving) {
+      return;
+    }
+
     _maybeShowMotivationVideo();
 
     if (_arrivalPromptShown ||
@@ -218,17 +241,24 @@ class _TimerScreenState extends State<TimerScreen> {
     }
 
     _arrivalPromptShown = true;
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
-      await Future<void>.delayed(const Duration(milliseconds: 900));
+    WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) {
         return;
       }
-      _confirmComplete(showFailureOnDecline: true);
+      _arrivalPromptTimer?.cancel();
+      _arrivalPromptTimer = Timer(const Duration(milliseconds: 900), () {
+        if (!mounted ||
+            _isFinishDriving ||
+            _controller.state != MealTimerState.arrived) {
+          return;
+        }
+        _confirmComplete(showFailureOnDecline: true);
+      });
     });
   }
 
   void _maybeShowMotivationVideo() {
-    if (!mounted || _activeMotivationMilestone != null) {
+    if (!mounted || _isFinishDriving || _activeMotivationMilestone != null) {
       return;
     }
 
@@ -313,7 +343,7 @@ class _TimerScreenState extends State<TimerScreen> {
   }
 
   Future<void> _confirmExit() async {
-    if (_exitPromptShown || _allowExit || !mounted) {
+    if (_exitPromptShown || _allowExit || _isFinishDriving || !mounted) {
       return;
     }
 
@@ -368,6 +398,11 @@ class _TimerScreenState extends State<TimerScreen> {
   }
 
   Future<void> _confirmComplete({bool showFailureOnDecline = false}) async {
+    if (_isFinishDriving) {
+      return;
+    }
+    _arrivalPromptTimer?.cancel();
+
     final texts = AppTexts.of(context);
     final arrivalDialogMessage = timerArrivalDialogMessage(
       texts: texts.timer,
@@ -419,7 +454,49 @@ class _TimerScreenState extends State<TimerScreen> {
           ? MealCompletionStatus.completedAtArrival
           : null,
     );
+    if (result.completedBeforeArrival) {
+      _startFinishDrive(result);
+      return;
+    }
     _openResult(result);
+  }
+
+  void _startFinishDrive(MealSessionResult result) {
+    _motivationVoiceTimer?.cancel();
+    unawaited(_motivationAudioService.stop());
+
+    _finishDriveStartProgress = _controller.progress.clamp(0.0, 1.0).toDouble();
+    _pendingFinishDriveResult = result;
+    _finishDriveController
+      ..stop()
+      ..duration = finishDriveDurationForProgress(_finishDriveStartProgress)
+      ..reset();
+    _finishDriveAnimation =
+        Tween<double>(begin: _finishDriveStartProgress, end: 1).animate(
+          CurvedAnimation(
+            parent: _finishDriveController,
+            curve: Curves.easeInOutCubic,
+          ),
+        );
+
+    setState(() {
+      _isFinishDriving = true;
+      _activeMotivationMilestone = null;
+      _activeMotivationVideoPath = null;
+    });
+    _finishDriveController.forward();
+  }
+
+  void _handleFinishDriveStatusChanged(AnimationStatus status) {
+    if (status != AnimationStatus.completed || !_isFinishDriving) {
+      return;
+    }
+
+    final result = _pendingFinishDriveResult;
+    _pendingFinishDriveResult = null;
+    if (result != null && mounted) {
+      _openResult(result);
+    }
   }
 
   void _openResult(MealSessionResult result) {
@@ -456,6 +533,15 @@ class _TimerScreenState extends State<TimerScreen> {
     MealTimerState state,
     double progress,
   ) {
+    if (_isFinishDriving) {
+      return _TimerStatusCopy(
+        progressMessage: texts.finishDriveProgressMessage,
+        timeLabel: texts.finishDriveTimeLabel,
+        icon: Icons.flag_rounded,
+        iconBackgroundColor: AppColors.primarySoft,
+      );
+    }
+
     return switch (state) {
       MealTimerState.running => _TimerStatusCopy(
         progressMessage: _runningProgressMessage(texts, progress),
@@ -489,7 +575,7 @@ class _TimerScreenState extends State<TimerScreen> {
     final texts = AppTexts.of(context);
 
     return AnimatedBuilder(
-      animation: _controller,
+      animation: Listenable.merge([_controller, _finishDriveController]),
       builder: (context, _) {
         final vehicle = VehicleCatalog.findById(widget.config.vehicleId);
         final vehicleAvatar = widget.config.avatarPresentationForVehicle(
@@ -498,13 +584,21 @@ class _TimerScreenState extends State<TimerScreen> {
         final courseIngredients = MealIngredientCatalog.courseSlotsFor(
           widget.config.courseIngredientIds,
         );
-        final progress = _controller.progress.clamp(0.0, 1.0).toDouble();
+        final timerProgress = _controller.progress.clamp(0.0, 1.0).toDouble();
+        final displayProgress = _isFinishDriving
+            ? (_finishDriveAnimation?.value ?? _finishDriveStartProgress)
+                  .clamp(0.0, 1.0)
+                  .toDouble()
+            : timerProgress;
         final statusCopy = _timerStatusCopy(
           texts.timer,
           _controller.state,
-          progress,
+          displayProgress,
         );
         void handlePauseResume() {
+          if (_isFinishDriving) {
+            return;
+          }
           if (_controller.isPaused) {
             _controller.resume();
           } else {
@@ -514,6 +608,12 @@ class _TimerScreenState extends State<TimerScreen> {
 
         final isScreenLandscape =
             MediaQuery.orientationOf(context) == Orientation.landscape;
+        final displayedRemaining = _isFinishDriving
+            ? Duration.zero
+            : _controller.remaining;
+        final vehicleMoveDuration = _isFinishDriving
+            ? Duration.zero
+            : const Duration(milliseconds: 850);
 
         return PopScope(
           canPop: _allowExit,
@@ -538,25 +638,33 @@ class _TimerScreenState extends State<TimerScreen> {
                   final isLandscape =
                       constraints.maxWidth > constraints.maxHeight;
                   final roadView = RoadView(
-                    progress: progress,
+                    progress: displayProgress,
                     vehicle: vehicle,
                     avatar: vehicleAvatar,
-                    motivationVideoAssetPath: _activeMotivationVideoPath,
-                    motivationVideoMilestone: _activeMotivationMilestone,
+                    motivationVideoAssetPath: _isFinishDriving
+                        ? null
+                        : _activeMotivationVideoPath,
+                    motivationVideoMilestone: _isFinishDriving
+                        ? null
+                        : _activeMotivationMilestone,
                     onMotivationVideoFinished: _handleMotivationVideoFinished,
                     showVehicle: !isLandscape,
                     showMotivationVideo: !isLandscape,
                     ingredients: courseIngredients,
+                    ingredientClearProgress: displayProgress,
+                    vehicleMoveDuration: vehicleMoveDuration,
                   );
                   final landscapeVehicleLayer = isLandscape
                       ? RoadVehicleLayer(
-                          progress: progress,
+                          progress: displayProgress,
                           vehicle: vehicle,
                           avatar: vehicleAvatar,
+                          vehicleMoveDuration: vehicleMoveDuration,
                         )
                       : null;
                   final landscapeMotivationVideoLayer =
-                      isLandscape &&
+                      !_isFinishDriving &&
+                          isLandscape &&
                           _activeMotivationVideoPath != null &&
                           _activeMotivationMilestone != null
                       ? RoadMotivationVideoLayer(
@@ -568,12 +676,12 @@ class _TimerScreenState extends State<TimerScreen> {
                   final remainingTimeCard = widget.config.showRemainingTime
                       ? _RemainingTimeCard(
                           label: statusCopy.timeLabel,
-                          remaining: _controller.remaining,
+                          remaining: displayedRemaining,
                           icon: statusCopy.icon,
                           iconBackgroundColor: statusCopy.iconBackgroundColor,
                           semanticLabel: texts.timer.remainingTimeSemanticLabel(
                             statusCopy.timeLabel,
-                            formatDuration(_controller.remaining),
+                            formatDuration(displayedRemaining),
                           ),
                           isCompact: isLandscape,
                         )
@@ -583,20 +691,20 @@ class _TimerScreenState extends State<TimerScreen> {
                     return _LandscapeTimerLayout(
                       progressCard: _ProgressMessageCard(
                         message: statusCopy.progressMessage,
-                        progress: progress,
+                        progress: displayProgress,
                         isCompact: true,
                       ),
                       remainingTimeBadge: widget.config.showRemainingTime
                           ? _RemainingTimeBadge(
                               label: statusCopy.timeLabel,
-                              remaining: _controller.remaining,
+                              remaining: displayedRemaining,
                               icon: statusCopy.icon,
                               iconBackgroundColor:
                                   statusCopy.iconBackgroundColor,
                               semanticLabel: texts.timer
                                   .remainingTimeSemanticLabel(
                                     statusCopy.timeLabel,
-                                    formatDuration(_controller.remaining),
+                                    formatDuration(displayedRemaining),
                                   ),
                             )
                           : null,
@@ -606,8 +714,10 @@ class _TimerScreenState extends State<TimerScreen> {
                       onBack: _confirmExit,
                       controls: TimerControlBar(
                         isPaused: _controller.isPaused,
-                        onPauseResume: handlePauseResume,
-                        onComplete: _confirmComplete,
+                        onPauseResume: _isFinishDriving
+                            ? null
+                            : handlePauseResume,
+                        onComplete: _isFinishDriving ? null : _confirmComplete,
                       ),
                     );
                   }
@@ -623,7 +733,7 @@ class _TimerScreenState extends State<TimerScreen> {
                       children: [
                         _ProgressMessageCard(
                           message: statusCopy.progressMessage,
-                          progress: progress,
+                          progress: displayProgress,
                         ),
                         const SizedBox(height: AppSpacing.lg),
                         Expanded(child: roadView),
@@ -634,8 +744,12 @@ class _TimerScreenState extends State<TimerScreen> {
                         const SizedBox(height: AppSpacing.lg),
                         TimerControlBar(
                           isPaused: _controller.isPaused,
-                          onPauseResume: handlePauseResume,
-                          onComplete: _confirmComplete,
+                          onPauseResume: _isFinishDriving
+                              ? null
+                              : handlePauseResume,
+                          onComplete: _isFinishDriving
+                              ? null
+                              : _confirmComplete,
                         ),
                       ],
                     ),

@@ -9,7 +9,7 @@ class EnMealIngredientTexts implements MealIngredientTextSet {
   String get subtitle =>
       'Your ingredients will appear along the Yamyam course.';
   String get randomStartButton => 'Random start';
-  String get selectedStartButton => 'Start with selected';
+  String get selectedStartButton => 'Start selected';
 
   String selectedCount(int selectedCount, int maxCount) {
     return '$selectedCount/$maxCount selected';

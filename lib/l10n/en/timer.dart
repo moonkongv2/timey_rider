@@ -27,6 +27,8 @@ class EnTimerTexts implements TimerTextSet {
   String get pausedProgressMessage => 'Taking a little break';
   String get arrivedProgressMessage => 'Arrived!';
   String get idleProgressMessage => 'Getting ready';
+  String get finishDriveProgressMessage => 'Heading to the finish!';
+  String get finishDriveTimeLabel => 'Finishing up';
 
   String arrivalDialogMessage(String vehicleLabel) {
     return 'The ${vehicleLabel.toLowerCase()} passed by... did you finish your meal?';

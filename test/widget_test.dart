@@ -2359,6 +2359,148 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
+  testWidgets('Meal done before arrival does not immediately push result', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        locale: const Locale('ko'),
+        home: TimerScreen(
+          config: MealTimerConfig.defaults().copyWith(
+            duration: const Duration(minutes: 10),
+          ),
+          mealProgressService: LocalMealProgressService(),
+          onConfigChanged: (_) {},
+        ),
+      ),
+    );
+    await tester.pump();
+
+    tester.widget<TimerControlBar>(find.byType(TimerControlBar)).onComplete!();
+    await tester.pump();
+    await tester.tap(find.byType(FilledButton).last);
+    await tester.pump();
+
+    expect(find.byType(TimerScreen), findsOneWidget);
+    expect(find.byType(ResultScreen), findsNothing);
+    expect(
+      tester.widget<TimerControlBar>(find.byType(TimerControlBar)).onComplete,
+      isNull,
+    );
+
+    await tester.pumpWidget(const SizedBox.shrink());
+    await tester.pump();
+  });
+
+  testWidgets('Fast finish drive animates display progress to finish', (
+    tester,
+  ) async {
+    var now = DateTime(2026);
+
+    await tester.pumpWidget(
+      MaterialApp(
+        locale: const Locale('ko'),
+        home: TimerScreen(
+          config: MealTimerConfig.defaults().copyWith(
+            duration: const Duration(seconds: 100),
+          ),
+          mealProgressService: LocalMealProgressService(),
+          now: () => now,
+          onConfigChanged: (_) {},
+        ),
+      ),
+    );
+    await tester.pump();
+    now = now.add(const Duration(seconds: 50));
+    await tester.pump(const Duration(milliseconds: 250));
+
+    tester.widget<TimerControlBar>(find.byType(TimerControlBar)).onComplete!();
+    await tester.pump();
+    await tester.tap(find.byType(FilledButton).last);
+    await tester.pump();
+
+    final driveDuration = finishDriveDurationForProgress(0.5);
+    await tester.pump(driveDuration - const Duration(milliseconds: 1));
+
+    expect(find.byType(ResultScreen), findsNothing);
+    expect(
+      tester.widget<RoadView>(find.byType(RoadView)).progress,
+      greaterThan(0.99),
+    );
+
+    await tester.pump(const Duration(milliseconds: 2));
+    await tester.pump();
+
+    expect(find.byType(ResultScreen), findsOneWidget);
+
+    await tester.pumpWidget(const SizedBox.shrink());
+    await tester.pump();
+  });
+
+  testWidgets('Controls are disabled during fast finish drive', (tester) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        locale: const Locale('ko'),
+        home: TimerScreen(
+          config: MealTimerConfig.defaults().copyWith(
+            duration: const Duration(minutes: 10),
+          ),
+          mealProgressService: LocalMealProgressService(),
+          onConfigChanged: (_) {},
+        ),
+      ),
+    );
+    await tester.pump();
+
+    tester.widget<TimerControlBar>(find.byType(TimerControlBar)).onComplete!();
+    await tester.pump();
+    await tester.tap(find.byType(FilledButton).last);
+    await tester.pump();
+
+    final controls = tester.widget<TimerControlBar>(
+      find.byType(TimerControlBar),
+    );
+    expect(controls.onPauseResume, isNull);
+    expect(controls.onComplete, isNull);
+
+    await tester.pumpWidget(const SizedBox.shrink());
+    await tester.pump();
+  });
+
+  testWidgets('Completing after arrival opens result without fast finish', (
+    tester,
+  ) async {
+    var now = DateTime(2026);
+
+    await tester.pumpWidget(
+      MaterialApp(
+        locale: const Locale('ko'),
+        home: TimerScreen(
+          config: MealTimerConfig.defaults().copyWith(
+            duration: const Duration(seconds: 1),
+          ),
+          mealProgressService: LocalMealProgressService(),
+          now: () => now,
+          onConfigChanged: (_) {},
+        ),
+      ),
+    );
+    await tester.pump();
+    now = now.add(const Duration(seconds: 2));
+    await tester.pump(const Duration(milliseconds: 250));
+
+    tester.widget<TimerControlBar>(find.byType(TimerControlBar)).onComplete!();
+    await tester.pump();
+    await tester.tap(find.byType(FilledButton).last);
+    await tester.pump();
+    await tester.pump();
+
+    expect(find.byType(ResultScreen), findsOneWidget);
+
+    await tester.pumpWidget(const SizedBox.shrink());
+    await tester.pump();
+  });
+
   testWidgets('Timer screen plays motivation voice after video starts', (
     tester,
   ) async {

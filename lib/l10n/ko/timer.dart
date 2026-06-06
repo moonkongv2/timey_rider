@@ -26,6 +26,8 @@ class TimerTexts implements TimerTextSet {
   String get pausedProgressMessage => '잠깐 쉬어가요';
   String get arrivedProgressMessage => '도착했어요!';
   String get idleProgressMessage => '출발 준비 중';
+  String get finishDriveProgressMessage => '마무리하러 가고 있어요!';
+  String get finishDriveTimeLabel => '마무리 중';
 
   String arrivalDialogMessage(String vehicleLabel) {
     return '$vehicleLabel${_subjectParticle(vehicleLabel)} 지나갔어. 식사를 마무리했어?';

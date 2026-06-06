@@ -14,8 +14,8 @@ class TimerControlBar extends StatelessWidget {
   });
 
   final bool isPaused;
-  final VoidCallback onPauseResume;
-  final VoidCallback onComplete;
+  final VoidCallback? onPauseResume;
+  final VoidCallback? onComplete;
   final bool isVertical;
 
   @override
