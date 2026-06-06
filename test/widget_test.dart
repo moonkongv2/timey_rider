@@ -30,6 +30,7 @@ import 'package:jy_yamyam/services/avatar_image_picker.dart';
 import 'package:jy_yamyam/services/local_avatar_image_service.dart';
 import 'package:jy_yamyam/services/local_meal_progress_service.dart';
 import 'package:jy_yamyam/services/local_settings_service.dart';
+import 'package:jy_yamyam/services/motivation_audio_service.dart';
 import 'package:jy_yamyam/services/screen_awake_service.dart';
 import 'package:jy_yamyam/widgets/app/app_bouncy_button.dart';
 import 'package:jy_yamyam/widgets/avatar/avatar_composite_preview.dart';
@@ -1988,6 +1989,55 @@ void main() {
     expect(roadView.avatar.rotationDegrees, 9.0);
   });
 
+  testWidgets('Timer screen plays motivation voice after video starts', (
+    tester,
+  ) async {
+    final motivationAudioService = _FakeMotivationAudioService();
+    var now = DateTime(2026);
+
+    await tester.pumpWidget(
+      MaterialApp(
+        locale: const Locale('ko'),
+        supportedLocales: const [Locale('ko'), Locale('en')],
+        localizationsDelegates: const [
+          GlobalMaterialLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+        ],
+        home: TimerScreen(
+          config: MealTimerConfig.defaults().copyWith(
+            duration: const Duration(seconds: 100),
+            soundEnabled: true,
+          ),
+          mealProgressService: LocalMealProgressService(),
+          motivationAudioService: motivationAudioService,
+          now: () => now,
+          onConfigChanged: (_) {},
+        ),
+      ),
+    );
+    await tester.pump();
+    now = now.add(const Duration(seconds: 10));
+    await tester.pump(const Duration(milliseconds: 250));
+
+    expect(
+      find.byKey(const ValueKey('motivationVideoBubble_10')),
+      findsOneWidget,
+    );
+    expect(motivationAudioService.playedAssets, isEmpty);
+
+    await tester.pump(motivationVoiceStartDelay);
+
+    expect(motivationAudioService.playedAssets, hasLength(1));
+    expect(
+      motivationAudioService.playedAssets.single,
+      startsWith('assets/audio/motivation/ko_'),
+    );
+
+    await tester.pumpWidget(const SizedBox.shrink());
+    await tester.pump();
+  });
+
   testWidgets('Timer screen gives the route primary space in landscape', (
     tester,
   ) async {
@@ -3161,6 +3211,27 @@ class _FakeScreenAwakeService implements ScreenAwakeService {
   @override
   Future<void> setEnabled(bool enabled) async {
     enabledValues.add(enabled);
+  }
+}
+
+class _FakeMotivationAudioService implements MotivationAudioService {
+  final List<String> playedAssets = [];
+  var stopCount = 0;
+  var disposeCount = 0;
+
+  @override
+  Future<void> playAsset(String assetPath) async {
+    playedAssets.add(assetPath);
+  }
+
+  @override
+  Future<void> stop() async {
+    stopCount += 1;
+  }
+
+  @override
+  Future<void> dispose() async {
+    disposeCount += 1;
   }
 }
 

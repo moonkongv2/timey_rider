@@ -27,6 +27,7 @@ import 'result_screen.dart';
 
 const _landscapeCourseCanvasSize = Size(1200, 520);
 const motivationMinimumVideoInterval = Duration(seconds: 10);
+const motivationVoiceStartDelay = Duration(milliseconds: 350);
 
 String? motivationVideoAssetPathForVehicle({
   required String vehicleId,
@@ -108,6 +109,7 @@ class TimerScreen extends StatefulWidget {
     required this.onConfigChanged,
     this.screenAwakeService = const WakelockScreenAwakeService(),
     this.motivationAudioService,
+    this.now,
   });
 
   final MealTimerConfig config;
@@ -115,6 +117,7 @@ class TimerScreen extends StatefulWidget {
   final ValueChanged<MealTimerConfig> onConfigChanged;
   final ScreenAwakeService screenAwakeService;
   final MotivationAudioService? motivationAudioService;
+  final DateTime Function()? now;
 
   @override
   State<TimerScreen> createState() => _TimerScreenState();
@@ -147,6 +150,7 @@ class _TimerScreenState extends State<TimerScreen> {
   int? _activeMotivationMilestone;
   String? _activeMotivationVideoPath;
   Duration? _lastMotivationVideoShownAt;
+  Timer? _motivationVoiceTimer;
 
   @override
   void initState() {
@@ -154,7 +158,7 @@ class _TimerScreenState extends State<TimerScreen> {
     _motivationAudioService =
         widget.motivationAudioService ?? AudioplayersMotivationAudioService();
     _ownsMotivationAudioService = widget.motivationAudioService == null;
-    _controller = MealTimerController(config: widget.config);
+    _controller = MealTimerController(config: widget.config, now: widget.now);
     _controller.addListener(_handleTimerChanged);
     _controller.start();
     _applyScreenAwakeSetting();
@@ -173,6 +177,7 @@ class _TimerScreenState extends State<TimerScreen> {
 
   @override
   void dispose() {
+    _motivationVoiceTimer?.cancel();
     unawaited(_disposeMotivationAudioService());
     if (_screenAwakeEnabled) {
       unawaited(widget.screenAwakeService.setEnabled(false));
@@ -246,10 +251,20 @@ class _TimerScreenState extends State<TimerScreen> {
 
     _shownMotivationMilestones.add(milestone);
     _lastMotivationVideoShownAt = _controller.elapsed;
-    _maybePlayMotivationVoice();
     setState(() {
       _activeMotivationMilestone = milestone;
       _activeMotivationVideoPath = videoPath;
+    });
+    _scheduleMotivationVoice();
+  }
+
+  void _scheduleMotivationVoice() {
+    _motivationVoiceTimer?.cancel();
+    _motivationVoiceTimer = Timer(motivationVoiceStartDelay, () {
+      if (!mounted) {
+        return;
+      }
+      _maybePlayMotivationVoice();
     });
   }
 
@@ -268,7 +283,16 @@ class _TimerScreenState extends State<TimerScreen> {
     if (voicePath == null) {
       return;
     }
-    unawaited(_motivationAudioService.playAsset(voicePath));
+    unawaited(_playMotivationVoice(voicePath));
+  }
+
+  Future<void> _playMotivationVoice(String voicePath) async {
+    try {
+      await _motivationAudioService.playAsset(voicePath);
+    } catch (error, stackTrace) {
+      debugPrint('Unable to play motivation voice $voicePath: $error');
+      debugPrintStack(stackTrace: stackTrace);
+    }
   }
 
   void _handleMotivationVideoFinished() {
