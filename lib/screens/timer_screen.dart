@@ -14,6 +14,7 @@ import '../models/meal_timer_config.dart';
 import '../models/vehicle_avatar_presentation.dart';
 import '../services/local_meal_progress_service.dart';
 import '../services/motivation_audio_service.dart';
+import '../services/orientation_service.dart';
 import '../services/screen_awake_service.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_radius.dart';
@@ -108,6 +109,7 @@ class TimerScreen extends StatefulWidget {
     required this.mealProgressService,
     required this.onConfigChanged,
     this.screenAwakeService = const WakelockScreenAwakeService(),
+    this.orientationService = const SystemOrientationService(),
     this.motivationAudioService,
     this.now,
   });
@@ -116,6 +118,7 @@ class TimerScreen extends StatefulWidget {
   final LocalMealProgressService mealProgressService;
   final ValueChanged<MealTimerConfig> onConfigChanged;
   final ScreenAwakeService screenAwakeService;
+  final OrientationService orientationService;
   final MotivationAudioService? motivationAudioService;
   final DateTime Function()? now;
 
@@ -161,6 +164,7 @@ class _TimerScreenState extends State<TimerScreen> {
     _controller = MealTimerController(config: widget.config, now: widget.now);
     _controller.addListener(_handleTimerChanged);
     _controller.start();
+    unawaited(widget.orientationService.allowTimerOrientations());
     _applyScreenAwakeSetting();
   }
 
@@ -179,6 +183,7 @@ class _TimerScreenState extends State<TimerScreen> {
   void dispose() {
     _motivationVoiceTimer?.cancel();
     unawaited(_disposeMotivationAudioService());
+    unawaited(widget.orientationService.lockPortrait());
     if (_screenAwakeEnabled) {
       unawaited(widget.screenAwakeService.setEnabled(false));
     }
