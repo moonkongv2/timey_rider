@@ -38,7 +38,8 @@ class RoadView extends StatelessWidget {
   final VoidCallback? onMotivationVideoFinished;
   final bool showVehicle;
   final bool showMotivationVideo;
-  static const double _vehicleSize = 138;
+  static const double _portraitVehicleSize = 164;
+  static const double _landscapeVehicleSize = 176;
 
   @override
   Widget build(BuildContext context) {
@@ -50,10 +51,10 @@ class RoadView extends StatelessWidget {
         final isLandscape = size.width > size.height;
         final vehicleSize = math
             .min(
-              isLandscape ? 124.0 : _vehicleSize,
+              isLandscape ? _landscapeVehicleSize : _portraitVehicleSize,
               math.min(
-                size.width * (isLandscape ? 0.16 : 0.30),
-                size.height * (isLandscape ? 0.23 : 0.20),
+                size.width * (isLandscape ? 0.24 : 0.38),
+                size.height * (isLandscape ? 0.34 : 0.24),
               ),
             )
             .toDouble();
@@ -242,10 +243,12 @@ class RoadVehicleLayer extends StatelessWidget {
           final isLandscape = size.width > size.height;
           final vehicleSize = math
               .min(
-                isLandscape ? 124.0 : RoadView._vehicleSize,
+                isLandscape
+                    ? RoadView._landscapeVehicleSize
+                    : RoadView._portraitVehicleSize,
                 math.min(
-                  size.width * (isLandscape ? 0.16 : 0.30),
-                  size.height * (isLandscape ? 0.23 : 0.20),
+                  size.width * (isLandscape ? 0.24 : 0.38),
+                  size.height * (isLandscape ? 0.34 : 0.24),
                 ),
               )
               .toDouble();
