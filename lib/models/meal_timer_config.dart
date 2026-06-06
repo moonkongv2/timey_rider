@@ -60,6 +60,7 @@ class MealTimerConfig {
     required this.avatarOffsetY,
     required this.avatarRotationDegrees,
     required this.customAvatarsByVehicle,
+    this.courseIngredientIds = const [],
   });
 
   factory MealTimerConfig.defaults() {
@@ -79,6 +80,7 @@ class MealTimerConfig {
       avatarOffsetY: 0.0,
       avatarRotationDegrees: 0.0,
       customAvatarsByVehicle: {},
+      courseIngredientIds: [],
     );
   }
 
@@ -97,6 +99,7 @@ class MealTimerConfig {
   final double avatarOffsetY;
   final double avatarRotationDegrees;
   final Map<String, VehicleAvatarConfig> customAvatarsByVehicle;
+  final List<String> courseIngredientIds;
 
   MealTimerConfig copyWith({
     Duration? duration,
@@ -114,6 +117,7 @@ class MealTimerConfig {
     double? avatarOffsetY,
     double? avatarRotationDegrees,
     Map<String, VehicleAvatarConfig>? customAvatarsByVehicle,
+    List<String>? courseIngredientIds,
   }) {
     final nextAvatarMode = avatarMode ?? this.avatarMode;
     final nextCustomAvatarImagePath =
@@ -163,6 +167,9 @@ class MealTimerConfig {
       avatarOffsetY: nextAvatarOffsetY,
       avatarRotationDegrees: nextAvatarRotationDegrees,
       customAvatarsByVehicle: Map.unmodifiable(nextCustomAvatarsByVehicle),
+      courseIngredientIds: List.unmodifiable(
+        courseIngredientIds ?? this.courseIngredientIds,
+      ),
     );
   }
 

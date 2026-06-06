@@ -9,6 +9,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:jy_yamyam/catalogs/avatar_prompt_catalog.dart';
+import 'package:jy_yamyam/catalogs/meal_ingredient_catalog.dart';
 import 'package:jy_yamyam/catalogs/motivation_asset_catalog.dart';
 import 'package:jy_yamyam/catalogs/vehicle_catalog.dart';
 import 'package:jy_yamyam/l10n/app_texts.dart';
@@ -54,7 +55,89 @@ void main() {
     expect(config.avatarOffsetY, 0.0);
     expect(config.avatarRotationDegrees, 0.0);
     expect(config.customAvatarsByVehicle, isEmpty);
+    expect(config.courseIngredientIds, isEmpty);
   });
+
+  test('Meal ingredient catalog has non-empty unique ids', () {
+    final ids = MealIngredientCatalog.all
+        .map((ingredient) => ingredient.id)
+        .toList();
+
+    expect(ids, isNotEmpty);
+    expect(ids.every((id) => id.trim().isNotEmpty), isTrue);
+    expect(ids.toSet(), hasLength(ids.length));
+  });
+
+  test('Meal ingredient random selection returns valid ids', () {
+    final ids = MealIngredientCatalog.randomSelectionIds();
+
+    expect(ids, isNotEmpty);
+    expect(ids, hasLength(5));
+    for (final id in ids) {
+      expect(MealIngredientCatalog.findById(id), isNotNull);
+    }
+  });
+
+  test('Meal ingredient course slots returns exactly 30 ingredients', () {
+    final slots = MealIngredientCatalog.courseSlotsFor(['carrot', 'egg']);
+
+    expect(slots, hasLength(30));
+  });
+
+  test('Meal ingredient course slots only uses selected ids', () {
+    const selectedIds = ['egg', 'rice', 'tomato'];
+    final slots = MealIngredientCatalog.courseSlotsFor(selectedIds);
+
+    expect(slots.map((ingredient) => ingredient.id).toSet(), {
+      'egg',
+      'rice',
+      'tomato',
+    });
+  });
+
+  test('Meal ingredient course slots fall back for invalid selected ids', () {
+    final slots = MealIngredientCatalog.courseSlotsFor(['missing']);
+
+    expect(
+      slots.map((ingredient) => ingredient.id).toSet(),
+      MealIngredientCatalog.defaultSelectionIds.toSet(),
+    );
+  });
+
+  test(
+    'Meal ingredient course slots avoids 3 consecutive identical ids when possible',
+    () {
+      final slots = MealIngredientCatalog.courseSlotsFor([
+        'carrot',
+        'carrot',
+        'egg',
+      ]);
+
+      for (var index = 2; index < slots.length; index += 1) {
+        expect(
+          slots[index].id == slots[index - 1].id &&
+              slots[index].id == slots[index - 2].id,
+          isFalse,
+        );
+      }
+    },
+  );
+
+  test(
+    'MealTimerConfig copyWith preserves and updates course ingredient ids',
+    () {
+      final config = MealTimerConfig.defaults().copyWith(
+        courseIngredientIds: const ['carrot', 'egg'],
+      );
+      final preservedConfig = config.copyWith(vehicleId: 'bus');
+      final updatedConfig = config.copyWith(
+        courseIngredientIds: const ['rice', 'tomato'],
+      );
+
+      expect(preservedConfig.courseIngredientIds, ['carrot', 'egg']);
+      expect(updatedConfig.courseIngredientIds, ['rice', 'tomato']);
+    },
+  );
 
   test('Local settings saves and loads avatar settings', () async {
     SharedPreferences.setMockInitialValues({});
@@ -71,6 +154,7 @@ void main() {
         avatarOffsetX: 8.0,
         avatarOffsetY: -6.0,
         avatarRotationDegrees: 12.0,
+        courseIngredientIds: const ['carrot', 'egg'],
       ),
     );
 
@@ -86,6 +170,8 @@ void main() {
     expect(loadedConfig.avatarOffsetX, 8.0);
     expect(loadedConfig.avatarOffsetY, -6.0);
     expect(loadedConfig.avatarRotationDegrees, 12.0);
+    expect(loadedConfig.courseIngredientIds, isEmpty);
+    expect(preferences.getStringList('courseIngredientIds'), isNull);
     final policeCarAvatar = loadedConfig.customAvatarConfigForVehicle(
       'police_car',
     );
