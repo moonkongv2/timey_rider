@@ -20,7 +20,7 @@ class EnTimerTexts implements TimerTextSet {
   String get exitDialogConfirmButton => 'Leave';
   String get pauseButton => 'Pause';
   String get completeMealButton => 'Meal done';
-  String get runningArrivalLabel => 'Until arrival';
+  String get runningArrivalLabel => 'Mealtime left';
   String get pausedTimeLabel => 'Taking a break';
   String get arrivedTimeLabel => 'Arrived';
   String get idleTimeLabel => 'Getting ready';

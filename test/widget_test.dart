@@ -1711,7 +1711,7 @@ void main() {
     await tester.pump();
 
     expect(find.textContaining('남은 시간'), findsNothing);
-    expect(find.text('도착까지'), findsNothing);
+    expect(find.text('남은 식사 시간'), findsNothing);
   });
 
   testWidgets('Settings screen shows avatar settings entry', (tester) async {
@@ -2924,7 +2924,7 @@ void main() {
 
     expect(find.text("Today's Yamyam Ride"), findsOneWidget);
     expect(find.text("We're off!"), findsOneWidget);
-    expect(find.text('Until arrival'), findsOneWidget);
+    expect(find.text('Mealtime left'), findsOneWidget);
     expect(find.text('출발했어요!'), findsNothing);
   });
 

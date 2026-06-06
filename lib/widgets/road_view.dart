@@ -101,12 +101,12 @@ class RoadView extends StatelessWidget {
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
               colors: [
+                AppColors.white.withValues(alpha: 0.96),
                 AppColors.surfaceWarm,
-                AppColors.surfaceBlue.withValues(alpha: 0.44),
-                AppColors.surfacePink.withValues(alpha: 0.34),
-                AppColors.cream,
+                AppColors.surfaceBlue.withValues(alpha: 0.18),
+                AppColors.cream.withValues(alpha: 0.92),
               ],
-              stops: const [0, 0.48, 0.78, 1],
+              stops: const [0, 0.5, 0.78, 1],
             ),
             border: Border.all(
               color: AppColors.white.withValues(alpha: 0.72),
