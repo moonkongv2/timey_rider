@@ -51,6 +51,45 @@ abstract interface class HomeTextSet {
   );
 }
 
+abstract interface class AvatarSetupTextSet {
+  String get title;
+  String get intro;
+  String get selectedVehicleTitle;
+  String get currentAvatarModeTitle;
+  String get defaultImageMode;
+  String get customAvatarMode;
+  String get copyPromptMessage;
+  String get avatarSaveFailureMessage;
+  String get avatarSavedMessage;
+  String get defaultImageSavedMessage;
+  String get missingAvatarWarning;
+  String get vehicleSelectionTitle;
+  String get vehicleSelectionSubtitle;
+  String get compositePreviewTitle;
+  String get compositePreviewSubtitle;
+  String get defaultPreviewTitle;
+  String get useDefaultImageButton;
+  String get adjustmentTitle;
+  String get faceSizeLabel;
+  String get horizontalPositionLabel;
+  String get verticalPositionLabel;
+  String get rotationLabel;
+  String get resetPositionButton;
+  String get adjustmentUnavailable;
+  String get confirmAvatarButton;
+  String get guideTitle;
+  List<String> get guideItems;
+  String get promptCopyTitle;
+  String get copyPromptButton;
+  String get uploadTitle;
+  String get uploadInstructions;
+  String get uploadingButton;
+  String get reuploadButton;
+  String get uploadButton;
+  String get selectedImageFallback;
+  String get privacyNote;
+}
+
 abstract interface class MealHistoryTextSet {
   String get title;
   String get emptyTitle;

@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 
 import '../catalogs/avatar_prompt_catalog.dart';
 import '../catalogs/vehicle_catalog.dart';
+import '../l10n/app_texts.dart';
 import '../models/meal_timer_config.dart';
 import '../models/vehicle.dart';
 import '../models/vehicle_avatar_presentation.dart';
@@ -46,14 +47,6 @@ class _AvatarSetupScreenState extends State<AvatarSetupScreen> {
     widget.config,
   ).rotationDegrees;
   bool _isUploadingAvatar = false;
-  static const _guideItems = [
-    '아이 얼굴이 잘 보이는 정면 사진을 사용해 주세요.',
-    '얼굴이 크고 선명할수록 좋아요.',
-    '모자, 마스크, 손 등으로 얼굴이 많이 가려진 사진은 피해주세요.',
-    '생성 결과는 정사각형 1:1 이미지가 좋아요.',
-    '배경은 투명하거나 단순한 배경이면 좋아요.',
-    '텍스트, 로고, 워터마크는 없어야 해요.',
-  ];
 
   @override
   void didUpdateWidget(covariant AvatarSetupScreen oldWidget) {
@@ -135,10 +128,11 @@ class _AvatarSetupScreenState extends State<AvatarSetupScreen> {
     return _config.avatarPresentationForVehicle(vehicleId);
   }
 
-  String get _avatarModeLabel {
+  String _avatarModeLabel(BuildContext context) {
+    final texts = AppTexts.of(context).avatarSetup;
     return switch (_avatarMode) {
-      AvatarImageMode.defaultImage => '기본 이미지 사용',
-      AvatarImageMode.custom => '직접 만든 아바타 사용',
+      AvatarImageMode.defaultImage => texts.defaultImageMode,
+      AvatarImageMode.custom => texts.customAvatarMode,
     };
   }
 
@@ -164,7 +158,9 @@ class _AvatarSetupScreenState extends State<AvatarSetupScreen> {
       return;
     }
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('프롬프트를 복사했어요. 외부 AI 서비스에 붙여넣어 사용해 주세요.')),
+      SnackBar(
+        content: Text(AppTexts.of(context).avatarSetup.copyPromptMessage),
+      ),
     );
   }
 
@@ -194,9 +190,13 @@ class _AvatarSetupScreenState extends State<AvatarSetupScreen> {
       if (!mounted) {
         return;
       }
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('아바타 이미지를 저장하지 못했어요.')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            AppTexts.of(context).avatarSetup.avatarSaveFailureMessage,
+          ),
+        ),
+      );
     } finally {
       if (mounted) {
         setState(() => _isUploadingAvatar = false);
@@ -241,9 +241,11 @@ class _AvatarSetupScreenState extends State<AvatarSetupScreen> {
         customAvatarsByVehicle: nextAvatarsByVehicle,
       ),
     );
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(const SnackBar(content: Text('아바타를 저장했어요.')));
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(AppTexts.of(context).avatarSetup.avatarSavedMessage),
+      ),
+    );
   }
 
   void _useDefaultAvatarImage() {
@@ -265,9 +267,13 @@ class _AvatarSetupScreenState extends State<AvatarSetupScreen> {
         customAvatarsByVehicle: nextAvatarsByVehicle,
       ),
     );
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(const SnackBar(content: Text('기본 이미지로 변경했어요.')));
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          AppTexts.of(context).avatarSetup.defaultImageSavedMessage,
+        ),
+      ),
+    );
   }
 
   void _handleVehicleSelected(String vehicleId) {
@@ -291,6 +297,7 @@ class _AvatarSetupScreenState extends State<AvatarSetupScreen> {
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
+    final texts = AppTexts.of(context).avatarSetup;
     final vehicle = VehicleCatalog.findById(_config.vehicleId);
     final vehicleLabel = vehicle.labelForLanguage(
       Localizations.localeOf(context).languageCode,
@@ -314,7 +321,7 @@ class _AvatarSetupScreenState extends State<AvatarSetupScreen> {
     return Scaffold(
       backgroundColor: AppColors.cream,
       appBar: AppBar(
-        title: const Text('우리 아이 아바타 만들기'),
+        title: Text(texts.title),
         backgroundColor: AppColors.cream,
         foregroundColor: AppColors.brown900,
         elevation: 0,
@@ -329,7 +336,7 @@ class _AvatarSetupScreenState extends State<AvatarSetupScreen> {
           ),
           children: [
             Text(
-              '외부 AI 서비스에서 아이 사진을 귀여운 라이더 캐릭터로 만든 뒤 업로드해 주세요.',
+              texts.intro,
               style: textTheme.bodyLarge?.copyWith(
                 color: AppColors.textPrimary,
                 fontWeight: FontWeight.w700,
@@ -338,26 +345,26 @@ class _AvatarSetupScreenState extends State<AvatarSetupScreen> {
             ),
             const SizedBox(height: AppSpacing.xl),
             _AvatarInfoCard(
-              title: '현재 선택한 차량',
+              title: texts.selectedVehicleTitle,
               value: vehicleLabel,
               icon: Icons.directions_car_filled_rounded,
             ),
             const SizedBox(height: AppSpacing.md),
             _AvatarInfoCard(
-              title: '현재 아바타 모드',
-              value: _avatarModeLabel,
+              title: texts.currentAvatarModeTitle,
+              value: _avatarModeLabel(context),
               icon: Icons.face_rounded,
             ),
             const SizedBox(height: AppSpacing.xl),
             SegmentedButton<AvatarImageMode>(
-              segments: const [
+              segments: [
                 ButtonSegment(
                   value: AvatarImageMode.defaultImage,
-                  label: Text('기본 이미지 사용'),
+                  label: Text(texts.defaultImageMode),
                 ),
                 ButtonSegment(
                   value: AvatarImageMode.custom,
-                  label: Text('직접 만든 아바타 사용'),
+                  label: Text(texts.customAvatarMode),
                 ),
               ],
               selected: {_avatarMode},
@@ -376,9 +383,7 @@ class _AvatarSetupScreenState extends State<AvatarSetupScreen> {
               ),
               const SizedBox(height: AppSpacing.md),
               if (shouldShowMissingAvatarWarning) ...[
-                const _AvatarWarningCard(
-                  message: '아바타 이미지를 찾을 수 없어 기본 이미지로 보여드려요.',
-                ),
+                _AvatarWarningCard(message: texts.missingAvatarWarning),
                 const SizedBox(height: AppSpacing.md),
               ],
               if (shouldShowCompositePreview) ...[
@@ -421,8 +426,8 @@ class _AvatarSetupScreenState extends State<AvatarSetupScreen> {
             ],
             const SizedBox(height: AppSpacing.xl),
             VehicleSelectionCard(
-              title: '아바타를 태울 차량',
-              subtitle: '프롬프트 기준',
+              title: texts.vehicleSelectionTitle,
+              subtitle: texts.vehicleSelectionSubtitle,
               selectedVehicleId: _config.vehicleId,
               onVehicleSelected: _handleVehicleSelected,
               avatar: currentEditingAvatar,
@@ -430,7 +435,7 @@ class _AvatarSetupScreenState extends State<AvatarSetupScreen> {
             ),
             if (_avatarMode == AvatarImageMode.custom) ...[
               const SizedBox(height: AppSpacing.xl),
-              const _AvatarGuideCard(items: _guideItems),
+              _AvatarGuideCard(items: texts.guideItems),
               const SizedBox(height: AppSpacing.md),
               _AvatarPromptCard(
                 prompt: prompt,
@@ -440,8 +445,8 @@ class _AvatarSetupScreenState extends State<AvatarSetupScreen> {
               const _AvatarPrivacyNoteCard(),
               const SizedBox(height: AppSpacing.md),
               if (!shouldShowCompositePreview)
-                const _AvatarSetupStepCard(
-                  title: '합성 미리보기',
+                _AvatarSetupStepCard(
+                  title: texts.compositePreviewTitle,
                   icon: Icons.preview_rounded,
                 ),
             ],
@@ -464,6 +469,7 @@ class _AvatarCompositePreviewCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
+    final texts = AppTexts.of(context).avatarSetup;
 
     return DecoratedBox(
       decoration: BoxDecoration(
@@ -483,7 +489,7 @@ class _AvatarCompositePreviewCard extends StatelessWidget {
                 const SizedBox(width: AppSpacing.sm),
                 Expanded(
                   child: Text(
-                    '합성 미리보기',
+                    texts.compositePreviewTitle,
                     style: textTheme.titleMedium?.copyWith(
                       color: AppColors.textStrong,
                       fontWeight: FontWeight.w800,
@@ -494,7 +500,7 @@ class _AvatarCompositePreviewCard extends StatelessWidget {
             ),
             const SizedBox(height: AppSpacing.xs),
             Text(
-              '이 모습으로 냠냠라이더를 탈까요?',
+              texts.compositePreviewSubtitle,
               style: textTheme.bodyMedium?.copyWith(
                 color: AppColors.textPrimary,
                 fontWeight: FontWeight.w600,
@@ -527,6 +533,7 @@ class _DefaultAvatarPreviewCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
+    final texts = AppTexts.of(context).avatarSetup;
 
     return DecoratedBox(
       decoration: BoxDecoration(
@@ -546,7 +553,7 @@ class _DefaultAvatarPreviewCard extends StatelessWidget {
                 const SizedBox(width: AppSpacing.sm),
                 Expanded(
                   child: Text(
-                    '기본 이미지 미리보기',
+                    texts.defaultPreviewTitle,
                     style: textTheme.titleMedium?.copyWith(
                       color: AppColors.textStrong,
                       fontWeight: FontWeight.w800,
@@ -568,7 +575,7 @@ class _DefaultAvatarPreviewCard extends StatelessWidget {
               key: const ValueKey('avatarUseDefaultButton'),
               onPressed: onUseDefaultPressed,
               icon: const Icon(Icons.image_rounded),
-              label: const Text('기본 이미지로 사용하기'),
+              label: Text(texts.useDefaultImageButton),
             ),
           ],
         ),
@@ -646,6 +653,7 @@ class _AvatarAdjustmentCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
+    final texts = AppTexts.of(context).avatarSetup;
 
     return DecoratedBox(
       decoration: BoxDecoration(
@@ -665,7 +673,7 @@ class _AvatarAdjustmentCard extends StatelessWidget {
                 const SizedBox(width: AppSpacing.sm),
                 Expanded(
                   child: Text(
-                    '아바타 위치 조정',
+                    texts.adjustmentTitle,
                     style: textTheme.titleMedium?.copyWith(
                       color: AppColors.textStrong,
                       fontWeight: FontWeight.w800,
@@ -677,7 +685,7 @@ class _AvatarAdjustmentCard extends StatelessWidget {
             if (hasImagePath) ...[
               const SizedBox(height: AppSpacing.md),
               _AvatarAdjustmentSlider(
-                label: '얼굴 크기',
+                label: texts.faceSizeLabel,
                 value: avatarScale,
                 min: 0.7,
                 max: 2.0,
@@ -686,7 +694,7 @@ class _AvatarAdjustmentCard extends StatelessWidget {
                 onChanged: onScaleChanged,
               ),
               _AvatarAdjustmentSlider(
-                label: '좌우 위치',
+                label: texts.horizontalPositionLabel,
                 value: avatarOffsetX,
                 min: -0.2,
                 max: 0.2,
@@ -695,7 +703,7 @@ class _AvatarAdjustmentCard extends StatelessWidget {
                 onChanged: onOffsetXChanged,
               ),
               _AvatarAdjustmentSlider(
-                label: '위아래 위치',
+                label: texts.verticalPositionLabel,
                 value: avatarOffsetY,
                 min: -0.2,
                 max: 0.2,
@@ -704,7 +712,7 @@ class _AvatarAdjustmentCard extends StatelessWidget {
                 onChanged: onOffsetYChanged,
               ),
               _AvatarAdjustmentSlider(
-                label: '기울기',
+                label: texts.rotationLabel,
                 value: avatarRotationDegrees,
                 min: -15,
                 max: 15,
@@ -717,12 +725,12 @@ class _AvatarAdjustmentCard extends StatelessWidget {
                 key: const ValueKey('avatarResetButton'),
                 onPressed: onResetPressed,
                 icon: const Icon(Icons.restart_alt_rounded),
-                label: const Text('위치 초기화'),
+                label: Text(texts.resetPositionButton),
               ),
             ] else ...[
               const SizedBox(height: AppSpacing.md),
               Text(
-                '아바타 이미지를 업로드하면 얼굴 크기와 위치를 조정할 수 있어요.',
+                texts.adjustmentUnavailable,
                 style: textTheme.bodyMedium?.copyWith(
                   color: AppColors.textPrimary,
                   fontWeight: FontWeight.w600,
@@ -735,14 +743,14 @@ class _AvatarAdjustmentCard extends StatelessWidget {
               key: const ValueKey('avatarConfirmButton'),
               onPressed: onConfirmPressed,
               icon: const Icon(Icons.check_circle_rounded),
-              label: const Text('이 아바타로 사용하기'),
+              label: Text(texts.confirmAvatarButton),
             ),
             const SizedBox(height: AppSpacing.sm),
             TextButton.icon(
               key: const ValueKey('avatarUseDefaultButton'),
               onPressed: onUseDefaultPressed,
               icon: const Icon(Icons.image_rounded),
-              label: const Text('기본 이미지로 사용하기'),
+              label: Text(texts.useDefaultImageButton),
             ),
           ],
         ),
@@ -805,6 +813,7 @@ class _AvatarGuideCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
+    final texts = AppTexts.of(context).avatarSetup;
 
     return DecoratedBox(
       decoration: BoxDecoration(
@@ -827,7 +836,7 @@ class _AvatarGuideCard extends StatelessWidget {
                 const SizedBox(width: AppSpacing.sm),
                 Expanded(
                   child: Text(
-                    '이미지 생성 가이드',
+                    texts.guideTitle,
                     style: textTheme.titleMedium?.copyWith(
                       color: AppColors.textStrong,
                       fontWeight: FontWeight.w800,
@@ -896,6 +905,7 @@ class _AvatarPromptCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
+    final texts = AppTexts.of(context).avatarSetup;
 
     return DecoratedBox(
       decoration: BoxDecoration(
@@ -918,7 +928,7 @@ class _AvatarPromptCard extends StatelessWidget {
                 const SizedBox(width: AppSpacing.sm),
                 Expanded(
                   child: Text(
-                    '프롬프트 복사',
+                    texts.promptCopyTitle,
                     style: textTheme.titleMedium?.copyWith(
                       color: AppColors.textStrong,
                       fontWeight: FontWeight.w800,
@@ -951,7 +961,7 @@ class _AvatarPromptCard extends StatelessWidget {
             FilledButton.icon(
               onPressed: onCopyPressed,
               icon: const Icon(Icons.content_copy_rounded),
-              label: const Text('프롬프트 복사하기'),
+              label: Text(texts.copyPromptButton),
             ),
           ],
         ),
@@ -976,6 +986,7 @@ class _AvatarUploadCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
+    final texts = AppTexts.of(context).avatarSetup;
 
     return DecoratedBox(
       decoration: BoxDecoration(
@@ -998,7 +1009,7 @@ class _AvatarUploadCard extends StatelessWidget {
                 const SizedBox(width: AppSpacing.sm),
                 Expanded(
                   child: Text(
-                    '아바타 이미지 업로드',
+                    texts.uploadTitle,
                     style: textTheme.titleMedium?.copyWith(
                       color: AppColors.textStrong,
                       fontWeight: FontWeight.w800,
@@ -1012,8 +1023,7 @@ class _AvatarUploadCard extends StatelessWidget {
               _AvatarImagePreview(imagePath: imagePath!)
             else
               Text(
-                '생성형 AI에서 만든 정사각형 아바타 이미지를 업로드해 주세요.\n'
-                '얼굴이 중앙에 있고 배경이 단순할수록 좋아요.',
+                texts.uploadInstructions,
                 style: textTheme.bodyMedium?.copyWith(
                   color: AppColors.textPrimary,
                   fontWeight: FontWeight.w600,
@@ -1030,10 +1040,10 @@ class _AvatarUploadCard extends StatelessWidget {
               ),
               label: Text(
                 isUploading
-                    ? '업로드 중'
+                    ? texts.uploadingButton
                     : _hasImagePath
-                    ? '다시 업로드'
-                    : '아바타 이미지 업로드',
+                    ? texts.reuploadButton
+                    : texts.uploadButton,
               ),
             ),
           ],
@@ -1066,7 +1076,7 @@ class _AvatarImagePreview extends StatelessWidget {
             errorBuilder: (context, error, stackTrace) {
               return Center(
                 child: Text(
-                  '선택한 아바타 이미지',
+                  AppTexts.of(context).avatarSetup.selectedImageFallback,
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     color: AppColors.textPrimary,
                     fontWeight: FontWeight.w700,
@@ -1101,9 +1111,7 @@ class _AvatarPrivacyNoteCard extends StatelessWidget {
             const SizedBox(width: AppSpacing.md),
             Expanded(
               child: Text(
-                '앱이 직접 AI 이미지를 생성하거나 아이 사진을 업로드하지는 않아요.\n'
-                '사용자가 선택한 외부 AI 서비스에서 이미지를 만든 뒤, 완성된 아바타 이미지만 냠냠라이더에 업로드해 주세요.\n'
-                '외부 서비스 이용 전 사진/개인정보 처리 방침을 확인해 주세요.',
+                AppTexts.of(context).avatarSetup.privacyNote,
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                   color: AppColors.textPrimary,
                   fontWeight: FontWeight.w600,

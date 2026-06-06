@@ -895,6 +895,27 @@ void main() {
     expect(find.text('프롬프트 복사하기'), findsOneWidget);
   });
 
+  testWidgets('English locale shows English avatar setup copy', (tester) async {
+    await _pumpAvatarSetupScreen(
+      tester,
+      MealTimerConfig.defaults(),
+      locale: const Locale('en'),
+    );
+
+    expect(find.text("Create Your Child's Avatar"), findsOneWidget);
+    expect(find.text('우리 아이 아바타 만들기'), findsNothing);
+    expect(find.text('Selected vehicle'), findsOneWidget);
+    expect(find.text('Default image preview'), findsOneWidget);
+
+    await tester.tap(find.text('Use custom avatar'));
+    await tester.pump();
+
+    await _scrollAvatarPromptIntoView(tester);
+    expect(find.text('Image generation guide'), findsOneWidget);
+    expect(find.text('Copy prompt'), findsWidgets);
+    expect(find.text('프롬프트 복사'), findsNothing);
+  });
+
   testWidgets('Avatar setup fire truck prompt includes firefighter guidance', (
     tester,
   ) async {
@@ -2924,13 +2945,14 @@ Future<void> _startApp(
 Future<void> _pumpAvatarSetupScreen(
   WidgetTester tester,
   MealTimerConfig config, {
+  Locale locale = const Locale('ko'),
   ValueChanged<MealTimerConfig>? onConfigChanged,
   AvatarImagePicker? imagePicker,
   LocalAvatarImageService? avatarImageService,
 }) async {
   await tester.pumpWidget(
     MaterialApp(
-      locale: const Locale('ko'),
+      locale: locale,
       supportedLocales: const [Locale('ko'), Locale('en')],
       localizationsDelegates: const [
         GlobalMaterialLocalizations.delegate,
