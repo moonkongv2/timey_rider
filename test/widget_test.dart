@@ -31,6 +31,7 @@ import 'package:jy_yamyam/services/local_avatar_image_service.dart';
 import 'package:jy_yamyam/services/local_meal_progress_service.dart';
 import 'package:jy_yamyam/services/local_settings_service.dart';
 import 'package:jy_yamyam/services/motivation_audio_service.dart';
+import 'package:jy_yamyam/services/orientation_service.dart';
 import 'package:jy_yamyam/services/screen_awake_service.dart';
 import 'package:jy_yamyam/widgets/app/app_bouncy_button.dart';
 import 'package:jy_yamyam/widgets/avatar/avatar_composite_preview.dart';
@@ -2141,6 +2142,34 @@ void main() {
     expect(tester.getSize(find.byType(RoadView)), roadSize);
   });
 
+  testWidgets('Timer screen allows landscape only while mounted', (
+    tester,
+  ) async {
+    final orientationService = _FakeOrientationService();
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: TimerScreen(
+          config: MealTimerConfig.defaults(),
+          mealProgressService: LocalMealProgressService(),
+          onConfigChanged: (_) {},
+          orientationService: orientationService,
+        ),
+      ),
+    );
+    await tester.pump();
+
+    expect(orientationService.calls, ['allowTimerOrientations']);
+
+    await tester.pumpWidget(const SizedBox.shrink());
+    await tester.pump();
+
+    expect(orientationService.calls, [
+      'allowTimerOrientations',
+      'lockPortrait',
+    ]);
+  });
+
   testWidgets('Timer screen keeps screen awake only when setting is enabled', (
     tester,
   ) async {
@@ -3211,6 +3240,20 @@ class _FakeScreenAwakeService implements ScreenAwakeService {
   @override
   Future<void> setEnabled(bool enabled) async {
     enabledValues.add(enabled);
+  }
+}
+
+class _FakeOrientationService implements OrientationService {
+  final List<String> calls = [];
+
+  @override
+  Future<void> lockPortrait() async {
+    calls.add('lockPortrait');
+  }
+
+  @override
+  Future<void> allowTimerOrientations() async {
+    calls.add('allowTimerOrientations');
   }
 }
 
