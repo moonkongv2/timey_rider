@@ -1389,7 +1389,9 @@ void main() {
     expect(find.text('도착까지'), findsNothing);
   });
 
-  testWidgets('Settings screen shows avatar settings entry', (tester) async {
+  testWidgets('Settings screen keeps vehicle and avatar actions on home', (
+    tester,
+  ) async {
     SharedPreferences.setMockInitialValues({});
 
     await _startApp(tester, const Locale('ko'));
@@ -1399,14 +1401,14 @@ void main() {
     await tester.drag(find.byType(ListView), const Offset(0, -700));
     await tester.pumpAndSettle();
 
-    expect(find.text('아바타 설정'), findsOneWidget);
-    expect(find.text('기본 이미지 사용 중'), findsOneWidget);
-    expect(find.text('아바타 설정하기'), findsOneWidget);
+    expect(find.text('아바타 설정'), findsNothing);
+    expect(find.text('기본 이미지 사용 중'), findsNothing);
+    expect(find.text('아바타 설정하기'), findsNothing);
     expect(find.text('빠방 고르기'), findsNothing);
     expect(_vehicleChoiceFinder('motorcycle'), findsNothing);
   });
 
-  testWidgets('Settings screen shows custom avatar state when active', (
+  testWidgets('Settings screen hides custom avatar state when active', (
     tester,
   ) async {
     final avatarFile = _createTemporaryAvatarImage();
@@ -1434,8 +1436,8 @@ void main() {
     await tester.drag(find.byType(ListView), const Offset(0, -700));
     await tester.pumpAndSettle();
 
-    expect(find.text('아바타 설정'), findsOneWidget);
-    expect(find.text('직접 만든 아바타 사용 중'), findsOneWidget);
+    expect(find.text('아바타 설정'), findsNothing);
+    expect(find.text('직접 만든 아바타 사용 중'), findsNothing);
     expect(find.text('빠방 고르기'), findsNothing);
     expect(find.byType(VehicleSelectionCard), findsNothing);
   });

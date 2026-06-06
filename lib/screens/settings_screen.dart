@@ -1,12 +1,8 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 
 import '../catalogs/meal_course_catalog.dart';
 import '../l10n/app_texts.dart';
 import '../models/meal_timer_config.dart';
-import '../models/vehicle_avatar_presentation.dart';
-import 'avatar_setup_screen.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({
@@ -63,28 +59,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
-  Future<void> _openAvatarSetup() async {
-    await Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (_) =>
-            AvatarSetupScreen(config: _config, onConfigChanged: _update),
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     final texts = AppTexts.of(context);
-    final vehicleAvatar = _config.avatarPresentationForVehicle(
-      _config.vehicleId,
-    );
-    final isUsingCustomAvatar =
-        vehicleAvatar.isCustom &&
-        vehicleAvatar.imagePath != null &&
-        File(vehicleAvatar.imagePath!).existsSync();
-    final avatarStateText = isUsingCustomAvatar
-        ? texts.settings.avatarCustomState
-        : texts.settings.avatarDefaultState;
 
     return Scaffold(
       appBar: AppBar(title: Text(texts.settings.title)),
@@ -194,30 +171,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         ),
                       );
                     },
-                  ),
-                ],
-              ),
-            ),
-          ),
-          const SizedBox(height: 20),
-          Card(
-            child: Padding(
-              padding: const EdgeInsets.all(20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Text(
-                    texts.settings.avatarSettingsTitle,
-                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                      fontWeight: FontWeight.w900,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(avatarStateText),
-                  const SizedBox(height: 12),
-                  FilledButton(
-                    onPressed: _openAvatarSetup,
-                    child: Text(texts.settings.avatarSettingsButton),
                   ),
                 ],
               ),
