@@ -82,26 +82,30 @@ class _MealIngredientPickerSheetState extends State<MealIngredientPickerSheet> {
     final texts = AppTexts.of(context).mealIngredient;
     final textTheme = Theme.of(context).textTheme;
     final maxCount = MealIngredientCatalog.maxSelectableIngredientCount;
+    final mediaQuery = MediaQuery.of(context);
 
-    return SafeArea(
-      top: false,
-      child: Align(
-        alignment: Alignment.bottomCenter,
-        child: DecoratedBox(
-          decoration: BoxDecoration(
-            color: AppColors.surfaceWarm,
-            borderRadius: const BorderRadius.vertical(
-              top: Radius.circular(AppRadius.xxl),
-            ),
-            border: Border.all(color: AppColors.borderWarm),
-            boxShadow: AppShadows.hero,
+    return Align(
+      alignment: Alignment.bottomCenter,
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          color: AppColors.surfaceWarm,
+          borderRadius: const BorderRadius.vertical(
+            top: Radius.circular(AppRadius.xxl),
           ),
+          border: Border.all(color: AppColors.borderWarm),
+          boxShadow: AppShadows.hero,
+        ),
+        child: SafeArea(
+          top: false,
+          bottom: false,
           child: Padding(
             padding: EdgeInsets.fromLTRB(
               AppSpacing.xl,
               AppSpacing.sm,
               AppSpacing.xl,
-              AppSpacing.xl + MediaQuery.viewInsetsOf(context).bottom,
+              AppSpacing.xl +
+                  mediaQuery.padding.bottom +
+                  mediaQuery.viewInsets.bottom,
             ),
             child: SingleChildScrollView(
               child: Column(

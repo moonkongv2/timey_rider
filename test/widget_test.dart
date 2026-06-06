@@ -2008,6 +2008,91 @@ void main() {
     );
   });
 
+  testWidgets('RoadView with 30 ingredients renders 30 ingredient markers', (
+    tester,
+  ) async {
+    final ingredients = MealIngredientCatalog.courseSlotsFor(['carrot', 'egg']);
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: SizedBox(
+            width: 420,
+            height: 640,
+            child: RoadView(
+              progress: 0,
+              vehicle: VehicleCatalog.fireTruck,
+              ingredients: ingredients,
+            ),
+          ),
+        ),
+      ),
+    );
+
+    for (var index = 0; index < ingredients.length; index += 1) {
+      expect(
+        find.byKey(ValueKey('roadIngredientMarker_$index')),
+        findsOneWidget,
+      );
+    }
+  });
+
+  testWidgets('RoadView at progress 1 hides ingredient markers', (
+    tester,
+  ) async {
+    final ingredients = MealIngredientCatalog.courseSlotsFor(['carrot', 'egg']);
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: SizedBox(
+            width: 420,
+            height: 640,
+            child: RoadView(
+              progress: 0,
+              vehicle: VehicleCatalog.fireTruck,
+              ingredients: ingredients,
+            ),
+          ),
+        ),
+      ),
+    );
+
+    expect(
+      find.byKey(const ValueKey('roadIngredientMarker_0')),
+      findsOneWidget,
+    );
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: SizedBox(
+            width: 420,
+            height: 640,
+            child: RoadView(
+              progress: 1,
+              vehicle: VehicleCatalog.fireTruck,
+              ingredients: ingredients,
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    for (var index = 0; index < ingredients.length; index += 1) {
+      expect(find.byKey(ValueKey('roadIngredientMarker_$index')), findsNothing);
+    }
+  });
+
+  test('RoadPainter roadStrokeWidthForSize stays within expected clamps', () {
+    expect(roadStrokeWidthForSize(const Size(100, 640)), 22);
+    expect(roadStrokeWidthForSize(const Size(1000, 1200)), 32);
+    expect(roadStrokeWidthForSize(const Size(1200, 100)), 30);
+    expect(roadStrokeWidthForSize(const Size(1200, 900)), 44);
+    expect(roadStrokeWidthForSize(const Size(420, 640)), closeTo(24.36, 0.01));
+  });
+
   testWidgets('Road view renders custom avatar overlay from local file', (
     tester,
   ) async {
@@ -2246,6 +2331,32 @@ void main() {
     expect(roadView.avatar.offsetX, 0.11);
     expect(roadView.avatar.offsetY, -0.07);
     expect(roadView.avatar.rotationDegrees, 9.0);
+  });
+
+  testWidgets('TimerScreen passes course ingredient ids to road ingredients', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        locale: const Locale('ko'),
+        home: TimerScreen(
+          config: MealTimerConfig.defaults().copyWith(
+            courseIngredientIds: const ['carrot', 'egg'],
+          ),
+          mealProgressService: LocalMealProgressService(),
+          onConfigChanged: (_) {},
+        ),
+      ),
+    );
+    await tester.pump();
+
+    final roadView = tester.widget<RoadView>(find.byType(RoadView));
+    expect(roadView.ingredients, hasLength(30));
+    expect(roadView.ingredients.map((ingredient) => ingredient.id).toSet(), {
+      'carrot',
+      'egg',
+    });
+    expect(tester.takeException(), isNull);
   });
 
   testWidgets('Timer screen plays motivation voice after video starts', (

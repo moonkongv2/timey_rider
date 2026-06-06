@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
 
 import '../l10n/app_texts.dart';
+import '../models/meal_ingredient.dart';
 import '../models/vehicle.dart';
 import '../models/vehicle_avatar_presentation.dart';
 import '../theme/app_colors.dart';
@@ -26,6 +27,8 @@ class RoadView extends StatelessWidget {
     this.onMotivationVideoFinished,
     this.showVehicle = true,
     this.showMotivationVideo = true,
+    this.ingredients = const [],
+    this.ingredientClearProgress,
   });
 
   final double progress;
@@ -38,6 +41,8 @@ class RoadView extends StatelessWidget {
   final VoidCallback? onMotivationVideoFinished;
   final bool showVehicle;
   final bool showMotivationVideo;
+  final List<MealIngredientDefinition> ingredients;
+  final double? ingredientClearProgress;
   static const double _portraitVehicleSize = 164;
   static const double _landscapeVehicleSize = 176;
 
@@ -66,6 +71,9 @@ class RoadView extends StatelessWidget {
         );
         final vehicleLeft = vehiclePosition.dx - (vehicleSize / 2);
         final vehicleTop = vehiclePosition.dy - (vehicleSize / 2);
+        final clearProgress = (ingredientClearProgress ?? progress)
+            .clamp(0.0, 1.0)
+            .toDouble();
         const videoMargin = 16.0;
         final videoFrameWidth = isLandscape
             ? math
@@ -111,6 +119,11 @@ class RoadView extends StatelessWidget {
                 Positioned.fill(
                   child: CustomPaint(painter: RoadPainter(progress: progress)),
                 ),
+                if (ingredients.isNotEmpty)
+                  _RoadIngredientLayer(
+                    ingredients: ingredients,
+                    clearProgress: clearProgress,
+                  ),
                 _RoadMarker(
                   position: roadPointForProgress(size, 0),
                   icon: Icons.home_rounded,
@@ -157,6 +170,143 @@ class RoadView extends StatelessWidget {
           ),
         );
       },
+    );
+  }
+}
+
+class _RoadIngredientLayer extends StatelessWidget {
+  const _RoadIngredientLayer({
+    required this.ingredients,
+    required this.clearProgress,
+  });
+
+  final List<MealIngredientDefinition> ingredients;
+  final double clearProgress;
+
+  @override
+  Widget build(BuildContext context) {
+    return IgnorePointer(
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final size = Size(constraints.maxWidth, constraints.maxHeight);
+          final isLandscape = size.width > size.height;
+          final markerSize = isLandscape ? 36.0 : 34.0;
+
+          return Stack(
+            children: [
+              for (var index = 0; index < ingredients.length; index += 1)
+                _RoadIngredientMarker(
+                  key: ValueKey('roadIngredientSlot_$index'),
+                  ingredient: ingredients[index],
+                  index: index,
+                  markerSize: markerSize,
+                  progress: (index + 1) / (ingredients.length + 1),
+                  clearProgress: clearProgress,
+                  roadSize: size,
+                ),
+            ],
+          );
+        },
+      ),
+    );
+  }
+}
+
+class _RoadIngredientMarker extends StatelessWidget {
+  const _RoadIngredientMarker({
+    super.key,
+    required this.ingredient,
+    required this.index,
+    required this.markerSize,
+    required this.progress,
+    required this.clearProgress,
+    required this.roadSize,
+  });
+
+  final MealIngredientDefinition ingredient;
+  final int index;
+  final double markerSize;
+  final double progress;
+  final double clearProgress;
+  final Size roadSize;
+
+  @override
+  Widget build(BuildContext context) {
+    final position = roadPointForProgress(roadSize, progress);
+    final isCleared = clearProgress >= progress;
+
+    return Positioned(
+      left: position.dx - (markerSize / 2),
+      top: position.dy - (markerSize / 2),
+      width: markerSize,
+      height: markerSize,
+      child: AnimatedSwitcher(
+        duration: const Duration(milliseconds: 380),
+        reverseDuration: const Duration(milliseconds: 220),
+        switchInCurve: Curves.easeOutBack,
+        switchOutCurve: Curves.easeOutCubic,
+        transitionBuilder: (child, animation) {
+          return FadeTransition(
+            opacity: animation,
+            child: ScaleTransition(scale: animation, child: child),
+          );
+        },
+        child: isCleared
+            ? SizedBox(key: ValueKey('roadIngredientCleared_$index'))
+            : _RoadIngredientChip(
+                key: ValueKey('roadIngredientMarker_$index'),
+                ingredient: ingredient,
+                size: markerSize,
+              ),
+      ),
+    );
+  }
+}
+
+class _RoadIngredientChip extends StatelessWidget {
+  const _RoadIngredientChip({
+    super.key,
+    required this.ingredient,
+    required this.size,
+  });
+
+  final MealIngredientDefinition ingredient;
+  final double size;
+
+  @override
+  Widget build(BuildContext context) {
+    final assetPath = ingredient.assetPath;
+
+    return SizedBox.expand(
+      child: Center(
+        child: assetPath == null
+            ? _IngredientEmoji(ingredient: ingredient, size: size)
+            : Image.asset(
+                assetPath,
+                width: size * 0.92,
+                height: size * 0.92,
+                fit: BoxFit.contain,
+                errorBuilder: (context, error, stackTrace) {
+                  return _IngredientEmoji(ingredient: ingredient, size: size);
+                },
+              ),
+      ),
+    );
+  }
+}
+
+class _IngredientEmoji extends StatelessWidget {
+  const _IngredientEmoji({required this.ingredient, required this.size});
+
+  final MealIngredientDefinition ingredient;
+  final double size;
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      ingredient.emoji,
+      textAlign: TextAlign.center,
+      style: TextStyle(fontSize: size * 0.86, height: 1),
     );
   }
 }

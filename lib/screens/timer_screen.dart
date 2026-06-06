@@ -3,6 +3,7 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
+import '../catalogs/meal_ingredient_catalog.dart';
 import '../catalogs/motivation_asset_catalog.dart';
 import '../catalogs/vehicle_catalog.dart';
 import '../controllers/meal_timer_controller.dart';
@@ -494,6 +495,9 @@ class _TimerScreenState extends State<TimerScreen> {
         final vehicleAvatar = widget.config.avatarPresentationForVehicle(
           vehicle.id,
         );
+        final courseIngredients = MealIngredientCatalog.courseSlotsFor(
+          widget.config.courseIngredientIds,
+        );
         final progress = _controller.progress.clamp(0.0, 1.0).toDouble();
         final statusCopy = _timerStatusCopy(
           texts.timer,
@@ -542,6 +546,7 @@ class _TimerScreenState extends State<TimerScreen> {
                     onMotivationVideoFinished: _handleMotivationVideoFinished,
                     showVehicle: !isLandscape,
                     showMotivationVideo: !isLandscape,
+                    ingredients: courseIngredients,
                   );
                   final landscapeVehicleLayer = isLandscape
                       ? RoadVehicleLayer(
