@@ -2167,7 +2167,7 @@ void main() {
     expect(sideChanges, greaterThanOrEqualTo(7));
     expect(
       roadPointForProgress(roadSize, 1).dx,
-      greaterThan(roadBounds.center.dx),
+      lessThan(roadBounds.center.dx),
     );
 
     await tester.pumpWidget(
@@ -2224,6 +2224,38 @@ void main() {
     expect(vehicleRect.right, lessThanOrEqualTo(roadRect.right));
     expect(vehicleRect.bottom, lessThanOrEqualTo(roadRect.bottom));
   });
+
+  testWidgets(
+    'Road view applies portrait road anchor offset for long vehicles',
+    (tester) async {
+      const progress = 0.5;
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: SizedBox(
+              width: 420,
+              height: 640,
+              child: RoadView(progress: progress, vehicle: VehicleCatalog.tRex),
+            ),
+          ),
+        ),
+      );
+      await tester.pump();
+
+      final roadSize = tester.getSize(find.byType(RoadView));
+      final vehicleSize = tester.getSize(find.byType(VehicleWidget)).height;
+      final rawRoadPoint = roadPointForProgress(roadSize, progress);
+      final expectedVehicleCenterY =
+          rawRoadPoint.dy +
+          (vehicleSize * VehicleCatalog.tRex.roadAnchorOffset.portraitDyRatio);
+
+      expect(
+        tester.getCenter(find.byType(VehicleWidget)).dy,
+        closeTo(expectedVehicleCenterY, 1),
+      );
+    },
+  );
 
   testWidgets('RoadView with 30 ingredients renders 30 ingredient markers', (
     tester,

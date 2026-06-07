@@ -758,10 +758,10 @@ class _TimerScreenState extends State<TimerScreen>
                         const SizedBox(height: AppSpacing.lg),
                         Expanded(child: roadView),
                         if (remainingTimeCard != null) ...[
-                          const SizedBox(height: AppSpacing.lg),
+                          const SizedBox(height: AppSpacing.md),
                           remainingTimeCard,
                         ],
-                        const SizedBox(height: AppSpacing.lg),
+                        const SizedBox(height: AppSpacing.md),
                         TimerControlBar(
                           isPaused: _controller.isPaused,
                           onPauseResume: _isFinishDriving
@@ -1333,12 +1333,12 @@ class _RemainingTimeCard extends StatelessWidget {
           boxShadow: AppShadows.surface,
         ),
         child: Padding(
-          padding: EdgeInsets.symmetric(
-            horizontal: isCompact ? AppSpacing.md : AppSpacing.lg,
-            vertical: isCompact ? AppSpacing.sm : AppSpacing.md,
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppSpacing.md,
+            vertical: AppSpacing.sm,
           ),
           child: ConstrainedBox(
-            constraints: BoxConstraints(minHeight: isCompact ? 48 : 58),
+            constraints: BoxConstraints(minHeight: isCompact ? 48 : 52),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -1348,14 +1348,8 @@ class _RemainingTimeCard extends StatelessWidget {
                     borderRadius: AppRadius.pill,
                   ),
                   child: Padding(
-                    padding: EdgeInsets.all(
-                      isCompact ? AppSpacing.xs : AppSpacing.sm,
-                    ),
-                    child: Icon(
-                      icon,
-                      color: AppColors.brown700,
-                      size: isCompact ? 22 : 24,
-                    ),
+                    padding: const EdgeInsets.all(AppSpacing.xs),
+                    child: Icon(icon, color: AppColors.brown700, size: 22),
                   ),
                 ),
                 SizedBox(width: isCompact ? AppSpacing.sm : AppSpacing.md),
@@ -1371,7 +1365,7 @@ class _RemainingTimeCard extends StatelessWidget {
                           style:
                               (isCompact
                                       ? textTheme.titleMedium
-                                      : textTheme.headlineSmall)
+                                      : textTheme.titleLarge)
                                   ?.copyWith(
                                     color: AppColors.textStrong,
                                     fontWeight: FontWeight.w900,
@@ -1387,7 +1381,7 @@ class _RemainingTimeCard extends StatelessWidget {
                         style:
                             (isCompact
                                     ? textTheme.titleMedium
-                                    : textTheme.headlineSmall)
+                                    : textTheme.titleLarge)
                                 ?.copyWith(
                                   color: AppColors.textStrong,
                                   fontWeight: FontWeight.w900,

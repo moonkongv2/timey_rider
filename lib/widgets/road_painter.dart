@@ -10,13 +10,14 @@ Rect createRoadBounds(Size size) {
       (isLandscape ? size.width * 0.10 : size.width * 0.13)
           .clamp(isLandscape ? 84.0 : 46.0, isLandscape ? 118.0 : 62.0)
           .toDouble();
-  final verticalPadding = isLandscape ? size.height * 0.18 : size.height * 0.06;
+  final topPadding = isLandscape ? size.height * 0.31 : size.height * 0.14;
+  final bottomPadding = isLandscape ? size.height * 0.11 : size.height * 0.085;
 
   return Rect.fromLTWH(
     horizontalPadding,
-    verticalPadding,
+    topPadding,
     size.width - (horizontalPadding * 2),
-    size.height - (verticalPadding * 2),
+    size.height - topPadding - bottomPadding,
   );
 }
 
@@ -27,7 +28,8 @@ Path createRoadPath(Size size) {
   final top = bounds.top;
   final bottom = bounds.bottom;
   final height = bounds.height;
-  final rowCount = size.width > size.height ? 5 : 10;
+  final isLandscape = size.width > size.height;
+  final rowCount = isLandscape ? 5 : 9;
   final rowHeight = height / rowCount;
   final path = Path()..moveTo(left, bottom);
 

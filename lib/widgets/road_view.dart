@@ -83,11 +83,19 @@ class RoadView extends StatelessWidget {
             : videoMargin;
         final videoFrameTop = isLandscape ? size.height * 0.18 : videoMargin;
         final clampedProgress = progress.clamp(0.0, 1.0).toDouble();
-        final vehiclePosition = roadPointForProgress(size, clampedProgress);
+        final roadPosition = roadPointForProgress(size, clampedProgress);
         final isVehicleFacingLeft = roadIsFacingLeftForProgress(
           size,
           clampedProgress,
         );
+        final vehiclePosition =
+            roadPosition +
+            _vehicleRoadAnchorOffset(
+              vehicle: vehicle,
+              vehicleSize: vehicleSize,
+              isLandscape: isLandscape,
+              isFacingLeft: isVehicleFacingLeft,
+            );
         final vehicleOffset = _boundedVehicleOffset(
           size: size,
           position: vehiclePosition,
@@ -499,11 +507,19 @@ class RoadVehicleLayer extends StatelessWidget {
               )
               .toDouble();
           final clampedProgress = progress.clamp(0.0, 1.0).toDouble();
-          final vehiclePosition = roadPointForProgress(size, clampedProgress);
+          final roadPosition = roadPointForProgress(size, clampedProgress);
           final isVehicleFacingLeft = roadIsFacingLeftForProgress(
             size,
             clampedProgress,
           );
+          final vehiclePosition =
+              roadPosition +
+              _vehicleRoadAnchorOffset(
+                vehicle: vehicle,
+                vehicleSize: vehicleSize,
+                isLandscape: isLandscape,
+                isFacingLeft: isVehicleFacingLeft,
+              );
           final vehicleOffset = _boundedVehicleOffset(
             size: size,
             position: vehiclePosition,
@@ -528,6 +544,24 @@ class RoadVehicleLayer extends StatelessWidget {
       ),
     );
   }
+}
+
+Offset _vehicleRoadAnchorOffset({
+  required VehicleDefinition vehicle,
+  required double vehicleSize,
+  required bool isLandscape,
+  required bool isFacingLeft,
+}) {
+  final anchorOffset = vehicle.roadAnchorOffset;
+  final dxRatio = isLandscape
+      ? anchorOffset.landscapeDxRatio
+      : anchorOffset.portraitDxRatio;
+  final dyRatio = isLandscape
+      ? anchorOffset.landscapeDyRatio
+      : anchorOffset.portraitDyRatio;
+  final facingAdjustedDxRatio = isFacingLeft ? -dxRatio : dxRatio;
+
+  return Offset(vehicleSize * facingAdjustedDxRatio, vehicleSize * dyRatio);
 }
 
 Offset _boundedVehicleOffset({

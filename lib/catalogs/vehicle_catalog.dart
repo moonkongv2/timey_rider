@@ -14,6 +14,10 @@ abstract final class VehicleCatalog {
       centerY: 0.31,
       sizeRatio: 0.28,
     ),
+    roadAnchorOffset: VehicleRoadAnchorOffset(
+      portraitDyRatio: -0.08,
+      landscapeDyRatio: -0.05,
+    ),
   );
 
   static const fireTruck = VehicleDefinition(
@@ -126,6 +130,10 @@ abstract final class VehicleCatalog {
       centerY: 0.31,
       sizeRatio: 0.27,
     ),
+    roadAnchorOffset: VehicleRoadAnchorOffset(
+      portraitDyRatio: -0.13,
+      landscapeDyRatio: -0.08,
+    ),
   );
 
   static const shark = VehicleDefinition(
@@ -154,6 +162,10 @@ abstract final class VehicleCatalog {
       centerY: 0.33,
       sizeRatio: 0.25,
     ),
+    roadAnchorOffset: VehicleRoadAnchorOffset(
+      portraitDyRatio: -0.18,
+      landscapeDyRatio: -0.11,
+    ),
   );
 
   static const pteranodon = VehicleDefinition(
@@ -167,6 +179,10 @@ abstract final class VehicleCatalog {
       centerX: 0.50,
       centerY: 0.32,
       sizeRatio: 0.24,
+    ),
+    roadAnchorOffset: VehicleRoadAnchorOffset(
+      portraitDyRatio: -0.08,
+      landscapeDyRatio: -0.05,
     ),
   );
 

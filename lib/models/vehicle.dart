@@ -12,6 +12,22 @@ class VehicleAvatarSlot {
   final double rotationDegrees;
 }
 
+class VehicleRoadAnchorOffset {
+  const VehicleRoadAnchorOffset({
+    this.portraitDxRatio = 0.0,
+    this.portraitDyRatio = 0.0,
+    this.landscapeDxRatio = 0.0,
+    this.landscapeDyRatio = 0.0,
+  });
+
+  static const zero = VehicleRoadAnchorOffset();
+
+  final double portraitDxRatio;
+  final double portraitDyRatio;
+  final double landscapeDxRatio;
+  final double landscapeDyRatio;
+}
+
 class VehicleDefinition {
   const VehicleDefinition({
     required this.id,
@@ -21,6 +37,7 @@ class VehicleDefinition {
     required this.assetPath,
     this.selectionAssetPath,
     this.avatarSlot,
+    this.roadAnchorOffset = VehicleRoadAnchorOffset.zero,
   });
 
   final String id;
@@ -30,6 +47,7 @@ class VehicleDefinition {
   final String assetPath;
   final String? selectionAssetPath;
   final VehicleAvatarSlot? avatarSlot;
+  final VehicleRoadAnchorOffset roadAnchorOffset;
 
   String get selectionImagePath => selectionAssetPath ?? assetPath;
 
