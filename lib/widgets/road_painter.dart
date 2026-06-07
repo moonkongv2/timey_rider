@@ -4,6 +4,35 @@ import 'package:flutter/material.dart';
 
 import '../theme/app_colors.dart';
 
+class RoadCourseGeometry {
+  const RoadCourseGeometry({
+    required this.viewportSize,
+    required this.canvasSize,
+    required this.roadBounds,
+    required this.rowCount,
+  });
+
+  final Size viewportSize;
+  final Size canvasSize;
+  final Rect roadBounds;
+  final int rowCount;
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        other is RoadCourseGeometry &&
+            other.viewportSize == viewportSize &&
+            other.canvasSize == canvasSize &&
+            other.roadBounds == roadBounds &&
+            other.rowCount == rowCount;
+  }
+
+  @override
+  int get hashCode {
+    return Object.hash(viewportSize, canvasSize, roadBounds, rowCount);
+  }
+}
+
 Rect createRoadBounds(Size size) {
   final isLandscape = size.width > size.height;
   final horizontalPadding =
@@ -50,6 +79,124 @@ Path createRoadPath(Size size) {
   return path..lineTo(rowCount.isEven ? right : left, top);
 }
 
+RoadCourseGeometry createRoadCourseGeometry({
+  required Size viewportSize,
+  required Duration duration,
+  Duration referenceDuration = const Duration(minutes: 5),
+}) {
+  final baselineBounds = createRoadBounds(viewportSize);
+  final baselineRowCount = _baselineRoadRowCount(viewportSize);
+  final baselineRowHeight = baselineBounds.height / baselineRowCount;
+  final factor = _roadDurationFactor(duration, referenceDuration);
+  final rowCount = _scaledRoadRowCount(
+    baselineBounds: baselineBounds,
+    baselineRowCount: baselineRowCount,
+    baselineRowHeight: baselineRowHeight,
+    factor: factor,
+  );
+  final roadHeight = baselineRowHeight * rowCount;
+  final bottomPadding = viewportSize.height - baselineBounds.bottom;
+  final canvasHeight = baselineBounds.top + roadHeight + bottomPadding;
+
+  return RoadCourseGeometry(
+    viewportSize: viewportSize,
+    canvasSize: Size(viewportSize.width, canvasHeight),
+    roadBounds: Rect.fromLTWH(
+      baselineBounds.left,
+      baselineBounds.top,
+      baselineBounds.width,
+      roadHeight,
+    ),
+    rowCount: rowCount,
+  );
+}
+
+Path createRoadPathForGeometry(RoadCourseGeometry geometry) {
+  final bounds = geometry.roadBounds;
+  final left = bounds.left;
+  final right = bounds.right;
+  final top = bounds.top;
+  final bottom = bounds.bottom;
+  final rowHeight = bounds.height / geometry.rowCount;
+  final path = Path()..moveTo(left, bottom);
+
+  for (var row = 0; row < geometry.rowCount; row += 1) {
+    final currentY = bottom - (rowHeight * row);
+    final nextY = bottom - (rowHeight * (row + 1));
+    if (row.isEven) {
+      path
+        ..lineTo(right, currentY)
+        ..lineTo(right, nextY);
+    } else {
+      path
+        ..lineTo(left, currentY)
+        ..lineTo(left, nextY);
+    }
+  }
+
+  return path..lineTo(geometry.rowCount.isEven ? right : left, top);
+}
+
+PathMetric roadMetricForGeometry(RoadCourseGeometry geometry) {
+  return createRoadPathForGeometry(geometry).computeMetrics().first;
+}
+
+Tangent roadTangentForGeometryProgress(
+  RoadCourseGeometry geometry,
+  double progress,
+) {
+  final metric = roadMetricForGeometry(geometry);
+  final distance = metric.length * progress.clamp(0.0, 1.0).toDouble();
+  return metric.getTangentForOffset(distance)!;
+}
+
+Offset roadPointForGeometryProgress(
+  RoadCourseGeometry geometry,
+  double progress,
+) {
+  return roadTangentForGeometryProgress(geometry, progress).position;
+}
+
+bool roadIsFacingLeftForGeometryProgress(
+  RoadCourseGeometry geometry,
+  double progress,
+) {
+  final clampedProgress = progress.clamp(0.0, 1.0).toDouble();
+  final tangent = roadTangentForGeometryProgress(geometry, clampedProgress);
+  if (tangent.vector.dx.abs() > 0.01) {
+    return tangent.vector.dx < 0;
+  }
+
+  final probeProgress = (clampedProgress + 0.015).clamp(0.0, 1.0).toDouble();
+  final probeTangent = roadTangentForGeometryProgress(geometry, probeProgress);
+  if (probeTangent.vector.dx.abs() > 0.01) {
+    return probeTangent.vector.dx < 0;
+  }
+
+  final previousProgress = (clampedProgress - 0.015).clamp(0.0, 1.0).toDouble();
+  final previousTangent = roadTangentForGeometryProgress(
+    geometry,
+    previousProgress,
+  );
+  return previousTangent.vector.dx < 0;
+}
+
+double roadCameraOffsetForGeometryProgress({
+  required RoadCourseGeometry geometry,
+  required double progress,
+}) {
+  const viewportAnchorY = 0.65;
+  final maxOffset = geometry.canvasSize.height - geometry.viewportSize.height;
+  if (maxOffset <= 0) {
+    return 0;
+  }
+
+  final roadPoint = roadPointForGeometryProgress(geometry, progress);
+  final targetOffset =
+      roadPoint.dy - (geometry.viewportSize.height * viewportAnchorY);
+  return targetOffset.clamp(0.0, maxOffset).toDouble();
+}
+
 PathMetric _roadMetric(Size size) {
   return createRoadPath(size).computeMetrics().first;
 }
@@ -89,8 +236,85 @@ bool roadIsFacingLeftForProgress(Size size, double progress) {
   return previousTangent.vector.dx < 0;
 }
 
+int _baselineRoadRowCount(Size size) {
+  return size.width > size.height ? 5 : 9;
+}
+
+double _roadDurationFactor(Duration duration, Duration referenceDuration) {
+  if (referenceDuration <= Duration.zero || duration <= Duration.zero) {
+    return 1;
+  }
+
+  final factor = duration.inMilliseconds / referenceDuration.inMilliseconds;
+  return factor < 1 ? 1 : factor;
+}
+
+int _scaledRoadRowCount({
+  required Rect baselineBounds,
+  required int baselineRowCount,
+  required double baselineRowHeight,
+  required double factor,
+}) {
+  if (factor <= 1) {
+    return baselineRowCount;
+  }
+
+  final targetLength =
+      _roadPathLengthForRows(
+        width: baselineBounds.width,
+        rowHeight: baselineRowHeight,
+        rowCount: baselineRowCount,
+      ) *
+      factor;
+  final estimatedRowCount =
+      ((targetLength - baselineBounds.width) /
+              (baselineBounds.width + baselineRowHeight))
+          .ceil();
+  var maxCandidate = estimatedRowCount + baselineRowCount + 8;
+  if (maxCandidate < baselineRowCount) {
+    maxCandidate = baselineRowCount;
+  }
+
+  var bestRowCount = baselineRowCount;
+  var bestDelta = double.infinity;
+  for (
+    var candidate = baselineRowCount;
+    candidate <= maxCandidate;
+    candidate += 1
+  ) {
+    if (candidate.isEven != baselineRowCount.isEven) {
+      continue;
+    }
+
+    final length = _roadPathLengthForRows(
+      width: baselineBounds.width,
+      rowHeight: baselineRowHeight,
+      rowCount: candidate,
+    );
+    final delta = (length - targetLength).abs();
+    if (delta < bestDelta) {
+      bestDelta = delta;
+      bestRowCount = candidate;
+    }
+  }
+
+  return bestRowCount;
+}
+
+double _roadPathLengthForRows({
+  required double width,
+  required double rowHeight,
+  required int rowCount,
+}) {
+  return (width * (rowCount + 1)) + (rowHeight * rowCount);
+}
+
 class RoadPainter extends CustomPainter {
-  const RoadPainter({required this.progress, this.laneDashPhase = 0});
+  const RoadPainter({
+    required this.progress,
+    this.laneDashPhase = 0,
+    this.geometry,
+  });
 
   static const laneDashWidth = 15.0;
   static const laneDashGap = 22.0;
@@ -102,11 +326,14 @@ class RoadPainter extends CustomPainter {
 
   final double progress;
   final double laneDashPhase;
+  final RoadCourseGeometry? geometry;
 
   @override
   void paint(Canvas canvas, Size size) {
-    final roadPath = createRoadPath(size);
-    final roadWidth = roadStrokeWidthForSize(size);
+    final roadPath = geometry == null
+        ? createRoadPath(size)
+        : createRoadPathForGeometry(geometry!);
+    final roadWidth = roadStrokeWidthForSize(geometry?.viewportSize ?? size);
     final roadMetric = roadPath.computeMetrics().first;
     final progressDistance =
         roadMetric.length * progress.clamp(0.0, 1.0).toDouble();
@@ -189,6 +416,7 @@ class RoadPainter extends CustomPainter {
   @override
   bool shouldRepaint(covariant RoadPainter oldDelegate) {
     return oldDelegate.progress != progress ||
-        oldDelegate.laneDashPhase != laneDashPhase;
+        oldDelegate.laneDashPhase != laneDashPhase ||
+        oldDelegate.geometry != geometry;
   }
 }
