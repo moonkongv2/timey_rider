@@ -191,6 +191,20 @@ class _ResultScreenState extends State<ResultScreen> {
           padding: const EdgeInsets.all(AppSpacing.xl),
           child: LayoutBuilder(
             builder: (context, constraints) {
+              final isCompactLandscape =
+                  constraints.maxWidth > constraints.maxHeight &&
+                  constraints.maxHeight < 430;
+              if (isCompactLandscape) {
+                return _CompactLandscapeResultLayout(
+                  mealCompleted: mealCompleted,
+                  recordedSession: _recordedSession,
+                  mealProgressService: widget.mealProgressService,
+                  orientationService: widget.orientationService,
+                  onRestart: () => _restart(context),
+                  onHome: () => _goHome(context),
+                );
+              }
+
               return SingleChildScrollView(
                 child: ConstrainedBox(
                   constraints: BoxConstraints(minHeight: constraints.maxHeight),
@@ -295,18 +309,178 @@ class _ResultScreenState extends State<ResultScreen> {
   }
 }
 
+class _CompactLandscapeResultLayout extends StatelessWidget {
+  const _CompactLandscapeResultLayout({
+    required this.mealCompleted,
+    required this.recordedSession,
+    required this.mealProgressService,
+    required this.orientationService,
+    required this.onRestart,
+    required this.onHome,
+  });
+
+  final bool mealCompleted;
+  final Future<RecordedMealSession> recordedSession;
+  final LocalMealProgressService mealProgressService;
+  final OrientationService orientationService;
+  final VoidCallback onRestart;
+  final VoidCallback onHome;
+
+  @override
+  Widget build(BuildContext context) {
+    final texts = AppTexts.of(context);
+    final theme = Theme.of(context);
+
+    return SizedBox.expand(
+      child: Card(
+        key: const ValueKey('compactLandscapeResultCard'),
+        margin: EdgeInsets.zero,
+        child: Padding(
+          padding: const EdgeInsets.all(AppSpacing.xl),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Expanded(
+                flex: 5,
+                child: mealCompleted
+                    ? FutureBuilder<RecordedMealSession>(
+                        future: recordedSession,
+                        builder: (context, snapshot) {
+                          final recordedSession = snapshot.data;
+
+                          return Center(
+                            child: SingleChildScrollView(
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  _RewardResultBox(
+                                    rewards: recordedSession?.awardedRewards,
+                                    isCompact: true,
+                                  ),
+                                  if (recordedSession != null &&
+                                      (recordedSession
+                                              .updatedRewardGoals
+                                              .isNotEmpty ||
+                                          recordedSession
+                                              .earnedRewardGoals
+                                              .isNotEmpty)) ...[
+                                    const SizedBox(height: AppSpacing.sm),
+                                    _RewardGoalResultBox(
+                                      updatedGoals:
+                                          recordedSession.updatedRewardGoals,
+                                      earnedGoals:
+                                          recordedSession.earnedRewardGoals,
+                                      mealProgressService: mealProgressService,
+                                      orientationService: orientationService,
+                                      isCompact: true,
+                                    ),
+                                  ],
+                                ],
+                              ),
+                            ),
+                          );
+                        },
+                      )
+                    : Center(
+                        child: Icon(
+                          Icons.sentiment_satisfied_alt_rounded,
+                          color: AppColors.primary,
+                          size: 88,
+                        ),
+                      ),
+              ),
+              const SizedBox(width: AppSpacing.xxl),
+              Expanded(
+                flex: 6,
+                child: Center(
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 420),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        Text(
+                          texts.result.title(mealCompleted),
+                          textAlign: TextAlign.left,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: theme.textTheme.headlineSmall?.copyWith(
+                            fontWeight: FontWeight.w900,
+                            color: AppColors.textStrong,
+                          ),
+                        ),
+                        const SizedBox(height: AppSpacing.md),
+                        Text(
+                          texts.result.primaryMessage(mealCompleted),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: theme.textTheme.titleMedium?.copyWith(
+                            height: 1.3,
+                          ),
+                        ),
+                        const SizedBox(height: AppSpacing.sm),
+                        Text(
+                          texts.result.secondaryMessage(mealCompleted),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: theme.textTheme.titleMedium?.copyWith(
+                            height: 1.3,
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                        const SizedBox(height: AppSpacing.xxxl),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: SizedBox(
+                                height: 54,
+                                child: FilledButton.icon(
+                                  onPressed: onRestart,
+                                  icon: const Icon(Icons.two_wheeler_rounded),
+                                  label: Text(texts.common.restartRide),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: AppSpacing.md),
+                            Expanded(
+                              child: SizedBox(
+                                height: 54,
+                                child: OutlinedButton.icon(
+                                  onPressed: onHome,
+                                  icon: const Icon(Icons.home_rounded),
+                                  label: Text(texts.common.home),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 class _RewardGoalResultBox extends StatelessWidget {
   const _RewardGoalResultBox({
     required this.updatedGoals,
     required this.earnedGoals,
     required this.mealProgressService,
     required this.orientationService,
+    this.isCompact = false,
   });
 
   final List<RewardGoal> updatedGoals;
   final List<RewardGoal> earnedGoals;
   final LocalMealProgressService mealProgressService;
   final OrientationService orientationService;
+  final bool isCompact;
 
   @override
   Widget build(BuildContext context) {
@@ -337,9 +511,9 @@ class _RewardGoalResultBox extends StatelessWidget {
             const SizedBox(height: AppSpacing.xs),
             for (final goal in goals) ...[
               _RewardGoalProgressRow(goal: goal),
-              const SizedBox(height: AppSpacing.sm),
+              SizedBox(height: isCompact ? AppSpacing.xs : AppSpacing.sm),
             ],
-            if (justEarned) ...[
+            if (justEarned && !isCompact) ...[
               const SizedBox(height: AppSpacing.md),
               FilledButton.icon(
                 onPressed: () async {
@@ -470,9 +644,10 @@ class _ResultIntroScreen extends StatelessWidget {
 }
 
 class _RewardResultBox extends StatelessWidget {
-  const _RewardResultBox({required this.rewards});
+  const _RewardResultBox({required this.rewards, this.isCompact = false});
 
   final List<RewardDefinition>? rewards;
+  final bool isCompact;
 
   @override
   Widget build(BuildContext context) {
@@ -481,13 +656,16 @@ class _RewardResultBox extends StatelessWidget {
 
     return DecoratedBox(
       decoration: BoxDecoration(
-        color: AppColors.surfaceYellow,
+        color: isCompact
+            ? AppColors.surfaceYellow.withValues(alpha: 0.72)
+            : AppColors.surfaceYellow,
         borderRadius: AppRadius.card,
+        border: isCompact ? Border.all(color: AppColors.borderWarm) : null,
       ),
       child: Padding(
-        padding: const EdgeInsets.symmetric(
-          horizontal: AppSpacing.xl,
-          vertical: AppSpacing.lg,
+        padding: EdgeInsets.symmetric(
+          horizontal: isCompact ? AppSpacing.lg : AppSpacing.xl,
+          vertical: isCompact ? AppSpacing.md : AppSpacing.lg,
         ),
         child: rewards == null
             ? Text(
@@ -508,10 +686,11 @@ class _RewardResultBox extends StatelessWidget {
             : Wrap(
                 alignment: WrapAlignment.center,
                 runAlignment: WrapAlignment.center,
-                spacing: AppSpacing.lg,
-                runSpacing: AppSpacing.lg,
+                spacing: isCompact ? AppSpacing.md : AppSpacing.lg,
+                runSpacing: isCompact ? AppSpacing.sm : AppSpacing.lg,
                 children: [
-                  for (final reward in rewards) _RewardBadge(reward: reward),
+                  for (final reward in rewards)
+                    _RewardBadge(reward: reward, isCompact: isCompact),
                 ],
               ),
       ),
@@ -520,15 +699,111 @@ class _RewardResultBox extends StatelessWidget {
 }
 
 class _RewardBadge extends StatelessWidget {
-  const _RewardBadge({required this.reward});
+  const _RewardBadge({required this.reward, this.isCompact = false});
 
   final RewardDefinition reward;
+  final bool isCompact;
 
   @override
   Widget build(BuildContext context) {
     final texts = AppTexts.of(context);
     final rewardName = texts.rewards.name(reward.id);
 
+    if (isCompact) {
+      return SizedBox(
+        width: 196,
+        height: 196,
+        child: Stack(
+          children: [
+            const _RewardConfettiDot(
+              alignment: Alignment(-0.74, -0.42),
+              size: 8,
+              color: AppColors.primarySoft,
+            ),
+            const _RewardConfettiDot(
+              alignment: Alignment(0.74, -0.58),
+              size: 10,
+              color: AppColors.accentBlueSoft,
+            ),
+            const _RewardConfettiDot(
+              alignment: Alignment(-0.56, 0.30),
+              size: 7,
+              color: AppColors.surfacePink,
+            ),
+            const _RewardConfettiSparkle(
+              alignment: Alignment(0.60, 0.22),
+              color: AppColors.orange,
+            ),
+            Positioned(
+              left: 0,
+              top: 0,
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  color: AppColors.white.withValues(alpha: 0.86),
+                  borderRadius: AppRadius.pill,
+                  border: Border.all(color: AppColors.borderWarm),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppSpacing.md,
+                    vertical: AppSpacing.xs,
+                  ),
+                  child: Text(
+                    '+1',
+                    style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                      fontWeight: FontWeight.w900,
+                      color: AppColors.primary,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            Center(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  DecoratedBox(
+                    decoration: BoxDecoration(
+                      color: AppColors.white.withValues(alpha: 0.74),
+                      shape: BoxShape.circle,
+                      border: Border.all(color: AppColors.white, width: 2),
+                      boxShadow: [
+                        BoxShadow(
+                          color: AppColors.orange.withValues(alpha: 0.12),
+                          blurRadius: 16,
+                          offset: const Offset(0, 6),
+                        ),
+                      ],
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(AppSpacing.md),
+                      child: RewardStickerImage(
+                        reward: reward,
+                        semanticLabel: rewardName,
+                        size: 78,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: AppSpacing.md),
+                  Text(
+                    rewardName,
+                    textAlign: TextAlign.center,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.w900,
+                      color: AppColors.textPrimary,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    const stickerSize = 64.0;
     return SizedBox(
       width: 116,
       child: Column(
@@ -537,7 +812,7 @@ class _RewardBadge extends StatelessWidget {
           RewardStickerImage(
             reward: reward,
             semanticLabel: rewardName,
-            size: 64,
+            size: stickerSize,
           ),
           const SizedBox(height: AppSpacing.sm),
           Text(
@@ -551,6 +826,51 @@ class _RewardBadge extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _RewardConfettiDot extends StatelessWidget {
+  const _RewardConfettiDot({
+    required this.alignment,
+    required this.size,
+    required this.color,
+  });
+
+  final Alignment alignment;
+  final double size;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    return Align(
+      alignment: alignment,
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          color: color.withValues(alpha: 0.68),
+          shape: BoxShape.circle,
+        ),
+        child: SizedBox.square(dimension: size),
+      ),
+    );
+  }
+}
+
+class _RewardConfettiSparkle extends StatelessWidget {
+  const _RewardConfettiSparkle({required this.alignment, required this.color});
+
+  final Alignment alignment;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    return Align(
+      alignment: alignment,
+      child: Icon(
+        Icons.auto_awesome_rounded,
+        color: color.withValues(alpha: 0.32),
+        size: 24,
       ),
     );
   }

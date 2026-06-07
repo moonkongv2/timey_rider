@@ -464,6 +464,62 @@ void main() {
     );
   });
 
+  testWidgets('Success result keeps actions visible in compact landscape', (
+    tester,
+  ) async {
+    SharedPreferences.setMockInitialValues({});
+    tester.view.physicalSize = const Size(852, 393);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(() {
+      tester.view.resetPhysicalSize();
+      tester.view.resetDevicePixelRatio();
+    });
+
+    await tester.pumpWidget(
+      MaterialApp(
+        locale: const Locale('ko'),
+        supportedLocales: const [Locale('ko'), Locale('en')],
+        localizationsDelegates: const [
+          GlobalMaterialLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+        ],
+        home: ResultScreen(
+          result: _mealResult(completedBeforeArrival: true),
+          config: MealTimerConfig.defaults(),
+          mealProgressService: LocalMealProgressService(),
+          onConfigChanged: (_) {},
+          introControllerFactory: (_) {
+            return VideoPlayerController.asset(
+              'assets/videos/missing_result_success.mp4',
+            );
+          },
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    final cardRect = tester.getRect(
+      find.byKey(const ValueKey('compactLandscapeResultCard')),
+    );
+    final restartButton = find.widgetWithText(FilledButton, '다시 출발');
+    final homeButton = find.widgetWithText(OutlinedButton, '홈으로');
+
+    expect(find.text('식사 완주 성공!'), findsOneWidget);
+    expect(restartButton, findsOneWidget);
+    expect(homeButton, findsOneWidget);
+    expect(cardRect.contains(tester.getCenter(restartButton)), isTrue);
+    expect(cardRect.contains(tester.getCenter(homeButton)), isTrue);
+    expect(
+      tester.getRect(restartButton).bottom,
+      lessThanOrEqualTo(tester.view.physicalSize.height),
+    );
+    expect(
+      tester.getRect(homeButton).bottom,
+      lessThanOrEqualTo(tester.view.physicalSize.height),
+    );
+  });
+
   testWidgets('Result screen allows landscape until disposed', (tester) async {
     SharedPreferences.setMockInitialValues({});
     final orientationService = _FakeOrientationService();
