@@ -2131,6 +2131,44 @@ void main() {
     );
   });
 
+  testWidgets('Road view keeps vehicle inside portrait bounds at route ends', (
+    tester,
+  ) async {
+    Future<void> pumpRoad(double progress) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: SizedBox(
+              width: 420,
+              height: 640,
+              child: RoadView(
+                progress: progress,
+                vehicle: VehicleCatalog.fireTruck,
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.pump();
+    }
+
+    await pumpRoad(0);
+    var roadRect = tester.getRect(find.byType(RoadView));
+    var vehicleRect = tester.getRect(find.byType(VehicleWidget));
+    expect(vehicleRect.left, greaterThanOrEqualTo(roadRect.left));
+    expect(vehicleRect.top, greaterThanOrEqualTo(roadRect.top));
+    expect(vehicleRect.right, lessThanOrEqualTo(roadRect.right));
+    expect(vehicleRect.bottom, lessThanOrEqualTo(roadRect.bottom));
+
+    await pumpRoad(1);
+    roadRect = tester.getRect(find.byType(RoadView));
+    vehicleRect = tester.getRect(find.byType(VehicleWidget));
+    expect(vehicleRect.left, greaterThanOrEqualTo(roadRect.left));
+    expect(vehicleRect.top, greaterThanOrEqualTo(roadRect.top));
+    expect(vehicleRect.right, lessThanOrEqualTo(roadRect.right));
+    expect(vehicleRect.bottom, lessThanOrEqualTo(roadRect.bottom));
+  });
+
   testWidgets('RoadView with 30 ingredients renders 30 ingredient markers', (
     tester,
   ) async {
@@ -2821,6 +2859,55 @@ void main() {
 
     expect(tester.getSize(find.byType(RoadView)), roadSize);
   });
+
+  testWidgets(
+    'Timer screen places controls inside compact landscape course action slot',
+    (tester) async {
+      tester.view.physicalSize = const Size(852, 393);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(() {
+        tester.view.resetPhysicalSize();
+        tester.view.resetDevicePixelRatio();
+      });
+
+      await tester.pumpWidget(
+        MaterialApp(
+          locale: const Locale('en'),
+          home: TimerScreen(
+            config: MealTimerConfig.defaults(),
+            mealProgressService: LocalMealProgressService(),
+            onConfigChanged: (_) {},
+          ),
+        ),
+      );
+      await tester.pump();
+
+      final roadRect = tester.getRect(find.byType(RoadView));
+      final controlsRect = tester.getRect(
+        find.byKey(const ValueKey('compactLandscapeControls')),
+      );
+      final roadBounds = createRoadBounds(const Size(1200, 520));
+      final expectedRoadRight =
+          roadRect.left + (roadRect.width * roadBounds.right / 1200);
+
+      expect(find.byType(SingleChildScrollView), findsNothing);
+      expect(find.byType(TimerControlBar), findsNothing);
+      expect(roadRect.width, greaterThan(760));
+      expect(roadRect.height, greaterThan(320));
+      expect(controlsRect.left, greaterThanOrEqualTo(expectedRoadRight));
+      expect(controlsRect.right, lessThanOrEqualTo(roadRect.right));
+      expect(controlsRect.width, lessThanOrEqualTo(72));
+      expect(controlsRect.height, lessThanOrEqualTo(132));
+      expect(
+        controlsRect.right,
+        lessThanOrEqualTo(tester.view.physicalSize.width),
+      );
+      expect(
+        controlsRect.bottom,
+        lessThanOrEqualTo(tester.view.physicalSize.height),
+      );
+    },
+  );
 
   testWidgets('Timer screen allows landscape only while mounted', (
     tester,

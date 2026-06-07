@@ -71,8 +71,11 @@ class RoadView extends StatelessWidget {
           size,
           clampedProgress,
         );
-        final vehicleLeft = vehiclePosition.dx - (vehicleSize / 2);
-        final vehicleTop = vehiclePosition.dy - (vehicleSize / 2);
+        final vehicleOffset = _boundedVehicleOffset(
+          size: size,
+          position: vehiclePosition,
+          vehicleSize: vehicleSize,
+        );
         final clearProgress = (ingredientClearProgress ?? progress)
             .clamp(0.0, 1.0)
             .toDouble();
@@ -145,8 +148,8 @@ class RoadView extends StatelessWidget {
                     progress: progress,
                     vehicle: vehicle,
                     vehicleSize: vehicleSize,
-                    vehicleLeft: vehicleLeft,
-                    vehicleTop: vehicleTop,
+                    vehicleLeft: vehicleOffset.dx,
+                    vehicleTop: vehicleOffset.dy,
                     isVehicleFacingLeft: isVehicleFacingLeft,
                     avatar: avatar,
                     avatarImageBuilder: avatarImageBuilder,
@@ -413,8 +416,11 @@ class RoadVehicleLayer extends StatelessWidget {
             size,
             clampedProgress,
           );
-          final vehicleLeft = vehiclePosition.dx - (vehicleSize / 2);
-          final vehicleTop = vehiclePosition.dy - (vehicleSize / 2);
+          final vehicleOffset = _boundedVehicleOffset(
+            size: size,
+            position: vehiclePosition,
+            vehicleSize: vehicleSize,
+          );
 
           return Stack(
             children: [
@@ -422,8 +428,8 @@ class RoadVehicleLayer extends StatelessWidget {
                 progress: progress,
                 vehicle: vehicle,
                 vehicleSize: vehicleSize,
-                vehicleLeft: vehicleLeft,
-                vehicleTop: vehicleTop,
+                vehicleLeft: vehicleOffset.dx,
+                vehicleTop: vehicleOffset.dy,
                 isVehicleFacingLeft: isVehicleFacingLeft,
                 avatar: avatar,
                 avatarImageBuilder: avatarImageBuilder,
@@ -435,6 +441,35 @@ class RoadVehicleLayer extends StatelessWidget {
       ),
     );
   }
+}
+
+Offset _boundedVehicleOffset({
+  required Size size,
+  required Offset position,
+  required double vehicleSize,
+}) {
+  return Offset(
+    _boundedVehicleAxis(
+      position.dx - (vehicleSize / 2),
+      size.width,
+      vehicleSize,
+    ),
+    _boundedVehicleAxis(
+      position.dy - (vehicleSize / 2),
+      size.height,
+      vehicleSize,
+    ),
+  );
+}
+
+double _boundedVehicleAxis(double value, double extent, double vehicleSize) {
+  const margin = 6.0;
+  final minValue = math.min(margin, math.max(0.0, extent - vehicleSize));
+  final maxValue = extent - vehicleSize - margin;
+  if (maxValue < minValue) {
+    return (extent - vehicleSize) / 2;
+  }
+  return value.clamp(minValue, maxValue).toDouble();
 }
 
 class _PositionedRoadVehicle extends StatelessWidget {

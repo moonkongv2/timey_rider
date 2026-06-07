@@ -724,6 +724,13 @@ class _TimerScreenState extends State<TimerScreen>
                             : handlePauseResume,
                         onComplete: _isFinishDriving ? null : _confirmComplete,
                       ),
+                      compactControls: _CompactLandscapeControls(
+                        isPaused: _controller.isPaused,
+                        onPauseResume: _isFinishDriving
+                            ? null
+                            : handlePauseResume,
+                        onComplete: _isFinishDriving ? null : _confirmComplete,
+                      ),
                     );
                   }
 
@@ -778,6 +785,7 @@ class _LandscapeTimerLayout extends StatelessWidget {
     required this.motivationVideoLayer,
     required this.onBack,
     required this.controls,
+    required this.compactControls,
   });
 
   final Widget progressCard;
@@ -787,6 +795,7 @@ class _LandscapeTimerLayout extends StatelessWidget {
   final Widget? motivationVideoLayer;
   final VoidCallback onBack;
   final Widget controls;
+  final Widget compactControls;
 
   @override
   Widget build(BuildContext context) {
@@ -799,9 +808,23 @@ class _LandscapeTimerLayout extends StatelessWidget {
       ),
       child: LayoutBuilder(
         builder: (context, constraints) {
+          final isCompactLandscape = constraints.maxHeight < 430;
           final courseViewportHeight = (constraints.maxHeight - AppSpacing.xl)
               .clamp(360.0, 620.0)
               .toDouble();
+          final courseCanvas = _LandscapeCourseCanvas(
+            progressCard: progressCard,
+            remainingTimeBadge: remainingTimeBadge,
+            roadView: roadView,
+            vehicleLayer: vehicleLayer,
+            motivationVideoLayer: motivationVideoLayer,
+            onBack: onBack,
+            compactControls: isCompactLandscape ? compactControls : null,
+          );
+
+          if (isCompactLandscape) {
+            return Center(child: courseCanvas);
+          }
 
           return SingleChildScrollView(
             child: Column(
@@ -809,16 +832,7 @@ class _LandscapeTimerLayout extends StatelessWidget {
                 SizedBox(
                   width: double.infinity,
                   height: courseViewportHeight,
-                  child: Center(
-                    child: _LandscapeCourseCanvas(
-                      progressCard: progressCard,
-                      remainingTimeBadge: remainingTimeBadge,
-                      roadView: roadView,
-                      vehicleLayer: vehicleLayer,
-                      motivationVideoLayer: motivationVideoLayer,
-                      onBack: onBack,
-                    ),
-                  ),
+                  child: Center(child: courseCanvas),
                 ),
                 const SizedBox(height: AppSpacing.md),
                 controls,
@@ -832,6 +846,106 @@ class _LandscapeTimerLayout extends StatelessWidget {
   }
 }
 
+class _CompactLandscapeControls extends StatelessWidget {
+  const _CompactLandscapeControls({
+    required this.isPaused,
+    required this.onPauseResume,
+    required this.onComplete,
+  });
+
+  final bool isPaused;
+  final VoidCallback? onPauseResume;
+  final VoidCallback? onComplete;
+
+  @override
+  Widget build(BuildContext context) {
+    final texts = AppTexts.of(context);
+
+    return Column(
+      key: const ValueKey('compactLandscapeControls'),
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        _CompactLandscapeButton(
+          label: isPaused ? texts.common.restartRide : texts.timer.pauseButton,
+          icon: isPaused ? Icons.play_arrow_rounded : Icons.pause_rounded,
+          onPressed: onPauseResume,
+          variant: _CompactLandscapeButtonVariant.outline,
+        ),
+        const SizedBox(height: AppSpacing.sm),
+        _CompactLandscapeButton(
+          label: texts.timer.completeMealButton,
+          icon: Icons.check_circle_rounded,
+          onPressed: onComplete,
+          variant: _CompactLandscapeButtonVariant.primary,
+        ),
+      ],
+    );
+  }
+}
+
+enum _CompactLandscapeButtonVariant { primary, outline }
+
+class _CompactLandscapeButton extends StatelessWidget {
+  const _CompactLandscapeButton({
+    required this.label,
+    required this.icon,
+    required this.onPressed,
+    required this.variant,
+  });
+
+  final String label;
+  final IconData icon;
+  final VoidCallback? onPressed;
+  final _CompactLandscapeButtonVariant variant;
+
+  @override
+  Widget build(BuildContext context) {
+    final isEnabled = onPressed != null;
+    final isPrimary = variant == _CompactLandscapeButtonVariant.primary;
+    final backgroundColor = isEnabled
+        ? isPrimary
+              ? AppColors.primary
+              : AppColors.white.withValues(alpha: 0.94)
+        : AppColors.brown300.withValues(alpha: 0.30);
+    final foregroundColor = isEnabled
+        ? isPrimary
+              ? AppColors.white
+              : AppColors.brown700
+        : AppColors.brown500.withValues(alpha: 0.56);
+    final border = isPrimary
+        ? null
+        : Border.all(color: AppColors.borderSoft, width: 1.4);
+    return Semantics(
+      label: label,
+      button: true,
+      child: Tooltip(
+        message: label,
+        child: SizedBox(
+          height: 62,
+          width: 62,
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+              color: backgroundColor,
+              borderRadius: AppRadius.card,
+              border: border,
+              boxShadow: isEnabled ? AppShadows.buttonSoft : null,
+            ),
+            child: Material(
+              color: AppColors.transparent,
+              borderRadius: AppRadius.card,
+              clipBehavior: Clip.antiAlias,
+              child: InkWell(
+                onTap: onPressed,
+                child: Icon(icon, color: foregroundColor, size: 28),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 class _LandscapeCourseCanvas extends StatelessWidget {
   const _LandscapeCourseCanvas({
     required this.progressCard,
@@ -840,6 +954,7 @@ class _LandscapeCourseCanvas extends StatelessWidget {
     required this.vehicleLayer,
     required this.motivationVideoLayer,
     required this.onBack,
+    this.compactControls,
   });
 
   final Widget progressCard;
@@ -848,6 +963,7 @@ class _LandscapeCourseCanvas extends StatelessWidget {
   final Widget? vehicleLayer;
   final Widget? motivationVideoLayer;
   final VoidCallback onBack;
+  final Widget? compactControls;
 
   @override
   Widget build(BuildContext context) {
@@ -904,6 +1020,15 @@ class _LandscapeCourseCanvas extends StatelessWidget {
             if (vehicleLayer != null) Positioned.fill(child: vehicleLayer!),
             if (motivationVideoLayer != null)
               Positioned.fill(child: motivationVideoLayer!),
+            if (compactControls != null)
+              Positioned(
+                right: AppSpacing.xl,
+                top: 0,
+                bottom: 0,
+                child: Center(
+                  child: SizedBox(width: 72, child: compactControls!),
+                ),
+              ),
           ],
         ),
       ),
