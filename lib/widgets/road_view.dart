@@ -30,6 +30,7 @@ class RoadView extends StatelessWidget {
     this.ingredients = const [],
     this.ingredientClearProgress,
     this.isRoadMotionActive = false,
+    this.courseDuration = const Duration(minutes: 5),
   });
 
   final double progress;
@@ -45,6 +46,7 @@ class RoadView extends StatelessWidget {
   final List<MealIngredientDefinition> ingredients;
   final double? ingredientClearProgress;
   final bool isRoadMotionActive;
+  final Duration courseDuration;
   static const double _portraitVehicleSize = 164;
   static const double _landscapeVehicleSize = 176;
 
@@ -54,52 +56,52 @@ class RoadView extends StatelessWidget {
 
     return LayoutBuilder(
       builder: (context, constraints) {
-        final size = Size(constraints.maxWidth, constraints.maxHeight);
-        final isLandscape = size.width > size.height;
+        final viewportSize = Size(constraints.maxWidth, constraints.maxHeight);
+        final geometry = createRoadCourseGeometry(
+          viewportSize: viewportSize,
+          duration: courseDuration,
+        );
+        final isLandscape = viewportSize.width > viewportSize.height;
         final vehicleSize = math
             .min(
               isLandscape ? _landscapeVehicleSize : _portraitVehicleSize,
               math.min(
-                size.width * (isLandscape ? 0.24 : 0.38),
-                size.height * (isLandscape ? 0.34 : 0.24),
+                viewportSize.width * (isLandscape ? 0.24 : 0.38),
+                viewportSize.height * (isLandscape ? 0.34 : 0.24),
               ),
             )
             .toDouble();
         const videoMargin = 16.0;
         final videoFrameWidth = isLandscape
             ? math
-                  .min(size.width * 0.36, 460.0)
-                  .clamp(320.0, size.width - (videoMargin * 2))
+                  .min(viewportSize.width * 0.36, 460.0)
+                  .clamp(320.0, viewportSize.width - (videoMargin * 2))
                   .toDouble()
-            : math.max(0.0, size.width - (videoMargin * 2));
+            : math.max(0.0, viewportSize.width - (videoMargin * 2));
         final videoFrameHeight = isLandscape
             ? videoFrameWidth * 9 / 16
             : (videoFrameWidth * 0.62).clamp(
                 132.0,
-                math.max(140.0, size.height * 0.44),
+                math.max(140.0, viewportSize.height * 0.44),
               );
         final videoFrameLeft = isLandscape
-            ? size.width - videoFrameWidth - videoMargin
+            ? viewportSize.width - videoFrameWidth - videoMargin
             : videoMargin;
-        final videoFrameTop = isLandscape ? size.height * 0.18 : videoMargin;
+        final videoFrameTop = isLandscape
+            ? viewportSize.height * 0.18
+            : videoMargin;
         final clampedProgress = progress.clamp(0.0, 1.0).toDouble();
-        final roadPosition = roadPointForProgress(size, clampedProgress);
-        final isVehicleFacingLeft = roadIsFacingLeftForProgress(
-          size,
-          clampedProgress,
+        final cameraOffsetY = roadCameraOffsetForGeometryProgress(
+          geometry: geometry,
+          progress: clampedProgress,
         );
-        final vehiclePosition =
-            roadPosition +
-            _vehicleRoadAnchorOffset(
-              vehicle: vehicle,
-              vehicleSize: vehicleSize,
-              isLandscape: isLandscape,
-              isFacingLeft: isVehicleFacingLeft,
-            );
-        final vehicleOffset = _boundedVehicleOffset(
-          size: size,
-          position: vehiclePosition,
+        final vehiclePlacement = _roadVehiclePlacementForGeometryProgress(
+          geometry: geometry,
+          progress: clampedProgress,
+          vehicle: vehicle,
           vehicleSize: vehicleSize,
+          cameraOffsetY: cameraOffsetY,
+          isLandscape: isLandscape,
         );
         final clearProgress = (ingredientClearProgress ?? clampedProgress)
             .clamp(0.0, 1.0)
@@ -129,42 +131,56 @@ class RoadView extends StatelessWidget {
             borderRadius: AppRadius.hero,
             child: Stack(
               children: [
-                Positioned.fill(
-                  child: _AnimatedRoadPaint(
-                    progress: clampedProgress,
-                    isMotionActive: isRoadMotionActive,
+                Positioned(
+                  left: 0,
+                  top: -cameraOffsetY,
+                  width: geometry.canvasSize.width,
+                  height: geometry.canvasSize.height,
+                  child: Stack(
+                    children: [
+                      Positioned.fill(
+                        child: _AnimatedRoadPaint(
+                          progress: clampedProgress,
+                          isMotionActive: isRoadMotionActive,
+                          geometry: geometry,
+                        ),
+                      ),
+                      if (ingredients.isNotEmpty)
+                        _RoadIngredientLayer(
+                          ingredients: ingredients,
+                          clearProgress: clearProgress,
+                          geometry: geometry,
+                          markerSize: isLandscape ? 36 : 34,
+                        ),
+                      _RoadMarker(
+                        position: roadPointForGeometryProgress(geometry, 0),
+                        icon: Icons.home_rounded,
+                        label: texts.common.start,
+                        isActive: true,
+                        size: isLandscape ? 42 : 36,
+                      ),
+                      _RoadMarker(
+                        position: roadPointForGeometryProgress(geometry, 1),
+                        icon: Icons.flag_rounded,
+                        label: texts.common.complete,
+                        isActive: clampedProgress >= 1,
+                        size: isLandscape ? 42 : 36,
+                      ),
+                      if (showVehicle)
+                        _PositionedRoadVehicle(
+                          progress: clampedProgress,
+                          vehicle: vehicle,
+                          vehicleSize: vehicleSize,
+                          vehicleLeft: vehiclePlacement.contentOffset.dx,
+                          vehicleTop: vehiclePlacement.contentOffset.dy,
+                          isVehicleFacingLeft:
+                              vehiclePlacement.isVehicleFacingLeft,
+                          avatar: avatar,
+                          avatarImageBuilder: avatarImageBuilder,
+                        ),
+                    ],
                   ),
                 ),
-                if (ingredients.isNotEmpty)
-                  _RoadIngredientLayer(
-                    ingredients: ingredients,
-                    clearProgress: clearProgress,
-                  ),
-                _RoadMarker(
-                  position: roadPointForProgress(size, 0),
-                  icon: Icons.home_rounded,
-                  label: texts.common.start,
-                  isActive: true,
-                  size: isLandscape ? 42 : 36,
-                ),
-                _RoadMarker(
-                  position: roadPointForProgress(size, 1),
-                  icon: Icons.flag_rounded,
-                  label: texts.common.complete,
-                  isActive: clampedProgress >= 1,
-                  size: isLandscape ? 42 : 36,
-                ),
-                if (showVehicle)
-                  _PositionedRoadVehicle(
-                    progress: clampedProgress,
-                    vehicle: vehicle,
-                    vehicleSize: vehicleSize,
-                    vehicleLeft: vehicleOffset.dx,
-                    vehicleTop: vehicleOffset.dy,
-                    isVehicleFacingLeft: isVehicleFacingLeft,
-                    avatar: avatar,
-                    avatarImageBuilder: avatarImageBuilder,
-                  ),
                 if (showMotivationVideo &&
                     motivationVideoAssetPath != null &&
                     motivationVideoMilestone != null)
@@ -194,10 +210,12 @@ class _AnimatedRoadPaint extends StatefulWidget {
   const _AnimatedRoadPaint({
     required this.progress,
     required this.isMotionActive,
+    required this.geometry,
   });
 
   final double progress;
   final bool isMotionActive;
+  final RoadCourseGeometry geometry;
 
   @override
   State<_AnimatedRoadPaint> createState() => _AnimatedRoadPaintState();
@@ -255,7 +273,12 @@ class _AnimatedRoadPaintState extends State<_AnimatedRoadPaint>
   @override
   Widget build(BuildContext context) {
     if (!_shouldAnimate) {
-      return CustomPaint(painter: RoadPainter(progress: widget.progress));
+      return CustomPaint(
+        painter: RoadPainter(
+          progress: widget.progress,
+          geometry: widget.geometry,
+        ),
+      );
     }
 
     return AnimatedBuilder(
@@ -266,6 +289,7 @@ class _AnimatedRoadPaintState extends State<_AnimatedRoadPaint>
             progress: widget.progress,
             laneDashPhase:
                 _controller.value * RoadPainter.laneDashPatternLength,
+            geometry: widget.geometry,
           ),
         );
       },
@@ -277,35 +301,31 @@ class _RoadIngredientLayer extends StatelessWidget {
   const _RoadIngredientLayer({
     required this.ingredients,
     required this.clearProgress,
+    required this.geometry,
+    required this.markerSize,
   });
 
   final List<MealIngredientDefinition> ingredients;
   final double clearProgress;
+  final RoadCourseGeometry geometry;
+  final double markerSize;
 
   @override
   Widget build(BuildContext context) {
     return IgnorePointer(
-      child: LayoutBuilder(
-        builder: (context, constraints) {
-          final size = Size(constraints.maxWidth, constraints.maxHeight);
-          final isLandscape = size.width > size.height;
-          final markerSize = isLandscape ? 36.0 : 34.0;
-
-          return Stack(
-            children: [
-              for (var index = 0; index < ingredients.length; index += 1)
-                _RoadIngredientMarker(
-                  key: ValueKey('roadIngredientSlot_$index'),
-                  ingredient: ingredients[index],
-                  index: index,
-                  markerSize: markerSize,
-                  progress: (index + 1) / (ingredients.length + 1),
-                  clearProgress: clearProgress,
-                  roadSize: size,
-                ),
-            ],
-          );
-        },
+      child: Stack(
+        children: [
+          for (var index = 0; index < ingredients.length; index += 1)
+            _RoadIngredientMarker(
+              key: ValueKey('roadIngredientSlot_$index'),
+              ingredient: ingredients[index],
+              index: index,
+              markerSize: markerSize,
+              progress: (index + 1) / (ingredients.length + 1),
+              clearProgress: clearProgress,
+              geometry: geometry,
+            ),
+        ],
       ),
     );
   }
@@ -319,7 +339,7 @@ class _RoadIngredientMarker extends StatelessWidget {
     required this.markerSize,
     required this.progress,
     required this.clearProgress,
-    required this.roadSize,
+    required this.geometry,
   });
 
   final MealIngredientDefinition ingredient;
@@ -327,11 +347,11 @@ class _RoadIngredientMarker extends StatelessWidget {
   final double markerSize;
   final double progress;
   final double clearProgress;
-  final Size roadSize;
+  final RoadCourseGeometry geometry;
 
   @override
   Widget build(BuildContext context) {
-    final position = roadPointForProgress(roadSize, progress);
+    final position = roadPointForGeometryProgress(geometry, progress);
     final isCleared = clearProgress >= progress;
 
     return Positioned(
@@ -480,6 +500,7 @@ class RoadVehicleLayer extends StatelessWidget {
     required this.vehicle,
     this.avatar = VehicleAvatarPresentation.defaultImage,
     this.avatarImageBuilder,
+    this.courseDuration = const Duration(minutes: 5),
   });
 
   final double progress;
@@ -487,43 +508,45 @@ class RoadVehicleLayer extends StatelessWidget {
   final VehicleAvatarPresentation avatar;
   final Widget Function(BuildContext context, String imagePath)?
   avatarImageBuilder;
+  final Duration courseDuration;
 
   @override
   Widget build(BuildContext context) {
     return IgnorePointer(
       child: LayoutBuilder(
         builder: (context, constraints) {
-          final size = Size(constraints.maxWidth, constraints.maxHeight);
-          final isLandscape = size.width > size.height;
+          final viewportSize = Size(
+            constraints.maxWidth,
+            constraints.maxHeight,
+          );
+          final geometry = createRoadCourseGeometry(
+            viewportSize: viewportSize,
+            duration: courseDuration,
+          );
+          final isLandscape = viewportSize.width > viewportSize.height;
           final vehicleSize = math
               .min(
                 isLandscape
                     ? RoadView._landscapeVehicleSize
                     : RoadView._portraitVehicleSize,
                 math.min(
-                  size.width * (isLandscape ? 0.24 : 0.38),
-                  size.height * (isLandscape ? 0.34 : 0.24),
+                  viewportSize.width * (isLandscape ? 0.24 : 0.38),
+                  viewportSize.height * (isLandscape ? 0.34 : 0.24),
                 ),
               )
               .toDouble();
           final clampedProgress = progress.clamp(0.0, 1.0).toDouble();
-          final roadPosition = roadPointForProgress(size, clampedProgress);
-          final isVehicleFacingLeft = roadIsFacingLeftForProgress(
-            size,
-            clampedProgress,
+          final cameraOffsetY = roadCameraOffsetForGeometryProgress(
+            geometry: geometry,
+            progress: clampedProgress,
           );
-          final vehiclePosition =
-              roadPosition +
-              _vehicleRoadAnchorOffset(
-                vehicle: vehicle,
-                vehicleSize: vehicleSize,
-                isLandscape: isLandscape,
-                isFacingLeft: isVehicleFacingLeft,
-              );
-          final vehicleOffset = _boundedVehicleOffset(
-            size: size,
-            position: vehiclePosition,
+          final vehiclePlacement = _roadVehiclePlacementForGeometryProgress(
+            geometry: geometry,
+            progress: clampedProgress,
+            vehicle: vehicle,
             vehicleSize: vehicleSize,
+            cameraOffsetY: cameraOffsetY,
+            isLandscape: isLandscape,
           );
 
           return Stack(
@@ -532,9 +555,9 @@ class RoadVehicleLayer extends StatelessWidget {
                 progress: clampedProgress,
                 vehicle: vehicle,
                 vehicleSize: vehicleSize,
-                vehicleLeft: vehicleOffset.dx,
-                vehicleTop: vehicleOffset.dy,
-                isVehicleFacingLeft: isVehicleFacingLeft,
+                vehicleLeft: vehiclePlacement.viewportOffset.dx,
+                vehicleTop: vehiclePlacement.viewportOffset.dy,
+                isVehicleFacingLeft: vehiclePlacement.isVehicleFacingLeft,
                 avatar: avatar,
                 avatarImageBuilder: avatarImageBuilder,
               ),
@@ -544,6 +567,53 @@ class RoadVehicleLayer extends StatelessWidget {
       ),
     );
   }
+}
+
+class _RoadVehiclePlacement {
+  const _RoadVehiclePlacement({
+    required this.contentOffset,
+    required this.viewportOffset,
+    required this.isVehicleFacingLeft,
+  });
+
+  final Offset contentOffset;
+  final Offset viewportOffset;
+  final bool isVehicleFacingLeft;
+}
+
+_RoadVehiclePlacement _roadVehiclePlacementForGeometryProgress({
+  required RoadCourseGeometry geometry,
+  required double progress,
+  required VehicleDefinition vehicle,
+  required double vehicleSize,
+  required double cameraOffsetY,
+  required bool isLandscape,
+}) {
+  final isVehicleFacingLeft = roadIsFacingLeftForGeometryProgress(
+    geometry,
+    progress,
+  );
+  final roadPosition = roadPointForGeometryProgress(geometry, progress);
+  final viewportRoadPosition = roadPosition - Offset(0, cameraOffsetY);
+  final vehiclePosition =
+      viewportRoadPosition +
+      _vehicleRoadAnchorOffset(
+        vehicle: vehicle,
+        vehicleSize: vehicleSize,
+        isLandscape: isLandscape,
+        isFacingLeft: isVehicleFacingLeft,
+      );
+  final viewportOffset = _boundedVehicleOffset(
+    size: geometry.viewportSize,
+    position: vehiclePosition,
+    vehicleSize: vehicleSize,
+  );
+
+  return _RoadVehiclePlacement(
+    contentOffset: viewportOffset + Offset(0, cameraOffsetY),
+    viewportOffset: viewportOffset,
+    isVehicleFacingLeft: isVehicleFacingLeft,
+  );
 }
 
 Offset _vehicleRoadAnchorOffset({

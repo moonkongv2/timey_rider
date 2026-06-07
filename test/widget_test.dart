@@ -2334,6 +2334,82 @@ void main() {
     }
   });
 
+  testWidgets('RoadView keeps long-course vehicle inside viewport', (
+    tester,
+  ) async {
+    Future<void> pumpLongRoad(double progress) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: SizedBox(
+              width: 420,
+              height: 640,
+              child: RoadView(
+                progress: progress,
+                vehicle: VehicleCatalog.fireTruck,
+                courseDuration: const Duration(minutes: 60),
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.pump();
+    }
+
+    for (final progress in const [0.0, 0.5, 1.0]) {
+      await pumpLongRoad(progress);
+
+      final roadRect = tester.getRect(find.byType(RoadView));
+      final vehicleRect = tester.getRect(find.byType(VehicleWidget));
+      expect(vehicleRect.left, greaterThanOrEqualTo(roadRect.left));
+      expect(vehicleRect.top, greaterThanOrEqualTo(roadRect.top));
+      expect(vehicleRect.right, lessThanOrEqualTo(roadRect.right));
+      expect(vehicleRect.bottom, lessThanOrEqualTo(roadRect.bottom));
+    }
+
+    await tester.pumpWidget(const SizedBox.shrink());
+    await tester.pump();
+  });
+
+  testWidgets(
+    'RoadView keeps long-course ingredient markers in the road layer',
+    (tester) async {
+      final ingredients = MealIngredientCatalog.courseSlotsFor([
+        'carrot',
+        'egg',
+      ]);
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: SizedBox(
+              width: 420,
+              height: 640,
+              child: RoadView(
+                progress: 0.5,
+                vehicle: VehicleCatalog.fireTruck,
+                ingredients: ingredients,
+                ingredientClearProgress: 0,
+                courseDuration: const Duration(minutes: 60),
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.pump();
+
+      for (var index = 0; index < ingredients.length; index += 1) {
+        expect(
+          find.byKey(ValueKey('roadIngredientMarker_$index')),
+          findsOneWidget,
+        );
+      }
+
+      await tester.pumpWidget(const SizedBox.shrink());
+      await tester.pump();
+    },
+  );
+
   test('RoadPainter roadStrokeWidthForSize stays within expected clamps', () {
     expect(roadStrokeWidthForSize(const Size(100, 640)), 22);
     expect(roadStrokeWidthForSize(const Size(1000, 1200)), 32);
@@ -2615,6 +2691,80 @@ void main() {
       find.byKey(const ValueKey('motivationVideoBubble_10')),
     );
     expect(insetVideoRect.right, lessThanOrEqualTo(1200 - 16 - 92));
+
+    await tester.pumpWidget(const SizedBox.shrink());
+    await tester.pump();
+  });
+
+  testWidgets('RoadView keeps motivation video fixed while long road scrolls', (
+    tester,
+  ) async {
+    Future<void> pumpLongRoadWithVideo(double progress) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: SizedBox(
+              width: 420,
+              height: 640,
+              child: RoadView(
+                progress: progress,
+                vehicle: VehicleCatalog.fireTruck,
+                motivationVideoAssetPath:
+                    MotivationAssetCatalog.fallbackVideoPath,
+                motivationVideoMilestone: 10,
+                courseDuration: const Duration(minutes: 60),
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.pump();
+    }
+
+    await pumpLongRoadWithVideo(0);
+    final startRect = tester.getRect(
+      find.byKey(const ValueKey('motivationVideoBubble_10')),
+    );
+
+    await pumpLongRoadWithVideo(0.5);
+    final middleRect = tester.getRect(
+      find.byKey(const ValueKey('motivationVideoBubble_10')),
+    );
+
+    expect(middleRect.left, closeTo(startRect.left, 0.1));
+    expect(middleRect.top, closeTo(startRect.top, 0.1));
+
+    await tester.pumpWidget(const SizedBox.shrink());
+    await tester.pump();
+  });
+
+  testWidgets('RoadVehicleLayer keeps long-course vehicle inside viewport', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: SizedBox(
+            width: 1200,
+            height: 520,
+            child: RoadVehicleLayer(
+              progress: 0.5,
+              vehicle: VehicleCatalog.fireTruck,
+              courseDuration: const Duration(minutes: 60),
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.pump();
+
+    final layerRect = tester.getRect(find.byType(RoadVehicleLayer));
+    final vehicleRect = tester.getRect(find.byType(VehicleWidget));
+    expect(vehicleRect.left, greaterThanOrEqualTo(layerRect.left));
+    expect(vehicleRect.top, greaterThanOrEqualTo(layerRect.top));
+    expect(vehicleRect.right, lessThanOrEqualTo(layerRect.right));
+    expect(vehicleRect.bottom, lessThanOrEqualTo(layerRect.bottom));
+    expect(tester.takeException(), isNull);
 
     await tester.pumpWidget(const SizedBox.shrink());
     await tester.pump();
