@@ -2188,6 +2188,145 @@ void main() {
     expect(find.text('남은 식사 시간'), findsNothing);
   });
 
+  testWidgets('Settings screen updates motivation video settings', (
+    tester,
+  ) async {
+    var latestConfig = MealTimerConfig.defaults();
+
+    await tester.pumpWidget(
+      MaterialApp(
+        locale: const Locale('en'),
+        supportedLocales: const [Locale('ko'), Locale('en')],
+        localizationsDelegates: const [
+          GlobalMaterialLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+        ],
+        home: SettingsScreen(
+          config: latestConfig,
+          onConfigChanged: (config) => latestConfig = config,
+        ),
+      ),
+    );
+
+    expect(
+      find.byKey(const ValueKey('motivationVideoIntervalSegmentedButton')),
+      findsNothing,
+    );
+
+    tester
+        .widget<SwitchListTile>(
+          find.byKey(const ValueKey('motivationVideoCustomIntervalSwitch')),
+        )
+        .onChanged!(true);
+    await tester.pump();
+
+    expect(latestConfig.motivationVideoUseCustomInterval, isTrue);
+    expect(
+      find.byKey(const ValueKey('motivationVideoIntervalSegmentedButton')),
+      findsOneWidget,
+    );
+
+    tester
+        .widget<SegmentedButton<int>>(
+          find.byKey(const ValueKey('motivationVideoIntervalSegmentedButton')),
+        )
+        .onSelectionChanged!({10});
+    await tester.pump();
+
+    expect(latestConfig.motivationVideoInterval, const Duration(minutes: 10));
+
+    tester
+        .widget<SwitchListTile>(
+          find.byKey(const ValueKey('motivationVideoEnabledSwitch')),
+        )
+        .onChanged!(false);
+    await tester.pump();
+
+    expect(latestConfig.motivationVideoEnabled, isFalse);
+    expect(
+      tester
+          .widget<SwitchListTile>(
+            find.byKey(const ValueKey('motivationVideoCustomIntervalSwitch')),
+          )
+          .onChanged,
+      isNull,
+    );
+    expect(
+      find.byKey(const ValueKey('motivationVideoIntervalSegmentedButton')),
+      findsNothing,
+    );
+  });
+
+  testWidgets('Home settings apply motivation video settings to new timers', (
+    tester,
+  ) async {
+    MealTimerConfig? changedConfig;
+
+    await tester.pumpWidget(
+      MaterialApp(
+        locale: const Locale('ko'),
+        supportedLocales: const [Locale('ko'), Locale('en')],
+        localizationsDelegates: const [
+          GlobalMaterialLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+        ],
+        home: HomeScreen(
+          config: MealTimerConfig.defaults().copyWith(childName: '지율'),
+          mealProgressService: LocalMealProgressService(),
+          onConfigChanged: (config) => changedConfig = config,
+        ),
+      ),
+    );
+    await tester.pump();
+
+    await tester.tap(find.byTooltip('설정'));
+    await tester.pumpAndSettle();
+
+    tester
+        .widget<SwitchListTile>(
+          find.byKey(const ValueKey('motivationVideoCustomIntervalSwitch')),
+        )
+        .onChanged!(true);
+    await tester.pump();
+
+    tester
+        .widget<SegmentedButton<int>>(
+          find.byKey(const ValueKey('motivationVideoIntervalSegmentedButton')),
+        )
+        .onSelectionChanged!({5});
+    await tester.pump();
+
+    await tester.tap(find.byType(BackButton));
+    await tester.pumpAndSettle();
+
+    expect(changedConfig?.motivationVideoUseCustomInterval, isTrue);
+    expect(changedConfig?.motivationVideoInterval, const Duration(minutes: 5));
+
+    final regularCourseButton = tester.widget<AppBouncyButton>(
+      find.ancestor(
+        of: find.textContaining('25분 보통 코스'),
+        matching: find.byType(AppBouncyButton),
+      ),
+    );
+    regularCourseButton.onPressed!();
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 400));
+    await tester.tap(
+      find.byKey(const ValueKey('randomStartMealIngredientsButton')),
+    );
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 400));
+
+    final timerConfig = tester
+        .widget<TimerScreen>(find.byType(TimerScreen))
+        .config;
+    expect(timerConfig.duration, const Duration(minutes: 25));
+    expect(timerConfig.motivationVideoUseCustomInterval, isTrue);
+    expect(timerConfig.motivationVideoInterval, const Duration(minutes: 5));
+  });
+
   testWidgets('Settings screen keeps vehicle and avatar actions on home', (
     tester,
   ) async {

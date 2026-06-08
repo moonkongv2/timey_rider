@@ -4,6 +4,20 @@ import '../catalogs/meal_course_catalog.dart';
 import '../l10n/app_texts.dart';
 import '../models/meal_timer_config.dart';
 
+const _motivationVideoIntervalOptions = [
+  Duration(minutes: 3),
+  Duration(minutes: 5),
+  Duration(minutes: 10),
+];
+
+int _normalizedMotivationVideoIntervalMinutes(Duration interval) {
+  if (_motivationVideoIntervalOptions.contains(interval)) {
+    return interval.inMinutes;
+  }
+
+  return _motivationVideoIntervalOptions.first.inMinutes;
+}
+
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({
     super.key,
@@ -62,6 +76,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
   @override
   Widget build(BuildContext context) {
     final texts = AppTexts.of(context);
+    final motivationVideoIntervalMinutes =
+        _normalizedMotivationVideoIntervalMinutes(
+          _config.motivationVideoInterval,
+        );
 
     return Scaffold(
       appBar: AppBar(title: Text(texts.settings.title)),
@@ -127,6 +145,85 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     _update(_config.copyWith(keepScreenAwake: value));
                   },
                 ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 20),
+          Card(
+            child: Column(
+              children: [
+                SwitchListTile(
+                  key: const ValueKey('motivationVideoEnabledSwitch'),
+                  title: Text(texts.settings.motivationVideoEnabled),
+                  value: _config.motivationVideoEnabled,
+                  onChanged: (value) {
+                    _update(_config.copyWith(motivationVideoEnabled: value));
+                  },
+                ),
+                SwitchListTile(
+                  key: const ValueKey('motivationVideoCustomIntervalSwitch'),
+                  title: Text(texts.settings.motivationVideoCustomInterval),
+                  value: _config.motivationVideoUseCustomInterval,
+                  onChanged: _config.motivationVideoEnabled
+                      ? (value) {
+                          _update(
+                            _config.copyWith(
+                              motivationVideoUseCustomInterval: value,
+                            ),
+                          );
+                        }
+                      : null,
+                ),
+                if (_config.motivationVideoEnabled &&
+                    _config.motivationVideoUseCustomInterval)
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(20, 8, 20, 20),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          texts.settings.motivationVideoInterval,
+                          style: Theme.of(context).textTheme.titleMedium
+                              ?.copyWith(fontWeight: FontWeight.w900),
+                        ),
+                        const SizedBox(height: 12),
+                        SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          child: SegmentedButton<int>(
+                            key: const ValueKey(
+                              'motivationVideoIntervalSegmentedButton',
+                            ),
+                            segments: [
+                              for (final interval
+                                  in _motivationVideoIntervalOptions)
+                                ButtonSegment(
+                                  value: interval.inMinutes,
+                                  label: Text(
+                                    texts.settings
+                                        .motivationVideoIntervalSegmentLabel(
+                                          interval.inMinutes,
+                                        ),
+                                  ),
+                                ),
+                            ],
+                            selected: {motivationVideoIntervalMinutes},
+                            onSelectionChanged: (selected) {
+                              if (selected.isEmpty) {
+                                return;
+                              }
+                              _update(
+                                _config.copyWith(
+                                  motivationVideoInterval: Duration(
+                                    minutes: selected.first,
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
               ],
             ),
           ),
