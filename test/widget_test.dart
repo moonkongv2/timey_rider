@@ -4137,18 +4137,26 @@ void main() {
       final controlsRect = tester.getRect(
         find.byKey(const ValueKey('compactLandscapeControls')),
       );
+      final settingsRect = tester.getRect(
+        find.byKey(const ValueKey('motivationSettingsButton')),
+      );
+      final pauseRect = tester.getRect(find.byIcon(Icons.pause_rounded));
       final roadBounds = createRoadBounds(const Size(1200, 520));
       final expectedRoadRight =
           roadRect.left + (roadRect.width * roadBounds.right / 1200);
 
       expect(find.byType(SingleChildScrollView), findsNothing);
       expect(find.byType(TimerControlBar), findsNothing);
+      expect(find.byIcon(Icons.video_settings_rounded), findsOneWidget);
       expect(roadRect.width, greaterThan(760));
       expect(roadRect.height, greaterThan(320));
       expect(controlsRect.left, greaterThanOrEqualTo(expectedRoadRight));
       expect(controlsRect.right, lessThanOrEqualTo(roadRect.right));
       expect(controlsRect.width, lessThanOrEqualTo(72));
-      expect(controlsRect.height, lessThanOrEqualTo(132));
+      expect(controlsRect.height, lessThanOrEqualTo(210));
+      expect(controlsRect.contains(settingsRect.center), isTrue);
+      expect(controlsRect.contains(pauseRect.center), isTrue);
+      expect(settingsRect.bottom, lessThanOrEqualTo(pauseRect.top));
       expect(
         controlsRect.right,
         lessThanOrEqualTo(tester.view.physicalSize.width),

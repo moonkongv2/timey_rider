@@ -865,6 +865,7 @@ class _TimerScreenState extends State<TimerScreen>
                       ),
                       compactControls: _CompactLandscapeControls(
                         isPaused: _controller.isPaused,
+                        onMotivationSettings: _openMotivationSettings,
                         onPauseResume: _isFinishDriving
                             ? null
                             : handlePauseResume,
@@ -991,11 +992,13 @@ class _LandscapeTimerLayout extends StatelessWidget {
 class _CompactLandscapeControls extends StatelessWidget {
   const _CompactLandscapeControls({
     required this.isPaused,
+    required this.onMotivationSettings,
     required this.onPauseResume,
     required this.onComplete,
   });
 
   final bool isPaused;
+  final VoidCallback onMotivationSettings;
   final VoidCallback? onPauseResume;
   final VoidCallback? onComplete;
 
@@ -1007,6 +1010,14 @@ class _CompactLandscapeControls extends StatelessWidget {
       key: const ValueKey('compactLandscapeControls'),
       mainAxisSize: MainAxisSize.min,
       children: [
+        _CompactLandscapeButton(
+          key: const ValueKey('motivationSettingsButton'),
+          label: texts.settings.motivationVideoEnabled,
+          icon: Icons.video_settings_rounded,
+          onPressed: onMotivationSettings,
+          variant: _CompactLandscapeButtonVariant.outline,
+        ),
+        const SizedBox(height: AppSpacing.sm),
         _CompactLandscapeButton(
           label: isPaused ? texts.common.restartRide : texts.timer.pauseButton,
           icon: isPaused ? Icons.play_arrow_rounded : Icons.pause_rounded,
@@ -1029,6 +1040,7 @@ enum _CompactLandscapeButtonVariant { primary, outline }
 
 class _CompactLandscapeButton extends StatelessWidget {
   const _CompactLandscapeButton({
+    super.key,
     required this.label,
     required this.icon,
     required this.onPressed,
@@ -1160,13 +1172,17 @@ class _LandscapeCourseCanvas extends StatelessWidget {
                     icon: Icons.arrow_back_rounded,
                     onPressed: onBack,
                   ),
-                  const SizedBox(width: AppSpacing.sm),
-                  _LandscapeIconButton(
-                    key: const ValueKey('motivationSettingsButton'),
-                    label: AppTexts.of(context).settings.motivationVideoEnabled,
-                    icon: Icons.video_settings_rounded,
-                    onPressed: onMotivationSettings,
-                  ),
+                  if (compactControls == null) ...[
+                    const SizedBox(width: AppSpacing.sm),
+                    _LandscapeIconButton(
+                      key: const ValueKey('motivationSettingsButton'),
+                      label: AppTexts.of(
+                        context,
+                      ).settings.motivationVideoEnabled,
+                      icon: Icons.video_settings_rounded,
+                      onPressed: onMotivationSettings,
+                    ),
+                  ],
                 ],
               ),
             ),
