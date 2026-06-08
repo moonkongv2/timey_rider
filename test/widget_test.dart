@@ -2250,6 +2250,7 @@ void main() {
           rawRoadPoint.dy +
           (vehicleSize * VehicleCatalog.tRex.roadAnchorOffset.portraitDyRatio);
 
+      expect(vehicleSize, closeTo(120, 0.1));
       expect(
         tester.getCenter(find.byType(VehicleWidget)).dy,
         closeTo(expectedVehicleCenterY, 1),

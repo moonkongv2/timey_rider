@@ -67,7 +67,7 @@ class RoadView extends StatelessWidget {
               isLandscape ? _landscapeVehicleSize : _portraitVehicleSize,
               math.min(
                 viewportSize.width * (isLandscape ? 0.24 : 0.38),
-                viewportSize.height * (isLandscape ? 0.34 : 0.24),
+                viewportSize.height * (isLandscape ? 0.34 : 0.20),
               ),
             )
             .toDouble();
@@ -531,7 +531,7 @@ class RoadVehicleLayer extends StatelessWidget {
                     : RoadView._portraitVehicleSize,
                 math.min(
                   viewportSize.width * (isLandscape ? 0.24 : 0.38),
-                  viewportSize.height * (isLandscape ? 0.34 : 0.24),
+                  viewportSize.height * (isLandscape ? 0.34 : 0.20),
                 ),
               )
               .toDouble();
