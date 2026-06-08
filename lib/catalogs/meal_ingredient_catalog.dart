@@ -4,6 +4,9 @@ import '../models/meal_ingredient.dart';
 
 abstract final class MealIngredientCatalog {
   static const maxSelectableIngredientCount = 5;
+  static const minCourseSlotCount = 30;
+  static const maxCourseSlotCount = 144;
+  static const referenceCourseDuration = Duration(minutes: 5);
 
   static const carrot = MealIngredientDefinition(
     id: 'carrot',
@@ -163,7 +166,7 @@ abstract final class MealIngredientCatalog {
 
   static List<MealIngredientDefinition> courseSlotsFor(
     List<String> selectedIds, {
-    int slotCount = 30,
+    int slotCount = minCourseSlotCount,
   }) {
     if (slotCount <= 0) {
       return const [];
@@ -187,6 +190,20 @@ abstract final class MealIngredientCatalog {
     }
 
     return List.unmodifiable(slots);
+  }
+
+  static int courseSlotCountForDuration(Duration duration) {
+    if (duration <= Duration.zero) {
+      return minCourseSlotCount;
+    }
+
+    final durationFactor =
+        duration.inMilliseconds / referenceCourseDuration.inMilliseconds;
+    final clampedFactor = math.max(1.0, durationFactor);
+    final targetSlotCount = (18 * clampedFactor).round();
+    return targetSlotCount
+        .clamp(minCourseSlotCount, maxCourseSlotCount)
+        .toInt();
   }
 
   static List<MealIngredientDefinition> _ingredientsForIds(List<String> ids) {

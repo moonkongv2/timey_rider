@@ -101,6 +101,45 @@ void main() {
     expect(slots, hasLength(30));
   });
 
+  test('Meal ingredient course slot count scales with duration', () {
+    expect(
+      MealIngredientCatalog.courseSlotCountForDuration(
+        const Duration(minutes: 1),
+      ),
+      30,
+    );
+    expect(
+      MealIngredientCatalog.courseSlotCountForDuration(
+        const Duration(minutes: 5),
+      ),
+      30,
+    );
+    expect(
+      MealIngredientCatalog.courseSlotCountForDuration(
+        const Duration(minutes: 15),
+      ),
+      54,
+    );
+    expect(
+      MealIngredientCatalog.courseSlotCountForDuration(
+        const Duration(minutes: 25),
+      ),
+      90,
+    );
+    expect(
+      MealIngredientCatalog.courseSlotCountForDuration(
+        const Duration(minutes: 35),
+      ),
+      126,
+    );
+    expect(
+      MealIngredientCatalog.courseSlotCountForDuration(
+        const Duration(minutes: 60),
+      ),
+      144,
+    );
+  });
+
   test('Meal ingredient course slots only uses selected ids', () {
     const selectedIds = ['egg', 'rice', 'tomato'];
     final slots = MealIngredientCatalog.courseSlotsFor(selectedIds);
@@ -2940,7 +2979,14 @@ void main() {
     await tester.pump();
 
     final roadView = tester.widget<RoadView>(find.byType(RoadView));
-    expect(roadView.ingredients, hasLength(30));
+    expect(
+      roadView.ingredients,
+      hasLength(
+        MealIngredientCatalog.courseSlotCountForDuration(
+          MealTimerConfig.defaults().duration,
+        ),
+      ),
+    );
     expect(roadView.ingredients.map((ingredient) => ingredient.id).toSet(), {
       'carrot',
       'egg',

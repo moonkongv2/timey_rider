@@ -591,6 +591,9 @@ class _TimerScreenState extends State<TimerScreen>
         );
         final courseIngredients = MealIngredientCatalog.courseSlotsFor(
           widget.config.courseIngredientIds,
+          slotCount: MealIngredientCatalog.courseSlotCountForDuration(
+            widget.config.duration,
+          ),
         );
         final timerProgress = _controller.progress.clamp(0.0, 1.0).toDouble();
         final displayProgress = _isFinishDriving
