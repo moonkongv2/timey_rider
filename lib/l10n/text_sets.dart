@@ -179,7 +179,7 @@ abstract interface class ResultTextSet {
   String get recordSaved;
 
   String title(bool mealCompleted);
-  String primaryMessage(bool mealCompleted);
+  String primaryMessage(bool mealCompleted, {String? vehicleId});
   String secondaryMessage(bool mealCompleted);
 }
 

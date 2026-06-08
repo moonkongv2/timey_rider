@@ -543,6 +543,13 @@ void main() {
 
   testWidgets('Failed result screen skips the intro video', (tester) async {
     SharedPreferences.setMockInitialValues({});
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(() {
+      tester.view.resetPhysicalSize();
+      tester.view.resetDevicePixelRatio();
+    });
+
     final service = LocalMealProgressService();
     final introVideoPaths = <String>[];
 
@@ -573,6 +580,10 @@ void main() {
     expect(find.byKey(const ValueKey('resultIntroScreen')), findsNothing);
     expect(find.text('아쉽지만 조금 늦었어'), findsOneWidget);
     expect(find.text('오토바이가 먼저 지나갔어.'), findsOneWidget);
+    expect(
+      _assetImage('assets/images/result_failed_bg_portrait.png'),
+      findsOneWidget,
+    );
     expect(
       _assetImage(failureRiderAssetPathForVehicle(vehicleId: 'motorcycle')),
       findsOneWidget,
@@ -619,6 +630,11 @@ void main() {
 
     expect(
       find.byKey(const ValueKey('compactLandscapeResultCard')),
+      findsOneWidget,
+    );
+    expect(find.text('버스가 먼저 출발했어.'), findsOneWidget);
+    expect(
+      _assetImage('assets/images/result_failed_bg_landscape.png'),
       findsOneWidget,
     );
     expect(
