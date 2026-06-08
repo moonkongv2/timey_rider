@@ -774,6 +774,69 @@ void main() {
     expect(nextMotivationMilestoneForProgress(1.0, {}), isNull);
   });
 
+  test(
+    'Motivation schedule switches to three-minute cadence after 30 minutes',
+    () {
+      expect(usesTimedMotivationSchedule(const Duration(minutes: 30)), isFalse);
+      expect(usesTimedMotivationSchedule(const Duration(minutes: 31)), isTrue);
+
+      expect(
+        nextMotivationMilestoneForTimer(
+          duration: const Duration(minutes: 30),
+          elapsed: const Duration(minutes: 3),
+          progress: 0.10,
+          shownMilestones: {},
+        ),
+        10,
+      );
+      expect(
+        nextMotivationMilestoneForTimer(
+          duration: const Duration(minutes: 60),
+          elapsed: const Duration(minutes: 2, seconds: 59),
+          progress: 0.05,
+          shownMilestones: {},
+        ),
+        isNull,
+      );
+      expect(
+        nextMotivationMilestoneForTimer(
+          duration: const Duration(minutes: 60),
+          elapsed: const Duration(minutes: 3),
+          progress: 0.05,
+          shownMilestones: {},
+        ),
+        3,
+      );
+      expect(
+        nextMotivationMilestoneForTimer(
+          duration: const Duration(minutes: 60),
+          elapsed: const Duration(minutes: 6, seconds: 1),
+          progress: 0.10,
+          shownMilestones: {3},
+        ),
+        6,
+      );
+      expect(
+        nextMotivationMilestoneForTimer(
+          duration: const Duration(minutes: 60),
+          elapsed: const Duration(minutes: 9, seconds: 59),
+          progress: 0.16,
+          shownMilestones: {},
+        ),
+        9,
+      );
+      expect(
+        nextMotivationMilestoneForTimer(
+          duration: const Duration(minutes: 60),
+          elapsed: const Duration(minutes: 60),
+          progress: 1,
+          shownMilestones: {57},
+        ),
+        isNull,
+      );
+    },
+  );
+
   test('Motivation video interval requires at least 10 seconds', () {
     expect(
       canShowMotivationVideoAt(
@@ -3252,6 +3315,62 @@ void main() {
     await tester.pumpWidget(const SizedBox.shrink());
     await tester.pump();
   });
+
+  testWidgets(
+    'Timer screen uses three-minute motivation cadence for long timer',
+    (tester) async {
+      var now = DateTime(2026);
+
+      await tester.pumpWidget(
+        MaterialApp(
+          locale: const Locale('ko'),
+          supportedLocales: const [Locale('ko'), Locale('en')],
+          localizationsDelegates: const [
+            GlobalMaterialLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+          ],
+          home: TimerScreen(
+            config: MealTimerConfig.defaults().copyWith(
+              duration: const Duration(minutes: 60),
+              soundEnabled: false,
+            ),
+            mealProgressService: LocalMealProgressService(),
+            now: () => now,
+            onConfigChanged: (_) {},
+          ),
+        ),
+      );
+      await tester.pump();
+
+      now = now.add(const Duration(minutes: 2, seconds: 59));
+      await tester.pump(const Duration(milliseconds: 250));
+
+      expect(
+        find.byKey(const ValueKey('motivationVideoBubble_3')),
+        findsNothing,
+      );
+      expect(
+        find.byKey(const ValueKey('motivationVideoBubble_10')),
+        findsNothing,
+      );
+
+      now = now.add(const Duration(seconds: 1));
+      await tester.pump(const Duration(milliseconds: 250));
+
+      expect(
+        find.byKey(const ValueKey('motivationVideoBubble_3')),
+        findsOneWidget,
+      );
+      expect(
+        find.byKey(const ValueKey('motivationVideoBubble_10')),
+        findsNothing,
+      );
+
+      await tester.pumpWidget(const SizedBox.shrink());
+      await tester.pump();
+    },
+  );
 
   testWidgets('Timer screen keeps vehicle fixed when paused', (tester) async {
     tester.view.physicalSize = const Size(852, 393);

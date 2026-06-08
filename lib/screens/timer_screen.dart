@@ -32,6 +32,8 @@ const _compactLandscapeControlsWidth = 72.0;
 const _compactLandscapeControlsRightInset =
     _compactLandscapeControlsWidth + AppSpacing.xl;
 const motivationMinimumVideoInterval = Duration(seconds: 10);
+const motivationLongCourseThreshold = Duration(minutes: 30);
+const motivationLongCourseVideoInterval = Duration(minutes: 3);
 const motivationVoiceStartDelay = Duration(milliseconds: 350);
 
 Duration finishDriveDurationForProgress(double startProgress) {
@@ -44,8 +46,11 @@ String? motivationVideoAssetPathForVehicle({
   required String vehicleId,
   required int milestone,
   int Function(int max)? nextInt,
+  bool allowTimedMilestone = false,
 }) {
-  if (milestone < 10 || milestone > 90 || milestone % 10 != 0) {
+  final isProgressMilestone =
+      milestone >= 10 && milestone <= 90 && milestone % 10 == 0;
+  if (!allowTimedMilestone && !isProgressMilestone) {
     return null;
   }
 
@@ -100,6 +105,49 @@ int? nextMotivationMilestoneForProgress(
   }
 
   return null;
+}
+
+bool usesTimedMotivationSchedule(Duration duration) {
+  return duration > motivationLongCourseThreshold;
+}
+
+int? nextTimedMotivationMilestoneForElapsed({
+  required Duration elapsed,
+  required Duration duration,
+  required Set<int> shownMilestones,
+  Duration interval = motivationLongCourseVideoInterval,
+}) {
+  if (interval <= Duration.zero ||
+      elapsed <= Duration.zero ||
+      elapsed >= duration ||
+      elapsed < interval) {
+    return null;
+  }
+
+  final reachedIntervals = elapsed.inMilliseconds ~/ interval.inMilliseconds;
+  final milestone = reachedIntervals * interval.inMinutes;
+  if (milestone <= 0 || shownMilestones.contains(milestone)) {
+    return null;
+  }
+
+  return milestone;
+}
+
+int? nextMotivationMilestoneForTimer({
+  required Duration duration,
+  required Duration elapsed,
+  required double progress,
+  required Set<int> shownMilestones,
+}) {
+  if (usesTimedMotivationSchedule(duration)) {
+    return nextTimedMotivationMilestoneForElapsed(
+      elapsed: elapsed,
+      duration: duration,
+      shownMilestones: shownMilestones,
+    );
+  }
+
+  return nextMotivationMilestoneForProgress(progress, shownMilestones);
 }
 
 String timerArrivalDialogMessage({
@@ -268,9 +316,14 @@ class _TimerScreenState extends State<TimerScreen>
       return;
     }
 
-    final milestone = nextMotivationMilestoneForProgress(
-      _controller.progress,
-      _shownMotivationMilestones,
+    final usesTimedSchedule = usesTimedMotivationSchedule(
+      widget.config.duration,
+    );
+    final milestone = nextMotivationMilestoneForTimer(
+      duration: widget.config.duration,
+      elapsed: _controller.elapsed,
+      progress: _controller.progress,
+      shownMilestones: _shownMotivationMilestones,
     );
     if (milestone == null) {
       return;
@@ -286,6 +339,7 @@ class _TimerScreenState extends State<TimerScreen>
       vehicleId: widget.config.vehicleId,
       milestone: milestone,
       nextInt: _motivationRandom.nextInt,
+      allowTimedMilestone: usesTimedSchedule,
     );
     if (videoPath == null) {
       return;
