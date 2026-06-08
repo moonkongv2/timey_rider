@@ -16,7 +16,8 @@ abstract final class MealIngredientCatalog {
     id: 'egg',
     labelKo: '달걀',
     labelEn: 'Egg',
-    emoji: '🥚',
+    emoji: '🍳',
+    assetPath: 'assets/images/ingredients/egg.png',
   );
 
   static const meat = MealIngredientDefinition(
@@ -52,6 +53,7 @@ abstract final class MealIngredientCatalog {
     labelKo: '김',
     labelEn: 'Seaweed',
     emoji: '🟩',
+    assetPath: 'assets/images/ingredients/seaweed.png',
   );
 
   static const tofu = MealIngredientDefinition(
@@ -59,6 +61,7 @@ abstract final class MealIngredientCatalog {
     labelKo: '두부',
     labelEn: 'Tofu',
     emoji: '⬜',
+    assetPath: 'assets/images/ingredients/tofu.png',
   );
 
   static const broccoli = MealIngredientDefinition(

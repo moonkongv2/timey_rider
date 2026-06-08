@@ -70,6 +70,21 @@ void main() {
     expect(ids.toSet(), hasLength(ids.length));
   });
 
+  test('Meal ingredient image asset paths point to existing files', () {
+    final imageIngredients = [
+      MealIngredientCatalog.egg,
+      MealIngredientCatalog.seaweed,
+      MealIngredientCatalog.tofu,
+    ];
+
+    expect(MealIngredientCatalog.egg.emoji, '🍳');
+    for (final ingredient in imageIngredients) {
+      final assetPath = ingredient.assetPath;
+      expect(assetPath, isNotNull);
+      expect(File(assetPath!).existsSync(), isTrue);
+    }
+  });
+
   test('Meal ingredient random selection returns valid ids', () {
     final ids = MealIngredientCatalog.randomSelectionIds();
 
@@ -921,6 +936,18 @@ void main() {
 
     expect(
       find.byKey(const ValueKey('mealIngredientPickerSheet')),
+      findsOneWidget,
+    );
+    expect(
+      find.byKey(const ValueKey('mealIngredientChipImage_egg')),
+      findsOneWidget,
+    );
+    expect(
+      find.byKey(const ValueKey('mealIngredientChipImage_seaweed')),
+      findsOneWidget,
+    );
+    expect(
+      find.byKey(const ValueKey('mealIngredientChipImage_tofu')),
       findsOneWidget,
     );
     expect(find.byType(TimerScreen), findsNothing);

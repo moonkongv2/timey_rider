@@ -251,7 +251,7 @@ class _IngredientChoiceChip extends StatelessWidget {
       key: ValueKey('mealIngredientChip_${ingredient.id}'),
       selected: isSelected,
       onSelected: isEnabled ? (_) => onSelected() : null,
-      avatar: Text(ingredient.emoji),
+      avatar: _IngredientChipAvatar(ingredient: ingredient),
       label: Text(label),
       labelStyle: Theme.of(context).textTheme.labelLarge?.copyWith(
         color: isSelected ? AppColors.textStrong : AppColors.textPrimary,
@@ -264,6 +264,33 @@ class _IngredientChoiceChip extends StatelessWidget {
         color: isSelected ? AppColors.primarySoft : AppColors.borderSoft,
       ),
       showCheckmark: false,
+    );
+  }
+}
+
+class _IngredientChipAvatar extends StatelessWidget {
+  const _IngredientChipAvatar({required this.ingredient});
+
+  final MealIngredientDefinition ingredient;
+
+  @override
+  Widget build(BuildContext context) {
+    final assetPath = ingredient.assetPath;
+    if (assetPath == null) {
+      return Text(ingredient.emoji);
+    }
+
+    return SizedBox(
+      width: 22,
+      height: 22,
+      child: Image.asset(
+        assetPath,
+        key: ValueKey('mealIngredientChipImage_${ingredient.id}'),
+        fit: BoxFit.contain,
+        errorBuilder: (context, error, stackTrace) {
+          return Center(child: Text(ingredient.emoji));
+        },
+      ),
     );
   }
 }

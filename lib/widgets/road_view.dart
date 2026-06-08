@@ -150,7 +150,7 @@ class RoadView extends StatelessWidget {
                           ingredients: ingredients,
                           clearProgress: clearProgress,
                           geometry: geometry,
-                          markerSize: isLandscape ? 36 : 34,
+                          markerSize: isLandscape ? 50 : 33,
                         ),
                       _RoadMarker(
                         position: roadPointForGeometryProgress(geometry, 0),
