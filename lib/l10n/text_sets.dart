@@ -118,6 +118,9 @@ abstract interface class SettingsTextSet {
   String get title;
   String get showRemainingTime;
   String get soundEnabled;
+  String get motivationVideoEnabled;
+  String get motivationVideoCustomInterval;
+  String get motivationVideoInterval;
   String get keepScreenAwake;
   String get savedOnlySubtitle;
   String get keepScreenAwakeSubtitle;
@@ -136,6 +139,7 @@ abstract interface class SettingsTextSet {
   String get avatarSettingsButton;
 
   String durationSegmentLabel(int minutes);
+  String motivationVideoIntervalSegmentLabel(int minutes);
 }
 
 abstract interface class TimerTextSet {

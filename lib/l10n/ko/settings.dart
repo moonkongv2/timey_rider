@@ -8,6 +8,9 @@ class SettingsTexts implements SettingsTextSet {
   String get title => '설정';
   String get showRemainingTime => '남은 시간 보여주기';
   String get soundEnabled => '효과음 사용';
+  String get motivationVideoEnabled => '동기부여 영상 사용';
+  String get motivationVideoCustomInterval => '영상 간격 직접 설정';
+  String get motivationVideoInterval => '동기부여 영상 간격';
   String get keepScreenAwake => '화면 계속 켜두기';
   String get savedOnlySubtitle => 'MVP에서는 설정만 저장해요';
   String get keepScreenAwakeSubtitle => '식사 타이머 중에 적용돼요';
@@ -26,4 +29,5 @@ class SettingsTexts implements SettingsTextSet {
   String get avatarSettingsButton => '아바타 설정하기';
 
   String durationSegmentLabel(int minutes) => '$minutes분';
+  String motivationVideoIntervalSegmentLabel(int minutes) => '$minutes분';
 }

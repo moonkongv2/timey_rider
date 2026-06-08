@@ -48,6 +48,9 @@ class MealTimerConfig {
     required this.duration,
     required this.showRemainingTime,
     required this.soundEnabled,
+    required this.motivationVideoEnabled,
+    required this.motivationVideoUseCustomInterval,
+    required this.motivationVideoInterval,
     required this.keepScreenAwake,
     required this.courseId,
     required this.vehicleId,
@@ -68,6 +71,9 @@ class MealTimerConfig {
       duration: MealCourseCatalog.defaultDuration,
       showRemainingTime: true,
       soundEnabled: true,
+      motivationVideoEnabled: true,
+      motivationVideoUseCustomInterval: false,
+      motivationVideoInterval: Duration(minutes: 3),
       keepScreenAwake: false,
       courseId: 'park',
       vehicleId: 'motorcycle',
@@ -87,6 +93,9 @@ class MealTimerConfig {
   final Duration duration;
   final bool showRemainingTime;
   final bool soundEnabled;
+  final bool motivationVideoEnabled;
+  final bool motivationVideoUseCustomInterval;
+  final Duration motivationVideoInterval;
   final bool keepScreenAwake;
   final String courseId;
   final String vehicleId;
@@ -105,6 +114,9 @@ class MealTimerConfig {
     Duration? duration,
     bool? showRemainingTime,
     bool? soundEnabled,
+    bool? motivationVideoEnabled,
+    bool? motivationVideoUseCustomInterval,
+    Duration? motivationVideoInterval,
     bool? keepScreenAwake,
     String? courseId,
     String? vehicleId,
@@ -155,6 +167,13 @@ class MealTimerConfig {
       duration: duration ?? this.duration,
       showRemainingTime: showRemainingTime ?? this.showRemainingTime,
       soundEnabled: soundEnabled ?? this.soundEnabled,
+      motivationVideoEnabled:
+          motivationVideoEnabled ?? this.motivationVideoEnabled,
+      motivationVideoUseCustomInterval:
+          motivationVideoUseCustomInterval ??
+          this.motivationVideoUseCustomInterval,
+      motivationVideoInterval:
+          motivationVideoInterval ?? this.motivationVideoInterval,
       keepScreenAwake: keepScreenAwake ?? this.keepScreenAwake,
       courseId: courseId ?? this.courseId,
       vehicleId: vehicleId ?? this.vehicleId,

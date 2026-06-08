@@ -8,6 +8,9 @@ class EnSettingsTexts implements SettingsTextSet {
   String get title => 'Settings';
   String get showRemainingTime => 'Show remaining time';
   String get soundEnabled => 'Sound effects';
+  String get motivationVideoEnabled => 'Motivation videos';
+  String get motivationVideoCustomInterval => 'Use custom video interval';
+  String get motivationVideoInterval => 'Motivation video interval';
   String get keepScreenAwake => 'Keep screen awake';
   String get savedOnlySubtitle => 'This setting is saved but not active yet.';
   String get keepScreenAwakeSubtitle =>
@@ -27,4 +30,5 @@ class EnSettingsTexts implements SettingsTextSet {
   String get avatarSettingsButton => 'Open avatar settings';
 
   String durationSegmentLabel(int minutes) => '$minutes min';
+  String motivationVideoIntervalSegmentLabel(int minutes) => '$minutes min';
 }

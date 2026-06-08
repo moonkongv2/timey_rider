@@ -52,6 +52,9 @@ void main() {
     expect(config.customAvatarVehicleId, isNull);
     expect(config.vehicleId, 'motorcycle');
     expect(config.soundEnabled, isTrue);
+    expect(config.motivationVideoEnabled, isTrue);
+    expect(config.motivationVideoUseCustomInterval, isFalse);
+    expect(config.motivationVideoInterval, const Duration(minutes: 3));
     expect(config.avatarScale, 1.0);
     expect(config.avatarOffsetX, 0.0);
     expect(config.avatarOffsetY, 0.0);
@@ -195,6 +198,27 @@ void main() {
     },
   );
 
+  test('MealTimerConfig copyWith updates motivation video settings', () {
+    final config = MealTimerConfig.defaults().copyWith(
+      motivationVideoEnabled: false,
+      motivationVideoUseCustomInterval: true,
+      motivationVideoInterval: const Duration(minutes: 5),
+    );
+    final preservedConfig = config.copyWith(vehicleId: 'bus');
+    final updatedConfig = config.copyWith(
+      motivationVideoEnabled: true,
+      motivationVideoUseCustomInterval: false,
+      motivationVideoInterval: const Duration(minutes: 10),
+    );
+
+    expect(preservedConfig.motivationVideoEnabled, isFalse);
+    expect(preservedConfig.motivationVideoUseCustomInterval, isTrue);
+    expect(preservedConfig.motivationVideoInterval, const Duration(minutes: 5));
+    expect(updatedConfig.motivationVideoEnabled, isTrue);
+    expect(updatedConfig.motivationVideoUseCustomInterval, isFalse);
+    expect(updatedConfig.motivationVideoInterval, const Duration(minutes: 10));
+  });
+
   test('Local settings saves and loads avatar settings', () async {
     SharedPreferences.setMockInitialValues({});
 
@@ -237,6 +261,45 @@ void main() {
     expect(policeCarAvatar?.offsetY, -6.0);
     expect(policeCarAvatar?.rotationDegrees, 12.0);
   });
+
+  test('Local settings saves and loads motivation video settings', () async {
+    SharedPreferences.setMockInitialValues({});
+
+    final service = LocalSettingsService();
+    await service.saveConfig(
+      MealTimerConfig.defaults().copyWith(
+        motivationVideoEnabled: false,
+        motivationVideoUseCustomInterval: true,
+        motivationVideoInterval: const Duration(minutes: 5),
+      ),
+    );
+
+    final loadedConfig = await service.loadConfig();
+    final preferences = await SharedPreferences.getInstance();
+    expect(loadedConfig.motivationVideoEnabled, isFalse);
+    expect(loadedConfig.motivationVideoUseCustomInterval, isTrue);
+    expect(loadedConfig.motivationVideoInterval, const Duration(minutes: 5));
+    expect(preferences.getBool('motivationVideoEnabled'), isFalse);
+    expect(preferences.getBool('motivationVideoUseCustomInterval'), isTrue);
+    expect(preferences.getInt('motivationVideoIntervalMinutes'), 5);
+  });
+
+  test(
+    'Local settings falls back for invalid motivation video interval',
+    () async {
+      SharedPreferences.setMockInitialValues({
+        'motivationVideoEnabled': false,
+        'motivationVideoUseCustomInterval': true,
+        'motivationVideoIntervalMinutes': 0,
+      });
+
+      final loadedConfig = await LocalSettingsService().loadConfig();
+
+      expect(loadedConfig.motivationVideoEnabled, isFalse);
+      expect(loadedConfig.motivationVideoUseCustomInterval, isTrue);
+      expect(loadedConfig.motivationVideoInterval, const Duration(minutes: 3));
+    },
+  );
 
   test('Local settings saves and loads vehicle avatar maps', () async {
     SharedPreferences.setMockInitialValues({});
