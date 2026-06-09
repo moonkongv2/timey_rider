@@ -310,6 +310,99 @@ double _roadPathLengthForRows({
   return (width * (rowCount + 1)) + (rowHeight * rowCount);
 }
 
+class RoadCourseVisualStyle {
+  const RoadCourseVisualStyle({
+    required this.backgroundColors,
+    required this.backgroundStops,
+    required this.softShadowColor,
+    required this.rimColor,
+    required this.pathColor,
+    required this.progressColor,
+    required this.progressGlowColor,
+    required this.laneColor,
+  });
+
+  final List<Color> backgroundColors;
+  final List<double> backgroundStops;
+  final Color softShadowColor;
+  final Color rimColor;
+  final Color pathColor;
+  final Color progressColor;
+  final Color progressGlowColor;
+  final Color laneColor;
+
+  static RoadCourseVisualStyle forCourseKind(VehicleCourseKind courseKind) {
+    switch (courseKind) {
+      case VehicleCourseKind.sky:
+        return RoadCourseVisualStyle(
+          backgroundColors: [
+            AppColors.white.withValues(alpha: 0.96),
+            const Color(0xFFEAF7FF),
+            AppColors.skyBlue.withValues(alpha: 0.34),
+            const Color(0xFFFFF9E8).withValues(alpha: 0.92),
+          ],
+          backgroundStops: const [0, 0.5, 0.78, 1],
+          softShadowColor: AppColors.blueDeep.withValues(alpha: 0.10),
+          rimColor: AppColors.white.withValues(alpha: 0.88),
+          pathColor: const Color(0xFFD9F0FF),
+          progressColor: const Color(0xFFFFD36E).withValues(alpha: 0.94),
+          progressGlowColor: const Color(0xFFFFC857).withValues(alpha: 0.18),
+          laneColor: AppColors.white.withValues(alpha: 0.82),
+        );
+      case VehicleCourseKind.water:
+        return RoadCourseVisualStyle(
+          backgroundColors: [
+            AppColors.white.withValues(alpha: 0.96),
+            const Color(0xFFE8FBFF),
+            const Color(0xFFC7F2EA).withValues(alpha: 0.55),
+            const Color(0xFFEFFAF7).withValues(alpha: 0.92),
+          ],
+          backgroundStops: const [0, 0.5, 0.78, 1],
+          softShadowColor: AppColors.blueDeep.withValues(alpha: 0.10),
+          rimColor: AppColors.white.withValues(alpha: 0.88),
+          pathColor: const Color(0xFFBFEFEA),
+          progressColor: const Color(0xFF72D8E8).withValues(alpha: 0.92),
+          progressGlowColor: AppColors.blueDeep.withValues(alpha: 0.16),
+          laneColor: AppColors.white.withValues(alpha: 0.75),
+        );
+      case VehicleCourseKind.rail:
+        return RoadCourseVisualStyle(
+          backgroundColors: [
+            AppColors.white.withValues(alpha: 0.96),
+            const Color(0xFFF4FBED),
+            const Color(0xFFDDECC9).withValues(alpha: 0.52),
+            AppColors.cream.withValues(alpha: 0.92),
+          ],
+          backgroundStops: const [0, 0.5, 0.78, 1],
+          softShadowColor: AppColors.brown700.withValues(alpha: 0.08),
+          rimColor: AppColors.surfaceWarm.withValues(alpha: 0.90),
+          pathColor: const Color(0xFFC9D7B8),
+          progressColor: const Color(0xFFE5BC73).withValues(alpha: 0.95),
+          progressGlowColor: const Color(0xFFC58A3B).withValues(alpha: 0.14),
+          laneColor: AppColors.surfaceSoft.withValues(alpha: 0.78),
+        );
+      case VehicleCourseKind.road:
+        return RoadCourseVisualStyle(
+          backgroundColors: [
+            AppColors.white.withValues(alpha: 0.96),
+            AppColors.surfaceWarm,
+            AppColors.surfaceBlue.withValues(alpha: 0.18),
+            AppColors.cream.withValues(alpha: 0.92),
+          ],
+          backgroundStops: const [0, 0.5, 0.78, 1],
+          softShadowColor: AppColors.brown700.withValues(alpha: 0.075),
+          rimColor: AppColors.white.withValues(alpha: 0.90),
+          pathColor: const Color(0xFFBCEFD0),
+          progressColor: const Color(0xFFFFC38B).withValues(alpha: 0.92),
+          progressGlowColor: AppColors.orange.withValues(alpha: 0.14),
+          laneColor: AppColors.white.withValues(
+            alpha: RoadPainter.laneDashOpacity,
+          ),
+        );
+    }
+  }
+}
+
 class RoadPainter extends CustomPainter {
   const RoadPainter({
     required this.progress,
@@ -333,6 +426,7 @@ class RoadPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
+    final visualStyle = RoadCourseVisualStyle.forCourseKind(courseKind);
     final roadPath = geometry == null
         ? createRoadPath(size)
         : createRoadPathForGeometry(geometry!);
@@ -343,32 +437,32 @@ class RoadPainter extends CustomPainter {
     final progressPath = roadMetric.extractPath(0, progressDistance);
 
     final softShadowPaint = Paint()
-      ..color = AppColors.brown700.withValues(alpha: 0.075)
+      ..color = visualStyle.softShadowColor
       ..style = PaintingStyle.stroke
       ..strokeCap = StrokeCap.round
       ..strokeJoin = StrokeJoin.round
       ..strokeWidth = roadWidth + 8
       ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 6);
     final rimPaint = Paint()
-      ..color = AppColors.white.withValues(alpha: 0.9)
+      ..color = visualStyle.rimColor
       ..style = PaintingStyle.stroke
       ..strokeCap = StrokeCap.round
       ..strokeJoin = StrokeJoin.round
       ..strokeWidth = roadWidth + 5;
     final roadPaint = Paint()
-      ..color = const Color(0xFFBCEFD0)
+      ..color = visualStyle.pathColor
       ..style = PaintingStyle.stroke
       ..strokeCap = StrokeCap.round
       ..strokeJoin = StrokeJoin.round
       ..strokeWidth = roadWidth;
     final progressPaint = Paint()
-      ..color = const Color(0xFFFFC38B).withValues(alpha: 0.92)
+      ..color = visualStyle.progressColor
       ..style = PaintingStyle.stroke
       ..strokeCap = StrokeCap.round
       ..strokeJoin = StrokeJoin.round
       ..strokeWidth = roadWidth;
     final progressGlowPaint = Paint()
-      ..color = AppColors.orange.withValues(alpha: 0.14)
+      ..color = visualStyle.progressGlowColor
       ..style = PaintingStyle.stroke
       ..strokeCap = StrokeCap.round
       ..strokeJoin = StrokeJoin.round
@@ -384,7 +478,7 @@ class RoadPainter extends CustomPainter {
     }
 
     final lanePaint = Paint()
-      ..color = AppColors.white.withValues(alpha: laneDashOpacity)
+      ..color = visualStyle.laneColor
       ..style = PaintingStyle.stroke
       ..strokeCap = StrokeCap.round
       ..strokeWidth = laneDashStrokeWidth;

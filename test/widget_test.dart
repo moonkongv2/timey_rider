@@ -3063,6 +3063,26 @@ void main() {
     expect(roadStrokeWidthForSize(const Size(420, 640)), closeTo(24.36, 0.01));
   });
 
+  test('RoadCourseVisualStyle maps course kinds to distinct palettes', () {
+    final roadStyle = RoadCourseVisualStyle.forCourseKind(
+      VehicleCourseKind.road,
+    );
+    final skyStyle = RoadCourseVisualStyle.forCourseKind(VehicleCourseKind.sky);
+    final waterStyle = RoadCourseVisualStyle.forCourseKind(
+      VehicleCourseKind.water,
+    );
+    final railStyle = RoadCourseVisualStyle.forCourseKind(
+      VehicleCourseKind.rail,
+    );
+
+    expect(roadStyle.pathColor, const Color(0xFFBCEFD0));
+    expect(roadStyle.backgroundColors, hasLength(4));
+    expect(roadStyle.backgroundStops, const [0, 0.5, 0.78, 1]);
+    expect(skyStyle.pathColor, isNot(roadStyle.pathColor));
+    expect(waterStyle.pathColor, isNot(roadStyle.pathColor));
+    expect(railStyle.pathColor, isNot(roadStyle.pathColor));
+  });
+
   test('RoadCourseGeometry keeps five minutes as the current route', () {
     const viewportSize = Size(420, 640);
     final baselinePathLength = createRoadPath(

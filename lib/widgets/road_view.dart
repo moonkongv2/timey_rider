@@ -106,6 +106,9 @@ class RoadView extends StatelessWidget {
         final clearProgress = (ingredientClearProgress ?? clampedProgress)
             .clamp(0.0, 1.0)
             .toDouble();
+        final visualStyle = RoadCourseVisualStyle.forCourseKind(
+          vehicle.courseKind,
+        );
 
         return DecoratedBox(
           decoration: BoxDecoration(
@@ -113,13 +116,8 @@ class RoadView extends StatelessWidget {
             gradient: LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
-              colors: [
-                AppColors.white.withValues(alpha: 0.96),
-                AppColors.surfaceWarm,
-                AppColors.surfaceBlue.withValues(alpha: 0.18),
-                AppColors.cream.withValues(alpha: 0.92),
-              ],
-              stops: const [0, 0.5, 0.78, 1],
+              colors: visualStyle.backgroundColors,
+              stops: visualStyle.backgroundStops,
             ),
             border: Border.all(
               color: AppColors.white.withValues(alpha: 0.72),
