@@ -10,6 +10,7 @@ class MealHistoryEntry {
     required this.completedBeforeArrival,
     required this.rewardIds,
     this.mealCompleted = true,
+    this.selectedIngredientIds = const [],
     MealCompletionStatus? completionStatus,
   }) : completionStatus =
            completionStatus ??
@@ -21,6 +22,7 @@ class MealHistoryEntry {
 
   factory MealHistoryEntry.fromJson(Map<String, Object?> json) {
     final rewardIds = json['rewardIds'];
+    final selectedIngredientIds = json['selectedIngredientIds'];
     final completedBeforeArrival =
         json['completedBeforeArrival'] as bool? ?? false;
     final completionStatus = mealCompletionStatusFromJson(
@@ -44,6 +46,9 @@ class MealHistoryEntry {
       rewardIds: rewardIds is List
           ? rewardIds.whereType<String>().toList(growable: false)
           : const [],
+      selectedIngredientIds: selectedIngredientIds is List
+          ? selectedIngredientIds.whereType<String>().toList(growable: false)
+          : const [],
     );
   }
 
@@ -56,6 +61,7 @@ class MealHistoryEntry {
   final bool mealCompleted;
   final MealCompletionStatus completionStatus;
   final List<String> rewardIds;
+  final List<String> selectedIngredientIds;
 
   Map<String, Object?> toJson() {
     return {
@@ -68,6 +74,7 @@ class MealHistoryEntry {
       'mealCompleted': mealCompleted,
       'completionStatus': completionStatus.name,
       'rewardIds': rewardIds,
+      'selectedIngredientIds': selectedIngredientIds,
     };
   }
 }

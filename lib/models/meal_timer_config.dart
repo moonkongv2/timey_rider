@@ -67,6 +67,7 @@ class MealTimerConfig {
     required this.customAvatarsByVehicle,
     required this.courseIngredientMode,
     this.courseIngredientIds = const [],
+    this.selectedCourseIngredientIds = const [],
   });
 
   factory MealTimerConfig.defaults() {
@@ -91,6 +92,7 @@ class MealTimerConfig {
       customAvatarsByVehicle: {},
       courseIngredientMode: CourseIngredientMode.manual,
       courseIngredientIds: [],
+      selectedCourseIngredientIds: [],
     );
   }
 
@@ -114,6 +116,7 @@ class MealTimerConfig {
   final Map<String, VehicleAvatarConfig> customAvatarsByVehicle;
   final CourseIngredientMode courseIngredientMode;
   final List<String> courseIngredientIds;
+  final List<String> selectedCourseIngredientIds;
 
   MealTimerConfig copyWith({
     Duration? duration,
@@ -136,6 +139,7 @@ class MealTimerConfig {
     Map<String, VehicleAvatarConfig>? customAvatarsByVehicle,
     CourseIngredientMode? courseIngredientMode,
     List<String>? courseIngredientIds,
+    List<String>? selectedCourseIngredientIds,
   }) {
     final nextAvatarMode = avatarMode ?? this.avatarMode;
     final nextCustomAvatarImagePath =
@@ -195,6 +199,9 @@ class MealTimerConfig {
       courseIngredientMode: courseIngredientMode ?? this.courseIngredientMode,
       courseIngredientIds: List.unmodifiable(
         courseIngredientIds ?? this.courseIngredientIds,
+      ),
+      selectedCourseIngredientIds: List.unmodifiable(
+        selectedCourseIngredientIds ?? this.selectedCourseIngredientIds,
       ),
     );
   }

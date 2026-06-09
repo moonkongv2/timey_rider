@@ -116,14 +116,17 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
   }
 
   Future<void> _startTimer(int minutes) async {
-    final courseIngredientIds = await _courseIngredientIdsForStart();
-    if (!mounted || courseIngredientIds == null) {
+    final courseIngredientSelection =
+        await _courseIngredientSelectionForStart();
+    if (!mounted || courseIngredientSelection == null) {
       return;
     }
 
     final config = _config.copyWith(
       duration: Duration(minutes: minutes),
-      courseIngredientIds: courseIngredientIds,
+      courseIngredientIds: courseIngredientSelection.courseIngredientIds,
+      selectedCourseIngredientIds:
+          courseIngredientSelection.selectedCourseIngredientIds,
     );
     await Navigator.of(context).push(
       MaterialPageRoute(
@@ -139,12 +142,19 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
     }
   }
 
-  Future<List<String>?> _courseIngredientIdsForStart() async {
+  Future<_CourseIngredientSelection?>
+  _courseIngredientSelectionForStart() async {
     switch (_config.courseIngredientMode) {
       case CourseIngredientMode.off:
-        return const <String>[];
+        return const _CourseIngredientSelection(
+          courseIngredientIds: [],
+          selectedCourseIngredientIds: [],
+        );
       case CourseIngredientMode.random:
-        return MealIngredientCatalog.randomSelectionIds();
+        return _CourseIngredientSelection(
+          courseIngredientIds: MealIngredientCatalog.randomSelectionIds(),
+          selectedCourseIngredientIds: const [],
+        );
       case CourseIngredientMode.manual:
         final ingredientResult =
             await showModalBottomSheet<MealIngredientPickerResult>(
@@ -157,8 +167,15 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
           return null;
         }
         return switch (ingredientResult) {
-          RandomMealIngredients() => MealIngredientCatalog.randomSelectionIds(),
-          SelectedMealIngredients(:final ingredientIds) => ingredientIds,
+          RandomMealIngredients() => _CourseIngredientSelection(
+            courseIngredientIds: MealIngredientCatalog.randomSelectionIds(),
+            selectedCourseIngredientIds: const [],
+          ),
+          SelectedMealIngredients(:final ingredientIds) =>
+            _CourseIngredientSelection(
+              courseIngredientIds: ingredientIds,
+              selectedCourseIngredientIds: ingredientIds,
+            ),
         };
     }
   }
@@ -525,6 +542,16 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
       ),
     );
   }
+}
+
+class _CourseIngredientSelection {
+  const _CourseIngredientSelection({
+    required this.courseIngredientIds,
+    required this.selectedCourseIngredientIds,
+  });
+
+  final List<String> courseIngredientIds;
+  final List<String> selectedCourseIngredientIds;
 }
 
 String? _quickCourseEmoji(int minutes) {

@@ -8,6 +8,7 @@ class MealSessionResult {
     required this.actualDuration,
     required this.completedBeforeArrival,
     this.mealCompleted = true,
+    this.selectedIngredientIds = const [],
     MealCompletionStatus? completionStatus,
   }) : completionStatus =
            completionStatus ??
@@ -23,5 +24,20 @@ class MealSessionResult {
   final Duration actualDuration;
   final bool completedBeforeArrival;
   final bool mealCompleted;
+  final List<String> selectedIngredientIds;
   final MealCompletionStatus completionStatus;
+
+  MealSessionResult copyWith({List<String>? selectedIngredientIds}) {
+    return MealSessionResult(
+      startedAt: startedAt,
+      endedAt: endedAt,
+      targetDuration: targetDuration,
+      actualDuration: actualDuration,
+      completedBeforeArrival: completedBeforeArrival,
+      mealCompleted: mealCompleted,
+      selectedIngredientIds:
+          selectedIngredientIds ?? this.selectedIngredientIds,
+      completionStatus: completionStatus,
+    );
+  }
 }

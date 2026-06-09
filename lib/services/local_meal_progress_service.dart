@@ -223,6 +223,7 @@ class LocalMealProgressService {
       mealCompleted: result.mealCompleted,
       completionStatus: result.completionStatus,
       rewardIds: awardedRewards.map((reward) => reward.id).toList(),
+      selectedIngredientIds: result.selectedIngredientIds,
     );
 
     history.insert(0, entry);

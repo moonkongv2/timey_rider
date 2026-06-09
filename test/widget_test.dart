@@ -64,6 +64,7 @@ void main() {
     expect(config.avatarRotationDegrees, 0.0);
     expect(config.customAvatarsByVehicle, isEmpty);
     expect(config.courseIngredientIds, isEmpty);
+    expect(config.selectedCourseIngredientIds, isEmpty);
   });
 
   test('Meal ingredient catalog has non-empty unique ids', () {
@@ -190,14 +191,18 @@ void main() {
     () {
       final config = MealTimerConfig.defaults().copyWith(
         courseIngredientIds: const ['carrot', 'egg'],
+        selectedCourseIngredientIds: const ['carrot'],
       );
       final preservedConfig = config.copyWith(vehicleId: 'bus');
       final updatedConfig = config.copyWith(
         courseIngredientIds: const ['rice', 'tomato'],
+        selectedCourseIngredientIds: const ['rice'],
       );
 
       expect(preservedConfig.courseIngredientIds, ['carrot', 'egg']);
+      expect(preservedConfig.selectedCourseIngredientIds, ['carrot']);
       expect(updatedConfig.courseIngredientIds, ['rice', 'tomato']);
+      expect(updatedConfig.selectedCourseIngredientIds, ['rice']);
     },
   );
 
@@ -1432,6 +1437,13 @@ void main() {
           .courseIngredientIds,
       isEmpty,
     );
+    expect(
+      tester
+          .widget<TimerScreen>(find.byType(TimerScreen))
+          .config
+          .selectedCourseIngredientIds,
+      isEmpty,
+    );
   });
 
   testWidgets('Course ingredient random starts timer without picker', (
@@ -1474,6 +1486,13 @@ void main() {
           .config
           .courseIngredientIds,
       hasLength(MealIngredientCatalog.maxSelectableIngredientCount),
+    );
+    expect(
+      tester
+          .widget<TimerScreen>(find.byType(TimerScreen))
+          .config
+          .selectedCourseIngredientIds,
+      isEmpty,
     );
   });
 
@@ -1575,6 +1594,13 @@ void main() {
             .widget<TimerScreen>(find.byType(TimerScreen))
             .config
             .courseIngredientIds,
+        ['carrot', 'egg'],
+      );
+      expect(
+        tester
+            .widget<TimerScreen>(find.byType(TimerScreen))
+            .config
+            .selectedCourseIngredientIds,
         ['carrot', 'egg'],
       );
     },
@@ -3933,6 +3959,47 @@ void main() {
     await tester.pump();
   });
 
+  testWidgets('Timer records directly selected ingredients on completion', (
+    tester,
+  ) async {
+    SharedPreferences.setMockInitialValues({});
+
+    var now = DateTime(2026);
+    final service = LocalMealProgressService();
+
+    await tester.pumpWidget(
+      MaterialApp(
+        locale: const Locale('ko'),
+        home: TimerScreen(
+          config: MealTimerConfig.defaults().copyWith(
+            duration: const Duration(seconds: 1),
+            courseIngredientMode: CourseIngredientMode.manual,
+            courseIngredientIds: const ['carrot', 'egg'],
+            selectedCourseIngredientIds: const ['carrot', 'egg'],
+          ),
+          mealProgressService: service,
+          now: () => now,
+          onConfigChanged: (_) {},
+        ),
+      ),
+    );
+    await tester.pump();
+    now = now.add(const Duration(seconds: 2));
+    await tester.pump(const Duration(milliseconds: 250));
+
+    tester.widget<TimerControlBar>(find.byType(TimerControlBar)).onComplete!();
+    await tester.pump();
+    await tester.tap(find.byType(FilledButton).last);
+    await tester.pump();
+    await tester.pump();
+
+    final snapshot = await service.loadSnapshot();
+    expect(snapshot.history.single.selectedIngredientIds, ['carrot', 'egg']);
+
+    await tester.pumpWidget(const SizedBox.shrink());
+    await tester.pump();
+  });
+
   testWidgets('Timer hands orientation control to result screen', (
     tester,
   ) async {
@@ -4975,6 +5042,19 @@ void main() {
     );
   });
 
+  test('Meal history stores directly selected ingredient ids', () async {
+    SharedPreferences.setMockInitialValues({});
+
+    final service = LocalMealProgressService();
+    final recordedSession = await service.recordMealResult(
+      _mealResult(selectedIngredientIds: const ['carrot', 'egg']),
+    );
+    final snapshot = await service.loadSnapshot();
+
+    expect(recordedSession.entry.selectedIngredientIds, ['carrot', 'egg']);
+    expect(snapshot.history.single.selectedIngredientIds, ['carrot', 'egg']);
+  });
+
   test('Completed meal fills exactly one active reward goal slot', () async {
     SharedPreferences.setMockInitialValues({});
 
@@ -5089,6 +5169,7 @@ void main() {
       snapshot.history.single.completionStatus,
       MealCompletionStatus.completedAfterArrival,
     );
+    expect(snapshot.history.single.selectedIngredientIds, isEmpty);
   });
 
   test('Fast meal fills only one reward goal slot', () async {
@@ -5507,6 +5588,7 @@ MealSessionResult _mealResult({
   bool completedBeforeArrival = false,
   bool mealCompleted = true,
   MealCompletionStatus? completionStatus,
+  List<String> selectedIngredientIds = const [],
 }) {
   final resolvedStartedAt = startedAt ?? DateTime(2026, 5, 4, 12);
   final resolvedEndedAt = endedAt ?? resolvedStartedAt.add(actualDuration);
@@ -5519,6 +5601,7 @@ MealSessionResult _mealResult({
     completedBeforeArrival: completedBeforeArrival,
     mealCompleted: mealCompleted,
     completionStatus: completionStatus,
+    selectedIngredientIds: selectedIngredientIds,
   );
 }
 

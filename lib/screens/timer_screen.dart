@@ -624,17 +624,27 @@ class _TimerScreenState extends State<TimerScreen>
   }
 
   void _openResult(MealSessionResult result) {
+    final recordableResult = _resultWithSelectedIngredients(result);
     _handoffOrientation = true;
     Navigator.of(context).pushReplacement(
       MaterialPageRoute(
         builder: (_) => ResultScreen(
-          result: result,
+          result: recordableResult,
           config: _timerConfig,
           mealProgressService: widget.mealProgressService,
           onConfigChanged: widget.onConfigChanged,
           orientationService: widget.orientationService,
         ),
       ),
+    );
+  }
+
+  MealSessionResult _resultWithSelectedIngredients(MealSessionResult result) {
+    if (_timerConfig.courseIngredientMode != CourseIngredientMode.manual) {
+      return result.copyWith(selectedIngredientIds: const []);
+    }
+    return result.copyWith(
+      selectedIngredientIds: _timerConfig.selectedCourseIngredientIds,
     );
   }
 
