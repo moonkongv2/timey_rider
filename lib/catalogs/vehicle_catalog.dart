@@ -74,6 +74,7 @@ abstract final class VehicleCatalog {
       centerY: 0.33,
       sizeRatio: 0.25,
     ),
+    courseKind: VehicleCourseKind.sky,
   );
 
   static const bus = VehicleDefinition(
@@ -116,6 +117,7 @@ abstract final class VehicleCatalog {
       centerY: 0.39,
       sizeRatio: 0.25,
     ),
+    courseKind: VehicleCourseKind.rail,
   );
 
   static const tRex = VehicleDefinition(
@@ -148,6 +150,7 @@ abstract final class VehicleCatalog {
       centerY: 0.34,
       sizeRatio: 0.26,
     ),
+    courseKind: VehicleCourseKind.water,
   );
 
   static const brachio = VehicleDefinition(
@@ -184,6 +187,7 @@ abstract final class VehicleCatalog {
       portraitDyRatio: -0.08,
       landscapeDyRatio: -0.05,
     ),
+    courseKind: VehicleCourseKind.sky,
   );
 
   static const all = [

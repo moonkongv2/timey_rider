@@ -433,6 +433,23 @@ void main() {
     }
   });
 
+  test('Catalog vehicles define the expected course kind', () {
+    const expectedCourseKinds = {
+      'airplane': VehicleCourseKind.sky,
+      'pteranodon': VehicleCourseKind.sky,
+      'shark': VehicleCourseKind.water,
+      'train': VehicleCourseKind.rail,
+    };
+
+    for (final vehicle in VehicleCatalog.all) {
+      expect(
+        vehicle.courseKind,
+        expectedCourseKinds[vehicle.id] ?? VehicleCourseKind.road,
+        reason: vehicle.id,
+      );
+    }
+  });
+
   test(
     'Catalog vehicles use success result videos or the motorcycle fallback',
     () {

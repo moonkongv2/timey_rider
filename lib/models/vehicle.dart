@@ -28,6 +28,8 @@ class VehicleRoadAnchorOffset {
   final double landscapeDyRatio;
 }
 
+enum VehicleCourseKind { road, sky, water, rail }
+
 class VehicleDefinition {
   const VehicleDefinition({
     required this.id,
@@ -38,6 +40,7 @@ class VehicleDefinition {
     this.selectionAssetPath,
     this.avatarSlot,
     this.roadAnchorOffset = VehicleRoadAnchorOffset.zero,
+    this.courseKind = VehicleCourseKind.road,
   });
 
   final String id;
@@ -48,6 +51,7 @@ class VehicleDefinition {
   final String? selectionAssetPath;
   final VehicleAvatarSlot? avatarSlot;
   final VehicleRoadAnchorOffset roadAnchorOffset;
+  final VehicleCourseKind courseKind;
 
   String get selectionImagePath => selectionAssetPath ?? assetPath;
 
