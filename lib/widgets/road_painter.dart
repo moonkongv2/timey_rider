@@ -433,6 +433,12 @@ class RoadPainter extends CustomPainter {
   static const waterWavePatternLength = waterWaveWidth + waterWaveGap;
   static const waterWaveStrokeWidth = 2.8;
   static const waterWaveAnimationDuration = Duration(milliseconds: 2600);
+  static const railSleeperGap = 34.0;
+  static const railSleeperPatternLength = railSleeperGap;
+  static const railSleeperStrokeWidth = 4.2;
+  static const railStrokeWidth = 3.2;
+  static const railSampleStep = 8.0;
+  static const railAnimationDuration = Duration(milliseconds: 1800);
 
   final double progress;
   final double laneDashPhase;
@@ -444,7 +450,8 @@ class RoadPainter extends CustomPainter {
     return switch (courseKind) {
       VehicleCourseKind.sky => skyFlowPatternLength,
       VehicleCourseKind.water => waterWavePatternLength,
-      VehicleCourseKind.road || VehicleCourseKind.rail => laneDashPatternLength,
+      VehicleCourseKind.rail => railSleeperPatternLength,
+      VehicleCourseKind.road => laneDashPatternLength,
     };
   }
 
@@ -453,9 +460,9 @@ class RoadPainter extends CustomPainter {
   ) {
     return switch (courseKind) {
       VehicleCourseKind.water => waterWaveAnimationDuration,
+      VehicleCourseKind.rail => railAnimationDuration,
       VehicleCourseKind.road ||
-      VehicleCourseKind.sky ||
-      VehicleCourseKind.rail => laneDashAnimationDuration,
+      VehicleCourseKind.sky => laneDashAnimationDuration,
     };
   }
 
@@ -528,6 +535,8 @@ class RoadPainter extends CustomPainter {
       _drawSkyPathClouds(canvas, roadPath, skyPathCloudPhase);
     } else if (courseKind == VehicleCourseKind.water) {
       _drawWaterFlow(canvas, roadPath, visualStyle.laneColor, laneDashPhase);
+    } else if (courseKind == VehicleCourseKind.rail) {
+      _drawRailTrack(canvas, roadPath, visualStyle.laneColor, laneDashPhase);
     } else {
       _drawDashedPath(canvas, roadPath, lanePaint, laneDashPhase);
     }
@@ -721,6 +730,101 @@ class RoadPainter extends CustomPainter {
         waveIndex += 1;
         distance += waterWavePatternLength;
       }
+    }
+  }
+
+  void _drawRailTrack(Canvas canvas, Path path, Color color, double phase) {
+    final sleeperPaint = Paint()
+      ..color = AppColors.brown700.withValues(alpha: 0.24)
+      ..style = PaintingStyle.stroke
+      ..strokeCap = StrokeCap.round
+      ..strokeWidth = railSleeperStrokeWidth;
+    final railPaint = Paint()
+      ..color = color.withValues(alpha: 0.88)
+      ..style = PaintingStyle.stroke
+      ..strokeCap = StrokeCap.round
+      ..strokeWidth = railStrokeWidth;
+    final railShadowPaint = Paint()
+      ..color = AppColors.brown700.withValues(alpha: 0.12)
+      ..style = PaintingStyle.stroke
+      ..strokeCap = StrokeCap.round
+      ..strokeWidth = railStrokeWidth + 2;
+    final normalizedPhase = phase % railSleeperPatternLength;
+
+    for (final metric in path.computeMetrics()) {
+      final startLimit = laneDashInset;
+      final endLimit = metric.length - laneDashInset;
+      if (endLimit <= startLimit) {
+        continue;
+      }
+
+      var distance = startLimit - normalizedPhase;
+      while (distance < endLimit) {
+        if (distance >= startLimit && distance <= endLimit) {
+          final tangent = metric.getTangentForOffset(distance);
+          if (tangent != null && tangent.vector.distance > 0) {
+            final direction = tangent.vector / tangent.vector.distance;
+            final normal = Offset(-direction.dy, direction.dx);
+            final center = tangent.position;
+            canvas.drawLine(
+              center - (normal * 14),
+              center + (normal * 14),
+              sleeperPaint,
+            );
+          }
+        }
+
+        distance += railSleeperPatternLength;
+      }
+
+      _drawRailLine(
+        canvas: canvas,
+        metric: metric,
+        startLimit: startLimit,
+        endLimit: endLimit,
+        sideOffset: -8,
+        shadowPaint: railShadowPaint,
+        railPaint: railPaint,
+      );
+      _drawRailLine(
+        canvas: canvas,
+        metric: metric,
+        startLimit: startLimit,
+        endLimit: endLimit,
+        sideOffset: 8,
+        shadowPaint: railShadowPaint,
+        railPaint: railPaint,
+      );
+    }
+  }
+
+  void _drawRailLine({
+    required Canvas canvas,
+    required PathMetric metric,
+    required double startLimit,
+    required double endLimit,
+    required double sideOffset,
+    required Paint shadowPaint,
+    required Paint railPaint,
+  }) {
+    Offset? previous;
+    var distance = startLimit;
+
+    while (distance <= endLimit) {
+      final tangent = metric.getTangentForOffset(distance);
+      if (tangent != null && tangent.vector.distance > 0) {
+        final direction = tangent.vector / tangent.vector.distance;
+        final normal = Offset(-direction.dy, direction.dx);
+        final current = tangent.position + (normal * sideOffset);
+
+        if (previous != null) {
+          canvas.drawLine(previous, current, shadowPaint);
+          canvas.drawLine(previous, current, railPaint);
+        }
+        previous = current;
+      }
+
+      distance += railSampleStep;
     }
   }
 

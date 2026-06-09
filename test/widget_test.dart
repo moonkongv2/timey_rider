@@ -3097,11 +3097,19 @@ void main() {
       RoadPainter.waterWavePatternLength,
     );
     expect(
+      RoadPainter.flowPatternLengthForCourseKind(VehicleCourseKind.rail),
+      RoadPainter.railSleeperPatternLength,
+    );
+    expect(
       RoadPainter.skyPathCloudAnimationDuration,
       greaterThan(RoadPainter.laneDashAnimationDuration),
     );
     expect(
       RoadPainter.waterWaveAnimationDuration,
+      greaterThan(RoadPainter.laneDashAnimationDuration),
+    );
+    expect(
+      RoadPainter.railAnimationDuration,
       greaterThan(RoadPainter.laneDashAnimationDuration),
     );
   });
@@ -3133,6 +3141,23 @@ void main() {
           progress: 0.5,
           laneDashPhase: 12,
           courseKind: VehicleCourseKind.water,
+        ),
+      ),
+    );
+
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('RoadPainter renders the rail course track safely', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      const CustomPaint(
+        size: Size(420, 640),
+        painter: RoadPainter(
+          progress: 0.5,
+          laneDashPhase: 12,
+          courseKind: VehicleCourseKind.rail,
         ),
       ),
     );
