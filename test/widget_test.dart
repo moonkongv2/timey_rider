@@ -3201,6 +3201,16 @@ void main() {
       ),
       isTrue,
     );
+    expect(
+      basePainter.shouldRepaint(
+        const RoadPainter(
+          progress: 0.3,
+          laneDashPhase: 0,
+          courseKind: VehicleCourseKind.sky,
+        ),
+      ),
+      isTrue,
+    );
   });
 
   testWidgets('Road view renders custom avatar overlay from local file', (

@@ -2,6 +2,7 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 
+import '../models/vehicle.dart';
 import '../theme/app_colors.dart';
 
 class RoadCourseGeometry {
@@ -314,6 +315,7 @@ class RoadPainter extends CustomPainter {
     required this.progress,
     this.laneDashPhase = 0,
     this.geometry,
+    this.courseKind = VehicleCourseKind.road,
   });
 
   static const laneDashWidth = 15.0;
@@ -327,6 +329,7 @@ class RoadPainter extends CustomPainter {
   final double progress;
   final double laneDashPhase;
   final RoadCourseGeometry? geometry;
+  final VehicleCourseKind courseKind;
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -417,6 +420,7 @@ class RoadPainter extends CustomPainter {
   bool shouldRepaint(covariant RoadPainter oldDelegate) {
     return oldDelegate.progress != progress ||
         oldDelegate.laneDashPhase != laneDashPhase ||
-        oldDelegate.geometry != geometry;
+        oldDelegate.geometry != geometry ||
+        oldDelegate.courseKind != courseKind;
   }
 }

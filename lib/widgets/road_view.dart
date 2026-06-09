@@ -143,6 +143,7 @@ class RoadView extends StatelessWidget {
                           progress: clampedProgress,
                           isMotionActive: isRoadMotionActive,
                           geometry: geometry,
+                          courseKind: vehicle.courseKind,
                         ),
                       ),
                       if (ingredients.isNotEmpty)
@@ -211,11 +212,13 @@ class _AnimatedRoadPaint extends StatefulWidget {
     required this.progress,
     required this.isMotionActive,
     required this.geometry,
+    required this.courseKind,
   });
 
   final double progress;
   final bool isMotionActive;
   final RoadCourseGeometry geometry;
+  final VehicleCourseKind courseKind;
 
   @override
   State<_AnimatedRoadPaint> createState() => _AnimatedRoadPaintState();
@@ -277,6 +280,7 @@ class _AnimatedRoadPaintState extends State<_AnimatedRoadPaint>
         painter: RoadPainter(
           progress: widget.progress,
           geometry: widget.geometry,
+          courseKind: widget.courseKind,
         ),
       );
     }
@@ -290,6 +294,7 @@ class _AnimatedRoadPaintState extends State<_AnimatedRoadPaint>
             laneDashPhase:
                 _controller.value * RoadPainter.laneDashPatternLength,
             geometry: widget.geometry,
+            courseKind: widget.courseKind,
           ),
         );
       },
