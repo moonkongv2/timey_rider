@@ -223,20 +223,31 @@ class _AnimatedRoadPaint extends StatefulWidget {
 }
 
 class _AnimatedRoadPaintState extends State<_AnimatedRoadPaint>
-    with SingleTickerProviderStateMixin {
-  late final AnimationController _controller;
+    with TickerProviderStateMixin {
+  late final AnimationController _flowController;
+  late final AnimationController _skyPathCloudController;
 
   bool get _disableAnimations =>
       MediaQuery.maybeOf(context)?.disableAnimations ?? false;
 
   bool get _shouldAnimate => widget.isMotionActive && !_disableAnimations;
 
+  bool get _shouldAnimateFlow =>
+      _shouldAnimate && widget.courseKind != VehicleCourseKind.sky;
+
+  bool get _shouldAnimateSkyPathClouds =>
+      _shouldAnimate && widget.courseKind == VehicleCourseKind.sky;
+
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(
+    _flowController = AnimationController(
       vsync: this,
       duration: RoadPainter.laneDashAnimationDuration,
+    );
+    _skyPathCloudController = AnimationController(
+      vsync: this,
+      duration: RoadPainter.skyPathCloudAnimationDuration,
     );
   }
 
@@ -249,25 +260,34 @@ class _AnimatedRoadPaintState extends State<_AnimatedRoadPaint>
   @override
   void didUpdateWidget(covariant _AnimatedRoadPaint oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (oldWidget.isMotionActive != widget.isMotionActive) {
+    if (oldWidget.isMotionActive != widget.isMotionActive ||
+        oldWidget.courseKind != widget.courseKind) {
       _syncController();
     }
   }
 
   void _syncController() {
-    if (_shouldAnimate) {
-      if (!_controller.isAnimating) {
-        _controller.repeat();
+    if (_shouldAnimateFlow) {
+      if (!_flowController.isAnimating) {
+        _flowController.repeat();
       }
-      return;
+    } else {
+      _flowController.stop();
     }
 
-    _controller.stop();
+    if (_shouldAnimateSkyPathClouds) {
+      if (!_skyPathCloudController.isAnimating) {
+        _skyPathCloudController.repeat();
+      }
+    } else {
+      _skyPathCloudController.stop();
+    }
   }
 
   @override
   void dispose() {
-    _controller.dispose();
+    _flowController.dispose();
+    _skyPathCloudController.dispose();
     super.dispose();
   }
 
@@ -284,13 +304,16 @@ class _AnimatedRoadPaintState extends State<_AnimatedRoadPaint>
     }
 
     return AnimatedBuilder(
-      animation: _controller,
+      animation: Listenable.merge([_flowController, _skyPathCloudController]),
       builder: (context, child) {
         return CustomPaint(
           painter: RoadPainter(
             progress: widget.progress,
             laneDashPhase:
-                _controller.value * RoadPainter.laneDashPatternLength,
+                _flowController.value *
+                RoadPainter.flowPatternLengthForCourseKind(widget.courseKind),
+            skyPathCloudPhase:
+                _skyPathCloudController.value * RoadPainter.skyPathCloudGap,
             geometry: widget.geometry,
             courseKind: widget.courseKind,
           ),

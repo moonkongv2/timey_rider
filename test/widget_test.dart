@@ -3083,6 +3083,38 @@ void main() {
     expect(railStyle.pathColor, isNot(roadStyle.pathColor));
   });
 
+  test('RoadPainter uses a dedicated sky path cloud flow', () {
+    expect(
+      RoadPainter.flowPatternLengthForCourseKind(VehicleCourseKind.road),
+      RoadPainter.laneDashPatternLength,
+    );
+    expect(
+      RoadPainter.flowPatternLengthForCourseKind(VehicleCourseKind.sky),
+      RoadPainter.skyFlowPatternLength,
+    );
+    expect(
+      RoadPainter.skyPathCloudAnimationDuration,
+      greaterThan(RoadPainter.laneDashAnimationDuration),
+    );
+  });
+
+  testWidgets('RoadPainter renders the sky course clouds safely', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      const CustomPaint(
+        size: Size(420, 640),
+        painter: RoadPainter(
+          progress: 0.5,
+          laneDashPhase: 12,
+          courseKind: VehicleCourseKind.sky,
+        ),
+      ),
+    );
+
+    expect(tester.takeException(), isNull);
+  });
+
   test('RoadCourseGeometry keeps five minutes as the current route', () {
     const viewportSize = Size(420, 640);
     final baselinePathLength = createRoadPath(
@@ -3226,6 +3258,21 @@ void main() {
         const RoadPainter(
           progress: 0.3,
           laneDashPhase: 0,
+          courseKind: VehicleCourseKind.sky,
+        ),
+      ),
+      isTrue,
+    );
+    expect(
+      const RoadPainter(
+        progress: 0.3,
+        laneDashPhase: 0,
+        courseKind: VehicleCourseKind.sky,
+      ).shouldRepaint(
+        const RoadPainter(
+          progress: 0.3,
+          laneDashPhase: 0,
+          skyPathCloudPhase: 8,
           courseKind: VehicleCourseKind.sky,
         ),
       ),

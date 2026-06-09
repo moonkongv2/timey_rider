@@ -407,6 +407,7 @@ class RoadPainter extends CustomPainter {
   const RoadPainter({
     required this.progress,
     this.laneDashPhase = 0,
+    this.skyPathCloudPhase = 0,
     this.geometry,
     this.courseKind = VehicleCourseKind.road,
   });
@@ -418,11 +419,28 @@ class RoadPainter extends CustomPainter {
   static const laneDashStrokeWidth = 3.4;
   static const laneDashOpacity = 0.72;
   static const laneDashAnimationDuration = Duration(milliseconds: 1200);
+  static const skyCloudVerticalGap = 142.0;
+  static const skyCloudMinWidth = 72.0;
+  static const skyCloudMaxWidth = 118.0;
+  static const skyPathCloudGap = 154.0;
+  static const skyPathCloudWidth = 38.0;
+  static const skyFlowPatternLength = skyPathCloudGap;
+  static const skyPathCloudAnimationDuration = Duration(milliseconds: 4800);
 
   final double progress;
   final double laneDashPhase;
+  final double skyPathCloudPhase;
   final RoadCourseGeometry? geometry;
   final VehicleCourseKind courseKind;
+
+  static double flowPatternLengthForCourseKind(VehicleCourseKind courseKind) {
+    return switch (courseKind) {
+      VehicleCourseKind.sky => skyFlowPatternLength,
+      VehicleCourseKind.road ||
+      VehicleCourseKind.water ||
+      VehicleCourseKind.rail => laneDashPatternLength,
+    };
+  }
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -435,6 +453,10 @@ class RoadPainter extends CustomPainter {
     final progressDistance =
         roadMetric.length * progress.clamp(0.0, 1.0).toDouble();
     final progressPath = roadMetric.extractPath(0, progressDistance);
+
+    if (courseKind == VehicleCourseKind.sky) {
+      _drawSkyClouds(canvas, size);
+    }
 
     final softShadowPaint = Paint()
       ..color = visualStyle.softShadowColor
@@ -483,7 +505,120 @@ class RoadPainter extends CustomPainter {
       ..strokeCap = StrokeCap.round
       ..strokeWidth = laneDashStrokeWidth;
 
-    _drawDashedPath(canvas, roadPath, lanePaint, laneDashPhase);
+    if (courseKind == VehicleCourseKind.sky) {
+      _drawSkyPathClouds(canvas, roadPath, skyPathCloudPhase);
+    } else {
+      _drawDashedPath(canvas, roadPath, lanePaint, laneDashPhase);
+    }
+  }
+
+  void _drawSkyClouds(Canvas canvas, Size size) {
+    final cloudPaint = Paint()
+      ..color = AppColors.white.withValues(alpha: 0.78)
+      ..style = PaintingStyle.fill;
+    final shadePaint = Paint()
+      ..color = AppColors.skyBlue.withValues(alpha: 0.22)
+      ..style = PaintingStyle.fill;
+    final rowCount = (size.height / skyCloudVerticalGap).ceil() + 1;
+
+    for (var row = 0; row < rowCount; row += 1) {
+      final y = (row * skyCloudVerticalGap) + 38;
+      if (y > size.height + skyCloudMaxWidth) {
+        break;
+      }
+
+      final xRatio = switch (row % 4) {
+        0 => 0.18,
+        1 => 0.78,
+        2 => 0.34,
+        _ => 0.66,
+      };
+      final cloudWidth =
+          skyCloudMinWidth +
+          ((row % 3) * ((skyCloudMaxWidth - skyCloudMinWidth) / 2));
+      final cloudHeight = cloudWidth * 0.42;
+      final center = Offset(size.width * xRatio, y);
+      _drawSkyCloud(
+        canvas: canvas,
+        center: center,
+        width: cloudWidth,
+        height: cloudHeight,
+        cloudPaint: cloudPaint,
+        shadePaint: shadePaint,
+      );
+    }
+  }
+
+  void _drawSkyCloud({
+    required Canvas canvas,
+    required Offset center,
+    required double width,
+    required double height,
+    required Paint cloudPaint,
+    required Paint shadePaint,
+  }) {
+    final baseRect = Rect.fromCenter(
+      center: center + Offset(width * 0.04, height * 0.14),
+      width: width,
+      height: height * 0.58,
+    );
+    canvas.drawOval(baseRect.shift(Offset(0, height * 0.08)), shadePaint);
+    canvas.drawOval(baseRect, cloudPaint);
+    canvas.drawCircle(
+      center + Offset(width * -0.28, height * -0.02),
+      height * 0.28,
+      cloudPaint,
+    );
+    canvas.drawCircle(
+      center + Offset(width * -0.05, height * -0.22),
+      height * 0.38,
+      cloudPaint,
+    );
+    canvas.drawCircle(
+      center + Offset(width * 0.25, height * -0.08),
+      height * 0.32,
+      cloudPaint,
+    );
+  }
+
+  void _drawSkyPathClouds(Canvas canvas, Path path, double phase) {
+    final cloudPaint = Paint()
+      ..color = AppColors.white.withValues(alpha: 0.42)
+      ..style = PaintingStyle.fill;
+    final shadePaint = Paint()
+      ..color = AppColors.skyBlue.withValues(alpha: 0.18)
+      ..style = PaintingStyle.fill;
+    final normalizedPhase = phase % skyPathCloudGap;
+
+    for (final metric in path.computeMetrics()) {
+      final startLimit = laneDashInset;
+      final endLimit = metric.length - laneDashInset;
+      if (endLimit <= startLimit) {
+        continue;
+      }
+
+      var distance = startLimit - normalizedPhase;
+      while (distance < endLimit) {
+        if (distance >= startLimit && distance <= endLimit) {
+          final tangent = metric.getTangentForOffset(distance);
+          if (tangent != null && tangent.vector.distance > 0) {
+            final direction = tangent.vector / tangent.vector.distance;
+            final center =
+                tangent.position - (direction * (skyPathCloudWidth * 0.16));
+            _drawSkyCloud(
+              canvas: canvas,
+              center: center,
+              width: skyPathCloudWidth,
+              height: skyPathCloudWidth * 0.38,
+              cloudPaint: cloudPaint,
+              shadePaint: shadePaint,
+            );
+          }
+        }
+
+        distance += skyPathCloudGap;
+      }
+    }
   }
 
   void _drawDashedPath(Canvas canvas, Path path, Paint paint, double phase) {
@@ -514,6 +649,7 @@ class RoadPainter extends CustomPainter {
   bool shouldRepaint(covariant RoadPainter oldDelegate) {
     return oldDelegate.progress != progress ||
         oldDelegate.laneDashPhase != laneDashPhase ||
+        oldDelegate.skyPathCloudPhase != skyPathCloudPhase ||
         oldDelegate.geometry != geometry ||
         oldDelegate.courseKind != courseKind;
   }
