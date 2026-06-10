@@ -9,6 +9,7 @@ import 'en/result.dart';
 import 'en/rewards.dart';
 import 'en/settings.dart';
 import 'en/timer.dart';
+import 'en/user_guide.dart';
 import 'ko/common.dart';
 import 'ko/avatar_setup.dart';
 import 'ko/home.dart';
@@ -18,6 +19,7 @@ import 'ko/result.dart';
 import 'ko/rewards.dart';
 import 'ko/settings.dart';
 import 'ko/timer.dart';
+import 'ko/user_guide.dart';
 import 'text_sets.dart';
 
 class AppTextBundle {
@@ -31,6 +33,7 @@ class AppTextBundle {
     required this.rewards,
     required this.settings,
     required this.timer,
+    required this.userGuide,
   });
 
   final AvatarSetupTextSet avatarSetup;
@@ -42,6 +45,7 @@ class AppTextBundle {
   final RewardTextSet rewards;
   final SettingsTextSet settings;
   final TimerTextSet timer;
+  final UserGuideTextSet userGuide;
 }
 
 abstract final class AppTexts {
@@ -57,6 +61,7 @@ abstract final class AppTexts {
     rewards: RewardTexts(),
     settings: SettingsTexts(),
     timer: TimerTexts(),
+    userGuide: UserGuideTexts(),
   );
 
   static const en = AppTextBundle(
@@ -69,6 +74,7 @@ abstract final class AppTexts {
     rewards: EnRewardTexts(),
     settings: EnSettingsTexts(),
     timer: EnTimerTexts(),
+    userGuide: EnUserGuideTexts(),
   );
 
   static AppTextBundle of(BuildContext context) {

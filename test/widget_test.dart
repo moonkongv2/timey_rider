@@ -29,6 +29,7 @@ import 'package:jy_yamyam/screens/reward_goal_screen.dart';
 import 'package:jy_yamyam/screens/result_screen.dart';
 import 'package:jy_yamyam/screens/settings_screen.dart';
 import 'package:jy_yamyam/screens/timer_screen.dart';
+import 'package:jy_yamyam/screens/user_guide_screen.dart';
 import 'package:jy_yamyam/services/active_meal_timer_session_store.dart';
 import 'package:jy_yamyam/services/avatar_image_picker.dart';
 import 'package:jy_yamyam/services/local_avatar_image_service.dart';
@@ -2737,6 +2738,56 @@ void main() {
     expect(find.text('남은 식사 시간'), findsNothing);
   });
 
+  testWidgets('Settings screen opens Korean parent guide', (tester) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        locale: const Locale('ko'),
+        supportedLocales: const [Locale('ko'), Locale('en')],
+        localizationsDelegates: const [
+          GlobalMaterialLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+        ],
+        home: SettingsScreen(
+          config: MealTimerConfig.defaults(),
+          onConfigChanged: (_) {},
+        ),
+      ),
+    );
+
+    expect(find.byKey(const ValueKey('userGuideSettingsTile')), findsOneWidget);
+    expect(find.text('사용 안내'), findsOneWidget);
+    expect(find.text('식재료, 응원 영상, 스티커 규칙을 확인해요.'), findsOneWidget);
+
+    await tester.tap(find.byKey(const ValueKey('userGuideSettingsTile')));
+    await tester.pumpAndSettle();
+
+    expect(find.byType(UserGuideScreen), findsOneWidget);
+    expect(find.text('사용 안내'), findsOneWidget);
+    expect(find.text('보호자 가이드'), findsOneWidget);
+  });
+
+  testWidgets('User guide uses English localization', (tester) async {
+    await tester.pumpWidget(
+      const MaterialApp(
+        locale: Locale('en'),
+        supportedLocales: [Locale('ko'), Locale('en')],
+        localizationsDelegates: [
+          GlobalMaterialLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+        ],
+        home: UserGuideScreen(),
+      ),
+    );
+
+    expect(find.text('Parent Guide'), findsOneWidget);
+    expect(
+      find.text('Review ingredients, cheer videos, and sticker rules.'),
+      findsOneWidget,
+    );
+  });
+
   testWidgets('Settings screen updates course ingredient mode', (tester) async {
     tester.view.physicalSize = const Size(393, 852);
     tester.view.devicePixelRatio = 1;
@@ -2816,8 +2867,12 @@ void main() {
       findsNothing,
     );
 
-    await tester.drag(find.byType(ListView), const Offset(0, -360));
-    await tester.pump();
+    await tester.scrollUntilVisible(
+      find.byKey(const ValueKey('motivationVideoCustomIntervalSwitch')),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.pumpAndSettle();
 
     tester
         .widget<SwitchListTile>(
@@ -2893,8 +2948,12 @@ void main() {
     await tester.tap(find.byTooltip('설정'));
     await tester.pumpAndSettle();
 
-    await tester.drag(find.byType(ListView), const Offset(0, -360));
-    await tester.pump();
+    await tester.scrollUntilVisible(
+      find.byKey(const ValueKey('motivationVideoCustomIntervalSwitch')),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.pumpAndSettle();
 
     tester
         .widget<SwitchListTile>(

@@ -5,6 +5,7 @@ import '../l10n/app_texts.dart';
 import '../l10n/text_sets.dart';
 import '../models/meal_timer_config.dart';
 import '../theme/app_colors.dart';
+import 'user_guide_screen.dart';
 
 const _motivationVideoIntervalOptions = [
   Duration(minutes: 3),
@@ -103,6 +104,26 @@ class _SettingsScreenState extends State<SettingsScreen> {
       body: ListView(
         padding: const EdgeInsets.all(20),
         children: [
+          Card(
+            child: ListTile(
+              key: const ValueKey('userGuideSettingsTile'),
+              leading: const Icon(Icons.menu_book_rounded),
+              title: Text(
+                texts.userGuide.title,
+                style: Theme.of(
+                  context,
+                ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w900),
+              ),
+              subtitle: Text(texts.userGuide.subtitle),
+              trailing: const Icon(Icons.chevron_right_rounded),
+              onTap: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(builder: (_) => const UserGuideScreen()),
+                );
+              },
+            ),
+          ),
+          const SizedBox(height: 20),
           Card(
             child: Padding(
               padding: const EdgeInsets.all(20),

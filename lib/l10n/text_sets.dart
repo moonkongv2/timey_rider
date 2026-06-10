@@ -159,6 +159,19 @@ abstract interface class SettingsTextSet {
   String motivationVideoIntervalSegmentLabel(int minutes);
 }
 
+abstract interface class UserGuideTextSet {
+  String get title;
+  String get subtitle;
+  String get introTitle;
+  String get introBody;
+  String get basicFlowTitle;
+  String get ingredientsTitle;
+  String get motivationTitle;
+  String get resultRewardsTitle;
+  String get historyTitle;
+  String get guardianTipsTitle;
+}
+
 abstract interface class TimerTextSet {
   String get courseTitle;
   String get progressJustStarted;
