@@ -29,9 +29,18 @@ class HomeTexts implements HomeTextSet {
   String get avatarCtaEditSemantics => '아바타 편집';
   String get avatarInlineDefaultState => '기본 얼굴 사용 중';
   String get avatarInlineCustomState => '아이 얼굴 탑승 중';
+  String get activeTimerTitle => '진행 중인 식사 타이머';
+  String get activeTimerResumeButton => '이어가기';
+  String get activeTimerCancelButton => '취소하기';
+  String get activeTimerCancelDialogTitle => '진행 중인 타이머를 취소할까요?';
+  String get activeTimerCancelDialogMessage => '취소하면 이 식사 타이머는 기록에 남지 않아요.';
+  String get activeTimerNewTimerDialogTitle => '진행 중인 타이머가 있어요';
+  String get activeTimerNewTimerDialogMessage => '새 타이머를 시작하면 진행 중인 타이머는 취소돼요.';
+  String get activeTimerStartNewButton => '새로 시작';
 
   String recentCustomMinutes(int minutes) => '최근 $minutes분';
   String minuteLabel(int minutes) => '$minutes분';
+  String activeTimerSubtitle(String remainingTime) => '남은 시간 $remainingTime';
   String normalCourse(int minutes) => '$minutes분 보통 코스';
   String alternateCourse(int minutes) => '$minutes분 코스';
   String alternateCourseSubtitle(int minutes) {

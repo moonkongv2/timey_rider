@@ -7,6 +7,7 @@ import 'navigation/app_route_observer.dart';
 import 'screens/child_name_setup_screen.dart';
 import 'screens/home_screen.dart';
 import 'screens/splash_screen.dart';
+import 'services/active_meal_timer_session_store.dart';
 import 'services/local_meal_progress_service.dart';
 import 'services/local_settings_service.dart';
 import 'theme/app_theme.dart';
@@ -17,11 +18,13 @@ class YamyamRiderApp extends StatefulWidget {
     required this.settingsService,
     required this.mealProgressService,
     required this.initialConfig,
+    this.activeSessionStore = const ActiveMealTimerSessionStore(),
   });
 
   final LocalSettingsService settingsService;
   final LocalMealProgressService mealProgressService;
   final MealTimerConfig initialConfig;
+  final ActiveMealTimerSessionStore activeSessionStore;
 
   @override
   State<YamyamRiderApp> createState() => _YamyamRiderAppState();
@@ -68,6 +71,7 @@ class _YamyamRiderAppState extends State<YamyamRiderApp> {
           ? HomeScreen(
               config: _config,
               mealProgressService: widget.mealProgressService,
+              activeSessionStore: widget.activeSessionStore,
               onConfigChanged: _saveConfig,
             )
           : ChildNameSetupScreen(onNameSaved: _saveChildName),

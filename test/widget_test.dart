@@ -1359,9 +1359,230 @@ void main() {
     expect(find.textContaining('직접 설정'), findsOneWidget);
   });
 
+  testWidgets('Home screen opens a saved active timer session', (tester) async {
+    SharedPreferences.setMockInitialValues({});
+    addTearDown(() async {
+      await const ActiveMealTimerSessionStore().clear();
+    });
+    final startedAt = DateTime(2026, 6, 10, 8);
+    final session = ActiveMealTimerSession(
+      sessionId: 'active-session',
+      startedAt: startedAt,
+      config: MealTimerConfig.defaults().copyWith(
+        childName: '지율',
+        duration: const Duration(minutes: 35),
+        vehicleId: 'bus',
+      ),
+      state: ActiveMealTimerSessionState.running,
+    );
+    await const ActiveMealTimerSessionStore().save(session);
+
+    await tester.pumpWidget(
+      MaterialApp(
+        locale: const Locale('ko'),
+        supportedLocales: const [Locale('ko'), Locale('en')],
+        localizationsDelegates: const [
+          GlobalMaterialLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+        ],
+        home: HomeScreen(
+          config: MealTimerConfig.defaults().copyWith(childName: '지율'),
+          mealProgressService: LocalMealProgressService(),
+          onConfigChanged: (_) {},
+        ),
+      ),
+    );
+    await tester.pump();
+
+    expect(find.byKey(const ValueKey('activeTimerResumeCard')), findsOneWidget);
+    expect(find.text('진행 중인 식사 타이머'), findsOneWidget);
+
+    await tester.tap(find.text('이어가기'));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 400));
+
+    final timerScreen = tester.widget<TimerScreen>(find.byType(TimerScreen));
+    expect(timerScreen.restoredSession?.sessionId, 'active-session');
+    expect(timerScreen.config.duration, const Duration(minutes: 35));
+  });
+
+  testWidgets('Home screen can cancel a saved active timer session', (
+    tester,
+  ) async {
+    SharedPreferences.setMockInitialValues({});
+    addTearDown(() async {
+      await const ActiveMealTimerSessionStore().clear();
+    });
+    await const ActiveMealTimerSessionStore().save(
+      ActiveMealTimerSession(
+        sessionId: 'active-session',
+        startedAt: DateTime(2026, 6, 10, 8),
+        config: MealTimerConfig.defaults().copyWith(childName: '지율'),
+        state: ActiveMealTimerSessionState.running,
+      ),
+    );
+
+    await tester.pumpWidget(
+      MaterialApp(
+        locale: const Locale('ko'),
+        supportedLocales: const [Locale('ko'), Locale('en')],
+        localizationsDelegates: const [
+          GlobalMaterialLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+        ],
+        home: HomeScreen(
+          config: MealTimerConfig.defaults().copyWith(childName: '지율'),
+          mealProgressService: LocalMealProgressService(),
+          onConfigChanged: (_) {},
+        ),
+      ),
+    );
+    await tester.pump();
+
+    expect(find.byKey(const ValueKey('activeTimerResumeCard')), findsOneWidget);
+
+    await tester.tap(find.byKey(const ValueKey('activeTimerCancelButton')));
+    await tester.pump();
+
+    expect(find.text('진행 중인 타이머를 취소할까요?'), findsOneWidget);
+
+    await tester.tap(find.byType(FilledButton).last);
+    await tester.pump();
+
+    expect(await const ActiveMealTimerSessionStore().load(), isNull);
+    await tester.pump();
+    expect(find.byKey(const ValueKey('activeTimerResumeCard')), findsNothing);
+  });
+
+  testWidgets('Home active timer remaining time updates every second', (
+    tester,
+  ) async {
+    SharedPreferences.setMockInitialValues({});
+    addTearDown(() async {
+      await const ActiveMealTimerSessionStore().clear();
+    });
+    var now = DateTime(2026, 6, 10, 8);
+    await const ActiveMealTimerSessionStore().save(
+      ActiveMealTimerSession(
+        sessionId: 'active-session',
+        startedAt: now.subtract(Duration(minutes: 24, seconds: 50)),
+        config: MealTimerConfig.defaults().copyWith(
+          childName: '지율',
+          duration: const Duration(minutes: 25),
+        ),
+        state: ActiveMealTimerSessionState.running,
+      ),
+    );
+
+    await tester.pumpWidget(
+      MaterialApp(
+        locale: const Locale('ko'),
+        supportedLocales: const [Locale('ko'), Locale('en')],
+        localizationsDelegates: const [
+          GlobalMaterialLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+        ],
+        home: HomeScreen(
+          config: MealTimerConfig.defaults().copyWith(childName: '지율'),
+          mealProgressService: LocalMealProgressService(),
+          onConfigChanged: (_) {},
+          now: () => now,
+        ),
+      ),
+    );
+    await tester.pump();
+
+    final activeTimerCard = find.byKey(const ValueKey('activeTimerResumeCard'));
+    String remainingText() {
+      return tester
+          .widget<Text>(
+            find.descendant(
+              of: activeTimerCard,
+              matching: find.textContaining('남은 시간'),
+            ),
+          )
+          .data!;
+    }
+
+    final initialRemainingText = remainingText();
+    expect(initialRemainingText, startsWith('남은 시간 00:'));
+
+    now = now.add(const Duration(seconds: 2));
+    await tester.pump(const Duration(seconds: 2));
+
+    expect(remainingText(), isNot(initialRemainingText));
+  });
+
+  testWidgets('Starting a new timer with an active session asks first', (
+    tester,
+  ) async {
+    SharedPreferences.setMockInitialValues({});
+    addTearDown(() async {
+      await const ActiveMealTimerSessionStore().clear();
+    });
+    await const ActiveMealTimerSessionStore().save(
+      ActiveMealTimerSession(
+        sessionId: 'active-session',
+        startedAt: DateTime(2026, 6, 10, 8),
+        config: MealTimerConfig.defaults().copyWith(
+          childName: '지율',
+          duration: const Duration(minutes: 35),
+        ),
+        state: ActiveMealTimerSessionState.running,
+      ),
+    );
+
+    await tester.pumpWidget(
+      MaterialApp(
+        locale: const Locale('ko'),
+        supportedLocales: const [Locale('ko'), Locale('en')],
+        localizationsDelegates: const [
+          GlobalMaterialLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+        ],
+        home: HomeScreen(
+          config: MealTimerConfig.defaults().copyWith(
+            childName: '지율',
+            courseIngredientMode: CourseIngredientMode.off,
+          ),
+          mealProgressService: LocalMealProgressService(),
+          onConfigChanged: (_) {},
+        ),
+      ),
+    );
+    await tester.pump();
+
+    await tester.tap(find.textContaining('25분 보통 코스'));
+    await tester.pump();
+
+    expect(find.text('진행 중인 타이머가 있어요'), findsOneWidget);
+    expect(
+      tester.widget<AlertDialog>(find.byType(AlertDialog)).actions,
+      hasLength(2),
+    );
+    expect(find.byType(TimerScreen), findsNothing);
+
+    await tester.tap(find.text('새로 시작'));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 400));
+
+    final timerScreen = tester.widget<TimerScreen>(find.byType(TimerScreen));
+    expect(timerScreen.restoredSession, isNull);
+    expect(timerScreen.config.duration, const Duration(minutes: 25));
+  });
+
   testWidgets('Starting a course opens the ingredient picker first', (
     tester,
   ) async {
+    SharedPreferences.setMockInitialValues({});
+    addTearDown(() async {
+      await const ActiveMealTimerSessionStore().clear();
+    });
+
     await tester.pumpWidget(
       MaterialApp(
         locale: const Locale('ko'),
@@ -1418,6 +1639,11 @@ void main() {
   testWidgets('Course ingredient off starts timer without picker', (
     tester,
   ) async {
+    SharedPreferences.setMockInitialValues({});
+    addTearDown(() async {
+      await const ActiveMealTimerSessionStore().clear();
+    });
+
     await tester.pumpWidget(
       MaterialApp(
         locale: const Locale('ko'),
@@ -1468,6 +1694,11 @@ void main() {
   testWidgets('Course ingredient random starts timer without picker', (
     tester,
   ) async {
+    SharedPreferences.setMockInitialValues({});
+    addTearDown(() async {
+      await const ActiveMealTimerSessionStore().clear();
+    });
+
     await tester.pumpWidget(
       MaterialApp(
         locale: const Locale('ko'),
@@ -1516,6 +1747,11 @@ void main() {
   });
 
   testWidgets('Tapping random start opens timer screen', (tester) async {
+    SharedPreferences.setMockInitialValues({});
+    addTearDown(() async {
+      await const ActiveMealTimerSessionStore().clear();
+    });
+
     await tester.pumpWidget(
       MaterialApp(
         locale: const Locale('ko'),
@@ -1547,9 +1783,10 @@ void main() {
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 400));
 
-    await tester.tap(
-      find.byKey(const ValueKey('randomStartMealIngredientsButton')),
+    final randomStartButton = find.byKey(
+      const ValueKey('randomStartMealIngredientsButton'),
     );
+    tester.widget<OutlinedButton>(randomStartButton).onPressed!();
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 400));
 
@@ -1570,6 +1807,11 @@ void main() {
   testWidgets(
     'Selecting carrot and egg opens timer with selected ingredients',
     (tester) async {
+      SharedPreferences.setMockInitialValues({});
+      addTearDown(() async {
+        await const ActiveMealTimerSessionStore().clear();
+      });
+
       await tester.pumpWidget(
         MaterialApp(
           locale: const Locale('ko'),
@@ -1598,13 +1840,18 @@ void main() {
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 400));
 
-      await tester.tap(find.byKey(const ValueKey('mealIngredientChip_carrot')));
-      await tester.pump();
-      await tester.tap(find.byKey(const ValueKey('mealIngredientChip_egg')));
-      await tester.pump();
-      await tester.tap(
-        find.byKey(const ValueKey('startSelectedMealIngredientsButton')),
+      final carrotChip = find.byKey(
+        const ValueKey('mealIngredientChip_carrot'),
       );
+      tester.widget<ChoiceChip>(carrotChip).onSelected!(true);
+      await tester.pump();
+      final eggChip = find.byKey(const ValueKey('mealIngredientChip_egg'));
+      tester.widget<ChoiceChip>(eggChip).onSelected!(true);
+      await tester.pump();
+      final startSelectedButton = find.byKey(
+        const ValueKey('startSelectedMealIngredientsButton'),
+      );
+      tester.widget<FilledButton>(startSelectedButton).onPressed!();
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 400));
 
@@ -1628,6 +1875,11 @@ void main() {
   testWidgets('Dismissing the ingredient picker does not open timer screen', (
     tester,
   ) async {
+    SharedPreferences.setMockInitialValues({});
+    addTearDown(() async {
+      await const ActiveMealTimerSessionStore().clear();
+    });
+
     await tester.pumpWidget(
       MaterialApp(
         locale: const Locale('ko'),
@@ -1700,6 +1952,10 @@ void main() {
   testWidgets('Quick courses do not overwrite default meal duration', (
     tester,
   ) async {
+    SharedPreferences.setMockInitialValues({});
+    addTearDown(() async {
+      await const ActiveMealTimerSessionStore().clear();
+    });
     MealTimerConfig? changedConfig;
 
     await tester.pumpWidget(
@@ -1738,9 +1994,10 @@ void main() {
     );
     expect(find.byType(TimerScreen), findsNothing);
 
-    await tester.tap(
-      find.byKey(const ValueKey('randomStartMealIngredientsButton')),
+    final randomStartButton = find.byKey(
+      const ValueKey('randomStartMealIngredientsButton'),
     );
+    tester.widget<OutlinedButton>(randomStartButton).onPressed!();
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 400));
 
@@ -1755,6 +2012,10 @@ void main() {
   testWidgets(
     'Timer motivation settings do not overwrite default meal duration',
     (tester) async {
+      SharedPreferences.setMockInitialValues({});
+      addTearDown(() async {
+        await const ActiveMealTimerSessionStore().clear();
+      });
       MealTimerConfig? changedConfig;
 
       await tester.pumpWidget(
@@ -1786,9 +2047,10 @@ void main() {
       quickCourseButton.onTap!();
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 400));
-      await tester.tap(
-        find.byKey(const ValueKey('randomStartMealIngredientsButton')),
+      final randomStartButton = find.byKey(
+        const ValueKey('randomStartMealIngredientsButton'),
       );
+      tester.widget<OutlinedButton>(randomStartButton).onPressed!();
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 400));
 
@@ -2604,6 +2866,10 @@ void main() {
   testWidgets('Home settings apply motivation video settings to new timers', (
     tester,
   ) async {
+    SharedPreferences.setMockInitialValues({});
+    addTearDown(() async {
+      await const ActiveMealTimerSessionStore().clear();
+    });
     MealTimerConfig? changedConfig;
 
     await tester.pumpWidget(
@@ -2659,9 +2925,10 @@ void main() {
     regularCourseButton.onPressed!();
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 400));
-    await tester.tap(
-      find.byKey(const ValueKey('randomStartMealIngredientsButton')),
+    final randomStartButton = find.byKey(
+      const ValueKey('randomStartMealIngredientsButton'),
     );
+    tester.widget<OutlinedButton>(randomStartButton).onPressed!();
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 400));
 
@@ -4144,6 +4411,52 @@ void main() {
     await tester.pump();
 
     expect(await store.load(), isNull);
+
+    await tester.pumpWidget(const SizedBox.shrink());
+    await tester.pump();
+  });
+
+  testWidgets('TimerScreen restores progress from an active session', (
+    tester,
+  ) async {
+    SharedPreferences.setMockInitialValues({});
+    addTearDown(() async {
+      await const ActiveMealTimerSessionStore().clear();
+    });
+    final startedAt = DateTime(2026, 6, 10, 8);
+    final now = startedAt.add(const Duration(minutes: 20));
+    final session = ActiveMealTimerSession(
+      sessionId: 'active-session',
+      startedAt: startedAt,
+      config: MealTimerConfig.defaults().copyWith(
+        duration: const Duration(minutes: 60),
+        vehicleId: 'bus',
+      ),
+      state: ActiveMealTimerSessionState.running,
+    );
+
+    await tester.pumpWidget(
+      MaterialApp(
+        locale: const Locale('ko'),
+        home: TimerScreen(
+          config: MealTimerConfig.defaults(),
+          restoredSession: session,
+          mealProgressService: LocalMealProgressService(),
+          now: () => now,
+          onConfigChanged: (_) {},
+        ),
+      ),
+    );
+    await tester.pump();
+
+    final roadView = tester.widget<RoadView>(find.byType(RoadView));
+    expect(roadView.courseDuration, const Duration(minutes: 60));
+    expect(roadView.vehicle.id, 'bus');
+    expect(roadView.progress, closeTo(1 / 3, 0.01));
+    expect(
+      tester.widget<TimerScreen>(find.byType(TimerScreen)).restoredSession,
+      session,
+    );
 
     await tester.pumpWidget(const SizedBox.shrink());
     await tester.pump();

@@ -161,6 +161,7 @@ class TimerScreen extends StatefulWidget {
     this.orientationService = const SystemOrientationService(),
     this.activeSessionStore = const ActiveMealTimerSessionStore(),
     this.motivationAudioService,
+    this.restoredSession,
     this.now,
   });
 
@@ -171,6 +172,7 @@ class TimerScreen extends StatefulWidget {
   final OrientationService orientationService;
   final ActiveMealTimerSessionStore activeSessionStore;
   final MotivationAudioService? motivationAudioService;
+  final ActiveMealTimerSession? restoredSession;
   final DateTime Function()? now;
 
   @override
@@ -224,12 +226,28 @@ class _TimerScreenState extends State<TimerScreen>
     _motivationAudioService =
         widget.motivationAudioService ?? AudioplayersMotivationAudioService();
     _ownsMotivationAudioService = widget.motivationAudioService == null;
-    _controller = MealTimerController(config: widget.config, now: widget.now);
+    final restoredSession = widget.restoredSession;
+    if (restoredSession == null) {
+      _controller = MealTimerController(config: widget.config, now: widget.now);
+      _activeSessionId = _createActiveSessionId();
+      _controller.start();
+    } else {
+      _timerConfig = restoredSession.config;
+      _shownMotivationMilestones.addAll(
+        restoredSession.shownMotivationMilestones,
+      );
+      _lastMotivationVideoShownAt = restoredSession.lastMotivationVideoShownAt;
+      _motivationScheduleStartedAt =
+          restoredSession.motivationScheduleStartedAt;
+      _activeSessionId = restoredSession.sessionId;
+      _controller = MealTimerController.fromSession(
+        session: restoredSession,
+        now: widget.now,
+      );
+    }
     _controller.addListener(_handleTimerChanged);
     _finishDriveController = AnimationController(vsync: this)
       ..addStatusListener(_handleFinishDriveStatusChanged);
-    _activeSessionId = _createActiveSessionId();
-    _controller.start();
     unawaited(_persistActiveSession());
     unawaited(widget.orientationService.allowMealFlowOrientations());
     _applyScreenAwakeSetting();
@@ -779,17 +797,17 @@ class _TimerScreenState extends State<TimerScreen>
     return AnimatedBuilder(
       animation: Listenable.merge([_controller, _finishDriveController]),
       builder: (context, _) {
-        final vehicle = VehicleCatalog.findById(widget.config.vehicleId);
-        final vehicleAvatar = widget.config.avatarPresentationForVehicle(
+        final vehicle = VehicleCatalog.findById(_timerConfig.vehicleId);
+        final vehicleAvatar = _timerConfig.avatarPresentationForVehicle(
           vehicle.id,
         );
         final courseIngredients =
-            widget.config.courseIngredientMode == CourseIngredientMode.off
+            _timerConfig.courseIngredientMode == CourseIngredientMode.off
             ? const <MealIngredientDefinition>[]
             : MealIngredientCatalog.courseSlotsFor(
-                widget.config.courseIngredientIds,
+                _timerConfig.courseIngredientIds,
                 slotCount: MealIngredientCatalog.courseSlotCountForDuration(
-                  widget.config.duration,
+                  _timerConfig.duration,
                 ),
               );
         final timerProgress = _controller.progress.clamp(0.0, 1.0).toDouble();
@@ -873,14 +891,14 @@ class _TimerScreenState extends State<TimerScreen>
                     isRoadMotionActive:
                         _isFinishDriving ||
                         _controller.state == MealTimerState.running,
-                    courseDuration: widget.config.duration,
+                    courseDuration: _timerConfig.duration,
                   );
                   final landscapeVehicleLayer = isLandscape
                       ? RoadVehicleLayer(
                           progress: displayProgress,
                           vehicle: vehicle,
                           avatar: vehicleAvatar,
-                          courseDuration: widget.config.duration,
+                          courseDuration: _timerConfig.duration,
                         )
                       : null;
                   final landscapeMotivationVideoLayer =
@@ -897,7 +915,7 @@ class _TimerScreenState extends State<TimerScreen>
                           onFinished: _handleMotivationVideoFinished,
                         )
                       : null;
-                  final remainingTimeCard = widget.config.showRemainingTime
+                  final remainingTimeCard = _timerConfig.showRemainingTime
                       ? _RemainingTimeCard(
                           label: statusCopy.timeLabel,
                           remaining: displayedRemaining,
@@ -918,7 +936,7 @@ class _TimerScreenState extends State<TimerScreen>
                         progress: displayProgress,
                         isCompact: true,
                       ),
-                      remainingTimeBadge: widget.config.showRemainingTime
+                      remainingTimeBadge: _timerConfig.showRemainingTime
                           ? _RemainingTimeBadge(
                               label: statusCopy.timeLabel,
                               remaining: displayedRemaining,

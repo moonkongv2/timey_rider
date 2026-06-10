@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -7,6 +8,7 @@ import '../catalogs/meal_ingredient_catalog.dart';
 import '../catalogs/meal_course_catalog.dart';
 import '../catalogs/vehicle_catalog.dart';
 import '../l10n/app_texts.dart';
+import '../models/active_meal_timer_session.dart';
 import '../models/meal_progress_snapshot.dart';
 import '../models/meal_timer_config.dart';
 import '../models/vehicle_avatar_presentation.dart';
@@ -14,6 +16,7 @@ import '../navigation/app_route_observer.dart';
 import '../models/reward_goal.dart';
 import '../models/reward_item.dart';
 import '../models/vehicle.dart';
+import '../services/active_meal_timer_session_store.dart';
 import '../services/local_meal_progress_service.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_radius.dart';
@@ -42,14 +45,18 @@ class HomeScreen extends StatefulWidget {
     required this.config,
     required this.mealProgressService,
     required this.onConfigChanged,
+    this.activeSessionStore = const ActiveMealTimerSessionStore(),
     this.avatarImageBuilder,
+    this.now,
   });
 
   final MealTimerConfig config;
   final LocalMealProgressService mealProgressService;
   final ValueChanged<MealTimerConfig> onConfigChanged;
+  final ActiveMealTimerSessionStore activeSessionStore;
   final Widget Function(BuildContext context, String imagePath)?
   avatarImageBuilder;
+  final DateTime Function()? now;
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -58,6 +65,15 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> with RouteAware {
   late MealTimerConfig _config = widget.config;
   late double _customMinutes = _config.duration.inMinutes.toDouble();
+  late Future<ActiveMealTimerSession?> _activeSessionFuture;
+  ActiveMealTimerSession? _activeSession;
+  Timer? _activeSessionTicker;
+
+  @override
+  void initState() {
+    super.initState();
+    _activeSessionFuture = _loadActiveSession();
+  }
 
   @override
   void didUpdateWidget(covariant HomeScreen oldWidget) {
@@ -68,10 +84,62 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
     if (oldWidget.config.duration != _config.duration) {
       _customMinutes = _config.duration.inMinutes.toDouble();
     }
+    if (oldWidget.activeSessionStore != widget.activeSessionStore) {
+      _refreshProgressSnapshot();
+    }
   }
 
   void _refreshProgressSnapshot() {
+    setState(() {
+      _activeSessionFuture = _loadActiveSession();
+    });
+  }
+
+  DateTime _now() => widget.now?.call() ?? DateTime.now();
+
+  Future<ActiveMealTimerSession?> _loadActiveSession() async {
+    final session = await widget.activeSessionStore.load();
+    if (mounted) {
+      _activeSession = session;
+      _updateActiveSessionTicker(session);
+    }
+    return session;
+  }
+
+  void _updateActiveSessionTicker(ActiveMealTimerSession? session) {
+    if (session?.state == ActiveMealTimerSessionState.running &&
+        _remainingForActiveSession(session!, now: _now()) > Duration.zero) {
+      _activeSessionTicker ??= Timer.periodic(
+        const Duration(seconds: 1),
+        _handleActiveSessionTick,
+      );
+      return;
+    }
+
+    _stopActiveSessionTicker();
+  }
+
+  void _handleActiveSessionTick(Timer timer) {
+    final session = _activeSession;
+    if (!mounted || session == null) {
+      timer.cancel();
+      if (identical(_activeSessionTicker, timer)) {
+        _activeSessionTicker = null;
+      }
+      return;
+    }
+
+    if (session.state != ActiveMealTimerSessionState.running ||
+        _remainingForActiveSession(session, now: _now()) <= Duration.zero) {
+      _stopActiveSessionTicker();
+    }
+
     setState(() {});
+  }
+
+  void _stopActiveSessionTicker() {
+    _activeSessionTicker?.cancel();
+    _activeSessionTicker = null;
   }
 
   @override
@@ -85,8 +153,14 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
 
   @override
   void dispose() {
+    _stopActiveSessionTicker();
     appRouteObserver.unsubscribe(this);
     super.dispose();
+  }
+
+  @override
+  void didPushNext() {
+    _stopActiveSessionTicker();
   }
 
   @override
@@ -116,6 +190,11 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
   }
 
   Future<void> _startTimer(int minutes) async {
+    final shouldStartNewTimer = await _resolveActiveSessionBeforeNewTimer();
+    if (!mounted || !shouldStartNewTimer) {
+      return;
+    }
+
     final courseIngredientSelection =
         await _courseIngredientSelectionForStart();
     if (!mounted || courseIngredientSelection == null) {
@@ -133,10 +212,111 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
         builder: (_) => TimerScreen(
           config: config,
           mealProgressService: widget.mealProgressService,
+          activeSessionStore: widget.activeSessionStore,
           onConfigChanged: _updateTimerRuntimeConfig,
         ),
       ),
     );
+    if (mounted) {
+      _refreshProgressSnapshot();
+    }
+  }
+
+  Future<bool> _resolveActiveSessionBeforeNewTimer() async {
+    final activeSession = await widget.activeSessionStore.load();
+    if (!mounted) {
+      return false;
+    }
+    if (activeSession == null) {
+      return true;
+    }
+
+    final texts = AppTexts.of(context);
+    final choice = await showDialog<_ActiveTimerStartChoice>(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text(texts.home.activeTimerNewTimerDialogTitle),
+          content: Text(texts.home.activeTimerNewTimerDialogMessage),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(_ActiveTimerStartChoice.cancel);
+              },
+              child: Text(texts.common.cancel),
+            ),
+            FilledButton(
+              onPressed: () {
+                Navigator.of(context).pop(_ActiveTimerStartChoice.startNew);
+              },
+              child: Text(texts.home.activeTimerStartNewButton),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (!mounted) {
+      return false;
+    }
+
+    switch (choice) {
+      case _ActiveTimerStartChoice.startNew:
+        await widget.activeSessionStore.clear();
+        if (mounted) {
+          _refreshProgressSnapshot();
+        }
+        return mounted;
+      case _ActiveTimerStartChoice.cancel:
+      case null:
+        return false;
+    }
+  }
+
+  Future<void> _resumeActiveTimer(ActiveMealTimerSession session) async {
+    await Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => TimerScreen(
+          config: session.config,
+          restoredSession: session,
+          mealProgressService: widget.mealProgressService,
+          activeSessionStore: widget.activeSessionStore,
+          onConfigChanged: _updateTimerRuntimeConfig,
+        ),
+      ),
+    );
+    if (mounted) {
+      _refreshProgressSnapshot();
+    }
+  }
+
+  Future<void> _cancelActiveTimer() async {
+    final texts = AppTexts.of(context);
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text(texts.home.activeTimerCancelDialogTitle),
+          content: Text(texts.home.activeTimerCancelDialogMessage),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: Text(texts.common.cancel),
+            ),
+            FilledButton(
+              onPressed: () => Navigator.of(context).pop(true),
+              child: Text(texts.home.activeTimerCancelButton),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (confirmed != true || !mounted) {
+      return;
+    }
+
+    await widget.activeSessionStore.clear();
     if (mounted) {
       _refreshProgressSnapshot();
     }
@@ -466,12 +646,36 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
                     ),
                   ],
                 );
+                final activeSessionCard =
+                    FutureBuilder<ActiveMealTimerSession?>(
+                      future: _activeSessionFuture,
+                      builder: (context, snapshot) {
+                        final activeSession = snapshot.data;
+                        if (activeSession == null) {
+                          return const SizedBox.shrink();
+                        }
+
+                        return Padding(
+                          padding: const EdgeInsets.only(bottom: AppSpacing.xl),
+                          child: _ActiveTimerResumeCard(
+                            remaining: _remainingForActiveSession(
+                              activeSession,
+                              now: _now(),
+                            ),
+                            onPressed: () => _resumeActiveTimer(activeSession),
+                            onCancel: _cancelActiveTimer,
+                          ),
+                        );
+                      },
+                    );
 
                 if (constraints.maxWidth >= 700) {
                   return Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Expanded(child: heroCard),
+                      Expanded(
+                        child: Column(children: [activeSessionCard, heroCard]),
+                      ),
                       const SizedBox(width: AppSpacing.xl),
                       Expanded(
                         child: Column(
@@ -488,6 +692,7 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
 
                 return Column(
                   children: [
+                    activeSessionCard,
                     heroCard,
                     const SizedBox(height: AppSpacing.xl),
                     quickCourses,
@@ -554,6 +759,27 @@ class _CourseIngredientSelection {
   final List<String> selectedCourseIngredientIds;
 }
 
+enum _ActiveTimerStartChoice { cancel, startNew }
+
+Duration _remainingForActiveSession(
+  ActiveMealTimerSession session, {
+  DateTime? now,
+}) {
+  if (session.state == ActiveMealTimerSessionState.arrived) {
+    return Duration.zero;
+  }
+
+  final currentTime = now ?? DateTime.now();
+  final referenceTime = session.state == ActiveMealTimerSessionState.paused
+      ? session.pausedAt ?? currentTime
+      : currentTime;
+  final elapsed =
+      referenceTime.difference(session.startedAt) - session.totalPausedDuration;
+  final remaining =
+      session.duration - (elapsed.isNegative ? Duration.zero : elapsed);
+  return remaining.isNegative ? Duration.zero : remaining;
+}
+
 String? _quickCourseEmoji(int minutes) {
   return switch (minutes) {
     15 => '🌞',
@@ -561,6 +787,122 @@ String? _quickCourseEmoji(int minutes) {
     35 => '🌈',
     _ => null,
   };
+}
+
+class _ActiveTimerResumeCard extends StatelessWidget {
+  const _ActiveTimerResumeCard({
+    required this.remaining,
+    required this.onPressed,
+    required this.onCancel,
+  });
+
+  final Duration remaining;
+  final VoidCallback onPressed;
+  final VoidCallback onCancel;
+
+  @override
+  Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
+    final texts = AppTexts.of(context);
+    final formattedRemaining = formatDuration(remaining);
+
+    return DecoratedBox(
+      key: const ValueKey('activeTimerResumeCard'),
+      decoration: BoxDecoration(
+        color: AppColors.surfaceMint,
+        borderRadius: AppRadius.card,
+        border: Border.all(color: AppColors.white.withValues(alpha: 0.88)),
+        boxShadow: AppShadows.surface,
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(AppSpacing.md),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Row(
+              children: [
+                DecoratedBox(
+                  decoration: BoxDecoration(
+                    color: AppColors.white.withValues(alpha: 0.7),
+                    borderRadius: AppRadius.pill,
+                  ),
+                  child: const SizedBox(
+                    width: 46,
+                    height: 46,
+                    child: Icon(
+                      Icons.timer_rounded,
+                      color: AppColors.brown700,
+                      size: 26,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: AppSpacing.md),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        texts.home.activeTimerTitle,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: textTheme.titleSmall?.copyWith(
+                          color: AppColors.textStrong,
+                          fontWeight: FontWeight.w900,
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        texts.home.activeTimerSubtitle(formattedRemaining),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: textTheme.bodySmall?.copyWith(
+                          color: AppColors.textSecondary,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: AppSpacing.md),
+            Row(
+              children: [
+                Expanded(
+                  child: OutlinedButton(
+                    key: const ValueKey('activeTimerCancelButton'),
+                    onPressed: onCancel,
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: AppColors.textPrimary,
+                      side: const BorderSide(color: AppColors.borderSoft),
+                      shape: const StadiumBorder(),
+                      minimumSize: const Size.fromHeight(44),
+                    ),
+                    child: Text(
+                      texts.home.activeTimerCancelButton,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: AppSpacing.sm),
+                Expanded(
+                  child: AppBouncyButton(
+                    label: texts.home.activeTimerResumeButton,
+                    icon: Icons.play_arrow_rounded,
+                    onPressed: onPressed,
+                    variant: AppButtonVariant.primary,
+                    size: AppButtonSize.compact,
+                    fullWidth: true,
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 }
 
 class _HomeLogo extends StatelessWidget {

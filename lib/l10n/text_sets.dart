@@ -37,9 +37,18 @@ abstract interface class HomeTextSet {
   String get avatarCtaEditSemantics;
   String get avatarInlineDefaultState;
   String get avatarInlineCustomState;
+  String get activeTimerTitle;
+  String get activeTimerResumeButton;
+  String get activeTimerCancelButton;
+  String get activeTimerCancelDialogTitle;
+  String get activeTimerCancelDialogMessage;
+  String get activeTimerNewTimerDialogTitle;
+  String get activeTimerNewTimerDialogMessage;
+  String get activeTimerStartNewButton;
 
   String recentCustomMinutes(int minutes);
   String minuteLabel(int minutes);
+  String activeTimerSubtitle(String remainingTime);
   String normalCourse(int minutes);
   String alternateCourse(int minutes);
   String alternateCourseSubtitle(int minutes);

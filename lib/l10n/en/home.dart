@@ -29,9 +29,20 @@ class EnHomeTexts implements HomeTextSet {
   String get avatarCtaEditSemantics => 'Edit avatar';
   String get avatarInlineDefaultState => 'Using default face';
   String get avatarInlineCustomState => 'Child face on board';
+  String get activeTimerTitle => 'Meal timer in progress';
+  String get activeTimerResumeButton => 'Resume';
+  String get activeTimerCancelButton => 'Cancel timer';
+  String get activeTimerCancelDialogTitle => 'Cancel the timer in progress?';
+  String get activeTimerCancelDialogMessage =>
+      'This meal timer will not be saved to meal records.';
+  String get activeTimerNewTimerDialogTitle => 'A timer is already in progress';
+  String get activeTimerNewTimerDialogMessage =>
+      'Starting a new timer will cancel the current one.';
+  String get activeTimerStartNewButton => 'Start new';
 
   String recentCustomMinutes(int minutes) => 'Recent $minutes min';
   String minuteLabel(int minutes) => '$minutes min';
+  String activeTimerSubtitle(String remainingTime) => '$remainingTime left';
   String normalCourse(int minutes) => '$minutes-min Regular Ride';
   String alternateCourse(int minutes) => '$minutes-min Ride';
   String alternateCourseSubtitle(int minutes) {
