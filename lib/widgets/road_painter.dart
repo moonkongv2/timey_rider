@@ -428,15 +428,15 @@ class RoadPainter extends CustomPainter {
   static const skyPathCloudAnimationDuration = Duration(milliseconds: 4800);
   static const waterRippleVerticalGap = 92.0;
   static const waterRippleMarkWidth = 42.0;
-  static const waterWaveWidth = 26.0;
-  static const waterWaveGap = 28.0;
+  static const waterWaveWidth = 32.0;
+  static const waterWaveGap = 34.0;
   static const waterWavePatternLength = waterWaveWidth + waterWaveGap;
-  static const waterWaveStrokeWidth = 2.8;
-  static const waterWaveAnimationDuration = Duration(milliseconds: 2600);
-  static const railSleeperGap = 46.0;
+  static const waterWaveStrokeWidth = 2.5;
+  static const waterWaveAnimationDuration = Duration(milliseconds: 3000);
+  static const railSleeperGap = 60.0;
   static const railSleeperPatternLength = railSleeperGap;
-  static const railSleeperStrokeWidth = 3.4;
-  static const railAnimationDuration = Duration(milliseconds: 1800);
+  static const railSleeperStrokeWidth = 2.8;
+  static const railAnimationDuration = Duration(milliseconds: 2200);
 
   final double progress;
   final double laneDashPhase;
@@ -690,7 +690,7 @@ class RoadPainter extends CustomPainter {
 
   void _drawWaterFlow(Canvas canvas, Path path, Color color, double phase) {
     final wavePaint = Paint()
-      ..color = color
+      ..color = color.withValues(alpha: 0.68)
       ..style = PaintingStyle.stroke
       ..strokeCap = StrokeCap.round
       ..strokeWidth = waterWaveStrokeWidth;
@@ -703,7 +703,6 @@ class RoadPainter extends CustomPainter {
         continue;
       }
 
-      var waveIndex = 0;
       var distance = startLimit - normalizedPhase;
       while (distance < endLimit) {
         final centerDistance = distance + (waterWaveWidth / 2);
@@ -712,20 +711,37 @@ class RoadPainter extends CustomPainter {
           if (tangent != null && tangent.vector.distance > 0) {
             final direction = tangent.vector / tangent.vector.distance;
             final normal = Offset(-direction.dy, direction.dx);
-            final amplitude = waveIndex.isEven ? 5.0 : -5.0;
+            const amplitude = 4.8;
             final center = tangent.position;
             final start = center - (direction * (waterWaveWidth * 0.5));
             final end = center + (direction * (waterWaveWidth * 0.5));
-            final control = center + (normal * amplitude);
+            final firstControl =
+                center -
+                (direction * (waterWaveWidth * 0.24)) +
+                (normal * amplitude);
+            final secondControl =
+                center +
+                (direction * (waterWaveWidth * 0.24)) -
+                (normal * amplitude);
             final wavePath = Path()
               ..moveTo(start.dx, start.dy)
-              ..quadraticBezierTo(control.dx, control.dy, end.dx, end.dy);
+              ..quadraticBezierTo(
+                firstControl.dx,
+                firstControl.dy,
+                center.dx,
+                center.dy,
+              )
+              ..quadraticBezierTo(
+                secondControl.dx,
+                secondControl.dy,
+                end.dx,
+                end.dy,
+              );
 
             canvas.drawPath(wavePath, wavePaint);
           }
         }
 
-        waveIndex += 1;
         distance += waterWavePatternLength;
       }
     }
@@ -733,7 +749,7 @@ class RoadPainter extends CustomPainter {
 
   void _drawRailTrack(Canvas canvas, Path path, Color color, double phase) {
     final sleeperPaint = Paint()
-      ..color = AppColors.brown700.withValues(alpha: 0.14)
+      ..color = AppColors.brown700.withValues(alpha: 0.10)
       ..style = PaintingStyle.stroke
       ..strokeCap = StrokeCap.round
       ..strokeWidth = railSleeperStrokeWidth;
@@ -755,8 +771,8 @@ class RoadPainter extends CustomPainter {
             final normal = Offset(-direction.dy, direction.dx);
             final center = tangent.position;
             canvas.drawLine(
-              center - (normal * 12),
-              center + (normal * 12),
+              center - (normal * 10),
+              center + (normal * 10),
               sleeperPaint,
             );
           }
