@@ -9,6 +9,13 @@ class EnMealHistoryTexts implements MealHistoryTextSet {
   String get title => 'Meal Records';
   String get emptyTitle => 'No meal records yet';
   String get emptyBody => 'Completed timer sessions will appear here.';
+  String get helpTitle => 'Meal history guide';
+  List<String> get helpBulletItems => const [
+    'Meal history shows target time, actual time, completion status, and earned stickers.',
+    'Manually chosen ingredients appear when they were saved with the meal.',
+    'Auto-selected ingredients appear on the road only and are not saved in history.',
+    'Incomplete meals may show no stickers.',
+  ];
   String get targetTimeLabel => 'Target';
   String get actualTimeLabel => 'Actual';
   String get overrunTimeLabel => 'Over';

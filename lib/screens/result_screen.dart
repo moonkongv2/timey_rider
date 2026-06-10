@@ -14,6 +14,7 @@ import '../services/orientation_service.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_radius.dart';
 import '../theme/app_spacing.dart';
+import '../widgets/app/app_help_sheet.dart';
 import '../widgets/reward_sticker_image.dart';
 import 'reward_goal_screen.dart';
 import 'timer_screen.dart';
@@ -184,6 +185,16 @@ class _ResultScreenState extends State<ResultScreen> {
     Navigator.of(context).popUntil((route) => route.isFirst);
   }
 
+  void _showResultHelp(bool mealCompleted) {
+    final texts = AppTexts.of(context).result;
+    showAppHelpSheet(
+      context: context,
+      title: texts.helpTitle(mealCompleted),
+      bodyParagraphs: texts.helpBodyParagraphs(mealCompleted),
+      bulletItems: texts.helpBulletItems(mealCompleted),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final mealCompleted = widget.result.mealCompleted;
@@ -340,6 +351,12 @@ class _ResultScreenState extends State<ResultScreen> {
                                             fontWeight: FontWeight.w800,
                                           ),
                                     ),
+                                    const SizedBox(height: AppSpacing.sm),
+                                    _ResultHelpButton(
+                                      mealCompleted: mealCompleted,
+                                      onPressed: () =>
+                                          _showResultHelp(mealCompleted),
+                                    ),
                                   ],
                                 ),
                               ),
@@ -370,6 +387,40 @@ class _ResultScreenState extends State<ResultScreen> {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _ResultHelpButton extends StatelessWidget {
+  const _ResultHelpButton({
+    required this.mealCompleted,
+    required this.onPressed,
+    this.isCompact = false,
+  });
+
+  final bool mealCompleted;
+  final VoidCallback onPressed;
+  final bool isCompact;
+
+  @override
+  Widget build(BuildContext context) {
+    final texts = AppTexts.of(context).result;
+
+    return IconButton.filledTonal(
+      key: ValueKey(
+        mealCompleted
+            ? 'completedResultHelpButton'
+            : 'incompleteResultHelpButton',
+      ),
+      tooltip: texts.helpButtonLabel(mealCompleted),
+      onPressed: onPressed,
+      icon: const Icon(Icons.help_outline_rounded),
+      style: IconButton.styleFrom(
+        backgroundColor: AppColors.white.withValues(alpha: 0.82),
+        foregroundColor: AppColors.brown700,
+        fixedSize: isCompact ? const Size(40, 40) : const Size(44, 44),
+        shape: const CircleBorder(),
       ),
     );
   }
@@ -506,15 +557,37 @@ class _CompactLandscapeResultLayout extends StatelessWidget {
                       mainAxisSize: MainAxisSize.min,
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        Text(
-                          texts.result.title(mealCompleted),
-                          textAlign: TextAlign.left,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: theme.textTheme.headlineSmall?.copyWith(
-                            fontWeight: FontWeight.w900,
-                            color: AppColors.textStrong,
-                          ),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: Text(
+                                texts.result.title(mealCompleted),
+                                textAlign: TextAlign.left,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: theme.textTheme.headlineSmall?.copyWith(
+                                  fontWeight: FontWeight.w900,
+                                  color: AppColors.textStrong,
+                                ),
+                              ),
+                            ),
+                            _ResultHelpButton(
+                              mealCompleted: mealCompleted,
+                              isCompact: true,
+                              onPressed: () {
+                                final resultTexts = AppTexts.of(context).result;
+                                showAppHelpSheet(
+                                  context: context,
+                                  title: resultTexts.helpTitle(mealCompleted),
+                                  bodyParagraphs: resultTexts
+                                      .helpBodyParagraphs(mealCompleted),
+                                  bulletItems: resultTexts.helpBulletItems(
+                                    mealCompleted,
+                                  ),
+                                );
+                              },
+                            ),
+                          ],
                         ),
                         const SizedBox(height: AppSpacing.md),
                         Text(

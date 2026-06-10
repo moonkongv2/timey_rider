@@ -708,6 +708,94 @@ void main() {
     );
   });
 
+  testWidgets('Completed result help explains sticker reward', (tester) async {
+    SharedPreferences.setMockInitialValues({});
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(() {
+      tester.view.resetPhysicalSize();
+      tester.view.resetDevicePixelRatio();
+    });
+
+    await tester.pumpWidget(
+      MaterialApp(
+        locale: const Locale('ko'),
+        supportedLocales: const [Locale('ko'), Locale('en')],
+        localizationsDelegates: const [
+          GlobalMaterialLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+        ],
+        home: ResultScreen(
+          result: _mealResult(completedBeforeArrival: true),
+          config: MealTimerConfig.defaults(),
+          mealProgressService: LocalMealProgressService(),
+          onConfigChanged: (_) {},
+          introControllerFactory: (_) {
+            return VideoPlayerController.asset(
+              'assets/videos/missing_result_success.mp4',
+            );
+          },
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(
+      find.byKey(const ValueKey('completedResultHelpButton')),
+      findsOneWidget,
+    );
+
+    await tester.tap(find.byKey(const ValueKey('completedResultHelpButton')));
+    await tester.pumpAndSettle();
+
+    expect(find.byKey(const ValueKey('appHelpSheet')), findsOneWidget);
+    expect(find.textContaining('랜덤 성공 스티커'), findsOneWidget);
+  });
+
+  testWidgets('Incomplete result help explains record without sticker', (
+    tester,
+  ) async {
+    SharedPreferences.setMockInitialValues({});
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(() {
+      tester.view.resetPhysicalSize();
+      tester.view.resetDevicePixelRatio();
+    });
+
+    await tester.pumpWidget(
+      MaterialApp(
+        locale: const Locale('ko'),
+        supportedLocales: const [Locale('ko'), Locale('en')],
+        localizationsDelegates: const [
+          GlobalMaterialLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+        ],
+        home: ResultScreen(
+          result: _mealResult(mealCompleted: false),
+          config: MealTimerConfig.defaults(),
+          mealProgressService: LocalMealProgressService(),
+          onConfigChanged: (_) {},
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(
+      find.byKey(const ValueKey('incompleteResultHelpButton')),
+      findsOneWidget,
+    );
+
+    await tester.tap(find.byKey(const ValueKey('incompleteResultHelpButton')));
+    await tester.pumpAndSettle();
+
+    expect(find.byKey(const ValueKey('appHelpSheet')), findsOneWidget);
+    expect(find.textContaining('미완료 기록'), findsWidgets);
+    expect(find.textContaining('스티커는 지급되지'), findsOneWidget);
+  });
+
   testWidgets('Failed result screen uses selected rider image in landscape', (
     tester,
   ) async {
@@ -6476,6 +6564,8 @@ void main() {
     );
     await tester.pumpAndSettle();
 
+    expect(find.byKey(const ValueKey('mealHistoryHelpCard')), findsOneWidget);
+    expect(find.text('식사 기록 안내'), findsOneWidget);
     expect(find.text('고른 식재료'), findsOneWidget);
     expect(find.text('당근'), findsOneWidget);
     expect(find.text('달걀'), findsOneWidget);

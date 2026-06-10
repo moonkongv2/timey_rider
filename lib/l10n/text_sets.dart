@@ -105,6 +105,8 @@ abstract interface class MealHistoryTextSet {
   String get title;
   String get emptyTitle;
   String get emptyBody;
+  String get helpTitle;
+  List<String> get helpBulletItems;
   String get targetTimeLabel;
   String get actualTimeLabel;
   String get overrunTimeLabel;
@@ -231,6 +233,10 @@ abstract interface class ResultTextSet {
   String title(bool mealCompleted);
   String primaryMessage(bool mealCompleted, {String? vehicleId});
   String secondaryMessage(bool mealCompleted);
+  String helpButtonLabel(bool mealCompleted);
+  String helpTitle(bool mealCompleted);
+  List<String> helpBodyParagraphs(bool mealCompleted);
+  List<String> helpBulletItems(bool mealCompleted);
 }
 
 abstract interface class RewardTextSet {

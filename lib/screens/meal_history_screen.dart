@@ -43,10 +43,13 @@ class MealHistoryScreen extends StatelessWidget {
                 AppSpacing.xl,
                 AppSpacing.xxl,
               ),
-              itemCount: history.length,
+              itemCount: history.length + 1,
               separatorBuilder: (_, _) => const SizedBox(height: AppSpacing.md),
               itemBuilder: (context, index) {
-                return _MealHistoryCard(entry: history[index]);
+                if (index == 0) {
+                  return const _MealHistoryHelpCard();
+                }
+                return _MealHistoryCard(entry: history[index - 1]);
               },
             );
           },
@@ -95,6 +98,88 @@ class _MealHistoryEmptyState extends StatelessWidget {
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class _MealHistoryHelpCard extends StatelessWidget {
+  const _MealHistoryHelpCard();
+
+  @override
+  Widget build(BuildContext context) {
+    final texts = AppTexts.of(context).mealHistory;
+    final textTheme = Theme.of(context).textTheme;
+
+    return Card(
+      key: const ValueKey('mealHistoryHelpCard'),
+      color: AppColors.surfaceWarm,
+      shape: RoundedRectangleBorder(borderRadius: AppRadius.card),
+      child: Padding(
+        padding: const EdgeInsets.all(AppSpacing.lg),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                const Icon(
+                  Icons.info_outline_rounded,
+                  color: AppColors.brown700,
+                ),
+                const SizedBox(width: AppSpacing.sm),
+                Expanded(
+                  child: Text(
+                    texts.helpTitle,
+                    style: textTheme.titleMedium?.copyWith(
+                      color: AppColors.textStrong,
+                      fontWeight: FontWeight.w900,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: AppSpacing.md),
+            for (final item in texts.helpBulletItems)
+              _MealHistoryHelpBullet(text: item),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _MealHistoryHelpBullet extends StatelessWidget {
+  const _MealHistoryHelpBullet({required this.text});
+
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: AppSpacing.sm),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            width: 7,
+            height: 7,
+            margin: const EdgeInsets.only(top: 7),
+            decoration: const BoxDecoration(
+              color: AppColors.primary,
+              shape: BoxShape.circle,
+            ),
+          ),
+          const SizedBox(width: AppSpacing.sm),
+          Expanded(
+            child: Text(
+              text,
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                color: AppColors.textPrimary,
+                height: 1.35,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
