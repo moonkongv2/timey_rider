@@ -2977,6 +2977,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('동기부여 영상'), findsOneWidget);
+    expect(find.textContaining('진행률 10%'), findsOneWidget);
 
     await tester.scrollUntilVisible(
       find.textContaining('성공하면 랜덤 성공 스티커'),
@@ -3194,6 +3195,7 @@ void main() {
 
     expect(find.byKey(const ValueKey('appHelpSheet')), findsOneWidget);
     expect(find.text('동기부여 영상 안내'), findsWidgets);
+    expect(find.textContaining('진행률 10%'), findsOneWidget);
     expect(find.textContaining('3분, 5분, 10분'), findsOneWidget);
   });
 

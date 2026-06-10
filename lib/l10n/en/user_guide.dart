@@ -45,7 +45,8 @@ class EnUserGuideTexts implements UserGuideTextSet {
   List<String> get motivationItems => const [
     'Motivation videos are short cheers that can appear during a meal.',
     'They do not affect rewards, success, or incomplete results.',
-    'By default, they appear based on meal progress.',
+    'For courses up to 30 minutes, videos appear around 10%, 20%, and other 10% progress steps by default.',
+    'Very short custom courses may skip some steps so videos do not overlap too often.',
     'Long courses or custom interval mode may use time-based scheduling.',
     'You can choose 3, 5, or 10 minute intervals.',
     'If sound is off, the video may appear without voice playback.',
