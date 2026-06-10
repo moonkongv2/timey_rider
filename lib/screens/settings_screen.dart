@@ -5,6 +5,8 @@ import '../l10n/app_texts.dart';
 import '../l10n/text_sets.dart';
 import '../models/meal_timer_config.dart';
 import '../theme/app_colors.dart';
+import '../widgets/app/app_help_sheet.dart';
+import 'user_guide_screen.dart';
 
 const _motivationVideoIntervalOptions = [
   Duration(minutes: 3),
@@ -86,6 +88,26 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
+  void _showIngredientHelp() {
+    final texts = AppTexts.of(context).mealIngredient;
+    showAppHelpSheet(
+      context: context,
+      title: texts.helpTitle,
+      bodyParagraphs: texts.helpBodyParagraphs,
+      bulletItems: texts.helpBulletItems,
+    );
+  }
+
+  void _showMotivationVideoHelp() {
+    final texts = AppTexts.of(context).settings;
+    showAppHelpSheet(
+      context: context,
+      title: texts.motivationVideoHelpTitle,
+      bodyParagraphs: texts.motivationVideoHelpBodyParagraphs,
+      bulletItems: texts.motivationVideoHelpBulletItems,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final texts = AppTexts.of(context);
@@ -103,6 +125,26 @@ class _SettingsScreenState extends State<SettingsScreen> {
       body: ListView(
         padding: const EdgeInsets.all(20),
         children: [
+          Card(
+            child: ListTile(
+              key: const ValueKey('userGuideSettingsTile'),
+              leading: const Icon(Icons.menu_book_rounded),
+              title: Text(
+                texts.userGuide.title,
+                style: Theme.of(
+                  context,
+                ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w900),
+              ),
+              subtitle: Text(texts.userGuide.subtitle),
+              trailing: const Icon(Icons.chevron_right_rounded),
+              onTap: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(builder: (_) => const UserGuideScreen()),
+                );
+              },
+            ),
+          ),
+          const SizedBox(height: 20),
           Card(
             child: Padding(
               padding: const EdgeInsets.all(20),
@@ -181,9 +223,22 @@ class _SettingsScreenState extends State<SettingsScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    texts.settings.courseIngredientModeTitle,
-                    style: sectionTitleStyle,
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          texts.settings.courseIngredientModeTitle,
+                          style: sectionTitleStyle,
+                        ),
+                      ),
+                      IconButton(
+                        key: const ValueKey('courseIngredientModeHelpButton'),
+                        tooltip: texts.mealIngredient.helpLinkLabel,
+                        onPressed: _showIngredientHelp,
+                        icon: const Icon(Icons.help_outline_rounded),
+                        color: AppColors.brown700,
+                      ),
+                    ],
                   ),
                   const SizedBox(height: 12),
                   LayoutBuilder(
@@ -285,6 +340,27 @@ class _SettingsScreenState extends State<SettingsScreen> {
           Card(
             child: Column(
               children: [
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(20, 12, 8, 0),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          texts.settings.motivationVideoHelpTitle,
+                          style: Theme.of(context).textTheme.titleMedium
+                              ?.copyWith(fontWeight: FontWeight.w900),
+                        ),
+                      ),
+                      IconButton(
+                        key: const ValueKey('motivationVideoHelpButton'),
+                        tooltip: texts.settings.motivationVideoHelpTitle,
+                        onPressed: _showMotivationVideoHelp,
+                        icon: const Icon(Icons.help_outline_rounded),
+                        color: AppColors.brown700,
+                      ),
+                    ],
+                  ),
+                ),
                 SwitchListTile(
                   key: const ValueKey('motivationVideoEnabledSwitch'),
                   title: Text(texts.settings.motivationVideoEnabled),

@@ -26,6 +26,7 @@ import '../theme/app_shadows.dart';
 import '../theme/app_spacing.dart';
 import '../utils/duration_format.dart';
 import '../utils/motivation_video_schedule.dart' as motivation_schedule;
+import '../widgets/app/app_help_sheet.dart';
 import '../widgets/road_painter.dart';
 import '../widgets/road_view.dart';
 import '../widgets/timer_control_bar.dart';
@@ -1401,6 +1402,16 @@ class _MotivationVideoSettingsSheetState
     return _motivationVideoIntervalOptions.first;
   }
 
+  void _showMotivationVideoHelp() {
+    final texts = AppTexts.of(context).settings;
+    showAppHelpSheet(
+      context: context,
+      title: texts.motivationVideoHelpTitle,
+      bodyParagraphs: texts.motivationVideoHelpBodyParagraphs,
+      bulletItems: texts.motivationVideoHelpBulletItems,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final texts = AppTexts.of(context);
@@ -1450,6 +1461,40 @@ class _MotivationVideoSettingsSheetState
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
+                      Padding(
+                        padding: EdgeInsets.fromLTRB(
+                          AppSpacing.lg,
+                          isLandscape ? AppSpacing.sm : AppSpacing.md,
+                          AppSpacing.sm,
+                          AppSpacing.xs,
+                        ),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Expanded(
+                              child: Text(
+                                texts.settings.motivationVideoHelpSummary,
+                                style: Theme.of(context).textTheme.bodyMedium
+                                    ?.copyWith(
+                                      color: AppColors.textSecondary,
+                                      height: 1.3,
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                              ),
+                            ),
+                            IconButton(
+                              key: const ValueKey(
+                                'timerMotivationVideoHelpButton',
+                              ),
+                              tooltip: texts.settings.motivationVideoHelpTitle,
+                              onPressed: _showMotivationVideoHelp,
+                              icon: const Icon(Icons.help_outline_rounded),
+                              color: AppColors.brown700,
+                              visualDensity: VisualDensity.compact,
+                            ),
+                          ],
+                        ),
+                      ),
                       SwitchListTile(
                         key: const ValueKey('motivationVideoEnabledSwitch'),
                         dense: isLandscape,

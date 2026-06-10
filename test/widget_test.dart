@@ -29,6 +29,7 @@ import 'package:jy_yamyam/screens/reward_goal_screen.dart';
 import 'package:jy_yamyam/screens/result_screen.dart';
 import 'package:jy_yamyam/screens/settings_screen.dart';
 import 'package:jy_yamyam/screens/timer_screen.dart';
+import 'package:jy_yamyam/screens/user_guide_screen.dart';
 import 'package:jy_yamyam/services/active_meal_timer_session_store.dart';
 import 'package:jy_yamyam/services/avatar_image_picker.dart';
 import 'package:jy_yamyam/services/local_avatar_image_service.dart';
@@ -705,6 +706,94 @@ void main() {
       _assetImage('assets/images/result_success_bg_portrait.png'),
       findsOneWidget,
     );
+  });
+
+  testWidgets('Completed result help explains sticker reward', (tester) async {
+    SharedPreferences.setMockInitialValues({});
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(() {
+      tester.view.resetPhysicalSize();
+      tester.view.resetDevicePixelRatio();
+    });
+
+    await tester.pumpWidget(
+      MaterialApp(
+        locale: const Locale('ko'),
+        supportedLocales: const [Locale('ko'), Locale('en')],
+        localizationsDelegates: const [
+          GlobalMaterialLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+        ],
+        home: ResultScreen(
+          result: _mealResult(completedBeforeArrival: true),
+          config: MealTimerConfig.defaults(),
+          mealProgressService: LocalMealProgressService(),
+          onConfigChanged: (_) {},
+          introControllerFactory: (_) {
+            return VideoPlayerController.asset(
+              'assets/videos/missing_result_success.mp4',
+            );
+          },
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(
+      find.byKey(const ValueKey('completedResultHelpButton')),
+      findsOneWidget,
+    );
+
+    await tester.tap(find.byKey(const ValueKey('completedResultHelpButton')));
+    await tester.pumpAndSettle();
+
+    expect(find.byKey(const ValueKey('appHelpSheet')), findsOneWidget);
+    expect(find.textContaining('랜덤 성공 스티커'), findsOneWidget);
+  });
+
+  testWidgets('Incomplete result help explains record without sticker', (
+    tester,
+  ) async {
+    SharedPreferences.setMockInitialValues({});
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(() {
+      tester.view.resetPhysicalSize();
+      tester.view.resetDevicePixelRatio();
+    });
+
+    await tester.pumpWidget(
+      MaterialApp(
+        locale: const Locale('ko'),
+        supportedLocales: const [Locale('ko'), Locale('en')],
+        localizationsDelegates: const [
+          GlobalMaterialLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+        ],
+        home: ResultScreen(
+          result: _mealResult(mealCompleted: false),
+          config: MealTimerConfig.defaults(),
+          mealProgressService: LocalMealProgressService(),
+          onConfigChanged: (_) {},
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(
+      find.byKey(const ValueKey('incompleteResultHelpButton')),
+      findsOneWidget,
+    );
+
+    await tester.tap(find.byKey(const ValueKey('incompleteResultHelpButton')));
+    await tester.pumpAndSettle();
+
+    expect(find.byKey(const ValueKey('appHelpSheet')), findsOneWidget);
+    expect(find.textContaining('미완료 기록'), findsWidgets);
+    expect(find.textContaining('스티커는 지급되지'), findsOneWidget);
   });
 
   testWidgets('Failed result screen uses selected rider image in landscape', (
@@ -1768,6 +1857,53 @@ void main() {
       findsOneWidget,
     );
     expect(find.byType(TimerScreen), findsNothing);
+  });
+
+  testWidgets('Meal ingredient picker help opens ingredient help text', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        locale: const Locale('ko'),
+        supportedLocales: const [Locale('ko'), Locale('en')],
+        localizationsDelegates: const [
+          GlobalMaterialLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+        ],
+        home: HomeScreen(
+          config: MealTimerConfig.defaults().copyWith(childName: '지율'),
+          mealProgressService: LocalMealProgressService(),
+          onConfigChanged: (_) {},
+        ),
+      ),
+    );
+    await tester.pump();
+
+    final regularCourseButton = tester.widget<AppBouncyButton>(
+      find.ancestor(
+        of: find.textContaining('25분 보통 코스'),
+        matching: find.byType(AppBouncyButton),
+      ),
+    );
+    regularCourseButton.onPressed!();
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 400));
+    await tester.pumpAndSettle();
+
+    expect(
+      find.byKey(const ValueKey('mealIngredientPickerSheet')),
+      findsOneWidget,
+    );
+    expect(find.text('식재료는 어떤 의미인가요?'), findsOneWidget);
+
+    await tester.tap(
+      find.byKey(const ValueKey('mealIngredientPickerHelpButton')),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.byKey(const ValueKey('appHelpSheet')), findsOneWidget);
+    expect(find.textContaining('직접 고른 식재료'), findsWidgets);
   });
 
   testWidgets('Course ingredient off starts timer without picker', (
@@ -2871,6 +3007,162 @@ void main() {
     expect(find.text('남은 식사 시간'), findsNothing);
   });
 
+  testWidgets('Settings screen opens Korean parent guide', (tester) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        locale: const Locale('ko'),
+        supportedLocales: const [Locale('ko'), Locale('en')],
+        localizationsDelegates: const [
+          GlobalMaterialLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+        ],
+        home: SettingsScreen(
+          config: MealTimerConfig.defaults(),
+          onConfigChanged: (_) {},
+        ),
+      ),
+    );
+
+    expect(find.byKey(const ValueKey('userGuideSettingsTile')), findsOneWidget);
+    expect(find.text('사용 안내'), findsOneWidget);
+    expect(find.text('식재료, 응원 영상, 스티커 규칙을 확인해요.'), findsOneWidget);
+
+    await tester.tap(find.byKey(const ValueKey('userGuideSettingsTile')));
+    await tester.pumpAndSettle();
+
+    expect(find.byType(UserGuideScreen), findsOneWidget);
+    expect(find.text('사용 안내'), findsOneWidget);
+    expect(find.text('보호자 가이드'), findsOneWidget);
+  });
+
+  testWidgets('User guide uses English localization', (tester) async {
+    await tester.pumpWidget(
+      const MaterialApp(
+        locale: Locale('en'),
+        supportedLocales: [Locale('ko'), Locale('en')],
+        localizationsDelegates: [
+          GlobalMaterialLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+        ],
+        home: UserGuideScreen(),
+      ),
+    );
+
+    expect(find.text('Parent Guide'), findsOneWidget);
+    expect(
+      find.text('Review ingredients, cheer videos, and sticker rules.'),
+      findsOneWidget,
+    );
+    expect(find.text('What is Yamyam Rider?'), findsOneWidget);
+
+    await tester.scrollUntilVisible(
+      find.text('Road ingredients'),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('Road ingredients'), findsOneWidget);
+    expect(
+      find.textContaining('Only manually chosen ingredients'),
+      findsOneWidget,
+    );
+  });
+
+  testWidgets('User guide shows key Korean guide copy', (tester) async {
+    await tester.pumpWidget(
+      const MaterialApp(
+        locale: Locale('ko'),
+        supportedLocales: [Locale('ko'), Locale('en')],
+        localizationsDelegates: [
+          GlobalMaterialLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+        ],
+        home: UserGuideScreen(),
+      ),
+    );
+
+    await tester.scrollUntilVisible(
+      find.text('도로 위 식재료'),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('도로 위 식재료'), findsOneWidget);
+
+    await tester.scrollUntilVisible(
+      find.textContaining('직접 고른 식재료').first,
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.textContaining('직접 고른 식재료'), findsWidgets);
+
+    await tester.scrollUntilVisible(
+      find.text('동기부여 영상'),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('동기부여 영상'), findsOneWidget);
+    expect(find.textContaining('진행률 10%'), findsOneWidget);
+
+    await tester.scrollUntilVisible(
+      find.textContaining('성공하면 랜덤 성공 스티커'),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.textContaining('스티커'), findsWidgets);
+  });
+
+  testWidgets('Settings screen opens course ingredient help sheet', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        locale: const Locale('ko'),
+        supportedLocales: const [Locale('ko'), Locale('en')],
+        localizationsDelegates: const [
+          GlobalMaterialLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+        ],
+        home: SettingsScreen(
+          config: MealTimerConfig.defaults(),
+          onConfigChanged: (_) {},
+        ),
+      ),
+    );
+
+    await tester.scrollUntilVisible(
+      find.byKey(const ValueKey('courseIngredientModeHelpButton')),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.pumpAndSettle();
+
+    expect(
+      find.byKey(const ValueKey('courseIngredientModeHelpButton')),
+      findsOneWidget,
+    );
+
+    await tester.tap(
+      find.byKey(const ValueKey('courseIngredientModeHelpButton')),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.byKey(const ValueKey('appHelpSheet')), findsOneWidget);
+    expect(find.textContaining('직접 고른 식재료'), findsWidgets);
+  });
+
   testWidgets('Settings screen updates course ingredient mode', (tester) async {
     tester.view.physicalSize = const Size(393, 852);
     tester.view.devicePixelRatio = 1;
@@ -2950,8 +3242,12 @@ void main() {
       findsNothing,
     );
 
-    await tester.drag(find.byType(ListView), const Offset(0, -360));
-    await tester.pump();
+    await tester.scrollUntilVisible(
+      find.byKey(const ValueKey('motivationVideoCustomIntervalSwitch')),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.pumpAndSettle();
 
     tester
         .widget<SwitchListTile>(
@@ -2997,6 +3293,46 @@ void main() {
     );
   });
 
+  testWidgets('Settings screen opens motivation video help sheet', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        locale: const Locale('ko'),
+        supportedLocales: const [Locale('ko'), Locale('en')],
+        localizationsDelegates: const [
+          GlobalMaterialLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+        ],
+        home: SettingsScreen(
+          config: MealTimerConfig.defaults(),
+          onConfigChanged: (_) {},
+        ),
+      ),
+    );
+
+    await tester.scrollUntilVisible(
+      find.byKey(const ValueKey('motivationVideoHelpButton')),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.pumpAndSettle();
+
+    expect(
+      find.byKey(const ValueKey('motivationVideoHelpButton')),
+      findsOneWidget,
+    );
+
+    await tester.tap(find.byKey(const ValueKey('motivationVideoHelpButton')));
+    await tester.pumpAndSettle();
+
+    expect(find.byKey(const ValueKey('appHelpSheet')), findsOneWidget);
+    expect(find.text('동기부여 영상 안내'), findsWidgets);
+    expect(find.textContaining('진행률 10%'), findsOneWidget);
+    expect(find.textContaining('3분, 5분, 10분'), findsOneWidget);
+  });
+
   testWidgets('Home settings apply motivation video settings to new timers', (
     tester,
   ) async {
@@ -3027,8 +3363,12 @@ void main() {
     await tester.tap(find.byTooltip('설정'));
     await tester.pumpAndSettle();
 
-    await tester.drag(find.byType(ListView), const Offset(0, -360));
-    await tester.pump();
+    await tester.scrollUntilVisible(
+      find.byKey(const ValueKey('motivationVideoCustomIntervalSwitch')),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.pumpAndSettle();
 
     tester
         .widget<SwitchListTile>(
@@ -5152,6 +5492,13 @@ void main() {
     await tester.tap(find.byKey(const ValueKey('motivationSettingsButton')));
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 400));
+
+    expect(
+      find.byKey(const ValueKey('timerMotivationVideoHelpButton')),
+      findsOneWidget,
+    );
+    expect(find.textContaining('보상'), findsOneWidget);
+
     tester
         .widget<SwitchListTile>(
           find.byKey(const ValueKey('motivationVideoEnabledSwitch')),
@@ -6478,6 +6825,8 @@ void main() {
     );
     await tester.pumpAndSettle();
 
+    expect(find.byKey(const ValueKey('mealHistoryHelpCard')), findsOneWidget);
+    expect(find.text('식사 기록 안내'), findsOneWidget);
     expect(find.text('고른 식재료'), findsOneWidget);
     expect(find.text('당근'), findsOneWidget);
     expect(find.text('달걀'), findsOneWidget);

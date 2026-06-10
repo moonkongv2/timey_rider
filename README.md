@@ -21,6 +21,7 @@ The app is designed around one simple goal: make mealtime pacing feel like a coz
 - Short motivation video overlay during timer milestones
 - Locale-based shared motivation voice playback when sound is enabled
 - Completion result screen with vehicle-specific success videos and fallback handling
+- In-app parent guide and contextual help for ingredients, motivation videos, results, rewards, and history
 - Local active timer session restore, meal history, progress summary, reward stickers, and reward goal tracking
 - Sticker collection and reward goal screens
 - Korean and English localization
@@ -106,6 +107,7 @@ lib/
     app_texts.dart                   # Locale selection and text bundle wiring
     text_sets.dart                   # Text interfaces
     en/, ko/                         # English and Korean copy
+    en/user_guide.dart, ko/user_guide.dart # Parent guide copy
   models/
     meal_timer_config.dart           # User timer, vehicle, avatar, and display settings
     active_meal_timer_session.dart   # Persisted active timer session data
@@ -128,6 +130,7 @@ lib/
     timer_screen.dart                # Active meal ride experience
     result_screen.dart               # Completion feedback and rewards
     settings_screen.dart             # Timer, sound, display, and avatar settings
+    user_guide_screen.dart           # In-app parent guide and usage rules
     avatar_setup_screen.dart         # Custom avatar upload, adjustment, and prompt flow
     reward_goal_screen.dart          # Reward goal creation and management
     sticker_collection_screen.dart   # Sticker inventory
@@ -151,6 +154,7 @@ lib/
     motivation_video_schedule.dart   # Timer milestone scheduling for motivation media
   widgets/
     app/                             # Reusable UI primitives
+    app/app_help_sheet.dart          # Reusable contextual help bottom sheet
     avatar/                          # Avatar composite preview
     meal_ingredient_picker_sheet.dart # Random/selected ingredient picker
     road_view.dart                   # Road scene, vehicle placement, video bubble/layers
@@ -218,6 +222,7 @@ dart run flutter_launcher_icons
 - Vehicle course visuals are selected through `VehicleCourseKind`, so airplanes and pteranodons use sky styling, sharks use water styling, trains use rail styling, and other vehicles use road styling.
 - Meal ingredients are selected before a ride and expanded into repeated course slots by `MealIngredientCatalog`.
 - Custom avatar images are stored per vehicle, so multiple vehicle tiles can keep their own custom avatar previews.
+- User-facing guide and help copy should stay synchronized with actual timer, ingredient, motivation, and reward rules.
 - Settings, meal progress, sticker inventory, reward goals, and avatar config are stored locally with `SharedPreferences`.
 - Motivation video paths and voice paths should be registered through `MotivationAssetCatalog`.
 - Vehicle and sticker assets should keep consistent canvas size, padding, and visual scale when adding new artwork.

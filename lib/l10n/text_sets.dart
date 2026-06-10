@@ -106,6 +106,8 @@ abstract interface class MealHistoryTextSet {
   String get title;
   String get emptyTitle;
   String get emptyBody;
+  String get helpTitle;
+  List<String> get helpBulletItems;
   String get targetTimeLabel;
   String get actualTimeLabel;
   String get overrunTimeLabel;
@@ -121,6 +123,10 @@ abstract interface class MealHistoryTextSet {
 abstract interface class MealIngredientTextSet {
   String get title;
   String get subtitle;
+  String get helpLinkLabel;
+  String get helpTitle;
+  List<String> get helpBodyParagraphs;
+  List<String> get helpBulletItems;
   String get randomStartButton;
   String get selectedStartButton;
 
@@ -134,6 +140,10 @@ abstract interface class SettingsTextSet {
   String get motivationVideoEnabled;
   String get motivationVideoCustomInterval;
   String get motivationVideoInterval;
+  String get motivationVideoHelpTitle;
+  String get motivationVideoHelpSummary;
+  List<String> get motivationVideoHelpBodyParagraphs;
+  List<String> get motivationVideoHelpBulletItems;
   String get keepScreenAwake;
   String get savedOnlySubtitle;
   String get keepScreenAwakeSubtitle;
@@ -158,6 +168,33 @@ abstract interface class SettingsTextSet {
 
   String durationSegmentLabel(int minutes);
   String motivationVideoIntervalSegmentLabel(int minutes);
+}
+
+abstract interface class UserGuideTextSet {
+  String get title;
+  String get subtitle;
+  String get introTitle;
+  String get introBody;
+  String get basicFlowTitle;
+  String get ingredientsTitle;
+  String get motivationTitle;
+  String get resultRewardsTitle;
+  String get historyTitle;
+  String get guardianTipsTitle;
+  String get whatIsYamyamTitle;
+  List<String> get whatIsYamyamItems;
+  String get startCourseTitle;
+  List<String> get startCourseItems;
+  String get roadIngredientsTitle;
+  List<String> get roadIngredientsItems;
+  List<String> get motivationItems;
+  String get completionTitle;
+  List<String> get completionItems;
+  String get historyRewardsTitle;
+  List<String> get historyRewardsItems;
+  String get exitResumeTitle;
+  List<String> get exitResumeItems;
+  List<String> get guardianTipsItems;
 }
 
 abstract interface class TimerTextSet {
@@ -197,6 +234,10 @@ abstract interface class ResultTextSet {
   String title(bool mealCompleted);
   String primaryMessage(bool mealCompleted, {String? vehicleId});
   String secondaryMessage(bool mealCompleted);
+  String helpButtonLabel(bool mealCompleted);
+  String helpTitle(bool mealCompleted);
+  List<String> helpBodyParagraphs(bool mealCompleted);
+  List<String> helpBulletItems(bool mealCompleted);
 }
 
 abstract interface class RewardTextSet {

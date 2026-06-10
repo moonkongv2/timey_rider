@@ -18,6 +18,23 @@ class ResultTexts implements ResultTextSet {
 
   String secondaryMessage(bool mealCompleted) =>
       mealCompleted ? '지나가기 전에 식사를 잘 마쳐서 선물을 받았어!' : '다음 냠냠코스에서 다시 도전해보자.';
+
+  String helpButtonLabel(bool mealCompleted) =>
+      mealCompleted ? '성공과 스티커 안내' : '미완료 기록 안내';
+
+  String helpTitle(bool mealCompleted) =>
+      mealCompleted ? '성공과 스티커 안내' : '미완료 기록 안내';
+
+  List<String> helpBodyParagraphs(bool mealCompleted) => mealCompleted
+      ? const ['식사를 마쳤다고 확인하면 성공으로 기록돼요.']
+      : const ['타이머가 먼저 도착했는데 아직 식사가 끝나지 않았으면 미완료로 기록돼요.'];
+
+  List<String> helpBulletItems(bool mealCompleted) => mealCompleted
+      ? const ['성공하면 랜덤 성공 스티커 1개를 받아요.', '보상 목표가 있으면 성공 스티커가 목표 칸을 채울 수 있어요.']
+      : const [
+          '미완료 기록은 식사 기록에 남지만 스티커는 지급되지 않아요.',
+          '미완료는 벌이 아니라 다음 도전을 위한 기록이에요.',
+        ];
 }
 
 const _failedPrimaryMessagesByVehicle = {
