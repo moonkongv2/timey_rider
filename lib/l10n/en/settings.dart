@@ -12,7 +12,7 @@ class EnSettingsTexts implements SettingsTextSet {
   String get motivationVideoCustomInterval => 'Use custom video interval';
   String get motivationVideoInterval => 'Motivation video interval';
   String get keepScreenAwake => 'Keep screen awake';
-  String get savedOnlySubtitle => 'This setting is saved but not active yet.';
+  String get savedOnlySubtitle => 'Turns sounds during the timer on or off.';
   String get keepScreenAwakeSubtitle =>
       'Applies while the meal timer is running.';
   String get courseIngredientModeTitle => 'Road ingredients';

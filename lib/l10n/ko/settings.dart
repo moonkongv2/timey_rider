@@ -12,7 +12,7 @@ class SettingsTexts implements SettingsTextSet {
   String get motivationVideoCustomInterval => '영상 간격 직접 설정';
   String get motivationVideoInterval => '동기부여 영상 간격';
   String get keepScreenAwake => '화면 계속 켜두기';
-  String get savedOnlySubtitle => 'MVP에서는 설정만 저장해요';
+  String get savedOnlySubtitle => '타이머 진행 중 나오는 소리를 켜고 꺼요';
   String get keepScreenAwakeSubtitle => '식사 타이머 중에 적용돼요';
   String get courseIngredientModeTitle => '도로 위 식재료';
   String get courseIngredientModeOff => '사용 안 함';
