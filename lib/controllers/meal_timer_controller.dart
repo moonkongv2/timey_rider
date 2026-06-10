@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 
+import '../models/active_meal_timer_session.dart';
 import '../models/meal_completion_status.dart';
 import '../models/meal_session_result.dart';
 import '../models/meal_timer_config.dart';
@@ -13,6 +14,14 @@ class MealTimerController extends ChangeNotifier {
 
   MealTimerController({required this.config, DateTime Function()? now})
     : _now = now ?? DateTime.now;
+
+  MealTimerController.fromSession({
+    required ActiveMealTimerSession session,
+    DateTime Function()? now,
+  }) : config = session.config,
+       _now = now ?? DateTime.now {
+    _restoreFromSession(session);
+  }
 
   final MealTimerConfig config;
   final DateTime Function() _now;
@@ -115,12 +124,63 @@ class MealTimerController extends ChangeNotifier {
     final referenceTime = _pausedAt ?? _now();
     // Elapsed time is derived from wall-clock time so small ticker delays do not
     // make the motorcycle drift away from the real meal duration.
-    final elapsed = referenceTime.difference(startedAt) - _totalPausedDuration;
-    _elapsed = elapsed.isNegative ? Duration.zero : elapsed;
+    _elapsed = _elapsedBetween(
+      startedAt: startedAt,
+      referenceTime: referenceTime,
+      totalPausedDuration: _totalPausedDuration,
+    );
 
     if (_elapsed >= config.duration && _state == MealTimerState.running) {
       _state = MealTimerState.arrived;
     }
+  }
+
+  void _restoreFromSession(ActiveMealTimerSession session) {
+    _ticker?.cancel();
+    _startedAt = session.startedAt;
+    _totalPausedDuration = _nonNegativeDuration(session.totalPausedDuration);
+    _pausedAt = session.state == ActiveMealTimerSessionState.paused
+        ? session.pausedAt ?? _now()
+        : null;
+
+    final referenceTime = _pausedAt ?? _now();
+    _elapsed = _elapsedBetween(
+      startedAt: session.startedAt,
+      referenceTime: referenceTime,
+      totalPausedDuration: _totalPausedDuration,
+    );
+
+    _state = switch (session.state) {
+      ActiveMealTimerSessionState.paused => MealTimerState.paused,
+      ActiveMealTimerSessionState.arrived => MealTimerState.arrived,
+      ActiveMealTimerSessionState.running =>
+        _elapsed >= config.duration
+            ? MealTimerState.arrived
+            : MealTimerState.running,
+    };
+
+    if (_state == MealTimerState.arrived && _elapsed < config.duration) {
+      _elapsed = config.duration;
+    }
+
+    if (_state == MealTimerState.running || _state == MealTimerState.arrived) {
+      _startTicker();
+    }
+  }
+
+  Duration _elapsedBetween({
+    required DateTime startedAt,
+    required DateTime referenceTime,
+    required Duration totalPausedDuration,
+  }) {
+    final elapsed =
+        referenceTime.difference(startedAt) -
+        _nonNegativeDuration(totalPausedDuration);
+    return _nonNegativeDuration(elapsed);
+  }
+
+  Duration _nonNegativeDuration(Duration duration) {
+    return duration.isNegative ? Duration.zero : duration;
   }
 
   @override
