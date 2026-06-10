@@ -194,7 +194,7 @@ class _TimerStatusCopy {
 }
 
 class _TimerScreenState extends State<TimerScreen>
-    with SingleTickerProviderStateMixin {
+    with WidgetsBindingObserver, SingleTickerProviderStateMixin {
   late final MealTimerController _controller;
   late final AnimationController _finishDriveController;
   late final MotivationAudioService _motivationAudioService;
@@ -222,6 +222,7 @@ class _TimerScreenState extends State<TimerScreen>
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _timerConfig = widget.config;
     _motivationAudioService =
         widget.motivationAudioService ?? AudioplayersMotivationAudioService();
@@ -274,6 +275,7 @@ class _TimerScreenState extends State<TimerScreen>
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     _motivationVoiceTimer?.cancel();
     _arrivalPromptTimer?.cancel();
     unawaited(_disposeMotivationAudioService());
@@ -288,6 +290,22 @@ class _TimerScreenState extends State<TimerScreen>
       ..dispose();
     _controller.dispose();
     super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    switch (state) {
+      case AppLifecycleState.resumed:
+        _controller.refreshFromClock();
+        unawaited(_persistActiveSession());
+        break;
+      case AppLifecycleState.inactive:
+      case AppLifecycleState.hidden:
+      case AppLifecycleState.paused:
+      case AppLifecycleState.detached:
+        unawaited(_persistActiveSession());
+        break;
+    }
   }
 
   Future<void> _disposeMotivationAudioService() async {

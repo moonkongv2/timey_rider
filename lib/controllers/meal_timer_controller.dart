@@ -85,6 +85,15 @@ class MealTimerController extends ChangeNotifier {
     notifyListeners();
   }
 
+  void refreshFromClock() {
+    if (_state != MealTimerState.running && _state != MealTimerState.arrived) {
+      return;
+    }
+
+    _updateElapsed();
+    notifyListeners();
+  }
+
   MealSessionResult complete({
     bool mealCompleted = true,
     MealCompletionStatus? completionStatus,

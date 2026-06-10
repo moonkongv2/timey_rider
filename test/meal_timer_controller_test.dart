@@ -90,6 +90,29 @@ void main() {
     },
   );
 
+  test(
+    'MealTimerController refreshes running sessions from wall-clock time',
+    () {
+      var now = DateTime.utc(2026, 6, 10, 1, 0);
+      final controller = MealTimerController(
+        config: MealTimerConfig.defaults().copyWith(
+          duration: const Duration(minutes: 30),
+        ),
+        now: () => now,
+      )..start();
+
+      now = DateTime.utc(2026, 6, 10, 1, 12);
+      controller.refreshFromClock();
+
+      expect(controller.state, MealTimerState.running);
+      expect(controller.elapsed, const Duration(minutes: 12));
+      expect(controller.remaining, const Duration(minutes: 18));
+      expect(controller.progress, closeTo(0.4, 0.001));
+
+      controller.dispose();
+    },
+  );
+
   test('MealTimerController keeps restored arrived sessions at the finish', () {
     final controller = MealTimerController.fromSession(
       session: ActiveMealTimerSession(

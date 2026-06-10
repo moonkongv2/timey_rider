@@ -4462,6 +4462,45 @@ void main() {
     await tester.pump();
   });
 
+  testWidgets('TimerScreen refreshes elapsed time when app resumes', (
+    tester,
+  ) async {
+    SharedPreferences.setMockInitialValues({});
+    addTearDown(() async {
+      await const ActiveMealTimerSessionStore().clear();
+    });
+    var now = DateTime(2026, 6, 10, 8);
+
+    await tester.pumpWidget(
+      MaterialApp(
+        locale: const Locale('ko'),
+        home: TimerScreen(
+          config: MealTimerConfig.defaults().copyWith(
+            duration: const Duration(minutes: 25),
+          ),
+          mealProgressService: LocalMealProgressService(),
+          now: () => now,
+          onConfigChanged: (_) {},
+        ),
+      ),
+    );
+    await tester.pump();
+
+    expect(tester.widget<RoadView>(find.byType(RoadView)).progress, 0);
+
+    now = now.add(const Duration(minutes: 10));
+    tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.resumed);
+    await tester.pump();
+
+    expect(
+      tester.widget<RoadView>(find.byType(RoadView)).progress,
+      closeTo(0.4, 0.01),
+    );
+
+    await tester.pumpWidget(const SizedBox.shrink());
+    await tester.pump();
+  });
+
   testWidgets('Meal done before arrival does not immediately push result', (
     tester,
   ) async {
