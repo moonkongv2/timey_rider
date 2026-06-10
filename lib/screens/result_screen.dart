@@ -351,12 +351,6 @@ class _ResultScreenState extends State<ResultScreen> {
                                             fontWeight: FontWeight.w800,
                                           ),
                                     ),
-                                    const SizedBox(height: AppSpacing.sm),
-                                    _ResultHelpButton(
-                                      mealCompleted: mealCompleted,
-                                      onPressed: () =>
-                                          _showResultHelp(mealCompleted),
-                                    ),
                                   ],
                                 ),
                               ),
@@ -386,6 +380,30 @@ class _ResultScreenState extends State<ResultScreen> {
               ),
             ),
           ),
+          LayoutBuilder(
+            builder: (context, constraints) {
+              if (constraints.maxWidth > constraints.maxHeight) {
+                return const SizedBox.shrink();
+              }
+
+              return SafeArea(
+                child: Align(
+                  alignment: Alignment.topRight,
+                  child: Padding(
+                    padding: const EdgeInsets.only(
+                      top: AppSpacing.sm,
+                      right: AppSpacing.sm,
+                    ),
+                    child: _ResultHelpButton(
+                      mealCompleted: mealCompleted,
+                      isPlain: true,
+                      onPressed: () => _showResultHelp(mealCompleted),
+                    ),
+                  ),
+                ),
+              );
+            },
+          ),
         ],
       ),
     );
@@ -397,22 +415,40 @@ class _ResultHelpButton extends StatelessWidget {
     required this.mealCompleted,
     required this.onPressed,
     this.isCompact = false,
+    this.isPlain = false,
   });
 
   final bool mealCompleted;
   final VoidCallback onPressed;
   final bool isCompact;
+  final bool isPlain;
 
   @override
   Widget build(BuildContext context) {
     final texts = AppTexts.of(context).result;
 
+    final key = ValueKey(
+      mealCompleted
+          ? 'completedResultHelpButton'
+          : 'incompleteResultHelpButton',
+    );
+
+    if (isPlain || isCompact) {
+      return IconButton(
+        key: key,
+        tooltip: texts.helpButtonLabel(mealCompleted),
+        onPressed: onPressed,
+        icon: const Icon(Icons.help_outline_rounded),
+        color: AppColors.brown700,
+        style: IconButton.styleFrom(
+          fixedSize: isCompact ? const Size(40, 40) : const Size(48, 48),
+          shape: const CircleBorder(),
+        ),
+      );
+    }
+
     return IconButton.filledTonal(
-      key: ValueKey(
-        mealCompleted
-            ? 'completedResultHelpButton'
-            : 'incompleteResultHelpButton',
-      ),
+      key: key,
       tooltip: texts.helpButtonLabel(mealCompleted),
       onPressed: onPressed,
       icon: const Icon(Icons.help_outline_rounded),
