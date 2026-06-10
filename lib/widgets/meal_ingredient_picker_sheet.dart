@@ -7,6 +7,7 @@ import '../theme/app_colors.dart';
 import '../theme/app_radius.dart';
 import '../theme/app_shadows.dart';
 import '../theme/app_spacing.dart';
+import 'app/app_help_sheet.dart';
 
 sealed class MealIngredientPickerResult {
   const MealIngredientPickerResult();
@@ -77,6 +78,16 @@ class _MealIngredientPickerSheetState extends State<MealIngredientPickerSheet> {
     Navigator.of(context).pop(SelectedMealIngredients(_selectedIds.toList()));
   }
 
+  void _showIngredientHelp() {
+    final texts = AppTexts.of(context).mealIngredient;
+    showAppHelpSheet(
+      context: context,
+      title: texts.helpTitle,
+      bodyParagraphs: texts.helpBodyParagraphs,
+      bulletItems: texts.helpBulletItems,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final texts = AppTexts.of(context).mealIngredient;
@@ -86,139 +97,164 @@ class _MealIngredientPickerSheetState extends State<MealIngredientPickerSheet> {
 
     return Align(
       alignment: Alignment.bottomCenter,
-      child: DecoratedBox(
-        decoration: BoxDecoration(
-          color: AppColors.surfaceWarm,
-          borderRadius: const BorderRadius.vertical(
-            top: Radius.circular(AppRadius.xxl),
-          ),
-          border: Border.all(color: AppColors.borderWarm),
-          boxShadow: AppShadows.hero,
-        ),
-        child: SafeArea(
-          top: false,
-          bottom: false,
-          child: Padding(
-            padding: EdgeInsets.fromLTRB(
-              AppSpacing.xl,
-              AppSpacing.sm,
-              AppSpacing.xl,
-              AppSpacing.xl +
-                  mediaQuery.padding.bottom +
-                  mediaQuery.viewInsets.bottom,
+      child: ConstrainedBox(
+        constraints: BoxConstraints(maxHeight: mediaQuery.size.height * 0.92),
+        child: DecoratedBox(
+          decoration: BoxDecoration(
+            color: AppColors.surfaceWarm,
+            borderRadius: const BorderRadius.vertical(
+              top: Radius.circular(AppRadius.xxl),
             ),
-            child: SingleChildScrollView(
-              child: Column(
-                key: const ValueKey('mealIngredientPickerSheet'),
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Align(
-                    child: DecoratedBox(
-                      decoration: BoxDecoration(
-                        color: AppColors.borderSoft,
-                        borderRadius: AppRadius.pill,
+            border: Border.all(color: AppColors.borderWarm),
+            boxShadow: AppShadows.hero,
+          ),
+          child: SafeArea(
+            top: false,
+            bottom: false,
+            child: Padding(
+              padding: EdgeInsets.fromLTRB(
+                AppSpacing.xl,
+                AppSpacing.sm,
+                AppSpacing.xl,
+                AppSpacing.xl +
+                    mediaQuery.padding.bottom +
+                    mediaQuery.viewInsets.bottom,
+              ),
+              child: SingleChildScrollView(
+                child: Column(
+                  key: const ValueKey('mealIngredientPickerSheet'),
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Align(
+                      child: DecoratedBox(
+                        decoration: BoxDecoration(
+                          color: AppColors.borderSoft,
+                          borderRadius: AppRadius.pill,
+                        ),
+                        child: const SizedBox(width: 44, height: 5),
                       ),
-                      child: const SizedBox(width: 44, height: 5),
                     ),
-                  ),
-                  const SizedBox(height: AppSpacing.md),
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              texts.title,
-                              style: textTheme.titleLarge?.copyWith(
-                                color: AppColors.textStrong,
-                                fontWeight: FontWeight.w900,
+                    const SizedBox(height: AppSpacing.md),
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                texts.title,
+                                style: textTheme.titleLarge?.copyWith(
+                                  color: AppColors.textStrong,
+                                  fontWeight: FontWeight.w900,
+                                ),
                               ),
-                            ),
-                            const SizedBox(height: AppSpacing.xs),
-                            Text(
-                              texts.subtitle,
-                              style: textTheme.bodyMedium?.copyWith(
-                                color: AppColors.textSecondary,
-                                height: 1.35,
+                              const SizedBox(height: AppSpacing.xs),
+                              Text(
+                                texts.subtitle,
+                                style: textTheme.bodyMedium?.copyWith(
+                                  color: AppColors.textSecondary,
+                                  height: 1.35,
+                                ),
                               ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(width: AppSpacing.sm),
-                      IconButton.filledTonal(
-                        onPressed: () => Navigator.of(context).pop(),
-                        icon: const Icon(Icons.close_rounded),
-                        tooltip: MaterialLocalizations.of(
-                          context,
-                        ).closeButtonTooltip,
-                        style: IconButton.styleFrom(
-                          backgroundColor: AppColors.white.withValues(
-                            alpha: 0.72,
+                              const SizedBox(height: AppSpacing.xs),
+                              Align(
+                                alignment: Alignment.centerLeft,
+                                child: TextButton.icon(
+                                  key: const ValueKey(
+                                    'mealIngredientPickerHelpButton',
+                                  ),
+                                  onPressed: _showIngredientHelp,
+                                  icon: const Icon(
+                                    Icons.help_outline_rounded,
+                                    size: 18,
+                                  ),
+                                  label: Text(texts.helpLinkLabel),
+                                  style: TextButton.styleFrom(
+                                    foregroundColor: AppColors.brown700,
+                                    padding: EdgeInsets.zero,
+                                    minimumSize: const Size(0, 36),
+                                    tapTargetSize:
+                                        MaterialTapTargetSize.shrinkWrap,
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
-                          foregroundColor: AppColors.brown700,
-                          fixedSize: const Size(44, 44),
-                          shape: const CircleBorder(),
                         ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: AppSpacing.md),
-                  Text(
-                    texts.selectedCount(_selectedIds.length, maxCount),
-                    style: textTheme.labelLarge?.copyWith(
-                      color: AppColors.textPrimary,
-                      fontWeight: FontWeight.w900,
+                        const SizedBox(width: AppSpacing.sm),
+                        IconButton.filledTonal(
+                          onPressed: () => Navigator.of(context).pop(),
+                          icon: const Icon(Icons.close_rounded),
+                          tooltip: MaterialLocalizations.of(
+                            context,
+                          ).closeButtonTooltip,
+                          style: IconButton.styleFrom(
+                            backgroundColor: AppColors.white.withValues(
+                              alpha: 0.72,
+                            ),
+                            foregroundColor: AppColors.brown700,
+                            fixedSize: const Size(44, 44),
+                            shape: const CircleBorder(),
+                          ),
+                        ),
+                      ],
                     ),
-                  ),
-                  const SizedBox(height: AppSpacing.sm),
-                  Wrap(
-                    spacing: AppSpacing.sm,
-                    runSpacing: AppSpacing.sm,
-                    children: [
-                      for (final ingredient in MealIngredientCatalog.all)
-                        _IngredientChoiceChip(
-                          ingredient: ingredient,
-                          isSelected: _selectedIds.contains(ingredient.id),
-                          isEnabled:
-                              _selectedIds.contains(ingredient.id) ||
-                              _selectedIds.length < maxCount,
-                          onSelected: () => _toggleIngredient(ingredient),
-                        ),
-                    ],
-                  ),
-                  const SizedBox(height: AppSpacing.xl),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: OutlinedButton.icon(
-                          key: const ValueKey(
-                            'randomStartMealIngredientsButton',
-                          ),
-                          onPressed: _startRandom,
-                          icon: const Icon(Icons.shuffle_rounded),
-                          label: Text(texts.randomStartButton),
-                        ),
+                    const SizedBox(height: AppSpacing.md),
+                    Text(
+                      texts.selectedCount(_selectedIds.length, maxCount),
+                      style: textTheme.labelLarge?.copyWith(
+                        color: AppColors.textPrimary,
+                        fontWeight: FontWeight.w900,
                       ),
-                      const SizedBox(width: AppSpacing.sm),
-                      Expanded(
-                        child: FilledButton.icon(
-                          key: const ValueKey(
-                            'startSelectedMealIngredientsButton',
+                    ),
+                    const SizedBox(height: AppSpacing.sm),
+                    Wrap(
+                      spacing: AppSpacing.sm,
+                      runSpacing: AppSpacing.sm,
+                      children: [
+                        for (final ingredient in MealIngredientCatalog.all)
+                          _IngredientChoiceChip(
+                            ingredient: ingredient,
+                            isSelected: _selectedIds.contains(ingredient.id),
+                            isEnabled:
+                                _selectedIds.contains(ingredient.id) ||
+                                _selectedIds.length < maxCount,
+                            onSelected: () => _toggleIngredient(ingredient),
                           ),
-                          onPressed: _selectedIds.isEmpty
-                              ? null
-                              : _startSelected,
-                          icon: const Icon(Icons.play_arrow_rounded),
-                          label: Text(texts.selectedStartButton),
+                      ],
+                    ),
+                    const SizedBox(height: AppSpacing.xl),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: OutlinedButton.icon(
+                            key: const ValueKey(
+                              'randomStartMealIngredientsButton',
+                            ),
+                            onPressed: _startRandom,
+                            icon: const Icon(Icons.shuffle_rounded),
+                            label: Text(texts.randomStartButton),
+                          ),
                         ),
-                      ),
-                    ],
-                  ),
-                ],
+                        const SizedBox(width: AppSpacing.sm),
+                        Expanded(
+                          child: FilledButton.icon(
+                            key: const ValueKey(
+                              'startSelectedMealIngredientsButton',
+                            ),
+                            onPressed: _selectedIds.isEmpty
+                                ? null
+                                : _startSelected,
+                            icon: const Icon(Icons.play_arrow_rounded),
+                            label: Text(texts.selectedStartButton),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
               ),
             ),
           ),

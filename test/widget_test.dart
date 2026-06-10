@@ -1637,6 +1637,53 @@ void main() {
     expect(find.byType(TimerScreen), findsNothing);
   });
 
+  testWidgets('Meal ingredient picker help opens ingredient help text', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        locale: const Locale('ko'),
+        supportedLocales: const [Locale('ko'), Locale('en')],
+        localizationsDelegates: const [
+          GlobalMaterialLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+        ],
+        home: HomeScreen(
+          config: MealTimerConfig.defaults().copyWith(childName: '지율'),
+          mealProgressService: LocalMealProgressService(),
+          onConfigChanged: (_) {},
+        ),
+      ),
+    );
+    await tester.pump();
+
+    final regularCourseButton = tester.widget<AppBouncyButton>(
+      find.ancestor(
+        of: find.textContaining('25분 보통 코스'),
+        matching: find.byType(AppBouncyButton),
+      ),
+    );
+    regularCourseButton.onPressed!();
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 400));
+    await tester.pumpAndSettle();
+
+    expect(
+      find.byKey(const ValueKey('mealIngredientPickerSheet')),
+      findsOneWidget,
+    );
+    expect(find.text('식재료는 어떤 의미인가요?'), findsOneWidget);
+
+    await tester.tap(
+      find.byKey(const ValueKey('mealIngredientPickerHelpButton')),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.byKey(const ValueKey('appHelpSheet')), findsOneWidget);
+    expect(find.textContaining('직접 고른 식재료'), findsWidgets);
+  });
+
   testWidgets('Course ingredient off starts timer without picker', (
     tester,
   ) async {
@@ -2851,6 +2898,46 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.textContaining('스티커'), findsWidgets);
+  });
+
+  testWidgets('Settings screen opens course ingredient help sheet', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        locale: const Locale('ko'),
+        supportedLocales: const [Locale('ko'), Locale('en')],
+        localizationsDelegates: const [
+          GlobalMaterialLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+        ],
+        home: SettingsScreen(
+          config: MealTimerConfig.defaults(),
+          onConfigChanged: (_) {},
+        ),
+      ),
+    );
+
+    await tester.scrollUntilVisible(
+      find.byKey(const ValueKey('courseIngredientModeHelpButton')),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.pumpAndSettle();
+
+    expect(
+      find.byKey(const ValueKey('courseIngredientModeHelpButton')),
+      findsOneWidget,
+    );
+
+    await tester.tap(
+      find.byKey(const ValueKey('courseIngredientModeHelpButton')),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.byKey(const ValueKey('appHelpSheet')), findsOneWidget);
+    expect(find.textContaining('직접 고른 식재료'), findsWidgets);
   });
 
   testWidgets('Settings screen updates course ingredient mode', (tester) async {

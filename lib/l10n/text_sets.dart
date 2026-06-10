@@ -120,6 +120,10 @@ abstract interface class MealHistoryTextSet {
 abstract interface class MealIngredientTextSet {
   String get title;
   String get subtitle;
+  String get helpLinkLabel;
+  String get helpTitle;
+  List<String> get helpBodyParagraphs;
+  List<String> get helpBulletItems;
   String get randomStartButton;
   String get selectedStartButton;
 

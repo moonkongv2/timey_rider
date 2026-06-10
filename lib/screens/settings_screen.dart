@@ -5,6 +5,7 @@ import '../l10n/app_texts.dart';
 import '../l10n/text_sets.dart';
 import '../models/meal_timer_config.dart';
 import '../theme/app_colors.dart';
+import '../widgets/app/app_help_sheet.dart';
 import 'user_guide_screen.dart';
 
 const _motivationVideoIntervalOptions = [
@@ -84,6 +85,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
     _update(_config.copyWith(childName: childName));
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text(texts.settings.childNameSavedMessage)),
+    );
+  }
+
+  void _showIngredientHelp() {
+    final texts = AppTexts.of(context).mealIngredient;
+    showAppHelpSheet(
+      context: context,
+      title: texts.helpTitle,
+      bodyParagraphs: texts.helpBodyParagraphs,
+      bulletItems: texts.helpBulletItems,
     );
   }
 
@@ -202,9 +213,22 @@ class _SettingsScreenState extends State<SettingsScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    texts.settings.courseIngredientModeTitle,
-                    style: sectionTitleStyle,
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          texts.settings.courseIngredientModeTitle,
+                          style: sectionTitleStyle,
+                        ),
+                      ),
+                      IconButton(
+                        key: const ValueKey('courseIngredientModeHelpButton'),
+                        tooltip: texts.mealIngredient.helpLinkLabel,
+                        onPressed: _showIngredientHelp,
+                        icon: const Icon(Icons.help_outline_rounded),
+                        color: AppColors.brown700,
+                      ),
+                    ],
                   ),
                   const SizedBox(height: 12),
                   LayoutBuilder(
