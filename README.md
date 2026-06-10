@@ -9,18 +9,19 @@ The app is designed around one simple goal: make mealtime pacing feel like a coz
 - First-run child name setup and local settings persistence
 - Preset meal courses for 15, 25, and 35 minutes
 - Custom meal duration from 1 to 60 minutes
+- Meal ingredient course setup with random or selected ingredients
 - Home course suggestions that adapt to the saved default duration
 - 12 selectable rider vehicles: motorcycle, fire truck, police car, excavator, airplane, bus, supercar, train, T-rex, shark, brachio, and pteranodon
 - Vehicle-specific custom avatar storage and preview
 - Custom avatar setup flow with image upload, per-vehicle adjustment controls, and prompt guidance
-- Animated road progress based on timer progress
+- Animated road, rail, sky, or water course progress based on the selected vehicle
 - Portrait and landscape timer layouts with dedicated road, vehicle, and motivation video layers
 - Pause, resume, complete, arrival prompt, and exit confirmation flows
 - Optional remaining-time display, sound effects, and keep-screen-awake setting
 - Short motivation video overlay during timer milestones
 - Locale-based shared motivation voice playback when sound is enabled
 - Completion result screen with vehicle-specific success videos and fallback handling
-- Local meal history, progress summary, reward stickers, and reward goal tracking
+- Local active timer session restore, meal history, progress summary, reward stickers, and reward goal tracking
 - Sticker collection and reward goal screens
 - Korean and English localization
 - Shared kid-friendly UI system with colors, radius, shadows, spacing, motion, cards, and bouncy buttons
@@ -30,12 +31,13 @@ The app is designed around one simple goal: make mealtime pacing feel like a coz
 1. Launch the app and enter the child's name on first run.
 2. Pick a rider vehicle on the home screen.
 3. Start a preset course or configure a custom duration.
-4. Watch the selected vehicle move along the road as the timer progresses.
-5. See short motivation videos at progress milestones.
-6. If sound is enabled, hear a short locale-based cheer voice with the motivation video.
-7. Pause, resume, complete, or respond to the arrival prompt when needed.
-8. Review the result and earned stickers.
-9. Track meal history, sticker inventory, and reward goals from the home screen.
+4. Choose random meal ingredients or select up to five ingredients for the course.
+5. Watch the selected vehicle move along its course as the timer progresses.
+6. See short motivation videos at progress milestones.
+7. If sound is enabled, hear a short locale-based cheer voice with the motivation video.
+8. Pause, resume, complete, or respond to the arrival prompt when needed.
+9. Review the result and earned stickers.
+10. Track meal history, sticker inventory, and reward goals from the home screen.
 
 ## Motivation Media
 
@@ -95,6 +97,7 @@ lib/
   catalogs/
     avatar_prompt_catalog.dart       # Vehicle-specific avatar generation prompt copy
     meal_course_catalog.dart         # Preset and custom meal course constants
+    meal_ingredient_catalog.dart     # Meal ingredient options and course slot generation
     motivation_asset_catalog.dart    # Motivation video and voice asset catalogs
     vehicle_catalog.dart             # Available vehicles and image assets
   controllers/
@@ -105,18 +108,23 @@ lib/
     en/, ko/                         # English and Korean copy
   models/
     meal_timer_config.dart           # User timer, vehicle, avatar, and display settings
+    active_meal_timer_session.dart   # Persisted active timer session data
+    meal_completion_status.dart      # Completion status enum
+    meal_ingredient.dart             # Meal ingredient definition
     meal_session_result.dart         # Completed session result data
     meal_progress_snapshot.dart      # Meal progress snapshot
     meal_history_entry.dart          # Stored meal history entry
     reward_goal.dart                 # Reward goal models
     reward_item.dart                 # Reward and sticker models
     vehicle.dart                     # Vehicle definition and avatar slot
+    vehicle_avatar_presentation.dart # Resolved default/custom avatar presentation
   navigation/
     app_route_observer.dart          # Route observer for home refresh behavior
   screens/
     splash_screen.dart               # Splash video
     child_name_setup_screen.dart     # First-run child name setup
     home_screen.dart                 # Course selection, vehicle picker, progress summary
+    meal_history_screen.dart         # Stored meal record list
     timer_screen.dart                # Active meal ride experience
     result_screen.dart               # Completion feedback and rewards
     settings_screen.dart             # Timer, sound, display, and avatar settings
@@ -125,6 +133,7 @@ lib/
     sticker_collection_screen.dart   # Sticker inventory
   services/
     avatar_image_picker.dart         # Avatar image picker abstraction
+    active_meal_timer_session_store.dart # SharedPreferences store for active timer sessions
     local_avatar_image_service.dart  # Local avatar image normalization and storage
     local_settings_service.dart      # SharedPreferences wrapper for settings
     local_meal_progress_service.dart # Local history, sticker, and reward persistence
@@ -139,9 +148,11 @@ lib/
     app_theme.dart                   # Material theme
   utils/
     duration_format.dart             # Duration display helper
+    motivation_video_schedule.dart   # Timer milestone scheduling for motivation media
   widgets/
     app/                             # Reusable UI primitives
     avatar/                          # Avatar composite preview
+    meal_ingredient_picker_sheet.dart # Random/selected ingredient picker
     road_view.dart                   # Road scene, vehicle placement, video bubble/layers
     road_painter.dart                # Road path drawing and progress highlight
     timer_control_bar.dart           # Pause/resume and complete controls
@@ -152,12 +163,18 @@ lib/
 assets/
   audio/motivation/                  # Locale-based shared motivation voice clips
   fonts/                             # Cal Sans font
-  images/                            # App icon, vehicles, stickers, result fallbacks
+  images/                            # Vehicles, stickers, ingredients, result fallbacks
+  icons/                             # Launcher icon source assets
   videos/                            # Splash and result media
   videos/motivation/                 # Vehicle-specific silent motivation videos
 
 test/
-  widget_test.dart                   # App flow, localization, timer, vehicle, avatar, media, reward tests
+  active_meal_timer_session_store_test.dart # Active timer persistence tests
+  avatar_composite_preview_test.dart # Avatar preview fallback and rendering tests
+  local_avatar_image_service_test.dart # Avatar image storage tests
+  meal_timer_controller_test.dart    # Timer restore and state transition tests
+  vehicle_avatar_presentation_test.dart # Avatar presentation resolution tests
+  widget_test.dart                   # App flow, localization, vehicle, media, reward tests
 ```
 
 ## Getting Started
@@ -177,7 +194,7 @@ flutter run
 Run static analysis:
 
 ```bash
-dart analyze
+flutter analyze
 ```
 
 Run tests:
@@ -195,15 +212,18 @@ dart run flutter_launcher_icons
 ## Development Notes
 
 - `MealTimerController` calculates elapsed time from wall-clock timestamps so progress stays accurate even if frame or ticker timing varies.
+- `ActiveMealTimerSessionStore` persists running or paused timer sessions for restore behavior.
 - Timer UI copy is state-aware: running uses progress-based messages, paused shows break copy, and arrived/completed shows arrival copy.
 - The selected vehicle is shared across home, vehicle selector, timer road view, result media, and avatar rendering through `VehicleDefinition`.
+- Vehicle course visuals are selected through `VehicleCourseKind`, so airplanes and pteranodons use sky styling, sharks use water styling, trains use rail styling, and other vehicles use road styling.
+- Meal ingredients are selected before a ride and expanded into repeated course slots by `MealIngredientCatalog`.
 - Custom avatar images are stored per vehicle, so multiple vehicle tiles can keep their own custom avatar previews.
 - Settings, meal progress, sticker inventory, reward goals, and avatar config are stored locally with `SharedPreferences`.
 - Motivation video paths and voice paths should be registered through `MotivationAssetCatalog`.
 - Vehicle and sticker assets should keep consistent canvas size, padding, and visual scale when adding new artwork.
 - UI polish should use the shared design tokens in `lib/theme/` and reusable app widgets in `lib/widgets/app/`.
-- Do not commit generated or reference-only files from `assets/resources/` unless they are intentionally part of the app.
+- Launcher icon assets live under `assets/icons/`; regenerate platform icons with `dart run flutter_launcher_icons` after changing them.
 
 ## Status
 
-This is an active Flutter prototype with a polished kid-friendly UI. Core flows are covered by widget tests, including first launch, home actions, vehicle selection, custom avatars, timer copy, road progress, motivation media catalogs, localization fallback, stickers, and reward persistence.
+This is an active Flutter prototype with a polished kid-friendly UI. Core flows are covered by focused unit and widget tests, including first launch, home actions, vehicle selection, custom avatars, active timer restore, timer copy, course progress, motivation media catalogs, localization fallback, stickers, and reward persistence.
