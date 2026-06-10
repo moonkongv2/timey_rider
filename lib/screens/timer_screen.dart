@@ -1446,12 +1446,12 @@ class _MotivationVideoSettingsSheetState
                       Padding(
                         padding: EdgeInsets.fromLTRB(
                           AppSpacing.lg,
-                          isLandscape ? AppSpacing.xs : AppSpacing.md,
+                          isLandscape ? AppSpacing.sm : AppSpacing.md,
                           AppSpacing.sm,
                           AppSpacing.xs,
                         ),
                         child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
                             Expanded(
                               child: Text(
