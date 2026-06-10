@@ -37,8 +37,8 @@ class EnUserGuideTexts implements UserGuideTextSet {
     'Ingredients are visual cues that help the child think about today’s food.',
     'They are not nutrition scoring and do not decide success or incomplete results.',
     'Off: no ingredients are shown on the road.',
-    'Manual: choose up to 5 ingredients before starting; manually chosen ingredients are saved in meal history.',
-    'Auto: the app shows random ingredients on the road, but they are not saved in history.',
+    'Manual: choose up to 5 ingredients before starting. Manually chosen ingredients are saved in meal history.',
+    'Auto: the app shows random ingredients on the road. They are not saved in history.',
     'Only manually chosen ingredients are saved to meal records.',
   ];
 
@@ -55,14 +55,14 @@ class EnUserGuideTexts implements UserGuideTextSet {
   List<String> get completionItems => const [
     'When the guardian confirms the meal is finished, it is recorded as complete.',
     'A completed meal earns 1 random success sticker.',
-    'If the timer arrives first and the meal is not finished, tap “Not yet” to record it as incomplete.',
+    'If the timer arrives first and the meal is not finished, tap “Not yet.” The meal is recorded as incomplete.',
     'Incomplete meals are saved in history but do not earn stickers.',
     'The child-facing result keeps a next-try tone instead of harsh failure wording.',
   ];
 
   String get historyRewardsTitle => 'Meal history and reward goals';
   List<String> get historyRewardsItems => const [
-    'Meal history shows target time, actual time, completion status, earned stickers, and manually chosen ingredients.',
+    'Meal history shows target time, actual time, and completion status. It also shows earned stickers and manually chosen ingredients.',
     'Earned stickers collect in the sticker collection screen.',
     'If reward goals are active, success stickers can fill goal slots.',
   ];
@@ -71,7 +71,7 @@ class EnUserGuideTexts implements UserGuideTextSet {
   List<String> get exitResumeItems => const [
     'Using back during a timer asks for confirmation first.',
     'Pausing is not a failure; the meal can continue after a short break.',
-    'When an active timer is saved, the home screen can show an in-progress timer card with resume and cancel actions.',
+    'When an active timer is saved, the home screen may show an in-progress card. Use that card to resume or cancel when it appears.',
   ];
 
   List<String> get guardianTipsItems => const [

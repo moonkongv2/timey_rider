@@ -15,8 +15,8 @@ class MealIngredientTexts implements MealIngredientTextSet {
   ];
   List<String> get helpBulletItems => const [
     '사용 안 함: 도로 위에 식재료를 표시하지 않아요.',
-    '직접 선택: 코스 시작 전 최대 5개까지 고르고, 직접 고른 식재료는 식사 기록에 남아요.',
-    '자동 선택: 앱이 랜덤 식재료를 도로에 표시하지만 기록에는 남지 않아요.',
+    '직접 선택: 코스 시작 전 최대 5개까지 골라요. 직접 고른 식재료는 식사 기록에 남아요.',
+    '자동 선택: 앱이 랜덤 식재료를 도로에 보여줘요. 기록에는 남지 않아요.',
     '식사 기록에는 직접 고른 식재료만 남아요.',
   ];
   String get randomStartButton => '랜덤으로 시작';

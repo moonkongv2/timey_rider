@@ -16,8 +16,8 @@ class EnMealIngredientTexts implements MealIngredientTextSet {
   ];
   List<String> get helpBulletItems => const [
     'Off: no ingredients are shown on the road.',
-    'Manual: choose up to 5 ingredients before starting; manually chosen ingredients are saved in meal history.',
-    'Auto: the app shows random ingredients on the road, but they are not saved in history.',
+    'Manual: choose up to 5 ingredients before starting. Manually chosen ingredients are saved in meal history.',
+    'Auto: the app shows random ingredients on the road. They are not saved in history.',
     'Only manually chosen ingredients are saved to meal records.',
   ];
   String get randomStartButton => 'Random start';
