@@ -1,7 +1,9 @@
 import 'dart:async';
 import 'dart:math' as math;
+import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:video_player/video_player.dart';
 
 import '../l10n/app_texts.dart';
@@ -224,8 +226,14 @@ class _AnimatedRoadPaint extends StatefulWidget {
 
 class _AnimatedRoadPaintState extends State<_AnimatedRoadPaint>
     with TickerProviderStateMixin {
+  static const _fieldFootprintAssetPath =
+      'assets/images/ingredients/footprints.png';
+
   late final AnimationController _flowController;
   late final AnimationController _skyPathCloudController;
+  ui.Image? _fieldFootprintImage;
+  var _fieldFootprintImageLoadId = 0;
+  var _isLoadingFieldFootprintImage = false;
 
   bool get _disableAnimations =>
       MediaQuery.maybeOf(context)?.disableAnimations ?? false;
@@ -256,6 +264,7 @@ class _AnimatedRoadPaintState extends State<_AnimatedRoadPaint>
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
+    _resolveFieldFootprintImage();
     _syncController();
   }
 
@@ -266,6 +275,7 @@ class _AnimatedRoadPaintState extends State<_AnimatedRoadPaint>
       _flowController.duration = RoadPainter.flowAnimationDurationForCourseKind(
         widget.courseKind,
       );
+      _resolveFieldFootprintImage();
     }
     if (oldWidget.isMotionActive != widget.isMotionActive ||
         oldWidget.courseKind != widget.courseKind) {
@@ -291,8 +301,62 @@ class _AnimatedRoadPaintState extends State<_AnimatedRoadPaint>
     }
   }
 
+  void _resolveFieldFootprintImage() {
+    if (widget.courseKind != VehicleCourseKind.field) {
+      _clearFieldFootprintImage();
+      return;
+    }
+
+    if (_fieldFootprintImage != null || _isLoadingFieldFootprintImage) {
+      return;
+    }
+
+    _loadFieldFootprintImage();
+  }
+
+  Future<void> _loadFieldFootprintImage() async {
+    _isLoadingFieldFootprintImage = true;
+    final loadId = _fieldFootprintImageLoadId + 1;
+    _fieldFootprintImageLoadId = loadId;
+
+    try {
+      final data = await rootBundle.load(_fieldFootprintAssetPath);
+      final codec = await ui.instantiateImageCodec(
+        data.buffer.asUint8List(data.offsetInBytes, data.lengthInBytes),
+      );
+      final frame = await codec.getNextFrame();
+      codec.dispose();
+
+      if (!mounted ||
+          loadId != _fieldFootprintImageLoadId ||
+          widget.courseKind != VehicleCourseKind.field) {
+        frame.image.dispose();
+        return;
+      }
+
+      setState(() {
+        _fieldFootprintImage?.dispose();
+        _fieldFootprintImage = frame.image;
+      });
+    } catch (_) {
+      // Keep the vector footprint fallback if the optional image cannot load.
+    } finally {
+      if (mounted && loadId == _fieldFootprintImageLoadId) {
+        _isLoadingFieldFootprintImage = false;
+      }
+    }
+  }
+
+  void _clearFieldFootprintImage() {
+    _fieldFootprintImageLoadId += 1;
+    _isLoadingFieldFootprintImage = false;
+    _fieldFootprintImage?.dispose();
+    _fieldFootprintImage = null;
+  }
+
   @override
   void dispose() {
+    _clearFieldFootprintImage();
     _flowController.dispose();
     _skyPathCloudController.dispose();
     super.dispose();
@@ -306,6 +370,7 @@ class _AnimatedRoadPaintState extends State<_AnimatedRoadPaint>
           progress: widget.progress,
           geometry: widget.geometry,
           courseKind: widget.courseKind,
+          fieldFootprintImage: _fieldFootprintImage,
         ),
       );
     }
@@ -323,6 +388,7 @@ class _AnimatedRoadPaintState extends State<_AnimatedRoadPaint>
                 _skyPathCloudController.value * RoadPainter.skyPathCloudGap,
             geometry: widget.geometry,
             courseKind: widget.courseKind,
+            fieldFootprintImage: _fieldFootprintImage,
           ),
         );
       },

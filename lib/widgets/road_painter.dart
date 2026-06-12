@@ -1,4 +1,5 @@
 import 'dart:ui';
+import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 
@@ -428,6 +429,7 @@ class RoadPainter extends CustomPainter {
     this.skyPathCloudPhase = 0,
     this.geometry,
     this.courseKind = VehicleCourseKind.road,
+    this.fieldFootprintImage,
   });
 
   static const laneDashWidth = 15.0;
@@ -456,17 +458,18 @@ class RoadPainter extends CustomPainter {
   static const railSleeperStrokeWidth = 3.8;
   static const railAnimationDuration = Duration(milliseconds: 2200);
   static const fieldGrassVerticalGap = 108.0;
-  static const fieldFootprintGap = 48.0;
+  static const fieldFootprintGap = 82.0;
   static const fieldFootprintWidth = 8.0;
   static const fieldFootprintHeight = 13.0;
   static const fieldFlowPatternLength = fieldFootprintGap;
-  static const fieldAnimationDuration = Duration(milliseconds: 2200);
+  static const fieldAnimationDuration = Duration(milliseconds: 4200);
 
   final double progress;
   final double laneDashPhase;
   final double skyPathCloudPhase;
   final RoadCourseGeometry? geometry;
   final VehicleCourseKind courseKind;
+  final ui.Image? fieldFootprintImage;
 
   static double flowPatternLengthForCourseKind(VehicleCourseKind courseKind) {
     return switch (courseKind) {
@@ -595,6 +598,7 @@ class RoadPainter extends CustomPainter {
         roadPath,
         visualStyle.laneColor,
         laneDashPhase,
+        fieldFootprintImage,
       );
     } else {
       _drawDashedPath(canvas, roadPath, lanePaint, laneDashPhase);
@@ -662,6 +666,7 @@ class RoadPainter extends CustomPainter {
     Path path,
     Color color,
     double phase,
+    ui.Image? footprintImage,
   ) {
     final footprintPaint = Paint()
       ..color = color.withValues(alpha: 0.58)
@@ -676,7 +681,7 @@ class RoadPainter extends CustomPainter {
       }
 
       var stepIndex = 0;
-      var distance = startLimit - normalizedPhase;
+      var distance = startLimit + normalizedPhase;
       while (distance < endLimit) {
         if (distance >= startLimit && distance <= endLimit) {
           final tangent = metric.getTangentForOffset(distance);
@@ -685,18 +690,28 @@ class RoadPainter extends CustomPainter {
             final normal = Offset(-direction.dy, direction.dx);
             final center = tangent.position;
             final leadOffset = direction * (stepIndex.isEven ? 3.0 : -3.0);
-            _drawFieldFootprint(
-              canvas,
-              center + (normal * 6) + leadOffset,
-              direction,
-              footprintPaint,
-            );
-            _drawFieldFootprint(
-              canvas,
-              center - (normal * 6) - leadOffset,
-              direction,
-              footprintPaint,
-            );
+            if (footprintImage == null) {
+              _drawFieldFootprint(
+                canvas,
+                center + (normal * 6) + leadOffset,
+                direction,
+                footprintPaint,
+              );
+              _drawFieldFootprint(
+                canvas,
+                center - (normal * 6) - leadOffset,
+                direction,
+                footprintPaint,
+              );
+            } else {
+              _drawFieldFootprintImage(
+                canvas,
+                center,
+                direction,
+                footprintImage,
+                footprintPaint,
+              );
+            }
           }
         }
 
@@ -724,6 +739,34 @@ class RoadPainter extends CustomPainter {
         ),
         paint,
       )
+      ..restore();
+  }
+
+  void _drawFieldFootprintImage(
+    Canvas canvas,
+    Offset center,
+    Offset direction,
+    ui.Image image,
+    Paint paint,
+  ) {
+    const footprintSize = 34.0;
+    final source = Rect.fromLTWH(
+      0,
+      0,
+      image.width.toDouble(),
+      image.height.toDouble(),
+    );
+    final destination = Rect.fromCenter(
+      center: Offset.zero,
+      width: footprintSize,
+      height: footprintSize,
+    );
+
+    canvas
+      ..save()
+      ..translate(center.dx, center.dy)
+      ..rotate(direction.direction)
+      ..drawImageRect(image, source, destination, paint)
       ..restore();
   }
 
@@ -1010,6 +1053,7 @@ class RoadPainter extends CustomPainter {
         oldDelegate.laneDashPhase != laneDashPhase ||
         oldDelegate.skyPathCloudPhase != skyPathCloudPhase ||
         oldDelegate.geometry != geometry ||
-        oldDelegate.courseKind != courseKind;
+        oldDelegate.courseKind != courseKind ||
+        oldDelegate.fieldFootprintImage != fieldFootprintImage;
   }
 }

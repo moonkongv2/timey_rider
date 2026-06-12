@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
+import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -645,7 +646,10 @@ void main() {
         ),
       ),
     );
-    await tester.pumpAndSettle();
+    await tester.runAsync(() async {
+      await Future<void>.delayed(const Duration(seconds: 1));
+    });
+    await tester.pump();
 
     expect(introVideoPaths, isEmpty);
     expect(find.byKey(const ValueKey('resultIntroScreen')), findsNothing);
@@ -702,7 +706,8 @@ void main() {
         ),
       ),
     );
-    await tester.pumpAndSettle();
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 100));
 
     expect(find.text('식사 완주 성공!'), findsOneWidget);
     expect(
@@ -4350,13 +4355,17 @@ void main() {
   testWidgets('RoadPainter renders the field course details safely', (
     tester,
   ) async {
+    final footprintImage = await _createTestFootprintImage();
+    addTearDown(footprintImage.dispose);
+
     await tester.pumpWidget(
-      const CustomPaint(
-        size: Size(420, 640),
+      CustomPaint(
+        size: const Size(420, 640),
         painter: RoadPainter(
           progress: 0.5,
           laneDashPhase: 12,
           courseKind: VehicleCourseKind.field,
+          fieldFootprintImage: footprintImage,
         ),
       ),
     );
@@ -7048,6 +7057,20 @@ MealSessionResult _mealResult({
     completionStatus: completionStatus,
     selectedIngredientIds: selectedIngredientIds,
   );
+}
+
+Future<ui.Image> _createTestFootprintImage() async {
+  final recorder = ui.PictureRecorder();
+  final canvas = Canvas(recorder);
+  final paint = Paint()..color = const Color(0xFF6D8F3A);
+  canvas.drawOval(
+    Rect.fromCenter(center: const Offset(8, 8), width: 12, height: 16),
+    paint,
+  );
+  final picture = recorder.endRecording();
+  final image = await picture.toImage(16, 16);
+  picture.dispose();
+  return image;
 }
 
 Future<void> _startApp(
