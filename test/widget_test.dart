@@ -491,6 +491,8 @@ void main() {
       'pteranodon': VehicleCourseKind.sky,
       'shark': VehicleCourseKind.water,
       'train': VehicleCourseKind.rail,
+      't_rex': VehicleCourseKind.field,
+      'brachio': VehicleCourseKind.field,
     };
 
     for (final vehicle in VehicleCatalog.all) {
@@ -3910,6 +3912,9 @@ void main() {
 
     final railPainter = await pumpRoadPainterForVehicle(VehicleCatalog.train);
     expect(railPainter.courseKind, VehicleCourseKind.rail);
+
+    final fieldPainter = await pumpRoadPainterForVehicle(VehicleCatalog.tRex);
+    expect(fieldPainter.courseKind, VehicleCourseKind.field);
   });
 
   testWidgets('Road view keeps vehicle inside portrait bounds at route ends', (
@@ -4180,6 +4185,10 @@ void main() {
     expect(
       RoadPainter.flowPatternLengthForCourseKind(VehicleCourseKind.rail),
       RoadPainter.railSleeperPatternLength,
+    );
+    expect(
+      RoadPainter.flowPatternLengthForCourseKind(VehicleCourseKind.field),
+      RoadPainter.laneDashPatternLength,
     );
     expect(
       RoadPainter.skyPathCloudAnimationDuration,

@@ -382,6 +382,7 @@ class RoadCourseVisualStyle {
           laneColor: AppColors.surfaceSoft.withValues(alpha: 0.78),
         );
       case VehicleCourseKind.road:
+      case VehicleCourseKind.field:
         return RoadCourseVisualStyle(
           backgroundColors: [
             AppColors.white.withValues(alpha: 0.96),
@@ -449,7 +450,8 @@ class RoadPainter extends CustomPainter {
       VehicleCourseKind.sky => skyFlowPatternLength,
       VehicleCourseKind.water => waterWavePatternLength,
       VehicleCourseKind.rail => railSleeperPatternLength,
-      VehicleCourseKind.road => laneDashPatternLength,
+      VehicleCourseKind.road ||
+      VehicleCourseKind.field => laneDashPatternLength,
     };
   }
 
@@ -459,6 +461,7 @@ class RoadPainter extends CustomPainter {
     return switch (courseKind) {
       VehicleCourseKind.water => waterWaveAnimationDuration,
       VehicleCourseKind.rail => railAnimationDuration,
+      VehicleCourseKind.field ||
       VehicleCourseKind.road ||
       VehicleCourseKind.sky => laneDashAnimationDuration,
     };
@@ -471,6 +474,7 @@ class RoadPainter extends CustomPainter {
     return switch (courseKind) {
       VehicleCourseKind.rail => (roadWidth * 0.52).clamp(14.0, 26.0).toDouble(),
       VehicleCourseKind.road ||
+      VehicleCourseKind.field ||
       VehicleCourseKind.sky ||
       VehicleCourseKind.water => roadWidth,
     };
@@ -503,6 +507,7 @@ class RoadPainter extends CustomPainter {
     final rimStrokeWidth = switch (courseKind) {
       VehicleCourseKind.rail => roadWidth + 8,
       VehicleCourseKind.road ||
+      VehicleCourseKind.field ||
       VehicleCourseKind.sky ||
       VehicleCourseKind.water => roadWidth + 5,
     };

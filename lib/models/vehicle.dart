@@ -28,7 +28,7 @@ class VehicleRoadAnchorOffset {
   final double landscapeDyRatio;
 }
 
-enum VehicleCourseKind { road, sky, water, rail }
+enum VehicleCourseKind { road, sky, water, rail, field }
 
 class VehicleDefinition {
   const VehicleDefinition({

@@ -136,6 +136,7 @@ abstract final class VehicleCatalog {
       portraitDyRatio: -0.13,
       landscapeDyRatio: -0.08,
     ),
+    courseKind: VehicleCourseKind.field,
   );
 
   static const shark = VehicleDefinition(
@@ -169,6 +170,7 @@ abstract final class VehicleCatalog {
       portraitDyRatio: -0.18,
       landscapeDyRatio: -0.11,
     ),
+    courseKind: VehicleCourseKind.field,
   );
 
   static const pteranodon = VehicleDefinition(
