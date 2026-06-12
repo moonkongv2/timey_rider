@@ -455,6 +455,12 @@ class RoadPainter extends CustomPainter {
   static const railSleeperPatternLength = railSleeperGap;
   static const railSleeperStrokeWidth = 3.8;
   static const railAnimationDuration = Duration(milliseconds: 2200);
+  static const fieldGrassVerticalGap = 108.0;
+  static const fieldFootprintGap = 48.0;
+  static const fieldFootprintWidth = 8.0;
+  static const fieldFootprintHeight = 13.0;
+  static const fieldFlowPatternLength = fieldFootprintGap;
+  static const fieldAnimationDuration = Duration(milliseconds: 2200);
 
   final double progress;
   final double laneDashPhase;
@@ -467,8 +473,8 @@ class RoadPainter extends CustomPainter {
       VehicleCourseKind.sky => skyFlowPatternLength,
       VehicleCourseKind.water => waterWavePatternLength,
       VehicleCourseKind.rail => railSleeperPatternLength,
-      VehicleCourseKind.road ||
-      VehicleCourseKind.field => laneDashPatternLength,
+      VehicleCourseKind.field => fieldFlowPatternLength,
+      VehicleCourseKind.road => laneDashPatternLength,
     };
   }
 
@@ -478,7 +484,7 @@ class RoadPainter extends CustomPainter {
     return switch (courseKind) {
       VehicleCourseKind.water => waterWaveAnimationDuration,
       VehicleCourseKind.rail => railAnimationDuration,
-      VehicleCourseKind.field ||
+      VehicleCourseKind.field => fieldAnimationDuration,
       VehicleCourseKind.road ||
       VehicleCourseKind.sky => laneDashAnimationDuration,
     };
@@ -519,6 +525,8 @@ class RoadPainter extends CustomPainter {
       _drawSkyClouds(canvas, size);
     } else if (courseKind == VehicleCourseKind.water) {
       _drawWaterRipples(canvas, size);
+    } else if (courseKind == VehicleCourseKind.field) {
+      _drawFieldDetails(canvas, size);
     }
 
     final rimStrokeWidth = switch (courseKind) {
@@ -581,9 +589,142 @@ class RoadPainter extends CustomPainter {
       _drawWaterFlow(canvas, roadPath, visualStyle.laneColor, laneDashPhase);
     } else if (courseKind == VehicleCourseKind.rail) {
       _drawRailTrack(canvas, roadPath, laneDashPhase, roadWidth);
+    } else if (courseKind == VehicleCourseKind.field) {
+      _drawFieldFootprints(
+        canvas,
+        roadPath,
+        visualStyle.laneColor,
+        laneDashPhase,
+      );
     } else {
       _drawDashedPath(canvas, roadPath, lanePaint, laneDashPhase);
     }
+  }
+
+  void _drawFieldDetails(Canvas canvas, Size size) {
+    final grassPaint = Paint()
+      ..color = const Color(0xFF7CAF4D).withValues(alpha: 0.32)
+      ..style = PaintingStyle.stroke
+      ..strokeCap = StrokeCap.round
+      ..strokeWidth = 2.2;
+    final flowerPaint = Paint()
+      ..color = const Color(0xFFFFC7D6).withValues(alpha: 0.56)
+      ..style = PaintingStyle.fill;
+    final stonePaint = Paint()
+      ..color = AppColors.brown300.withValues(alpha: 0.24)
+      ..style = PaintingStyle.fill;
+    final rowCount = (size.height / fieldGrassVerticalGap).ceil() + 1;
+
+    for (var row = 0; row < rowCount; row += 1) {
+      final y = (row * fieldGrassVerticalGap) + 34;
+      if (y > size.height + fieldGrassVerticalGap) {
+        break;
+      }
+
+      final xRatio = switch (row % 5) {
+        0 => 0.12,
+        1 => 0.82,
+        2 => 0.28,
+        3 => 0.68,
+        _ => 0.48,
+      };
+      final center = Offset(size.width * xRatio, y);
+      _drawGrassTuft(canvas, center, grassPaint);
+
+      if (row.isEven) {
+        canvas.drawCircle(center + const Offset(22, -6), 3.2, flowerPaint);
+      } else {
+        canvas.drawOval(
+          Rect.fromCenter(
+            center: center + const Offset(-24, 8),
+            width: 13,
+            height: 8,
+          ),
+          stonePaint,
+        );
+      }
+    }
+  }
+
+  void _drawGrassTuft(Canvas canvas, Offset base, Paint paint) {
+    canvas
+      ..drawLine(base, base + const Offset(-7, -13), paint)
+      ..drawLine(base + const Offset(3, 1), base + const Offset(1, -15), paint)
+      ..drawLine(
+        base + const Offset(6, 0),
+        base + const Offset(13, -11),
+        paint,
+      );
+  }
+
+  void _drawFieldFootprints(
+    Canvas canvas,
+    Path path,
+    Color color,
+    double phase,
+  ) {
+    final footprintPaint = Paint()
+      ..color = color.withValues(alpha: 0.58)
+      ..style = PaintingStyle.fill;
+    final normalizedPhase = phase % fieldFlowPatternLength;
+
+    for (final metric in path.computeMetrics()) {
+      final startLimit = laneDashInset;
+      final endLimit = metric.length - laneDashInset;
+      if (endLimit <= startLimit) {
+        continue;
+      }
+
+      var stepIndex = 0;
+      var distance = startLimit - normalizedPhase;
+      while (distance < endLimit) {
+        if (distance >= startLimit && distance <= endLimit) {
+          final tangent = metric.getTangentForOffset(distance);
+          if (tangent != null && tangent.vector.distance > 0) {
+            final direction = tangent.vector / tangent.vector.distance;
+            final normal = Offset(-direction.dy, direction.dx);
+            final center = tangent.position;
+            final leadOffset = direction * (stepIndex.isEven ? 3.0 : -3.0);
+            _drawFieldFootprint(
+              canvas,
+              center + (normal * 6) + leadOffset,
+              direction,
+              footprintPaint,
+            );
+            _drawFieldFootprint(
+              canvas,
+              center - (normal * 6) - leadOffset,
+              direction,
+              footprintPaint,
+            );
+          }
+        }
+
+        stepIndex += 1;
+        distance += fieldFlowPatternLength;
+      }
+    }
+  }
+
+  void _drawFieldFootprint(
+    Canvas canvas,
+    Offset center,
+    Offset direction,
+    Paint paint,
+  ) {
+    canvas
+      ..save()
+      ..translate(center.dx, center.dy)
+      ..rotate(direction.direction)
+      ..drawOval(
+        Rect.fromCenter(
+          center: Offset.zero,
+          width: fieldFootprintHeight,
+          height: fieldFootprintWidth,
+        ),
+        paint,
+      )
+      ..restore();
   }
 
   void _drawWaterRipples(Canvas canvas, Size size) {

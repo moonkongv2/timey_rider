@@ -4194,7 +4194,7 @@ void main() {
     );
     expect(
       RoadPainter.flowPatternLengthForCourseKind(VehicleCourseKind.field),
-      RoadPainter.laneDashPatternLength,
+      RoadPainter.fieldFlowPatternLength,
     );
     expect(
       RoadPainter.skyPathCloudAnimationDuration,
@@ -4206,6 +4206,10 @@ void main() {
     );
     expect(
       RoadPainter.railAnimationDuration,
+      greaterThan(RoadPainter.laneDashAnimationDuration),
+    );
+    expect(
+      RoadPainter.fieldAnimationDuration,
       greaterThan(RoadPainter.laneDashAnimationDuration),
     );
   });
@@ -4293,7 +4297,7 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
-  testWidgets('RoadPainter renders the field course palette safely', (
+  testWidgets('RoadPainter renders the field course details safely', (
     tester,
   ) async {
     await tester.pumpWidget(
