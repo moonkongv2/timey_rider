@@ -274,7 +274,7 @@ class LocalActivityProgressService {
       goals: activeRewardGoals,
       awardedRewards: awardedRewards,
       result: result,
-      mealSessionId: entry.id,
+      activitySessionId: entry.id,
     );
 
     await preferences.setStringList(
@@ -365,7 +365,7 @@ class LocalActivityProgressService {
     required List<RewardGoal> goals,
     required List<RewardDefinition> awardedRewards,
     required ActivitySessionResult result,
-    required String mealSessionId,
+    required String activitySessionId,
   }) {
     if (goals.isEmpty ||
         !_completionStatusAwardsSticker(result.completionStatus)) {
@@ -393,7 +393,7 @@ class LocalActivityProgressService {
         RewardGoalSlot(
           rewardId: slotReward.id,
           filledAt: result.endedAt,
-          mealSessionId: mealSessionId,
+          activitySessionId: activitySessionId,
         ),
       ];
       final becameEarned = filledSlots.length >= goal.requiredStickerCount;

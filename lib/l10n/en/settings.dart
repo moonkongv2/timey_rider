@@ -13,31 +13,29 @@ class EnSettingsTexts implements SettingsTextSet {
   String get motivationVideoInterval => 'Motivation video interval';
   String get motivationVideoHelpTitle => 'Motivation video guide';
   String get motivationVideoHelpSummary =>
-      'Motivation videos are short cheers during meals and do not affect rewards.';
+      'Motivation videos are short encouragement clips during the timer.';
   List<String> get motivationVideoHelpBodyParagraphs => const [
-    'Motivation videos are short cheers that can appear during a meal to support the child’s pacing.',
-    'They do not decide success, incomplete results, or sticker rewards.',
+    'Motivation videos are short encouragement clips that can appear during the timer.',
+    'They do not decide stickers or results.',
   ];
   List<String> get motivationVideoHelpBulletItems => const [
-    'For courses up to 30 minutes, videos appear around 10%, 20%, and other 10% progress steps by default.',
-    'Very short custom courses may skip some steps so videos do not overlap too often.',
-    'Courses longer than 30 minutes or custom interval mode may use time-based scheduling.',
+    'Short timers may skip some milestones so clips do not overlap.',
+    'Longer timers or custom interval mode may use time-based scheduling.',
     'Custom intervals can be set to 3, 5, or 10 minutes.',
     'Sound effects and video display settings can behave separately.',
     'The app spaces videos out so they do not overlap too frequently.',
   ];
   String get keepScreenAwake => 'Keep screen awake';
   String get savedOnlySubtitle => 'Turns sounds during the timer on or off.';
-  String get keepScreenAwakeSubtitle =>
-      'Applies while the meal timer is running.';
-  String get markerModeTitle => 'Road ingredients';
+  String get keepScreenAwakeSubtitle => 'Applies while the timer is running.';
+  String get markerModeTitle => 'Course markers';
   String get markerModeOff => 'Off';
-  String get markerModeManual => 'Manual';
-  String get markerModeRandom => 'Auto';
-  String get markerModeActivityDefault => 'Default';
+  String get markerModeManual => 'Choose';
+  String get markerModeRandom => 'Random';
+  String get markerModeActivityDefault => 'Match activity';
   String get markerModeDescription =>
-      'Only manually chosen ingredients are saved to meal records. Auto selections appear on the road only.';
-  String get defaultMealDuration => 'Default meal time';
+      'Only manually chosen markers are saved to activity records. Random selections appear on the road only.';
+  String get defaultTimerDuration => 'Default timer duration';
   String get vehicleSelection => 'Choose vehicle';
   String get childNameTitle => "Child's name";
   String get childNameFieldLabel => 'Name';

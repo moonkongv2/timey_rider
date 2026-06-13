@@ -56,7 +56,7 @@ class RewardCatalog {
   static const riceBowlStickerId = 'sticker_rice_bowl';
   static const yumSpoonStickerId = 'sticker_yum_spoon';
   static const crunchyCarrotStickerId = 'sticker_crunchy_carrot';
-  static const sunnyMealStickerId = 'sticker_sunny_meal';
+  static const sunnyMissionStickerId = 'sticker_sunny_meal';
   static const rainbowCourseStickerId = 'sticker_rainbow_course';
   static const rocketBiteStickerId = 'sticker_rocket_bite';
 
@@ -90,8 +90,8 @@ class RewardCatalog {
     emoji: '🥕',
   );
 
-  static const sunnyMealSticker = RewardDefinition(
-    id: sunnyMealStickerId,
+  static const sunnyMissionSticker = RewardDefinition(
+    id: sunnyMissionStickerId,
     type: RewardType.sticker,
     emoji: '🌞',
   );
@@ -114,7 +114,7 @@ class RewardCatalog {
     riceBowlSticker,
     yumSpoonSticker,
     crunchyCarrotSticker,
-    sunnyMealSticker,
+    sunnyMissionSticker,
     rainbowCourseSticker,
     rocketBiteSticker,
   ];

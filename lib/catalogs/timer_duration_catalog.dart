@@ -1,4 +1,4 @@
-abstract final class MealCourseCatalog {
+abstract final class TimerDurationCatalog {
   static const presetMinutes = [15, 25, 35];
   static const defaultDuration = Duration(minutes: 25);
   static const minCustomMinutes = 1;

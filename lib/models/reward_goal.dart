@@ -29,7 +29,7 @@ class RewardGoalSlot {
   const RewardGoalSlot({
     required this.rewardId,
     required this.filledAt,
-    required this.mealSessionId,
+    required this.activitySessionId,
   });
 
   factory RewardGoalSlot.fromJson(Map<String, Object?> json) {
@@ -43,37 +43,38 @@ class RewardGoalSlot {
   static RewardGoalSlot? tryFromJson(Map<String, Object?> json) {
     final rewardId = json['rewardId'];
     final filledAt = _tryParseDateTime(json['filledAt']);
-    final mealSessionId = json['mealSessionId'];
+    final activitySessionId =
+        json['activitySessionId'] ?? json['mealSessionId'];
     if (rewardId is! String ||
         rewardId.isEmpty ||
         filledAt == null ||
-        mealSessionId is! String ||
-        mealSessionId.isEmpty) {
+        activitySessionId is! String ||
+        activitySessionId.isEmpty) {
       return null;
     }
 
     return RewardGoalSlot(
       rewardId: rewardId,
       filledAt: filledAt,
-      mealSessionId: mealSessionId,
+      activitySessionId: activitySessionId,
     );
   }
 
   final String rewardId;
   final DateTime filledAt;
-  final String mealSessionId;
+  final String activitySessionId;
 
   RewardDefinition? get reward => RewardCatalog.findById(rewardId);
 
   RewardGoalSlot copyWith({
     String? rewardId,
     DateTime? filledAt,
-    String? mealSessionId,
+    String? activitySessionId,
   }) {
     return RewardGoalSlot(
       rewardId: rewardId ?? this.rewardId,
       filledAt: filledAt ?? this.filledAt,
-      mealSessionId: mealSessionId ?? this.mealSessionId,
+      activitySessionId: activitySessionId ?? this.activitySessionId,
     );
   }
 
@@ -81,7 +82,7 @@ class RewardGoalSlot {
     return {
       'rewardId': rewardId,
       'filledAt': filledAt.toIso8601String(),
-      'mealSessionId': mealSessionId,
+      'activitySessionId': activitySessionId,
     };
   }
 }

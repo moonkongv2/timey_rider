@@ -295,7 +295,7 @@ void main() {
     expect(preferences.getInt('motivationVideoIntervalMinutes'), 5);
   });
 
-  test('Local settings saves and loads course ingredient mode', () async {
+  test('Local settings saves and loads marker mode', () async {
     SharedPreferences.setMockInitialValues({});
 
     final service = LocalSettingsService();
@@ -312,18 +312,13 @@ void main() {
     expect(preferences.getString('courseIngredientMode'), isNull);
   });
 
-  test(
-    'Local settings reads legacy course ingredient mode as marker mode',
-    () async {
-      SharedPreferences.setMockInitialValues({
-        'courseIngredientMode': 'manual',
-      });
+  test('Local settings reads legacy marker mode key', () async {
+    SharedPreferences.setMockInitialValues({'courseIngredientMode': 'manual'});
 
-      final loadedConfig = await LocalSettingsService().loadConfig();
+    final loadedConfig = await LocalSettingsService().loadConfig();
 
-      expect(loadedConfig.markerMode, ActivityMarkerMode.manual);
-    },
-  );
+    expect(loadedConfig.markerMode, ActivityMarkerMode.manual);
+  });
 
   test('Local settings falls back for invalid marker mode', () async {
     SharedPreferences.setMockInitialValues({'markerMode': 'unknown'});
@@ -1088,13 +1083,13 @@ void main() {
     );
     await tester.pump();
 
-    expect(orientationService.calls, ['allowMealFlowOrientations']);
+    expect(orientationService.calls, ['allowTimerOrientations']);
 
     await tester.pumpWidget(const SizedBox.shrink());
     await tester.pump();
 
     expect(orientationService.calls, [
-      'allowMealFlowOrientations',
+      'allowTimerOrientations',
       'lockPortrait',
     ]);
   });
@@ -1604,7 +1599,7 @@ void main() {
 
     await _startApp(tester, const Locale('ko'), completeChildNameSetup: false);
 
-    expect(find.text('누가 냠냠 라이더를 탈까?'), findsOneWidget);
+    expect(find.text('누가 Ticky Rider를 탈까?'), findsOneWidget);
     expect(find.text('이름 저장'), findsOneWidget);
 
     await tester.enterText(find.byType(TextField), '민준');
@@ -2095,7 +2090,7 @@ void main() {
       find.byKey(const ValueKey('activityMarkerPickerSheet')),
       findsOneWidget,
     );
-    expect(find.text('식재료는 어떤 의미인가요?'), findsOneWidget);
+    expect(find.text('코스 마커 안내'), findsOneWidget);
 
     await tester.tap(
       find.byKey(const ValueKey('activityMarkerPickerHelpButton')),
@@ -2103,7 +2098,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.byKey(const ValueKey('appHelpSheet')), findsOneWidget);
-    expect(find.textContaining('직접 고른 식재료'), findsWidgets);
+    expect(find.textContaining('직접 고른 마커'), findsWidgets);
   });
 
   testWidgets('Activity marker off starts timer without picker', (
@@ -2866,7 +2861,7 @@ void main() {
     expect(find.widgetWithText(FilledButton, '다시 업로드'), findsOneWidget);
     await _scrollAvatarCompositeIntoView(tester);
     expect(find.text('합성 미리보기'), findsOneWidget);
-    expect(find.text('이 모습으로 냠냠라이더를 탈까요?'), findsOneWidget);
+    expect(find.text('이 모습으로 Ticky Rider를 탈까요?'), findsOneWidget);
   });
 
   testWidgets('Avatar setup initializes from custom config', (tester) async {
@@ -3227,7 +3222,6 @@ void main() {
     await tester.pump();
 
     expect(find.textContaining('남은 시간'), findsNothing);
-    expect(find.text('남은 식사 시간'), findsNothing);
   });
 
   testWidgets('Settings screen opens Korean parent guide', (tester) async {
@@ -3249,7 +3243,7 @@ void main() {
 
     expect(find.byKey(const ValueKey('userGuideSettingsTile')), findsOneWidget);
     expect(find.text('사용 안내'), findsOneWidget);
-    expect(find.text('식재료, 응원 영상, 스티커 규칙을 확인해요.'), findsOneWidget);
+    expect(find.text('활동 미션, 응원 영상, 스티커 규칙을 확인해요.'), findsOneWidget);
 
     await tester.tap(find.byKey(const ValueKey('userGuideSettingsTile')));
     await tester.pumpAndSettle();
@@ -3258,7 +3252,7 @@ void main() {
     expect(find.text('사용 안내'), findsOneWidget);
     expect(find.text('보호자 가이드'), findsOneWidget);
     expect(
-      find.textContaining('부모님뿐 아니라 아이의 식사를 함께 돕는 보호자도 참고할 수 있어요.'),
+      find.textContaining('아이의 루틴을 함께 돕는 보호자도 참고할 수 있어요.'),
       findsOneWidget,
     );
   });
@@ -3280,23 +3274,20 @@ void main() {
     expect(find.text('Parent Guide'), findsWidgets);
     expect(find.textContaining('parents and other caregivers'), findsOneWidget);
     expect(
-      find.text('Review ingredients, cheer videos, and sticker rules.'),
+      find.text('Review activity missions, cheer videos, and sticker rules.'),
       findsOneWidget,
     );
-    expect(find.text('What is Yamyam Rider?'), findsOneWidget);
+    expect(find.text('What is Ticky Rider?'), findsOneWidget);
 
     await tester.scrollUntilVisible(
-      find.text('Road ingredients'),
+      find.text('Course markers'),
       200,
       scrollable: find.byType(Scrollable).first,
     );
     await tester.pumpAndSettle();
 
-    expect(find.text('Road ingredients'), findsOneWidget);
-    expect(
-      find.textContaining('Only manually chosen ingredients'),
-      findsOneWidget,
-    );
+    expect(find.text('Course markers'), findsOneWidget);
+    expect(find.textContaining('Chosen markers are saved'), findsOneWidget);
   });
 
   testWidgets('User guide shows key Korean guide copy', (tester) async {
@@ -3314,22 +3305,22 @@ void main() {
     );
 
     await tester.scrollUntilVisible(
-      find.text('도로 위 식재료'),
+      find.text('코스 마커'),
       200,
       scrollable: find.byType(Scrollable).first,
     );
     await tester.pumpAndSettle();
 
-    expect(find.text('도로 위 식재료'), findsOneWidget);
+    expect(find.text('코스 마커'), findsOneWidget);
 
     await tester.scrollUntilVisible(
-      find.textContaining('직접 고른 식재료').first,
+      find.textContaining('직접 고른 마커').first,
       200,
       scrollable: find.byType(Scrollable).first,
     );
     await tester.pumpAndSettle();
 
-    expect(find.textContaining('직접 고른 식재료'), findsWidgets);
+    expect(find.textContaining('직접 고른 마커'), findsWidgets);
 
     await tester.scrollUntilVisible(
       find.text('동기부여 영상'),
@@ -3339,10 +3330,10 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('동기부여 영상'), findsOneWidget);
-    expect(find.textContaining('진행률 10%'), findsOneWidget);
+    expect(find.textContaining('일부 구간을 건너뛸 수 있어요'), findsOneWidget);
 
     await tester.scrollUntilVisible(
-      find.textContaining('성공하면 랜덤 성공 스티커'),
+      find.textContaining('완료한 미션은 랜덤 성공 스티커'),
       200,
       scrollable: find.byType(Scrollable).first,
     );
@@ -3351,9 +3342,7 @@ void main() {
     expect(find.textContaining('스티커'), findsWidgets);
   });
 
-  testWidgets('Settings screen opens course ingredient help sheet', (
-    tester,
-  ) async {
+  testWidgets('Settings screen opens course marker help sheet', (tester) async {
     await tester.pumpWidget(
       MaterialApp(
         locale: const Locale('ko'),
@@ -3383,10 +3372,10 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.byKey(const ValueKey('appHelpSheet')), findsOneWidget);
-    expect(find.textContaining('직접 고른 식재료'), findsWidgets);
+    expect(find.textContaining('직접 고른 마커'), findsWidgets);
   });
 
-  testWidgets('Settings screen updates course ingredient mode', (tester) async {
+  testWidgets('Settings screen updates course marker mode', (tester) async {
     tester.view.physicalSize = const Size(393, 852);
     tester.view.devicePixelRatio = 1;
     addTearDown(() {
@@ -3411,7 +3400,7 @@ void main() {
       ),
     );
 
-    expect(find.text('도로 위 식재료'), findsOneWidget);
+    expect(find.text('코스 마커'), findsOneWidget);
     final segmentedButtonFinder = find.byKey(
       const ValueKey('markerModeSegmentedButton'),
     );
@@ -3429,9 +3418,9 @@ void main() {
     expect(find.text('사용 안 함'), findsOneWidget);
     expect(find.text('직접 선택'), findsOneWidget);
     expect(find.text('자동 선택'), findsOneWidget);
-    expect(find.text('기본'), findsOneWidget);
+    expect(find.text('활동에 맞게'), findsOneWidget);
     expect(
-      find.text('직접 선택한 식재료만 식사 기록에 남아요. 자동 선택은 도로에만 표시돼요.'),
+      find.text('직접 선택한 마커만 활동 기록에 남아요. 자동 선택은 도로에만 표시돼요.'),
       findsOneWidget,
     );
 
@@ -3554,7 +3543,7 @@ void main() {
 
     expect(find.byKey(const ValueKey('appHelpSheet')), findsOneWidget);
     expect(find.text('동기부여 영상 안내'), findsWidgets);
-    expect(find.textContaining('진행률 10%'), findsOneWidget);
+    expect(find.textContaining('일부 구간을 건너뛸 수 있어요'), findsOneWidget);
     expect(find.textContaining('3분, 5분, 10분'), findsOneWidget);
   });
 
@@ -5343,7 +5332,7 @@ void main() {
     await tester.pump();
   });
 
-  testWidgets('Meal done before arrival does not immediately push result', (
+  testWidgets('Activity done before arrival does not immediately push result', (
     tester,
   ) async {
     await tester.pumpWidget(
@@ -5602,16 +5591,16 @@ void main() {
 
     expect(find.byType(ResultScreen), findsOneWidget);
     expect(orientationService.calls, [
-      'allowMealFlowOrientations',
-      'allowMealFlowOrientations',
+      'allowTimerOrientations',
+      'allowTimerOrientations',
     ]);
 
     await tester.pumpWidget(const SizedBox.shrink());
     await tester.pump();
 
     expect(orientationService.calls, [
-      'allowMealFlowOrientations',
-      'allowMealFlowOrientations',
+      'allowTimerOrientations',
+      'allowTimerOrientations',
       'lockPortrait',
     ]);
   });
@@ -5823,7 +5812,6 @@ void main() {
       find.byKey(const ValueKey('timerMotivationVideoHelpButton')),
       findsOneWidget,
     );
-    expect(find.textContaining('보상'), findsOneWidget);
 
     tester
         .widget<SwitchListTile>(
@@ -6158,7 +6146,6 @@ void main() {
       ),
     );
     expect(find.byType(SingleChildScrollView), findsOneWidget);
-    expect(find.text('오늘의 냠냠코스'), findsNothing);
     expect(find.byIcon(Icons.arrow_back_rounded), findsOneWidget);
     expect(
       tester.widget<TimerControlBar>(find.byType(TimerControlBar)).isVertical,
@@ -6327,13 +6314,13 @@ void main() {
     );
     await tester.pump();
 
-    expect(orientationService.calls, ['allowMealFlowOrientations']);
+    expect(orientationService.calls, ['allowTimerOrientations']);
 
     await tester.pumpWidget(const SizedBox.shrink());
     await tester.pump();
 
     expect(orientationService.calls, [
-      'allowMealFlowOrientations',
+      'allowTimerOrientations',
       'lockPortrait',
     ]);
   });
@@ -6537,7 +6524,7 @@ void main() {
     expect(find.textContaining('Custom Timer'), findsOneWidget);
   });
 
-  test('Fast meal awards only one random sticker', () async {
+  test('Fast activity awards only one random sticker', () async {
     SharedPreferences.setMockInitialValues({});
 
     final service = LocalActivityProgressService();
@@ -6554,7 +6541,7 @@ void main() {
     expect(recordedSession.awardedRewards, hasLength(1));
   });
 
-  test('Completed overtime meal awards a random sticker', () async {
+  test('Completed overtime activity awards a random sticker', () async {
     SharedPreferences.setMockInitialValues({});
 
     final service = LocalActivityProgressService();
@@ -6595,7 +6582,7 @@ void main() {
     expect(recordedSession.entry.activityCompleted, isTrue);
   });
 
-  test('Incomplete meal does not award stickers', () async {
+  test('Incomplete activity does not award stickers', () async {
     SharedPreferences.setMockInitialValues({});
 
     final service = LocalActivityProgressService();
@@ -6619,7 +6606,7 @@ void main() {
     expect(recordedSession.entry.rewardIds, isEmpty);
   });
 
-  test('Arrival-completed meal records at-arrival status', () async {
+  test('Arrival-completed activity records at-arrival status', () async {
     SharedPreferences.setMockInitialValues({});
 
     final service = LocalActivityProgressService();
@@ -6713,7 +6700,7 @@ void main() {
     );
     expect(afterDelete.activeRewardGoals.single.filledCount, 1);
     expect(
-      afterDelete.activeRewardGoals.single.filledSlots.single.mealSessionId,
+      afterDelete.activeRewardGoals.single.filledSlots.single.activitySessionId,
       recordedSession.entry.id,
     );
   });
@@ -6726,7 +6713,7 @@ void main() {
       final service = LocalActivityProgressService();
       await service.recordActivityResult(_activityResult());
 
-      final deleted = await service.deleteActivityHistoryEntry('missing-meal');
+      final deleted = await service.deleteActivityHistoryEntry('missing');
       final snapshot = await service.loadSnapshot();
 
       expect(deleted, isFalse);
@@ -6734,26 +6721,29 @@ void main() {
     },
   );
 
-  test('Completed meal fills exactly one active reward goal slot', () async {
-    SharedPreferences.setMockInitialValues({});
+  test(
+    'Completed activity fills exactly one active reward goal slot',
+    () async {
+      SharedPreferences.setMockInitialValues({});
 
-    final service = LocalActivityProgressService();
-    await service.createRewardGoal(
-      requiredStickerCount: 5,
-      rewardText: '아이스크림',
-    );
+      final service = LocalActivityProgressService();
+      await service.createRewardGoal(
+        requiredStickerCount: 5,
+        rewardText: '아이스크림',
+      );
 
-    final recordedSession = await service.recordActivityResult(
-      _activityResult(),
-    );
-    final snapshot = await service.loadSnapshot();
+      final recordedSession = await service.recordActivityResult(
+        _activityResult(),
+      );
+      final snapshot = await service.loadSnapshot();
 
-    expect(recordedSession.updatedRewardGoal?.filledCount, 1);
-    expect(recordedSession.rewardGoalJustReady, isFalse);
-    expect(snapshot.activeRewardGoals.single.filledCount, 1);
-  });
+      expect(recordedSession.updatedRewardGoal?.filledCount, 1);
+      expect(recordedSession.rewardGoalJustReady, isFalse);
+      expect(snapshot.activeRewardGoals.single.filledCount, 1);
+    },
+  );
 
-  test('Completed meal fills all active reward goals', () async {
+  test('Completed activity fills all active reward goals', () async {
     SharedPreferences.setMockInitialValues({});
 
     final service = LocalActivityProgressService();
@@ -6809,7 +6799,7 @@ void main() {
           RewardGoalSlot(
             rewardId: 'sticker_finish_flag',
             filledAt: DateTime(2026, 5, 4, 12),
-            mealSessionId: 'meal-1',
+            activitySessionId: 'activity-1',
           ),
         ],
         createdAt: DateTime(2026, 5, 4, 12),
@@ -6830,7 +6820,7 @@ void main() {
     },
   );
 
-  test('Legacy meal history loads with completion status fallback', () async {
+  test('Legacy history key loads with completion status fallback', () async {
     SharedPreferences.setMockInitialValues({
       'mealHistory': [
         jsonEncode({
@@ -6859,7 +6849,7 @@ void main() {
     expect(snapshot.history.single.selectedMarkerIds, isEmpty);
   });
 
-  test('Fast meal fills only one reward goal slot', () async {
+  test('Fast activity fills only one reward goal slot', () async {
     SharedPreferences.setMockInitialValues({});
 
     final service = LocalActivityProgressService();
@@ -6880,7 +6870,7 @@ void main() {
     expect(snapshot.activeRewardGoals.single.filledCount, 1);
   });
 
-  test('Incomplete meal does not fill a reward goal slot', () async {
+  test('Incomplete activity does not fill a reward goal slot', () async {
     SharedPreferences.setMockInitialValues({});
 
     final service = LocalActivityProgressService();
@@ -7692,8 +7682,8 @@ class _FakeOrientationService implements OrientationService {
   }
 
   @override
-  Future<void> allowMealFlowOrientations() async {
-    calls.add('allowMealFlowOrientations');
+  Future<void> allowTimerOrientations() async {
+    calls.add('allowTimerOrientations');
   }
 }
 

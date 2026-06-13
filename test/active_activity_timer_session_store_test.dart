@@ -154,7 +154,7 @@ void main() {
   });
 
   test(
-    'Active activity timer session store reads legacy meal session key',
+    'Active activity timer session store reads legacy session key',
     () async {
       final session = ActiveActivityTimerSession(
         sessionId: 'legacy-session',

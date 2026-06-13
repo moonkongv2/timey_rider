@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-class MealMessageCard extends StatelessWidget {
-  const MealMessageCard({super.key, required this.message});
+class MissionMessageCard extends StatelessWidget {
+  const MissionMessageCard({super.key, required this.message});
 
   final String message;
 

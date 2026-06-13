@@ -37,7 +37,7 @@ void main() {
     expect(status, ActivityCompletionStatus.completedAtEnd);
   });
 
-  test('activityCompletionStatusFromJson maps legacy meal status values', () {
+  test('activityCompletionStatusFromJson maps legacy status values', () {
     final status = activityCompletionStatusFromJson(
       'completedAtArrival',
       completedBeforeEnd: false,

@@ -81,7 +81,7 @@ flutter:
   assets:
     - assets/images/
     - assets/images/riders/
-    - assets/images/ingredients/
+    - assets/images/markers/
     - assets/videos/
     - assets/videos/motivation/
     - assets/audio/motivation/

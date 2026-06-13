@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../catalogs/meal_course_catalog.dart';
+import '../catalogs/timer_duration_catalog.dart';
 import '../l10n/app_texts.dart';
 import '../l10n/text_sets.dart';
 import '../models/activity_timer_config.dart';
@@ -86,8 +86,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
-  void _showIngredientHelp() {
-    final texts = AppTexts.of(context).mealIngredient;
+  void _showMarkerHelp() {
+    final texts = AppTexts.of(context).activityMarker;
     showAppHelpSheet(
       context: context,
       title: texts.helpTitle,
@@ -178,13 +178,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    texts.settings.defaultMealDuration,
+                    texts.settings.defaultTimerDuration,
                     style: sectionTitleStyle,
                   ),
                   const SizedBox(height: 12),
                   SegmentedButton<int>(
                     segments: [
-                      for (final minutes in MealCourseCatalog.presetMinutes)
+                      for (final minutes in TimerDurationCatalog.presetMinutes)
                         ButtonSegment(
                           value: minutes,
                           label: Text(
@@ -193,7 +193,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         ),
                     ],
                     selected: {
-                      if (MealCourseCatalog.isPresetMinutes(
+                      if (TimerDurationCatalog.isPresetMinutes(
                         _config.duration.inMinutes,
                       ))
                         _config.duration.inMinutes,
@@ -231,8 +231,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       ),
                       IconButton(
                         key: const ValueKey('markerModeHelpButton'),
-                        tooltip: texts.mealIngredient.helpLinkLabel,
-                        onPressed: _showIngredientHelp,
+                        tooltip: texts.activityMarker.helpLinkLabel,
+                        onPressed: _showMarkerHelp,
                         icon: const Icon(Icons.help_outline_rounded),
                         color: AppColors.brown700,
                       ),

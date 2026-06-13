@@ -260,7 +260,7 @@ class _TimerScreenState extends State<TimerScreen>
     _finishDriveController = AnimationController(vsync: this)
       ..addStatusListener(_handleFinishDriveStatusChanged);
     unawaited(_persistActiveSession());
-    unawaited(widget.orientationService.allowMealFlowOrientations());
+    unawaited(widget.orientationService.allowTimerOrientations());
     _applyScreenAwakeSetting();
   }
 
@@ -708,7 +708,7 @@ class _TimerScreenState extends State<TimerScreen>
   }
 
   void _openResult(ActivitySessionResult result) {
-    final recordableResult = _resultWithSelectedIngredients(result);
+    final recordableResult = _resultWithSelectedMarkers(result);
     _handoffOrientation = true;
     Navigator.of(context).pushReplacement(
       MaterialPageRoute(
@@ -723,7 +723,7 @@ class _TimerScreenState extends State<TimerScreen>
     );
   }
 
-  ActivitySessionResult _resultWithSelectedIngredients(
+  ActivitySessionResult _resultWithSelectedMarkers(
     ActivitySessionResult result,
   ) {
     if (_timerConfig.markerMode != ActivityMarkerMode.manual &&

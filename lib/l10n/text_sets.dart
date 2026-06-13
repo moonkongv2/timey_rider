@@ -127,7 +127,7 @@ abstract interface class ActivityHistoryTextSet {
   String overrunTime(String duration);
 }
 
-abstract interface class MealIngredientTextSet {
+abstract interface class ActivityMarkerTextSet {
   String get title;
   String get subtitle;
   String get helpLinkLabel;
@@ -160,7 +160,7 @@ abstract interface class SettingsTextSet {
   String get markerModeRandom;
   String get markerModeActivityDefault;
   String get markerModeDescription;
-  String get defaultMealDuration;
+  String get defaultTimerDuration;
   String get vehicleSelection;
   String get childNameTitle;
   String get childNameFieldLabel;
@@ -184,17 +184,17 @@ abstract interface class UserGuideTextSet {
   String get introTitle;
   String get introBody;
   String get basicFlowTitle;
-  String get ingredientsTitle;
+  String get markersTitle;
   String get motivationTitle;
   String get resultRewardsTitle;
   String get historyTitle;
   String get guardianTipsTitle;
-  String get whatIsYamyamTitle;
-  List<String> get whatIsYamyamItems;
-  String get startCourseTitle;
-  List<String> get startCourseItems;
-  String get roadIngredientsTitle;
-  List<String> get roadIngredientsItems;
+  String get whatIsTickyRiderTitle;
+  List<String> get whatIsTickyRiderItems;
+  String get startMissionTitle;
+  List<String> get startMissionItems;
+  String get courseMarkersTitle;
+  List<String> get courseMarkersItems;
   List<String> get motivationItems;
   String get completionTitle;
   List<String> get completionItems;

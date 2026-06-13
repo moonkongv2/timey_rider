@@ -77,20 +77,20 @@ class UserGuideScreen extends StatelessWidget {
           const SizedBox(height: AppSpacing.lg),
           _GuideSectionCard(
             icon: Icons.directions_car_filled_rounded,
-            title: texts.whatIsYamyamTitle,
-            items: texts.whatIsYamyamItems,
+            title: texts.whatIsTickyRiderTitle,
+            items: texts.whatIsTickyRiderItems,
             accentColor: AppColors.surfaceBlue,
           ),
           _GuideSectionCard(
             icon: Icons.route_rounded,
-            title: texts.startCourseTitle,
-            items: texts.startCourseItems,
+            title: texts.startMissionTitle,
+            items: texts.startMissionItems,
             accentColor: AppColors.surfaceMint,
           ),
           _GuideSectionCard(
-            icon: Icons.restaurant_menu_rounded,
-            title: texts.roadIngredientsTitle,
-            items: texts.roadIngredientsItems,
+            icon: Icons.assistant_photo_rounded,
+            title: texts.courseMarkersTitle,
+            items: texts.courseMarkersItems,
             accentColor: AppColors.surfaceYellow,
           ),
           _GuideSectionCard(

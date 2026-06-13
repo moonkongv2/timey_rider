@@ -153,7 +153,7 @@ class _ResultScreenState extends State<ResultScreen> {
   @override
   void initState() {
     super.initState();
-    unawaited(widget.orientationService.allowMealFlowOrientations());
+    unawaited(widget.orientationService.allowTimerOrientations());
     _recordedSession = widget.activityProgressService.recordActivityResult(
       widget.result,
     );
@@ -956,7 +956,7 @@ class _RewardGoalResultBox extends StatelessWidget {
                     ),
                   );
                   if (context.mounted) {
-                    unawaited(orientationService.allowMealFlowOrientations());
+                    unawaited(orientationService.allowTimerOrientations());
                   }
                 },
                 icon: const Icon(Icons.card_giftcard_rounded),

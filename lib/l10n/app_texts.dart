@@ -3,7 +3,7 @@ import 'package:flutter/widgets.dart';
 import 'en/common.dart';
 import 'en/avatar_setup.dart';
 import 'en/home.dart';
-import 'en/meal_ingredient.dart';
+import 'en/activity_marker.dart';
 import 'en/activity_history.dart';
 import 'en/result.dart';
 import 'en/rewards.dart';
@@ -13,7 +13,7 @@ import 'en/user_guide.dart';
 import 'ko/common.dart';
 import 'ko/avatar_setup.dart';
 import 'ko/home.dart';
-import 'ko/meal_ingredient.dart';
+import 'ko/activity_marker.dart';
 import 'ko/activity_history.dart';
 import 'ko/result.dart';
 import 'ko/rewards.dart';
@@ -27,7 +27,7 @@ class AppTextBundle {
     required this.avatarSetup,
     required this.common,
     required this.home,
-    required this.mealIngredient,
+    required this.activityMarker,
     required this.activityHistory,
     required this.result,
     required this.rewards,
@@ -39,7 +39,7 @@ class AppTextBundle {
   final AvatarSetupTextSet avatarSetup;
   final CommonTextSet common;
   final HomeTextSet home;
-  final MealIngredientTextSet mealIngredient;
+  final ActivityMarkerTextSet activityMarker;
   final ActivityHistoryTextSet activityHistory;
   final ResultTextSet result;
   final RewardTextSet rewards;
@@ -55,7 +55,7 @@ abstract final class AppTexts {
     avatarSetup: AvatarSetupTexts(),
     common: CommonTexts(),
     home: HomeTexts(),
-    mealIngredient: MealIngredientTexts(),
+    activityMarker: ActivityMarkerTexts(),
     activityHistory: ActivityHistoryTexts(),
     result: ResultTexts(),
     rewards: RewardTexts(),
@@ -68,7 +68,7 @@ abstract final class AppTexts {
     avatarSetup: EnAvatarSetupTexts(),
     common: EnCommonTexts(),
     home: EnHomeTexts(),
-    mealIngredient: EnMealIngredientTexts(),
+    activityMarker: EnActivityMarkerTexts(),
     activityHistory: EnActivityHistoryTexts(),
     result: EnResultTexts(),
     rewards: EnRewardTexts(),

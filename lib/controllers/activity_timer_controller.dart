@@ -141,7 +141,7 @@ class ActivityTimerController extends ChangeNotifier {
 
     final referenceTime = _pausedAt ?? _now();
     // Elapsed time is derived from wall-clock time so small ticker delays do not
-    // make the motorcycle drift away from the real meal duration.
+    // make the motorcycle drift away from the real timer duration.
     _elapsed = _elapsedBetween(
       startedAt: startedAt,
       referenceTime: referenceTime,

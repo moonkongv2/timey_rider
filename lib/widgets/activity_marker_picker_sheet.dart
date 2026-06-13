@@ -97,7 +97,7 @@ class _ActivityMarkerPickerSheetState extends State<ActivityMarkerPickerSheet> {
   }
 
   void _showMarkerHelp() {
-    final texts = AppTexts.of(context).mealIngredient;
+    final texts = AppTexts.of(context).activityMarker;
     showAppHelpSheet(
       context: context,
       title: texts.helpTitle,
@@ -108,7 +108,7 @@ class _ActivityMarkerPickerSheetState extends State<ActivityMarkerPickerSheet> {
 
   @override
   Widget build(BuildContext context) {
-    final texts = AppTexts.of(context).mealIngredient;
+    final texts = AppTexts.of(context).activityMarker;
     final textTheme = Theme.of(context).textTheme;
     final maxCount = ActivityMarkerCatalog.maxSelectableMarkerCount;
     final mediaQuery = MediaQuery.of(context);
