@@ -36,6 +36,10 @@ abstract interface class HomeTextSet {
   String get timerBuilderManualMarkerOption;
   String get timerBuilderRecentPresetTitle;
   String get timerBuilderRecentPresetApplyButton;
+  String get timerBuilderSavedPresetTitle;
+  String get timerBuilderSavePresetButton;
+  String get timerBuilderSavedPresetMessage;
+  String get timerBuilderDeletePresetTooltip;
   String get timerBuilderTimeStepTitle;
   String get timerBuilderStartButton;
   String get timerBuilderSelectedMarkerEmpty;

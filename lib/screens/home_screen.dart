@@ -21,6 +21,7 @@ import '../models/reward_item.dart';
 import '../services/active_activity_timer_session_store.dart';
 import '../services/local_activity_progress_service.dart';
 import '../services/local_recent_timer_service.dart';
+import '../services/local_saved_timer_preset_service.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_radius.dart';
 import '../theme/app_shadows.dart';
@@ -51,6 +52,7 @@ class HomeScreen extends StatefulWidget {
     required this.onConfigChanged,
     this.activeSessionStore = const ActiveActivityTimerSessionStore(),
     this.recentTimerService = const LocalRecentTimerService(),
+    this.savedTimerPresetService = const LocalSavedTimerPresetService(),
     this.avatarImageBuilder,
     this.now,
   });
@@ -60,6 +62,7 @@ class HomeScreen extends StatefulWidget {
   final ValueChanged<ActivityTimerConfig> onConfigChanged;
   final ActiveActivityTimerSessionStore activeSessionStore;
   final LocalRecentTimerService recentTimerService;
+  final LocalSavedTimerPresetService savedTimerPresetService;
   final Widget Function(BuildContext context, String imagePath)?
   avatarImageBuilder;
   final DateTime Function()? now;
@@ -342,6 +345,7 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
 
   Future<void> _openTimerBuilder() async {
     final recentPreset = await widget.recentTimerService.load();
+    final savedPresets = await widget.savedTimerPresetService.load();
     if (!mounted) {
       return;
     }
@@ -350,7 +354,12 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
       context: context,
       isScrollControlled: true,
       backgroundColor: AppColors.transparent,
-      builder: (_) => _TimerBuilderSheet(recentPreset: recentPreset),
+      builder: (_) => _TimerBuilderSheet(
+        recentPreset: recentPreset,
+        savedPresets: savedPresets,
+        savedTimerPresetService: widget.savedTimerPresetService,
+        now: _now,
+      ),
     );
 
     if (!mounted || result == null) {
@@ -1091,9 +1100,17 @@ class _TimerBuilderSection extends StatelessWidget {
 }
 
 class _TimerBuilderSheet extends StatefulWidget {
-  const _TimerBuilderSheet({this.recentPreset});
+  const _TimerBuilderSheet({
+    this.recentPreset,
+    required this.savedPresets,
+    required this.savedTimerPresetService,
+    required this.now,
+  });
 
   final ActivityTimerPreset? recentPreset;
+  final List<ActivityTimerPreset> savedPresets;
+  final LocalSavedTimerPresetService savedTimerPresetService;
+  final DateTime Function() now;
 
   @override
   State<_TimerBuilderSheet> createState() => _TimerBuilderSheetState();
@@ -1104,6 +1121,13 @@ class _TimerBuilderSheetState extends State<_TimerBuilderSheet> {
   late double _minutes = _selectedActivity.defaultDuration.inMinutes.toDouble();
   ActivityMarkerMode _markerMode = ActivityMarkerMode.random;
   final Set<String> _selectedMarkerIds = {};
+  late List<ActivityTimerPreset> _savedPresets;
+
+  @override
+  void initState() {
+    super.initState();
+    _savedPresets = List.unmodifiable(widget.savedPresets);
+  }
 
   List<ActivityMarkerDefinition> get _availableMarkers {
     final candidateIds = ActivityMarkerCatalog.defaultSelectionIdsForActivity(
@@ -1122,7 +1146,7 @@ class _TimerBuilderSheetState extends State<_TimerBuilderSheet> {
     });
   }
 
-  void _applyRecentPreset(ActivityTimerPreset preset) {
+  void _applyPreset(ActivityTimerPreset preset) {
     final activity = ActivityCatalog.findById(preset.activityId);
     final candidateMarkerIds =
         ActivityMarkerCatalog.defaultSelectionIdsForActivity(
@@ -1191,6 +1215,54 @@ class _TimerBuilderSheetState extends State<_TimerBuilderSheet> {
     _updateMinutes((_minutes.round() + delta).toDouble());
   }
 
+  ActivityTimerPreset _currentPreset() {
+    final markerIds = _markerMode == ActivityMarkerMode.manual
+        ? _selectedMarkerIds.toList(growable: false)
+        : const <String>[];
+    return ActivityTimerPreset(
+      activityId: _selectedActivity.id,
+      duration: Duration(minutes: _minutes.round()),
+      markerMode: _markerMode,
+      markerIds: markerIds,
+      selectedMarkerIds: markerIds,
+      updatedAt: widget.now(),
+    );
+  }
+
+  Future<void> _savePreset() async {
+    if (_markerMode == ActivityMarkerMode.manual &&
+        _selectedMarkerIds.isEmpty) {
+      return;
+    }
+
+    final savedPresets = await widget.savedTimerPresetService.save(
+      _currentPreset(),
+    );
+    if (!mounted) {
+      return;
+    }
+
+    setState(() {
+      _savedPresets = savedPresets;
+    });
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(AppTexts.of(context).home.timerBuilderSavedPresetMessage),
+      ),
+    );
+  }
+
+  Future<void> _deleteSavedPreset(int index) async {
+    final savedPresets = await widget.savedTimerPresetService.removeAt(index);
+    if (!mounted) {
+      return;
+    }
+
+    setState(() {
+      _savedPresets = savedPresets;
+    });
+  }
+
   void _start() {
     if (_markerMode == ActivityMarkerMode.manual &&
         _selectedMarkerIds.isEmpty) {
@@ -1236,6 +1308,34 @@ class _TimerBuilderSheetState extends State<_TimerBuilderSheet> {
         recentPreset?.markerMode == ActivityMarkerMode.manual
         ? homeTexts.timerBuilderManualMarkerOption
         : homeTexts.timerBuilderRandomMarkerOption;
+    final savedPresetCards = _savedPresets.indexed
+        .map((entry) {
+          final index = entry.$1;
+          final preset = entry.$2;
+          final activity = ActivityCatalog.findById(preset.activityId);
+          final markerModeLabel = preset.markerMode == ActivityMarkerMode.manual
+              ? homeTexts.timerBuilderManualMarkerOption
+              : homeTexts.timerBuilderRandomMarkerOption;
+          return _TimerBuilderPresetCard(
+            key: ValueKey('timerBuilderSavedPresetCard_$index'),
+            applyButtonKey: ValueKey(
+              'timerBuilderSavedPresetApplyButton_$index',
+            ),
+            deleteButtonKey: ValueKey(
+              'timerBuilderSavedPresetDeleteButton_$index',
+            ),
+            title: homeTexts.timerBuilderSavedPresetTitle,
+            applyLabel: homeTexts.timerBuilderRecentPresetApplyButton,
+            deleteTooltip: homeTexts.timerBuilderDeletePresetTooltip,
+            activityEmoji: activity.emoji,
+            activityLabel: activity.labelForLanguage(languageCode),
+            durationLabel: homeTexts.minuteLabel(preset.duration.inMinutes),
+            markerModeLabel: markerModeLabel,
+            onApply: () => _applyPreset(preset),
+            onDelete: () => _deleteSavedPreset(index),
+          );
+        })
+        .toList(growable: false);
     final canStart =
         _markerMode != ActivityMarkerMode.manual ||
         _selectedMarkerIds.isNotEmpty;
@@ -1314,9 +1414,19 @@ class _TimerBuilderSheetState extends State<_TimerBuilderSheet> {
                       ],
                     ),
                     const SizedBox(height: AppSpacing.lg),
+                    if (savedPresetCards.isNotEmpty) ...[
+                      for (final card in savedPresetCards) ...[
+                        card,
+                        const SizedBox(height: AppSpacing.sm),
+                      ],
+                      const SizedBox(height: AppSpacing.sm),
+                    ],
                     if (recentPreset != null && recentActivity != null) ...[
-                      _TimerBuilderRecentPresetCard(
+                      _TimerBuilderPresetCard(
                         key: const ValueKey('timerBuilderRecentPresetCard'),
+                        applyButtonKey: const ValueKey(
+                          'timerBuilderRecentPresetApplyButton',
+                        ),
                         title: homeTexts.timerBuilderRecentPresetTitle,
                         applyLabel:
                             homeTexts.timerBuilderRecentPresetApplyButton,
@@ -1328,7 +1438,7 @@ class _TimerBuilderSheetState extends State<_TimerBuilderSheet> {
                           recentPreset.duration.inMinutes,
                         ),
                         markerModeLabel: recentMarkerModeLabel,
-                        onApply: () => _applyRecentPreset(recentPreset),
+                        onApply: () => _applyPreset(recentPreset),
                       ),
                       const SizedBox(height: AppSpacing.lg),
                     ],
@@ -1484,13 +1594,39 @@ class _TimerBuilderSheetState extends State<_TimerBuilderSheet> {
                       ],
                     ),
                     const SizedBox(height: AppSpacing.lg),
-                    AppBouncyButton(
-                      key: const ValueKey('timerBuilderStartButton'),
-                      label: homeTexts.timerBuilderStartButton,
-                      icon: Icons.flag_rounded,
-                      onPressed: canStart ? _start : null,
-                      variant: AppButtonVariant.soft,
-                      size: AppButtonSize.medium,
+                    Row(
+                      children: [
+                        Expanded(
+                          child: OutlinedButton.icon(
+                            key: const ValueKey('timerBuilderSavePresetButton'),
+                            onPressed: canStart ? _savePreset : null,
+                            icon: const Icon(Icons.bookmark_add_rounded),
+                            label: Text(
+                              homeTexts.timerBuilderSavePresetButton,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            style: OutlinedButton.styleFrom(
+                              foregroundColor: AppColors.textPrimary,
+                              side: const BorderSide(
+                                color: AppColors.borderWarm,
+                              ),
+                              shape: const StadiumBorder(),
+                              minimumSize: const Size.fromHeight(48),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: AppSpacing.sm),
+                        Expanded(
+                          child: AppBouncyButton(
+                            key: const ValueKey('timerBuilderStartButton'),
+                            label: homeTexts.timerBuilderStartButton,
+                            icon: Icons.flag_rounded,
+                            onPressed: canStart ? _start : null,
+                            variant: AppButtonVariant.soft,
+                            size: AppButtonSize.medium,
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
@@ -1503,9 +1639,10 @@ class _TimerBuilderSheetState extends State<_TimerBuilderSheet> {
   }
 }
 
-class _TimerBuilderRecentPresetCard extends StatelessWidget {
-  const _TimerBuilderRecentPresetCard({
+class _TimerBuilderPresetCard extends StatelessWidget {
+  const _TimerBuilderPresetCard({
     super.key,
+    required this.applyButtonKey,
     required this.title,
     required this.applyLabel,
     required this.activityEmoji,
@@ -1513,8 +1650,12 @@ class _TimerBuilderRecentPresetCard extends StatelessWidget {
     required this.durationLabel,
     required this.markerModeLabel,
     required this.onApply,
+    this.deleteButtonKey,
+    this.deleteTooltip,
+    this.onDelete,
   });
 
+  final Key applyButtonKey;
   final String title;
   final String applyLabel;
   final String activityEmoji;
@@ -1522,6 +1663,9 @@ class _TimerBuilderRecentPresetCard extends StatelessWidget {
   final String durationLabel;
   final String markerModeLabel;
   final VoidCallback onApply;
+  final Key? deleteButtonKey;
+  final String? deleteTooltip;
+  final VoidCallback? onDelete;
 
   @override
   Widget build(BuildContext context) {
@@ -1580,10 +1724,20 @@ class _TimerBuilderRecentPresetCard extends StatelessWidget {
             ),
             const SizedBox(width: AppSpacing.sm),
             TextButton(
-              key: const ValueKey('timerBuilderRecentPresetApplyButton'),
+              key: applyButtonKey,
               onPressed: onApply,
               child: Text(applyLabel),
             ),
+            if (onDelete != null) ...[
+              const SizedBox(width: AppSpacing.xs),
+              IconButton(
+                key: deleteButtonKey,
+                onPressed: onDelete,
+                tooltip: deleteTooltip,
+                icon: const Icon(Icons.close_rounded),
+                color: AppColors.textSecondary,
+              ),
+            ],
           ],
         ),
       ),
