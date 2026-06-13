@@ -6,6 +6,7 @@ import 'models/activity_timer_config.dart';
 import 'navigation/app_route_observer.dart';
 import 'screens/child_name_setup_screen.dart';
 import 'screens/home_screen.dart';
+import 'screens/onboarding_screen.dart';
 import 'screens/splash_screen.dart';
 import 'services/active_activity_timer_session_store.dart';
 import 'services/local_activity_progress_service.dart';
@@ -18,13 +19,17 @@ class TimeyRiderApp extends StatefulWidget {
     required this.settingsService,
     required this.activityProgressService,
     required this.initialConfig,
+    required this.initialHasSeenOnboarding,
     this.activeSessionStore = const ActiveActivityTimerSessionStore(),
+    this.showSplashOnStart = true,
   });
 
   final LocalSettingsService settingsService;
   final LocalActivityProgressService activityProgressService;
   final ActivityTimerConfig initialConfig;
+  final bool initialHasSeenOnboarding;
   final ActiveActivityTimerSessionStore activeSessionStore;
+  final bool showSplashOnStart;
 
   @override
   State<TimeyRiderApp> createState() => _TimeyRiderAppState();
@@ -32,7 +37,8 @@ class TimeyRiderApp extends StatefulWidget {
 
 class _TimeyRiderAppState extends State<TimeyRiderApp> {
   late ActivityTimerConfig _config = widget.initialConfig;
-  bool _showSplash = true;
+  late bool _showSplash = widget.showSplashOnStart;
+  late bool _hasSeenOnboarding = widget.initialHasSeenOnboarding;
 
   Future<void> _saveConfig(ActivityTimerConfig config) async {
     setState(() => _config = config);
@@ -47,6 +53,13 @@ class _TimeyRiderAppState extends State<TimeyRiderApp> {
   }
 
   bool get _hasChildName => _config.childName.trim().isNotEmpty;
+
+  Future<void> _finishOnboarding() async {
+    if (!_hasSeenOnboarding) {
+      setState(() => _hasSeenOnboarding = true);
+    }
+    await widget.settingsService.saveHasSeenOnboarding(true);
+  }
 
   Future<void> _saveChildName(String name) {
     return _saveConfig(_config.copyWith(childName: name.trim()));
@@ -67,6 +80,8 @@ class _TimeyRiderAppState extends State<TimeyRiderApp> {
       theme: AppTheme.light(),
       home: _showSplash
           ? SplashScreen(onFinished: _finishSplash)
+          : !_hasSeenOnboarding
+          ? OnboardingScreen(onFinished: _finishOnboarding)
           : _hasChildName
           ? HomeScreen(
               config: _config,
