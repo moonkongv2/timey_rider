@@ -28,6 +28,8 @@ class EnHomeTexts implements HomeTextSet {
   String get timerBuilderMarkerStepTitle => '2. Markers';
   String get timerBuilderRandomMarkerOption => 'Auto';
   String get timerBuilderManualMarkerOption => 'Choose';
+  String get timerBuilderRecentPresetTitle => 'Recent setting';
+  String get timerBuilderRecentPresetApplyButton => 'Apply';
   String get timerBuilderTimeStepTitle => '3. Time';
   String get timerBuilderStartButton => 'Start';
   String get timerBuilderSelectedMarkerEmpty => 'Choose at least one marker.';

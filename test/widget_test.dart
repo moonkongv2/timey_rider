@@ -21,6 +21,7 @@ import 'package:timey_rider/models/active_activity_timer_session.dart';
 import 'package:timey_rider/models/activity_completion_status.dart';
 import 'package:timey_rider/models/activity_session_result.dart';
 import 'package:timey_rider/models/activity_timer_config.dart';
+import 'package:timey_rider/models/activity_timer_preset.dart';
 import 'package:timey_rider/models/reward_goal.dart';
 import 'package:timey_rider/models/reward_item.dart';
 import 'package:timey_rider/models/vehicle.dart';
@@ -37,6 +38,7 @@ import 'package:timey_rider/services/active_activity_timer_session_store.dart';
 import 'package:timey_rider/services/avatar_image_picker.dart';
 import 'package:timey_rider/services/local_avatar_image_service.dart';
 import 'package:timey_rider/services/local_activity_progress_service.dart';
+import 'package:timey_rider/services/local_recent_timer_service.dart';
 import 'package:timey_rider/services/local_settings_service.dart';
 import 'package:timey_rider/services/motivation_audio_service.dart';
 import 'package:timey_rider/services/orientation_service.dart';
@@ -2112,9 +2114,8 @@ void main() {
     await tester.pump();
 
     await _openTimerBuilder(tester);
-    await tester.tap(find.byKey(const ValueKey('timerBuilderMarkerManual')));
+    await _selectTimerBuilderManualMode(tester);
     expect(tester.takeException(), isNull);
-    await tester.pump();
 
     expect(find.byKey(const ValueKey('timerBuilderSheet')), findsOneWidget);
     expect(
@@ -2162,8 +2163,7 @@ void main() {
     expect(find.byKey(const ValueKey('timerBuilderSheet')), findsOneWidget);
     expect(find.text('2. 마커'), findsOneWidget);
 
-    await tester.tap(find.byKey(const ValueKey('timerBuilderMarkerManual')));
-    await tester.pump();
+    await _selectTimerBuilderManualMode(tester);
 
     expect(
       find.byKey(const ValueKey('timerBuilderMarker_top_teeth')),
@@ -2357,6 +2357,112 @@ void main() {
       );
     },
   );
+
+  testWidgets('Timer builder saves the latest started timer preset', (
+    tester,
+  ) async {
+    SharedPreferences.setMockInitialValues({});
+    addTearDown(() async {
+      await const ActiveActivityTimerSessionStore().clear();
+      await const LocalRecentTimerService().clear();
+    });
+
+    await tester.pumpWidget(
+      MaterialApp(
+        locale: const Locale('ko'),
+        supportedLocales: const [Locale('ko'), Locale('en')],
+        localizationsDelegates: const [
+          GlobalMaterialLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+        ],
+        home: HomeScreen(
+          config: ActivityTimerConfig.defaults().copyWith(childName: '지율'),
+          activityProgressService: LocalActivityProgressService(),
+          onConfigChanged: (_) {},
+          now: () => DateTime(2026, 6, 14, 9),
+        ),
+      ),
+    );
+    await tester.pump();
+
+    await _openTimerBuilder(tester);
+    await _selectTimerBuilderActivity(tester, 'reading');
+    await _setTimerBuilderMinutes(tester, 18);
+    await _selectTimerBuilderManualMarkers(tester, ['cover', 'bookmark']);
+    await _startTimerBuilder(tester);
+
+    final preset = await const LocalRecentTimerService().load();
+    expect(preset, isNotNull);
+    expect(preset!.activityId, 'reading');
+    expect(preset.duration, const Duration(minutes: 18));
+    expect(preset.markerMode, ActivityMarkerMode.manual);
+    expect(preset.markerIds, ['cover', 'bookmark']);
+    expect(preset.selectedMarkerIds, ['cover', 'bookmark']);
+    expect(preset.updatedAt, DateTime(2026, 6, 14, 9));
+  });
+
+  testWidgets('Timer builder applies a saved recent timer preset', (
+    tester,
+  ) async {
+    SharedPreferences.setMockInitialValues({});
+    addTearDown(() async {
+      await const ActiveActivityTimerSessionStore().clear();
+      await const LocalRecentTimerService().clear();
+    });
+    await const LocalRecentTimerService().save(
+      ActivityTimerPreset(
+        activityId: 'reading',
+        duration: Duration(minutes: 18),
+        markerMode: ActivityMarkerMode.manual,
+        markerIds: ['cover', 'bookmark'],
+        selectedMarkerIds: ['cover', 'bookmark'],
+        updatedAt: DateTime(2026, 6, 14, 8),
+      ),
+    );
+
+    await tester.pumpWidget(
+      MaterialApp(
+        locale: const Locale('ko'),
+        supportedLocales: const [Locale('ko'), Locale('en')],
+        localizationsDelegates: const [
+          GlobalMaterialLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+        ],
+        home: HomeScreen(
+          config: ActivityTimerConfig.defaults().copyWith(childName: '지율'),
+          activityProgressService: LocalActivityProgressService(),
+          onConfigChanged: (_) {},
+        ),
+      ),
+    );
+    await tester.pump();
+
+    await _openTimerBuilder(tester);
+
+    expect(
+      find.byKey(const ValueKey('timerBuilderRecentPresetCard')),
+      findsOneWidget,
+    );
+    expect(find.text('최근 설정'), findsOneWidget);
+    expect(find.textContaining('책 읽기 · 18분 · 선택'), findsOneWidget);
+
+    tester
+        .widget<TextButton>(
+          find.byKey(const ValueKey('timerBuilderRecentPresetApplyButton')),
+        )
+        .onPressed!();
+    await tester.pump();
+    await _startTimerBuilder(tester);
+
+    final timerScreen = tester.widget<TimerScreen>(find.byType(TimerScreen));
+    expect(timerScreen.config.activityId, 'reading');
+    expect(timerScreen.config.duration, const Duration(minutes: 18));
+    expect(timerScreen.config.markerMode, ActivityMarkerMode.manual);
+    expect(timerScreen.config.markerIds, ['cover', 'bookmark']);
+    expect(timerScreen.config.selectedMarkerIds, ['cover', 'bookmark']);
+  });
 
   testWidgets('Dismissing the timer builder does not open timer screen', (
     tester,
@@ -7490,12 +7596,23 @@ Future<void> _selectTimerBuilderActivity(
   await tester.pump();
 }
 
+Future<void> _selectTimerBuilderManualMode(WidgetTester tester) async {
+  tester
+      .widget<OutlinedButton>(
+        find.descendant(
+          of: find.byKey(const ValueKey('timerBuilderMarkerManual')),
+          matching: find.byType(OutlinedButton),
+        ),
+      )
+      .onPressed!();
+  await tester.pump();
+}
+
 Future<void> _selectTimerBuilderManualMarkers(
   WidgetTester tester,
   List<String> markerIds,
 ) async {
-  await tester.tap(find.byKey(const ValueKey('timerBuilderMarkerManual')));
-  await tester.pump();
+  await _selectTimerBuilderManualMode(tester);
 
   for (final markerId in markerIds) {
     tester
@@ -7505,6 +7622,13 @@ Future<void> _selectTimerBuilderManualMarkers(
         .onSelected!(true);
     await tester.pump();
   }
+}
+
+Future<void> _setTimerBuilderMinutes(WidgetTester tester, int minutes) async {
+  tester
+      .widget<Slider>(find.byKey(const ValueKey('timerBuilderMinuteSlider')))
+      .onChanged!(minutes.toDouble());
+  await tester.pump();
 }
 
 Future<void> _startTimerBuilder(WidgetTester tester) async {

@@ -13,12 +13,14 @@ import '../models/activity.dart';
 import '../models/activity_marker.dart';
 import '../models/activity_progress_snapshot.dart';
 import '../models/activity_timer_config.dart';
+import '../models/activity_timer_preset.dart';
 import '../models/vehicle_avatar_presentation.dart';
 import '../navigation/app_route_observer.dart';
 import '../models/reward_goal.dart';
 import '../models/reward_item.dart';
 import '../services/active_activity_timer_session_store.dart';
 import '../services/local_activity_progress_service.dart';
+import '../services/local_recent_timer_service.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_radius.dart';
 import '../theme/app_shadows.dart';
@@ -48,6 +50,7 @@ class HomeScreen extends StatefulWidget {
     required this.activityProgressService,
     required this.onConfigChanged,
     this.activeSessionStore = const ActiveActivityTimerSessionStore(),
+    this.recentTimerService = const LocalRecentTimerService(),
     this.avatarImageBuilder,
     this.now,
   });
@@ -56,6 +59,7 @@ class HomeScreen extends StatefulWidget {
   final LocalActivityProgressService activityProgressService;
   final ValueChanged<ActivityTimerConfig> onConfigChanged;
   final ActiveActivityTimerSessionStore activeSessionStore;
+  final LocalRecentTimerService recentTimerService;
   final Widget Function(BuildContext context, String imagePath)?
   avatarImageBuilder;
   final DateTime Function()? now;
@@ -206,6 +210,20 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
       markerIds: activityMarkerSelection.markerIds,
       selectedMarkerIds: activityMarkerSelection.selectedMarkerIds,
     );
+    await widget.recentTimerService.save(
+      ActivityTimerPreset(
+        activityId: activity.id,
+        duration: duration,
+        markerMode: markerMode,
+        markerIds: activityMarkerSelection.markerIds,
+        selectedMarkerIds: activityMarkerSelection.selectedMarkerIds,
+        updatedAt: _now(),
+      ),
+    );
+    if (!mounted) {
+      return;
+    }
+
     await Navigator.of(context).push(
       MaterialPageRoute(
         builder: (_) => TimerScreen(
@@ -323,11 +341,16 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
   }
 
   Future<void> _openTimerBuilder() async {
+    final recentPreset = await widget.recentTimerService.load();
+    if (!mounted) {
+      return;
+    }
+
     final result = await showModalBottomSheet<_TimerBuilderResult>(
       context: context,
       isScrollControlled: true,
       backgroundColor: AppColors.transparent,
-      builder: (_) => const _TimerBuilderSheet(),
+      builder: (_) => _TimerBuilderSheet(recentPreset: recentPreset),
     );
 
     if (!mounted || result == null) {
@@ -1068,7 +1091,9 @@ class _TimerBuilderSection extends StatelessWidget {
 }
 
 class _TimerBuilderSheet extends StatefulWidget {
-  const _TimerBuilderSheet();
+  const _TimerBuilderSheet({this.recentPreset});
+
+  final ActivityTimerPreset? recentPreset;
 
   @override
   State<_TimerBuilderSheet> createState() => _TimerBuilderSheetState();
@@ -1094,6 +1119,43 @@ class _TimerBuilderSheetState extends State<_TimerBuilderSheet> {
       _selectedActivity = activity;
       _minutes = activity.defaultDuration.inMinutes.toDouble();
       _selectedMarkerIds.clear();
+    });
+  }
+
+  void _applyRecentPreset(ActivityTimerPreset preset) {
+    final activity = ActivityCatalog.findById(preset.activityId);
+    final candidateMarkerIds =
+        ActivityMarkerCatalog.defaultSelectionIdsForActivity(
+          activity.id,
+        ).toSet();
+    final savedMarkerIds =
+        preset.selectedMarkerIds.isEmpty &&
+            preset.markerMode == ActivityMarkerMode.manual
+        ? preset.markerIds
+        : preset.selectedMarkerIds;
+    final selectedMarkerIds = savedMarkerIds
+        .where(candidateMarkerIds.contains)
+        .take(ActivityMarkerCatalog.maxSelectableMarkerCount)
+        .toList(growable: false);
+    final markerMode =
+        preset.markerMode == ActivityMarkerMode.manual &&
+            selectedMarkerIds.isNotEmpty
+        ? ActivityMarkerMode.manual
+        : ActivityMarkerMode.random;
+
+    setState(() {
+      _selectedActivity = activity;
+      _minutes = preset.duration.inMinutes
+          .clamp(_minCustomActivityMinutes, _maxCustomActivityMinutes)
+          .toDouble();
+      _markerMode = markerMode;
+      _selectedMarkerIds
+        ..clear()
+        ..addAll(
+          markerMode == ActivityMarkerMode.manual
+              ? selectedMarkerIds
+              : const [],
+        );
     });
   }
 
@@ -1166,6 +1228,14 @@ class _TimerBuilderSheetState extends State<_TimerBuilderSheet> {
     final mediaQuery = MediaQuery.of(context);
     final languageCode = Localizations.localeOf(context).languageCode;
     final selectedMinuteLabel = homeTexts.minuteLabel(_minutes.round());
+    final recentPreset = widget.recentPreset;
+    final recentActivity = recentPreset == null
+        ? null
+        : ActivityCatalog.findById(recentPreset.activityId);
+    final recentMarkerModeLabel =
+        recentPreset?.markerMode == ActivityMarkerMode.manual
+        ? homeTexts.timerBuilderManualMarkerOption
+        : homeTexts.timerBuilderRandomMarkerOption;
     final canStart =
         _markerMode != ActivityMarkerMode.manual ||
         _selectedMarkerIds.isNotEmpty;
@@ -1244,6 +1314,24 @@ class _TimerBuilderSheetState extends State<_TimerBuilderSheet> {
                       ],
                     ),
                     const SizedBox(height: AppSpacing.lg),
+                    if (recentPreset != null && recentActivity != null) ...[
+                      _TimerBuilderRecentPresetCard(
+                        key: const ValueKey('timerBuilderRecentPresetCard'),
+                        title: homeTexts.timerBuilderRecentPresetTitle,
+                        applyLabel:
+                            homeTexts.timerBuilderRecentPresetApplyButton,
+                        activityEmoji: recentActivity.emoji,
+                        activityLabel: recentActivity.labelForLanguage(
+                          languageCode,
+                        ),
+                        durationLabel: homeTexts.minuteLabel(
+                          recentPreset.duration.inMinutes,
+                        ),
+                        markerModeLabel: recentMarkerModeLabel,
+                        onApply: () => _applyRecentPreset(recentPreset),
+                      ),
+                      const SizedBox(height: AppSpacing.lg),
+                    ],
                     _TimerBuilderStepTitle(
                       title: homeTexts.timerBuilderActivityStepTitle,
                     ),
@@ -1409,6 +1497,94 @@ class _TimerBuilderSheetState extends State<_TimerBuilderSheet> {
               ),
             ),
           ),
+        ),
+      ),
+    );
+  }
+}
+
+class _TimerBuilderRecentPresetCard extends StatelessWidget {
+  const _TimerBuilderRecentPresetCard({
+    super.key,
+    required this.title,
+    required this.applyLabel,
+    required this.activityEmoji,
+    required this.activityLabel,
+    required this.durationLabel,
+    required this.markerModeLabel,
+    required this.onApply,
+  });
+
+  final String title;
+  final String applyLabel;
+  final String activityEmoji;
+  final String activityLabel;
+  final String durationLabel;
+  final String markerModeLabel;
+  final VoidCallback onApply;
+
+  @override
+  Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
+
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: AppColors.white.withValues(alpha: 0.82),
+        borderRadius: AppRadius.card,
+        border: Border.all(color: AppColors.borderWarm),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(AppSpacing.md),
+        child: Row(
+          children: [
+            DecoratedBox(
+              decoration: BoxDecoration(
+                color: AppColors.surfaceYellow,
+                borderRadius: AppRadius.pill,
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(AppSpacing.sm),
+                child: Text(
+                  activityEmoji,
+                  textScaler: TextScaler.noScaling,
+                  style: textTheme.titleLarge,
+                ),
+              ),
+            ),
+            const SizedBox(width: AppSpacing.md),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: textTheme.labelLarge?.copyWith(
+                      color: AppColors.textSecondary,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                  const SizedBox(height: AppSpacing.xs),
+                  Text(
+                    '$activityLabel · $durationLabel · $markerModeLabel',
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: textTheme.titleSmall?.copyWith(
+                      color: AppColors.textStrong,
+                      fontWeight: FontWeight.w900,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(width: AppSpacing.sm),
+            TextButton(
+              key: const ValueKey('timerBuilderRecentPresetApplyButton'),
+              onPressed: onApply,
+              child: Text(applyLabel),
+            ),
+          ],
         ),
       ),
     );
