@@ -3,7 +3,7 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
-import '../catalogs/meal_ingredient_catalog.dart';
+import '../catalogs/activity_marker_catalog.dart';
 import '../catalogs/motivation_asset_catalog.dart';
 import '../catalogs/vehicle_catalog.dart';
 import '../controllers/activity_timer_controller.dart';
@@ -11,7 +11,7 @@ import '../l10n/app_texts.dart';
 import '../l10n/text_sets.dart';
 import '../models/active_activity_timer_session.dart';
 import '../models/activity_completion_status.dart';
-import '../models/meal_ingredient.dart';
+import '../models/activity_marker.dart';
 import '../models/activity_session_result.dart';
 import '../models/activity_timer_config.dart';
 import '../models/vehicle_avatar_presentation.dart';
@@ -825,12 +825,11 @@ class _TimerScreenState extends State<TimerScreen>
         final vehicleAvatar = _timerConfig.avatarPresentationForVehicle(
           vehicle.id,
         );
-        final courseIngredients =
-            _timerConfig.markerMode == ActivityMarkerMode.off
-            ? const <MealIngredientDefinition>[]
-            : MealIngredientCatalog.courseSlotsFor(
+        final courseMarkers = _timerConfig.markerMode == ActivityMarkerMode.off
+            ? const <ActivityMarkerDefinition>[]
+            : ActivityMarkerCatalog.courseSlotsFor(
                 _timerConfig.markerIds,
-                slotCount: MealIngredientCatalog.courseSlotCountForDuration(
+                slotCount: ActivityMarkerCatalog.courseSlotCountForDuration(
                   _timerConfig.duration,
                 ),
               );
@@ -910,8 +909,8 @@ class _TimerScreenState extends State<TimerScreen>
                     onMotivationVideoFinished: _handleMotivationVideoFinished,
                     showVehicle: !isLandscape,
                     showMotivationVideo: !isLandscape,
-                    ingredients: courseIngredients,
-                    ingredientClearProgress: displayProgress,
+                    markers: courseMarkers,
+                    markerClearProgress: displayProgress,
                     isRoadMotionActive:
                         _isFinishDriving ||
                         _controller.state == ActivityTimerState.running,

@@ -7,7 +7,7 @@ import 'package:flutter/services.dart';
 import 'package:video_player/video_player.dart';
 
 import '../l10n/app_texts.dart';
-import '../models/meal_ingredient.dart';
+import '../models/activity_marker.dart';
 import '../models/vehicle.dart';
 import '../models/vehicle_avatar_presentation.dart';
 import '../theme/app_colors.dart';
@@ -29,8 +29,8 @@ class RoadView extends StatelessWidget {
     this.onMotivationVideoFinished,
     this.showVehicle = true,
     this.showMotivationVideo = true,
-    this.ingredients = const [],
-    this.ingredientClearProgress,
+    this.markers = const [],
+    this.markerClearProgress,
     this.isRoadMotionActive = false,
     this.courseDuration = const Duration(minutes: 5),
   });
@@ -45,8 +45,8 @@ class RoadView extends StatelessWidget {
   final VoidCallback? onMotivationVideoFinished;
   final bool showVehicle;
   final bool showMotivationVideo;
-  final List<MealIngredientDefinition> ingredients;
-  final double? ingredientClearProgress;
+  final List<ActivityMarkerDefinition> markers;
+  final double? markerClearProgress;
   final bool isRoadMotionActive;
   final Duration courseDuration;
   static const double _portraitVehicleSize = 164;
@@ -105,7 +105,7 @@ class RoadView extends StatelessWidget {
           cameraOffsetY: cameraOffsetY,
           isLandscape: isLandscape,
         );
-        final clearProgress = (ingredientClearProgress ?? clampedProgress)
+        final clearProgress = (markerClearProgress ?? clampedProgress)
             .clamp(0.0, 1.0)
             .toDouble();
         final visualStyle = RoadCourseVisualStyle.forCourseKind(
@@ -146,9 +146,9 @@ class RoadView extends StatelessWidget {
                           courseKind: vehicle.courseKind,
                         ),
                       ),
-                      if (ingredients.isNotEmpty)
-                        _RoadIngredientLayer(
-                          ingredients: ingredients,
+                      if (markers.isNotEmpty)
+                        _RoadMarkerLayer(
+                          markers: markers,
                           clearProgress: clearProgress,
                           geometry: geometry,
                           markerSize: isLandscape ? 50 : 33,
@@ -227,7 +227,7 @@ class _AnimatedRoadPaint extends StatefulWidget {
 class _AnimatedRoadPaintState extends State<_AnimatedRoadPaint>
     with TickerProviderStateMixin {
   static const _fieldFootprintAssetPath =
-      'assets/images/ingredients/footprints.png';
+      'assets/images/markers/footprints.png';
 
   late final AnimationController _flowController;
   late final AnimationController _skyPathCloudController;
@@ -396,15 +396,15 @@ class _AnimatedRoadPaintState extends State<_AnimatedRoadPaint>
   }
 }
 
-class _RoadIngredientLayer extends StatelessWidget {
-  const _RoadIngredientLayer({
-    required this.ingredients,
+class _RoadMarkerLayer extends StatelessWidget {
+  const _RoadMarkerLayer({
+    required this.markers,
     required this.clearProgress,
     required this.geometry,
     required this.markerSize,
   });
 
-  final List<MealIngredientDefinition> ingredients;
+  final List<ActivityMarkerDefinition> markers;
   final double clearProgress;
   final RoadCourseGeometry geometry;
   final double markerSize;
@@ -414,13 +414,13 @@ class _RoadIngredientLayer extends StatelessWidget {
     return IgnorePointer(
       child: Stack(
         children: [
-          for (var index = 0; index < ingredients.length; index += 1)
-            _RoadIngredientMarker(
-              key: ValueKey('roadIngredientSlot_$index'),
-              ingredient: ingredients[index],
+          for (var index = 0; index < markers.length; index += 1)
+            _RoadActivityMarker(
+              key: ValueKey('roadActivityMarkerSlot_$index'),
+              marker: markers[index],
               index: index,
               markerSize: markerSize,
-              progress: (index + 1) / (ingredients.length + 1),
+              progress: (index + 1) / (markers.length + 1),
               clearProgress: clearProgress,
               geometry: geometry,
             ),
@@ -430,10 +430,10 @@ class _RoadIngredientLayer extends StatelessWidget {
   }
 }
 
-class _RoadIngredientMarker extends StatelessWidget {
-  const _RoadIngredientMarker({
+class _RoadActivityMarker extends StatelessWidget {
+  const _RoadActivityMarker({
     super.key,
-    required this.ingredient,
+    required this.marker,
     required this.index,
     required this.markerSize,
     required this.progress,
@@ -441,7 +441,7 @@ class _RoadIngredientMarker extends StatelessWidget {
     required this.geometry,
   });
 
-  final MealIngredientDefinition ingredient;
+  final ActivityMarkerDefinition marker;
   final int index;
   final double markerSize;
   final double progress;
@@ -470,10 +470,10 @@ class _RoadIngredientMarker extends StatelessWidget {
           );
         },
         child: isCleared
-            ? SizedBox(key: ValueKey('roadIngredientCleared_$index'))
-            : _RoadIngredientChip(
-                key: ValueKey('roadIngredientMarker_$index'),
-                ingredient: ingredient,
+            ? SizedBox(key: ValueKey('roadActivityMarkerCleared_$index'))
+            : _RoadMarkerChip(
+                key: ValueKey('roadActivityMarker_$index'),
+                marker: marker,
                 size: markerSize,
               ),
       ),
@@ -481,31 +481,27 @@ class _RoadIngredientMarker extends StatelessWidget {
   }
 }
 
-class _RoadIngredientChip extends StatelessWidget {
-  const _RoadIngredientChip({
-    super.key,
-    required this.ingredient,
-    required this.size,
-  });
+class _RoadMarkerChip extends StatelessWidget {
+  const _RoadMarkerChip({super.key, required this.marker, required this.size});
 
-  final MealIngredientDefinition ingredient;
+  final ActivityMarkerDefinition marker;
   final double size;
 
   @override
   Widget build(BuildContext context) {
-    final assetPath = ingredient.assetPath;
+    final assetPath = marker.assetPath;
 
     return SizedBox.expand(
       child: Center(
         child: assetPath == null
-            ? _IngredientEmoji(ingredient: ingredient, size: size)
+            ? _MarkerEmoji(marker: marker, size: size)
             : Image.asset(
                 assetPath,
                 width: size * 0.92,
                 height: size * 0.92,
                 fit: BoxFit.contain,
                 errorBuilder: (context, error, stackTrace) {
-                  return _IngredientEmoji(ingredient: ingredient, size: size);
+                  return _MarkerEmoji(marker: marker, size: size);
                 },
               ),
       ),
@@ -513,16 +509,16 @@ class _RoadIngredientChip extends StatelessWidget {
   }
 }
 
-class _IngredientEmoji extends StatelessWidget {
-  const _IngredientEmoji({required this.ingredient, required this.size});
+class _MarkerEmoji extends StatelessWidget {
+  const _MarkerEmoji({required this.marker, required this.size});
 
-  final MealIngredientDefinition ingredient;
+  final ActivityMarkerDefinition marker;
   final double size;
 
   @override
   Widget build(BuildContext context) {
     return Text(
-      ingredient.emoji,
+      marker.emoji,
       textAlign: TextAlign.center,
       style: TextStyle(fontSize: size * 0.86, height: 1),
     );

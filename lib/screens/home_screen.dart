@@ -4,7 +4,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart' show ScrollCacheExtent;
 
-import '../catalogs/meal_ingredient_catalog.dart';
+import '../catalogs/activity_marker_catalog.dart';
 import '../catalogs/meal_course_catalog.dart';
 import '../catalogs/vehicle_catalog.dart';
 import '../l10n/app_texts.dart';
@@ -26,7 +26,7 @@ import '../utils/duration_format.dart';
 import '../widgets/app/app_bouncy_button.dart';
 import '../widgets/app/app_metric_tile.dart';
 import '../widgets/avatar/avatar_composite_preview.dart';
-import '../widgets/meal_ingredient_picker_sheet.dart';
+import '../widgets/activity_marker_picker_sheet.dart';
 import '../widgets/reward_sticker_image.dart';
 import '../widgets/vehicle_selection_card.dart';
 import 'avatar_setup_screen.dart';
@@ -200,16 +200,15 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
       return;
     }
 
-    final courseIngredientSelection =
-        await _courseIngredientSelectionForStart();
-    if (!mounted || courseIngredientSelection == null) {
+    final activityMarkerSelection = await _activityMarkerSelectionForStart();
+    if (!mounted || activityMarkerSelection == null) {
       return;
     }
 
     final config = _config.copyWith(
       duration: Duration(minutes: minutes),
-      markerIds: courseIngredientSelection.markerIds,
-      selectedMarkerIds: courseIngredientSelection.selectedMarkerIds,
+      markerIds: activityMarkerSelection.markerIds,
+      selectedMarkerIds: activityMarkerSelection.selectedMarkerIds,
     );
     await Navigator.of(context).push(
       MaterialPageRoute(
@@ -327,41 +326,52 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
     }
   }
 
-  Future<_CourseIngredientSelection?>
-  _courseIngredientSelectionForStart() async {
+  Future<_ActivityMarkerSelection?> _activityMarkerSelectionForStart() async {
     switch (_config.markerMode) {
       case ActivityMarkerMode.off:
-        return const _CourseIngredientSelection(
+        return const _ActivityMarkerSelection(
           markerIds: [],
           selectedMarkerIds: [],
         );
       case ActivityMarkerMode.random:
-        return _CourseIngredientSelection(
-          markerIds: MealIngredientCatalog.randomSelectionIds(),
+        return _ActivityMarkerSelection(
+          markerIds: ActivityMarkerCatalog.randomSelectionIds(
+            activityId: _config.activityId,
+          ),
           selectedMarkerIds: const [],
         );
       case ActivityMarkerMode.activityDefault:
+        return _ActivityMarkerSelection(
+          markerIds: ActivityMarkerCatalog.defaultSelectionIdsForActivity(
+            _config.activityId,
+          ),
+          selectedMarkerIds: const [],
+        );
       case ActivityMarkerMode.manual:
-        final ingredientResult =
-            await showModalBottomSheet<MealIngredientPickerResult>(
+        final markerResult =
+            await showModalBottomSheet<ActivityMarkerPickerResult>(
               context: context,
               isScrollControlled: true,
               backgroundColor: AppColors.transparent,
-              builder: (_) => const MealIngredientPickerSheet(),
+              builder: (_) => ActivityMarkerPickerSheet(
+                activityId: _config.activityId,
+                initialSelectedIds: _config.selectedMarkerIds,
+              ),
             );
-        if (ingredientResult == null) {
+        if (markerResult == null) {
           return null;
         }
-        return switch (ingredientResult) {
-          RandomMealIngredients() => _CourseIngredientSelection(
-            markerIds: MealIngredientCatalog.randomSelectionIds(),
+        return switch (markerResult) {
+          RandomActivityMarkers() => _ActivityMarkerSelection(
+            markerIds: ActivityMarkerCatalog.randomSelectionIds(
+              activityId: _config.activityId,
+            ),
             selectedMarkerIds: const [],
           ),
-          SelectedMealIngredients(:final ingredientIds) =>
-            _CourseIngredientSelection(
-              markerIds: ingredientIds,
-              selectedMarkerIds: ingredientIds,
-            ),
+          SelectedActivityMarkers(:final markerIds) => _ActivityMarkerSelection(
+            markerIds: markerIds,
+            selectedMarkerIds: markerIds,
+          ),
         };
     }
   }
@@ -762,8 +772,8 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
   }
 }
 
-class _CourseIngredientSelection {
-  const _CourseIngredientSelection({
+class _ActivityMarkerSelection {
+  const _ActivityMarkerSelection({
     required this.markerIds,
     required this.selectedMarkerIds,
   });

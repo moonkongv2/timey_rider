@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
-import '../catalogs/meal_ingredient_catalog.dart';
+import '../catalogs/activity_marker_catalog.dart';
 import '../l10n/app_texts.dart';
-import '../models/meal_ingredient.dart';
+import '../models/activity_marker.dart';
 import '../models/activity_history_entry.dart';
 import '../models/activity_progress_snapshot.dart';
 import '../models/reward_item.dart';
@@ -267,9 +267,9 @@ class _MealHistoryCard extends StatelessWidget {
       entry.targetDuration,
     );
     final overrun = overrunDuration(entry.actualDuration, entry.targetDuration);
-    final selectedIngredients = entry.selectedMarkerIds
-        .map(MealIngredientCatalog.findById)
-        .whereType<MealIngredientDefinition>()
+    final selectedMarkers = entry.selectedMarkerIds
+        .map(ActivityMarkerCatalog.findById)
+        .whereType<ActivityMarkerDefinition>()
         .toList(growable: false);
 
     return Card(
@@ -330,7 +330,7 @@ class _MealHistoryCard extends StatelessWidget {
                 label: historyTexts.overrunTime(formatDuration(overrun)),
               ),
             ],
-            if (selectedIngredients.isNotEmpty) ...[
+            if (selectedMarkers.isNotEmpty) ...[
               const SizedBox(height: AppSpacing.md),
               Text(
                 historyTexts.selectedIngredientLabel,
@@ -340,7 +340,7 @@ class _MealHistoryCard extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: AppSpacing.sm),
-              _SelectedIngredientRow(ingredients: selectedIngredients),
+              _SelectedMarkerRow(markers: selectedMarkers),
             ],
             const SizedBox(height: AppSpacing.md),
             Text(
@@ -481,10 +481,10 @@ class _DurationTile extends StatelessWidget {
   }
 }
 
-class _SelectedIngredientRow extends StatelessWidget {
-  const _SelectedIngredientRow({required this.ingredients});
+class _SelectedMarkerRow extends StatelessWidget {
+  const _SelectedMarkerRow({required this.markers});
 
-  final List<MealIngredientDefinition> ingredients;
+  final List<ActivityMarkerDefinition> markers;
 
   @override
   Widget build(BuildContext context) {
@@ -494,23 +494,20 @@ class _SelectedIngredientRow extends StatelessWidget {
       spacing: AppSpacing.sm,
       runSpacing: AppSpacing.sm,
       children: [
-        for (final ingredient in ingredients)
-          _SelectedIngredientPill(
-            ingredient: ingredient,
-            label: ingredient.labelForLanguage(languageCode),
+        for (final marker in markers)
+          _SelectedMarkerPill(
+            marker: marker,
+            label: marker.labelForLanguage(languageCode),
           ),
       ],
     );
   }
 }
 
-class _SelectedIngredientPill extends StatelessWidget {
-  const _SelectedIngredientPill({
-    required this.ingredient,
-    required this.label,
-  });
+class _SelectedMarkerPill extends StatelessWidget {
+  const _SelectedMarkerPill({required this.marker, required this.label});
 
-  final MealIngredientDefinition ingredient;
+  final ActivityMarkerDefinition marker;
   final String label;
 
   @override
@@ -529,10 +526,7 @@ class _SelectedIngredientPill extends StatelessWidget {
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            _SelectedIngredientAvatar(
-              ingredient: ingredient,
-              semanticLabel: label,
-            ),
+            _SelectedMarkerAvatar(marker: marker, semanticLabel: label),
             const SizedBox(width: AppSpacing.xs),
             Text(
               label,
@@ -548,20 +542,20 @@ class _SelectedIngredientPill extends StatelessWidget {
   }
 }
 
-class _SelectedIngredientAvatar extends StatelessWidget {
-  const _SelectedIngredientAvatar({
-    required this.ingredient,
+class _SelectedMarkerAvatar extends StatelessWidget {
+  const _SelectedMarkerAvatar({
+    required this.marker,
     required this.semanticLabel,
   });
 
-  final MealIngredientDefinition ingredient;
+  final ActivityMarkerDefinition marker;
   final String semanticLabel;
 
   @override
   Widget build(BuildContext context) {
-    final assetPath = ingredient.assetPath;
+    final assetPath = marker.assetPath;
     if (assetPath == null) {
-      return Text(ingredient.emoji);
+      return Text(marker.emoji);
     }
 
     return Image.asset(
@@ -571,7 +565,7 @@ class _SelectedIngredientAvatar extends StatelessWidget {
       height: 28,
       fit: BoxFit.contain,
       errorBuilder: (context, error, stackTrace) {
-        return Text(ingredient.emoji);
+        return Text(marker.emoji);
       },
     );
   }

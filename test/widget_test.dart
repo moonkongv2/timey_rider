@@ -10,9 +10,9 @@ import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:video_player/video_player.dart';
 
-import 'package:ticky_rider/catalogs/avatar_prompt_catalog.dart';
 import 'package:ticky_rider/catalogs/activity_catalog.dart';
-import 'package:ticky_rider/catalogs/meal_ingredient_catalog.dart';
+import 'package:ticky_rider/catalogs/activity_marker_catalog.dart';
+import 'package:ticky_rider/catalogs/avatar_prompt_catalog.dart';
 import 'package:ticky_rider/catalogs/motivation_asset_catalog.dart';
 import 'package:ticky_rider/catalogs/vehicle_catalog.dart';
 import 'package:ticky_rider/l10n/app_texts.dart';
@@ -74,114 +74,99 @@ void main() {
     expect(config.selectedMarkerIds, isEmpty);
   });
 
-  test('Meal ingredient catalog has non-empty unique ids', () {
-    final ids = MealIngredientCatalog.all
-        .map((ingredient) => ingredient.id)
-        .toList();
+  test('Activity marker catalog has non-empty unique ids', () {
+    final ids = ActivityMarkerCatalog.all.map((marker) => marker.id).toList();
 
     expect(ids, isNotEmpty);
     expect(ids.every((id) => id.trim().isNotEmpty), isTrue);
     expect(ids.toSet(), hasLength(ids.length));
   });
 
-  test('Meal ingredient image asset paths point to existing files', () {
-    final imageIngredients = [
-      MealIngredientCatalog.egg,
-      MealIngredientCatalog.seaweed,
-      MealIngredientCatalog.tofu,
-      MealIngredientCatalog.radish,
-    ];
-
-    expect(MealIngredientCatalog.egg.emoji, '🍳');
-    for (final ingredient in imageIngredients) {
-      final assetPath = ingredient.assetPath;
-      expect(assetPath, isNotNull);
-      expect(File(assetPath!).existsSync(), isTrue);
-    }
-  });
-
-  test('Meal ingredient random selection returns valid ids', () {
-    final ids = MealIngredientCatalog.randomSelectionIds();
+  test('Activity marker random selection returns valid ids', () {
+    final ids = ActivityMarkerCatalog.randomSelectionIds();
 
     expect(ids, isNotEmpty);
     expect(ids, hasLength(5));
     for (final id in ids) {
-      expect(MealIngredientCatalog.findById(id), isNotNull);
+      expect(ActivityMarkerCatalog.findById(id), isNotNull);
     }
   });
 
-  test('Meal ingredient course slots returns exactly 30 ingredients', () {
-    final slots = MealIngredientCatalog.courseSlotsFor(['carrot', 'egg']);
+  test('Activity marker course slots returns exactly 30 markers', () {
+    final slots = ActivityMarkerCatalog.courseSlotsFor([
+      'top_teeth',
+      'bottom_teeth',
+    ]);
 
     expect(slots, hasLength(30));
   });
 
-  test('Meal ingredient course slot count scales with duration', () {
+  test('Activity marker course slot count scales with duration', () {
     expect(
-      MealIngredientCatalog.courseSlotCountForDuration(
+      ActivityMarkerCatalog.courseSlotCountForDuration(
         const Duration(minutes: 1),
       ),
       30,
     );
     expect(
-      MealIngredientCatalog.courseSlotCountForDuration(
+      ActivityMarkerCatalog.courseSlotCountForDuration(
         const Duration(minutes: 5),
       ),
       30,
     );
     expect(
-      MealIngredientCatalog.courseSlotCountForDuration(
+      ActivityMarkerCatalog.courseSlotCountForDuration(
         const Duration(minutes: 15),
       ),
       54,
     );
     expect(
-      MealIngredientCatalog.courseSlotCountForDuration(
+      ActivityMarkerCatalog.courseSlotCountForDuration(
         const Duration(minutes: 25),
       ),
       90,
     );
     expect(
-      MealIngredientCatalog.courseSlotCountForDuration(
+      ActivityMarkerCatalog.courseSlotCountForDuration(
         const Duration(minutes: 35),
       ),
       126,
     );
     expect(
-      MealIngredientCatalog.courseSlotCountForDuration(
+      ActivityMarkerCatalog.courseSlotCountForDuration(
         const Duration(minutes: 60),
       ),
       144,
     );
   });
 
-  test('Meal ingredient course slots only uses selected ids', () {
-    const selectedIds = ['egg', 'rice', 'tomato'];
-    final slots = MealIngredientCatalog.courseSlotsFor(selectedIds);
+  test('Activity marker course slots only uses selected ids', () {
+    const selectedIds = ['top_teeth', 'bottom_teeth', 'front_teeth'];
+    final slots = ActivityMarkerCatalog.courseSlotsFor(selectedIds);
 
-    expect(slots.map((ingredient) => ingredient.id).toSet(), {
-      'egg',
-      'rice',
-      'tomato',
+    expect(slots.map((marker) => marker.id).toSet(), {
+      'top_teeth',
+      'bottom_teeth',
+      'front_teeth',
     });
   });
 
-  test('Meal ingredient course slots fall back for invalid selected ids', () {
-    final slots = MealIngredientCatalog.courseSlotsFor(['missing']);
+  test('Activity marker course slots fall back for invalid selected ids', () {
+    final slots = ActivityMarkerCatalog.courseSlotsFor(['missing']);
 
     expect(
-      slots.map((ingredient) => ingredient.id).toSet(),
-      MealIngredientCatalog.defaultSelectionIds.toSet(),
+      slots.map((marker) => marker.id).toSet(),
+      ActivityMarkerCatalog.defaultSelectionIds.toSet(),
     );
   });
 
   test(
-    'Meal ingredient course slots avoids 3 consecutive identical ids when possible',
+    'Activity marker course slots avoids 3 consecutive identical ids when possible',
     () {
-      final slots = MealIngredientCatalog.courseSlotsFor([
-        'carrot',
-        'carrot',
-        'egg',
+      final slots = ActivityMarkerCatalog.courseSlotsFor([
+        'top_teeth',
+        'top_teeth',
+        'bottom_teeth',
       ]);
 
       for (var index = 2; index < slots.length; index += 1) {
@@ -194,25 +179,22 @@ void main() {
     },
   );
 
-  test(
-    'ActivityTimerConfig copyWith preserves and updates course ingredient ids',
-    () {
-      final config = ActivityTimerConfig.defaults().copyWith(
-        markerIds: const ['carrot', 'egg'],
-        selectedMarkerIds: const ['carrot'],
-      );
-      final preservedConfig = config.copyWith(vehicleId: 'bus');
-      final updatedConfig = config.copyWith(
-        markerIds: const ['rice', 'tomato'],
-        selectedMarkerIds: const ['rice'],
-      );
+  test('ActivityTimerConfig copyWith preserves and updates marker ids', () {
+    final config = ActivityTimerConfig.defaults().copyWith(
+      markerIds: const ['top_teeth', 'bottom_teeth'],
+      selectedMarkerIds: const ['top_teeth'],
+    );
+    final preservedConfig = config.copyWith(vehicleId: 'bus');
+    final updatedConfig = config.copyWith(
+      markerIds: const ['cover', 'bookmark'],
+      selectedMarkerIds: const ['cover'],
+    );
 
-      expect(preservedConfig.markerIds, ['carrot', 'egg']);
-      expect(preservedConfig.selectedMarkerIds, ['carrot']);
-      expect(updatedConfig.markerIds, ['rice', 'tomato']);
-      expect(updatedConfig.selectedMarkerIds, ['rice']);
-    },
-  );
+    expect(preservedConfig.markerIds, ['top_teeth', 'bottom_teeth']);
+    expect(preservedConfig.selectedMarkerIds, ['top_teeth']);
+    expect(updatedConfig.markerIds, ['cover', 'bookmark']);
+    expect(updatedConfig.selectedMarkerIds, ['cover']);
+  });
 
   test('ActivityTimerConfig copyWith updates motivation video settings', () {
     final config = ActivityTimerConfig.defaults().copyWith(
@@ -235,7 +217,7 @@ void main() {
     expect(updatedConfig.motivationVideoInterval, const Duration(minutes: 10));
   });
 
-  test('ActivityTimerConfig copyWith updates course ingredient mode', () {
+  test('ActivityTimerConfig copyWith updates marker mode', () {
     final config = ActivityTimerConfig.defaults().copyWith(
       markerMode: ActivityMarkerMode.random,
     );
@@ -261,7 +243,7 @@ void main() {
         avatarOffsetX: 8.0,
         avatarOffsetY: -6.0,
         avatarRotationDegrees: 12.0,
-        markerIds: const ['carrot', 'egg'],
+        markerIds: const ['top_teeth', 'bottom_teeth'],
       ),
     );
 
@@ -1614,6 +1596,7 @@ void main() {
           config: ActivityTimerConfig.defaults().copyWith(
             childName: '지율',
             duration: const Duration(minutes: 25),
+            markerMode: ActivityMarkerMode.manual,
           ),
           activityProgressService: LocalActivityProgressService(),
           onConfigChanged: (_) {},
@@ -1936,7 +1919,7 @@ void main() {
     expect(timerScreen.config.duration, const Duration(minutes: 25));
   });
 
-  testWidgets('Starting a course opens the ingredient picker first', (
+  testWidgets('Starting a course opens the marker picker first', (
     tester,
   ) async {
     SharedPreferences.setMockInitialValues({});
@@ -1957,6 +1940,7 @@ void main() {
           config: ActivityTimerConfig.defaults().copyWith(
             childName: '지율',
             duration: const Duration(minutes: 35),
+            markerMode: ActivityMarkerMode.manual,
           ),
           activityProgressService: LocalActivityProgressService(),
           onConfigChanged: (_) {},
@@ -1979,33 +1963,27 @@ void main() {
     await tester.pump(const Duration(milliseconds: 400));
 
     expect(
-      find.byKey(const ValueKey('mealIngredientPickerSheet')),
+      find.byKey(const ValueKey('activityMarkerPickerSheet')),
       findsOneWidget,
     );
     expect(
-      find.byKey(const ValueKey('mealIngredientChipImage_egg')),
+      find.byKey(const ValueKey('activityMarkerChip_top_teeth')),
       findsOneWidget,
     );
     expect(
-      find.byKey(const ValueKey('mealIngredientChipImage_seaweed')),
+      find.byKey(const ValueKey('activityMarkerChip_bottom_teeth')),
       findsOneWidget,
     );
     expect(
-      find.byKey(const ValueKey('mealIngredientChipImage_tofu')),
+      find.byKey(const ValueKey('activityMarkerChip_front_teeth')),
       findsOneWidget,
     );
-    expect(find.text('배추'), findsOneWidget);
-    expect(
-      find.byKey(const ValueKey('mealIngredientChipImage_radish')),
-      findsOneWidget,
-    );
-    expect(find.text('콩'), findsOneWidget);
+    expect(find.text('어금니'), findsOneWidget);
+    expect(find.text('혀'), findsOneWidget);
     expect(find.byType(TimerScreen), findsNothing);
   });
 
-  testWidgets('Meal ingredient picker help opens ingredient help text', (
-    tester,
-  ) async {
+  testWidgets('Activity marker picker help opens help text', (tester) async {
     await tester.pumpWidget(
       MaterialApp(
         locale: const Locale('ko'),
@@ -2019,6 +1997,7 @@ void main() {
           config: ActivityTimerConfig.defaults().copyWith(
             childName: '지율',
             duration: const Duration(minutes: 25),
+            markerMode: ActivityMarkerMode.manual,
           ),
           activityProgressService: LocalActivityProgressService(),
           onConfigChanged: (_) {},
@@ -2039,13 +2018,13 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(
-      find.byKey(const ValueKey('mealIngredientPickerSheet')),
+      find.byKey(const ValueKey('activityMarkerPickerSheet')),
       findsOneWidget,
     );
     expect(find.text('식재료는 어떤 의미인가요?'), findsOneWidget);
 
     await tester.tap(
-      find.byKey(const ValueKey('mealIngredientPickerHelpButton')),
+      find.byKey(const ValueKey('activityMarkerPickerHelpButton')),
     );
     await tester.pumpAndSettle();
 
@@ -2053,7 +2032,7 @@ void main() {
     expect(find.textContaining('직접 고른 식재료'), findsWidgets);
   });
 
-  testWidgets('Course ingredient off starts timer without picker', (
+  testWidgets('Activity marker off starts timer without picker', (
     tester,
   ) async {
     SharedPreferences.setMockInitialValues({});
@@ -2088,7 +2067,7 @@ void main() {
     await tester.pump(const Duration(milliseconds: 400));
 
     expect(
-      find.byKey(const ValueKey('mealIngredientPickerSheet')),
+      find.byKey(const ValueKey('activityMarkerPickerSheet')),
       findsNothing,
     );
     expect(find.byType(TimerScreen), findsOneWidget);
@@ -2105,7 +2084,7 @@ void main() {
     );
   });
 
-  testWidgets('Course ingredient random starts timer without picker', (
+  testWidgets('Activity marker random starts timer without picker', (
     tester,
   ) async {
     SharedPreferences.setMockInitialValues({});
@@ -2140,13 +2119,13 @@ void main() {
     await tester.pump(const Duration(milliseconds: 400));
 
     expect(
-      find.byKey(const ValueKey('mealIngredientPickerSheet')),
+      find.byKey(const ValueKey('activityMarkerPickerSheet')),
       findsNothing,
     );
     expect(find.byType(TimerScreen), findsOneWidget);
     expect(
       tester.widget<TimerScreen>(find.byType(TimerScreen)).config.markerIds,
-      hasLength(MealIngredientCatalog.maxSelectableIngredientCount),
+      hasLength(ActivityMarkerCatalog.maxSelectableMarkerCount),
     );
     expect(
       tester
@@ -2176,6 +2155,7 @@ void main() {
           config: ActivityTimerConfig.defaults().copyWith(
             childName: '지율',
             duration: const Duration(minutes: 35),
+            markerMode: ActivityMarkerMode.manual,
           ),
           activityProgressService: LocalActivityProgressService(),
           onConfigChanged: (_) {},
@@ -2195,7 +2175,7 @@ void main() {
     await tester.pump(const Duration(milliseconds: 400));
 
     final randomStartButton = find.byKey(
-      const ValueKey('randomStartMealIngredientsButton'),
+      const ValueKey('randomStartActivityMarkersButton'),
     );
     tester.widget<OutlinedButton>(randomStartButton).onPressed!();
     await tester.pump();
@@ -2208,79 +2188,11 @@ void main() {
     );
     expect(
       tester.widget<TimerScreen>(find.byType(TimerScreen)).config.markerIds,
-      hasLength(MealIngredientCatalog.maxSelectableIngredientCount),
+      hasLength(ActivityMarkerCatalog.maxSelectableMarkerCount),
     );
   });
 
-  testWidgets(
-    'Selecting carrot and egg opens timer with selected ingredients',
-    (tester) async {
-      SharedPreferences.setMockInitialValues({});
-      addTearDown(() async {
-        await const ActiveActivityTimerSessionStore().clear();
-      });
-
-      await tester.pumpWidget(
-        MaterialApp(
-          locale: const Locale('ko'),
-          supportedLocales: const [Locale('ko'), Locale('en')],
-          localizationsDelegates: const [
-            GlobalMaterialLocalizations.delegate,
-            GlobalCupertinoLocalizations.delegate,
-            GlobalWidgetsLocalizations.delegate,
-          ],
-          home: HomeScreen(
-            config: ActivityTimerConfig.defaults().copyWith(
-              childName: '지율',
-              duration: const Duration(minutes: 25),
-            ),
-            activityProgressService: LocalActivityProgressService(),
-            onConfigChanged: (_) {},
-          ),
-        ),
-      );
-      await tester.pump();
-
-      final regularCourseButton = tester.widget<AppBouncyButton>(
-        find.ancestor(
-          of: find.textContaining('25분 보통 코스'),
-          matching: find.byType(AppBouncyButton),
-        ),
-      );
-      regularCourseButton.onPressed!();
-      await tester.pump();
-      await tester.pump(const Duration(milliseconds: 400));
-
-      final carrotChip = find.byKey(
-        const ValueKey('mealIngredientChip_carrot'),
-      );
-      tester.widget<ChoiceChip>(carrotChip).onSelected!(true);
-      await tester.pump();
-      final eggChip = find.byKey(const ValueKey('mealIngredientChip_egg'));
-      tester.widget<ChoiceChip>(eggChip).onSelected!(true);
-      await tester.pump();
-      final startSelectedButton = find.byKey(
-        const ValueKey('startSelectedMealIngredientsButton'),
-      );
-      tester.widget<FilledButton>(startSelectedButton).onPressed!();
-      await tester.pump();
-      await tester.pump(const Duration(milliseconds: 400));
-
-      expect(
-        tester.widget<TimerScreen>(find.byType(TimerScreen)).config.markerIds,
-        ['carrot', 'egg'],
-      );
-      expect(
-        tester
-            .widget<TimerScreen>(find.byType(TimerScreen))
-            .config
-            .selectedMarkerIds,
-        ['carrot', 'egg'],
-      );
-    },
-  );
-
-  testWidgets('Dismissing the ingredient picker does not open timer screen', (
+  testWidgets('Selecting brushing markers opens timer with selected markers', (
     tester,
   ) async {
     SharedPreferences.setMockInitialValues({});
@@ -2301,6 +2213,77 @@ void main() {
           config: ActivityTimerConfig.defaults().copyWith(
             childName: '지율',
             duration: const Duration(minutes: 25),
+            markerMode: ActivityMarkerMode.manual,
+          ),
+          activityProgressService: LocalActivityProgressService(),
+          onConfigChanged: (_) {},
+        ),
+      ),
+    );
+    await tester.pump();
+
+    final regularCourseButton = tester.widget<AppBouncyButton>(
+      find.ancestor(
+        of: find.textContaining('25분 보통 코스'),
+        matching: find.byType(AppBouncyButton),
+      ),
+    );
+    regularCourseButton.onPressed!();
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 400));
+
+    final topTeethChip = find.byKey(
+      const ValueKey('activityMarkerChip_top_teeth'),
+    );
+    tester.widget<ChoiceChip>(topTeethChip).onSelected!(true);
+    await tester.pump();
+    final bottomTeethChip = find.byKey(
+      const ValueKey('activityMarkerChip_bottom_teeth'),
+    );
+    tester.widget<ChoiceChip>(bottomTeethChip).onSelected!(true);
+    await tester.pump();
+    final startSelectedButton = find.byKey(
+      const ValueKey('startSelectedActivityMarkersButton'),
+    );
+    tester.widget<FilledButton>(startSelectedButton).onPressed!();
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 400));
+
+    expect(
+      tester.widget<TimerScreen>(find.byType(TimerScreen)).config.markerIds,
+      ['top_teeth', 'bottom_teeth'],
+    );
+    expect(
+      tester
+          .widget<TimerScreen>(find.byType(TimerScreen))
+          .config
+          .selectedMarkerIds,
+      ['top_teeth', 'bottom_teeth'],
+    );
+  });
+
+  testWidgets('Dismissing the marker picker does not open timer screen', (
+    tester,
+  ) async {
+    SharedPreferences.setMockInitialValues({});
+    addTearDown(() async {
+      await const ActiveActivityTimerSessionStore().clear();
+    });
+
+    await tester.pumpWidget(
+      MaterialApp(
+        locale: const Locale('ko'),
+        supportedLocales: const [Locale('ko'), Locale('en')],
+        localizationsDelegates: const [
+          GlobalMaterialLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+        ],
+        home: HomeScreen(
+          config: ActivityTimerConfig.defaults().copyWith(
+            childName: '지율',
+            duration: const Duration(minutes: 25),
+            markerMode: ActivityMarkerMode.manual,
           ),
           activityProgressService: LocalActivityProgressService(),
           onConfigChanged: (_) {},
@@ -2324,7 +2307,7 @@ void main() {
     await tester.pump(const Duration(milliseconds: 400));
 
     expect(
-      find.byKey(const ValueKey('mealIngredientPickerSheet')),
+      find.byKey(const ValueKey('activityMarkerPickerSheet')),
       findsNothing,
     );
     expect(find.byType(TimerScreen), findsNothing);
@@ -2382,6 +2365,7 @@ void main() {
           config: ActivityTimerConfig.defaults().copyWith(
             childName: '지율',
             duration: const Duration(minutes: 35),
+            markerMode: ActivityMarkerMode.manual,
           ),
           activityProgressService: LocalActivityProgressService(),
           onConfigChanged: (config) => changedConfig = config,
@@ -2400,13 +2384,13 @@ void main() {
     await tester.pump(const Duration(milliseconds: 400));
 
     expect(
-      find.byKey(const ValueKey('mealIngredientPickerSheet')),
+      find.byKey(const ValueKey('activityMarkerPickerSheet')),
       findsOneWidget,
     );
     expect(find.byType(TimerScreen), findsNothing);
 
     final randomStartButton = find.byKey(
-      const ValueKey('randomStartMealIngredientsButton'),
+      const ValueKey('randomStartActivityMarkersButton'),
     );
     tester.widget<OutlinedButton>(randomStartButton).onPressed!();
     await tester.pump();
@@ -2442,6 +2426,7 @@ void main() {
             config: ActivityTimerConfig.defaults().copyWith(
               childName: '지율',
               duration: const Duration(minutes: 35),
+              markerMode: ActivityMarkerMode.manual,
             ),
             activityProgressService: LocalActivityProgressService(),
             onConfigChanged: (config) => changedConfig = config,
@@ -2459,7 +2444,7 @@ void main() {
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 400));
       final randomStartButton = find.byKey(
-        const ValueKey('randomStartMealIngredientsButton'),
+        const ValueKey('randomStartActivityMarkersButton'),
       );
       tester.widget<OutlinedButton>(randomStartButton).onPressed!();
       await tester.pump();
@@ -3504,6 +3489,7 @@ void main() {
           config: ActivityTimerConfig.defaults().copyWith(
             childName: '지율',
             duration: const Duration(minutes: 25),
+            markerMode: ActivityMarkerMode.manual,
           ),
           activityProgressService: LocalActivityProgressService(),
           onConfigChanged: (config) => changedConfig = config,
@@ -3552,7 +3538,7 @@ void main() {
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 400));
     final randomStartButton = find.byKey(
-      const ValueKey('randomStartMealIngredientsButton'),
+      const ValueKey('randomStartActivityMarkersButton'),
     );
     tester.widget<OutlinedButton>(randomStartButton).onPressed!();
     await tester.pump();
@@ -4074,10 +4060,13 @@ void main() {
     },
   );
 
-  testWidgets('RoadView with 30 ingredients renders 30 ingredient markers', (
+  testWidgets('RoadView with 30 markers renders 30 activity markers', (
     tester,
   ) async {
-    final ingredients = MealIngredientCatalog.courseSlotsFor(['carrot', 'egg']);
+    final markers = ActivityMarkerCatalog.courseSlotsFor([
+      'top_teeth',
+      'bottom_teeth',
+    ]);
 
     await tester.pumpWidget(
       MaterialApp(
@@ -4088,25 +4077,23 @@ void main() {
             child: RoadView(
               progress: 0,
               vehicle: VehicleCatalog.fireTruck,
-              ingredients: ingredients,
+              markers: markers,
             ),
           ),
         ),
       ),
     );
 
-    for (var index = 0; index < ingredients.length; index += 1) {
-      expect(
-        find.byKey(ValueKey('roadIngredientMarker_$index')),
-        findsOneWidget,
-      );
+    for (var index = 0; index < markers.length; index += 1) {
+      expect(find.byKey(ValueKey('roadActivityMarker_$index')), findsOneWidget);
     }
   });
 
-  testWidgets('RoadView at progress 1 hides ingredient markers', (
-    tester,
-  ) async {
-    final ingredients = MealIngredientCatalog.courseSlotsFor(['carrot', 'egg']);
+  testWidgets('RoadView at progress 1 hides activity markers', (tester) async {
+    final markers = ActivityMarkerCatalog.courseSlotsFor([
+      'top_teeth',
+      'bottom_teeth',
+    ]);
 
     await tester.pumpWidget(
       MaterialApp(
@@ -4117,17 +4104,14 @@ void main() {
             child: RoadView(
               progress: 0,
               vehicle: VehicleCatalog.fireTruck,
-              ingredients: ingredients,
+              markers: markers,
             ),
           ),
         ),
       ),
     );
 
-    expect(
-      find.byKey(const ValueKey('roadIngredientMarker_0')),
-      findsOneWidget,
-    );
+    expect(find.byKey(const ValueKey('roadActivityMarker_0')), findsOneWidget);
 
     await tester.pumpWidget(
       MaterialApp(
@@ -4138,7 +4122,7 @@ void main() {
             child: RoadView(
               progress: 1,
               vehicle: VehicleCatalog.fireTruck,
-              ingredients: ingredients,
+              markers: markers,
             ),
           ),
         ),
@@ -4146,8 +4130,8 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    for (var index = 0; index < ingredients.length; index += 1) {
-      expect(find.byKey(ValueKey('roadIngredientMarker_$index')), findsNothing);
+    for (var index = 0; index < markers.length; index += 1) {
+      expect(find.byKey(ValueKey('roadActivityMarker_$index')), findsNothing);
     }
   });
 
@@ -4188,44 +4172,40 @@ void main() {
     await tester.pump();
   });
 
-  testWidgets(
-    'RoadView keeps long-course ingredient markers in the road layer',
-    (tester) async {
-      final ingredients = MealIngredientCatalog.courseSlotsFor([
-        'carrot',
-        'egg',
-      ]);
+  testWidgets('RoadView keeps long-course activity markers in the road layer', (
+    tester,
+  ) async {
+    final markers = ActivityMarkerCatalog.courseSlotsFor([
+      'top_teeth',
+      'bottom_teeth',
+    ]);
 
-      await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: SizedBox(
-              width: 420,
-              height: 640,
-              child: RoadView(
-                progress: 0.5,
-                vehicle: VehicleCatalog.fireTruck,
-                ingredients: ingredients,
-                ingredientClearProgress: 0,
-                courseDuration: const Duration(minutes: 60),
-              ),
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: SizedBox(
+            width: 420,
+            height: 640,
+            child: RoadView(
+              progress: 0.5,
+              vehicle: VehicleCatalog.fireTruck,
+              markers: markers,
+              markerClearProgress: 0,
+              courseDuration: const Duration(minutes: 60),
             ),
           ),
         ),
-      );
-      await tester.pump();
+      ),
+    );
+    await tester.pump();
 
-      for (var index = 0; index < ingredients.length; index += 1) {
-        expect(
-          find.byKey(ValueKey('roadIngredientMarker_$index')),
-          findsOneWidget,
-        );
-      }
+    for (var index = 0; index < markers.length; index += 1) {
+      expect(find.byKey(ValueKey('roadActivityMarker_$index')), findsOneWidget);
+    }
 
-      await tester.pumpWidget(const SizedBox.shrink());
-      await tester.pump();
-    },
-  );
+    await tester.pumpWidget(const SizedBox.shrink());
+    await tester.pump();
+  });
 
   test('RoadPainter roadStrokeWidthForSize stays within expected clamps', () {
     expect(roadStrokeWidthForSize(const Size(100, 640)), 22);
@@ -4925,15 +4905,13 @@ void main() {
     expect(roadView.avatar.rotationDegrees, 9.0);
   });
 
-  testWidgets('TimerScreen passes course ingredient ids to road ingredients', (
-    tester,
-  ) async {
+  testWidgets('TimerScreen passes marker ids to road markers', (tester) async {
     await tester.pumpWidget(
       MaterialApp(
         locale: const Locale('ko'),
         home: TimerScreen(
           config: ActivityTimerConfig.defaults().copyWith(
-            markerIds: const ['carrot', 'egg'],
+            markerIds: const ['top_teeth', 'bottom_teeth'],
           ),
           activityProgressService: LocalActivityProgressService(),
           onConfigChanged: (_) {},
@@ -4944,21 +4922,21 @@ void main() {
 
     final roadView = tester.widget<RoadView>(find.byType(RoadView));
     expect(
-      roadView.ingredients,
+      roadView.markers,
       hasLength(
-        MealIngredientCatalog.courseSlotCountForDuration(
+        ActivityMarkerCatalog.courseSlotCountForDuration(
           ActivityTimerConfig.defaults().duration,
         ),
       ),
     );
-    expect(roadView.ingredients.map((ingredient) => ingredient.id).toSet(), {
-      'carrot',
-      'egg',
+    expect(roadView.markers.map((marker) => marker.id).toSet(), {
+      'top_teeth',
+      'bottom_teeth',
     });
     expect(tester.takeException(), isNull);
   });
 
-  testWidgets('TimerScreen hides road ingredients when course mode is off', (
+  testWidgets('TimerScreen hides road markers when marker mode is off', (
     tester,
   ) async {
     await tester.pumpWidget(
@@ -4977,7 +4955,7 @@ void main() {
     await tester.pump();
 
     final roadView = tester.widget<RoadView>(find.byType(RoadView));
-    expect(roadView.ingredients, isEmpty);
+    expect(roadView.markers, isEmpty);
     expect(tester.takeException(), isNull);
   });
 
@@ -5405,7 +5383,7 @@ void main() {
     await tester.pump();
   });
 
-  testWidgets('Timer records directly selected ingredients on completion', (
+  testWidgets('Timer records directly selected markers on completion', (
     tester,
   ) async {
     SharedPreferences.setMockInitialValues({});
@@ -5420,8 +5398,8 @@ void main() {
           config: ActivityTimerConfig.defaults().copyWith(
             duration: const Duration(seconds: 1),
             markerMode: ActivityMarkerMode.manual,
-            markerIds: const ['carrot', 'egg'],
-            selectedMarkerIds: const ['carrot', 'egg'],
+            markerIds: const ['top_teeth', 'bottom_teeth'],
+            selectedMarkerIds: const ['top_teeth', 'bottom_teeth'],
           ),
           activityProgressService: service,
           now: () => now,
@@ -5440,7 +5418,10 @@ void main() {
     await tester.pump();
 
     final snapshot = await service.loadSnapshot();
-    expect(snapshot.history.single.selectedMarkerIds, ['carrot', 'egg']);
+    expect(snapshot.history.single.selectedMarkerIds, [
+      'top_teeth',
+      'bottom_teeth',
+    ]);
 
     await tester.pumpWidget(const SizedBox.shrink());
     await tester.pump();
@@ -6524,17 +6505,23 @@ void main() {
     );
   });
 
-  test('Meal history stores directly selected ingredient ids', () async {
+  test('Activity history stores directly selected marker ids', () async {
     SharedPreferences.setMockInitialValues({});
 
     final service = LocalActivityProgressService();
     final recordedSession = await service.recordActivityResult(
-      _activityResult(selectedMarkerIds: const ['carrot', 'egg']),
+      _activityResult(selectedMarkerIds: const ['top_teeth', 'bottom_teeth']),
     );
     final snapshot = await service.loadSnapshot();
 
-    expect(recordedSession.entry.selectedMarkerIds, ['carrot', 'egg']);
-    expect(snapshot.history.single.selectedMarkerIds, ['carrot', 'egg']);
+    expect(recordedSession.entry.selectedMarkerIds, [
+      'top_teeth',
+      'bottom_teeth',
+    ]);
+    expect(snapshot.history.single.selectedMarkerIds, [
+      'top_teeth',
+      'bottom_teeth',
+    ]);
 
     final preferences = await SharedPreferences.getInstance();
     final rawHistory = preferences.getStringList('activityHistory');
@@ -6548,7 +6535,7 @@ void main() {
     );
     expect(historyJson['activityId'], ActivityCatalog.defaultActivity.id);
     expect(historyJson['completedBeforeEnd'], isFalse);
-    expect(historyJson['selectedMarkerIds'], ['carrot', 'egg']);
+    expect(historyJson['selectedMarkerIds'], ['top_teeth', 'bottom_teeth']);
     expect(historyJson.containsKey('completedBeforeArrival'), isFalse);
     expect(historyJson.containsKey('mealCompleted'), isFalse);
     expect(historyJson.containsKey('selectedIngredientIds'), isFalse);
@@ -7193,7 +7180,7 @@ void main() {
     expect((await service.loadSnapshot()).history, hasLength(1));
   });
 
-  testWidgets('Meal history screen shows directly selected ingredients', (
+  testWidgets('Meal history screen shows directly selected markers', (
     tester,
   ) async {
     SharedPreferences.setMockInitialValues({});
@@ -7203,7 +7190,7 @@ void main() {
         startedAt: DateTime(2026, 5, 4, 12),
         targetDuration: const Duration(minutes: 20),
         actualDuration: const Duration(minutes: 20),
-        selectedMarkerIds: const ['carrot', 'egg'],
+        selectedMarkerIds: const ['top_teeth', 'bottom_teeth'],
       ),
     );
 
@@ -7220,8 +7207,8 @@ void main() {
     expect(find.byKey(const ValueKey('mealHistoryHelpCard')), findsOneWidget);
     expect(find.text('식사 기록 안내'), findsOneWidget);
     expect(find.text('고른 식재료'), findsOneWidget);
-    expect(find.text('당근'), findsOneWidget);
-    expect(find.text('달걀'), findsOneWidget);
+    expect(find.text('윗니'), findsOneWidget);
+    expect(find.text('아랫니'), findsOneWidget);
   });
 
   testWidgets('Meal history screen shows incomplete meal records', (

@@ -1,84 +1,102 @@
 import 'package:flutter/material.dart';
 
-import '../catalogs/meal_ingredient_catalog.dart';
+import '../catalogs/activity_marker_catalog.dart';
 import '../l10n/app_texts.dart';
-import '../models/meal_ingredient.dart';
+import '../models/activity_marker.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_radius.dart';
 import '../theme/app_shadows.dart';
 import '../theme/app_spacing.dart';
 import 'app/app_help_sheet.dart';
 
-sealed class MealIngredientPickerResult {
-  const MealIngredientPickerResult();
+sealed class ActivityMarkerPickerResult {
+  const ActivityMarkerPickerResult();
 }
 
-class RandomMealIngredients extends MealIngredientPickerResult {
-  const RandomMealIngredients();
+class RandomActivityMarkers extends ActivityMarkerPickerResult {
+  const RandomActivityMarkers();
 }
 
-class SelectedMealIngredients extends MealIngredientPickerResult {
-  SelectedMealIngredients(List<String> ingredientIds)
-    : ingredientIds = List.unmodifiable(ingredientIds);
+class SelectedActivityMarkers extends ActivityMarkerPickerResult {
+  SelectedActivityMarkers(List<String> markerIds)
+    : markerIds = List.unmodifiable(markerIds);
 
-  final List<String> ingredientIds;
+  final List<String> markerIds;
 }
 
-class MealIngredientPickerSheet extends StatefulWidget {
-  const MealIngredientPickerSheet({
+class ActivityMarkerPickerSheet extends StatefulWidget {
+  const ActivityMarkerPickerSheet({
     super.key,
+    required this.activityId,
     this.initialSelectedIds = const [],
   });
 
+  final String activityId;
   final List<String> initialSelectedIds;
 
   @override
-  State<MealIngredientPickerSheet> createState() =>
-      _MealIngredientPickerSheetState();
+  State<ActivityMarkerPickerSheet> createState() =>
+      _ActivityMarkerPickerSheetState();
 }
 
-class _MealIngredientPickerSheetState extends State<MealIngredientPickerSheet> {
+class _ActivityMarkerPickerSheetState extends State<ActivityMarkerPickerSheet> {
   late final Set<String> _selectedIds = _validInitialSelectedIds();
+
+  late final List<ActivityMarkerDefinition> _availableMarkers =
+      _markersForActivity();
+
+  List<ActivityMarkerDefinition> _markersForActivity() {
+    final activityMarkerIds = ActivityMarkerCatalog.markerIdsForActivity(
+      widget.activityId,
+    );
+    final candidateIds = activityMarkerIds.isEmpty
+        ? ActivityMarkerCatalog.defaultSelectionIds
+        : activityMarkerIds;
+    return List.unmodifiable(
+      candidateIds.map(ActivityMarkerCatalog.findById).nonNulls,
+    );
+  }
 
   Set<String> _validInitialSelectedIds() {
     final selectedIds = <String>{};
+    final availableIds = _availableMarkers.map((marker) => marker.id).toSet();
     for (final id in widget.initialSelectedIds) {
       if (selectedIds.length >=
-          MealIngredientCatalog.maxSelectableIngredientCount) {
+          ActivityMarkerCatalog.maxSelectableMarkerCount) {
         break;
       }
-      if (MealIngredientCatalog.findById(id) != null) {
+      if (availableIds.contains(id)) {
         selectedIds.add(id);
       }
     }
     return selectedIds;
   }
 
-  void _toggleIngredient(MealIngredientDefinition ingredient) {
+  void _toggleMarker(ActivityMarkerDefinition marker) {
     setState(() {
-      if (_selectedIds.contains(ingredient.id)) {
-        _selectedIds.remove(ingredient.id);
+      if (_selectedIds.contains(marker.id)) {
+        _selectedIds.remove(marker.id);
         return;
       }
       if (_selectedIds.length <
-          MealIngredientCatalog.maxSelectableIngredientCount) {
-        _selectedIds.add(ingredient.id);
+          ActivityMarkerCatalog.maxSelectableMarkerCount) {
+        _selectedIds.add(marker.id);
       }
     });
   }
 
   void _startRandom() {
-    Navigator.of(context).pop(const RandomMealIngredients());
+    Navigator.of(context).pop(const RandomActivityMarkers());
   }
 
   void _startSelected() {
     if (_selectedIds.isEmpty) {
       return;
     }
-    Navigator.of(context).pop(SelectedMealIngredients(_selectedIds.toList()));
+    Navigator.of(context).pop(SelectedActivityMarkers(_selectedIds.toList()));
   }
 
-  void _showIngredientHelp() {
+  void _showMarkerHelp() {
     final texts = AppTexts.of(context).mealIngredient;
     showAppHelpSheet(
       context: context,
@@ -92,7 +110,7 @@ class _MealIngredientPickerSheetState extends State<MealIngredientPickerSheet> {
   Widget build(BuildContext context) {
     final texts = AppTexts.of(context).mealIngredient;
     final textTheme = Theme.of(context).textTheme;
-    final maxCount = MealIngredientCatalog.maxSelectableIngredientCount;
+    final maxCount = ActivityMarkerCatalog.maxSelectableMarkerCount;
     final mediaQuery = MediaQuery.of(context);
 
     return Align(
@@ -122,7 +140,7 @@ class _MealIngredientPickerSheetState extends State<MealIngredientPickerSheet> {
               ),
               child: SingleChildScrollView(
                 child: Column(
-                  key: const ValueKey('mealIngredientPickerSheet'),
+                  key: const ValueKey('activityMarkerPickerSheet'),
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
@@ -163,9 +181,9 @@ class _MealIngredientPickerSheetState extends State<MealIngredientPickerSheet> {
                                 alignment: Alignment.centerLeft,
                                 child: TextButton.icon(
                                   key: const ValueKey(
-                                    'mealIngredientPickerHelpButton',
+                                    'activityMarkerPickerHelpButton',
                                   ),
-                                  onPressed: _showIngredientHelp,
+                                  onPressed: _showMarkerHelp,
                                   icon: const Icon(
                                     Icons.help_outline_rounded,
                                     size: 18,
@@ -214,14 +232,14 @@ class _MealIngredientPickerSheetState extends State<MealIngredientPickerSheet> {
                       spacing: AppSpacing.sm,
                       runSpacing: AppSpacing.sm,
                       children: [
-                        for (final ingredient in MealIngredientCatalog.all)
-                          _IngredientChoiceChip(
-                            ingredient: ingredient,
-                            isSelected: _selectedIds.contains(ingredient.id),
+                        for (final marker in _availableMarkers)
+                          _MarkerChoiceChip(
+                            marker: marker,
+                            isSelected: _selectedIds.contains(marker.id),
                             isEnabled:
-                                _selectedIds.contains(ingredient.id) ||
+                                _selectedIds.contains(marker.id) ||
                                 _selectedIds.length < maxCount,
-                            onSelected: () => _toggleIngredient(ingredient),
+                            onSelected: () => _toggleMarker(marker),
                           ),
                       ],
                     ),
@@ -231,7 +249,7 @@ class _MealIngredientPickerSheetState extends State<MealIngredientPickerSheet> {
                         Expanded(
                           child: OutlinedButton.icon(
                             key: const ValueKey(
-                              'randomStartMealIngredientsButton',
+                              'randomStartActivityMarkersButton',
                             ),
                             onPressed: _startRandom,
                             icon: const Icon(Icons.shuffle_rounded),
@@ -242,7 +260,7 @@ class _MealIngredientPickerSheetState extends State<MealIngredientPickerSheet> {
                         Expanded(
                           child: FilledButton.icon(
                             key: const ValueKey(
-                              'startSelectedMealIngredientsButton',
+                              'startSelectedActivityMarkersButton',
                             ),
                             onPressed: _selectedIds.isEmpty
                                 ? null
@@ -264,30 +282,30 @@ class _MealIngredientPickerSheetState extends State<MealIngredientPickerSheet> {
   }
 }
 
-class _IngredientChoiceChip extends StatelessWidget {
-  const _IngredientChoiceChip({
-    required this.ingredient,
+class _MarkerChoiceChip extends StatelessWidget {
+  const _MarkerChoiceChip({
+    required this.marker,
     required this.isSelected,
     required this.isEnabled,
     required this.onSelected,
   });
 
-  final MealIngredientDefinition ingredient;
+  final ActivityMarkerDefinition marker;
   final bool isSelected;
   final bool isEnabled;
   final VoidCallback onSelected;
 
   @override
   Widget build(BuildContext context) {
-    final label = ingredient.labelForLanguage(
+    final label = marker.labelForLanguage(
       Localizations.localeOf(context).languageCode,
     );
 
     return ChoiceChip(
-      key: ValueKey('mealIngredientChip_${ingredient.id}'),
+      key: ValueKey('activityMarkerChip_${marker.id}'),
       selected: isSelected,
       onSelected: isEnabled ? (_) => onSelected() : null,
-      avatar: _IngredientChipAvatar(ingredient: ingredient),
+      avatar: _MarkerChipAvatar(marker: marker),
       label: Text(label),
       labelStyle: Theme.of(context).textTheme.labelLarge?.copyWith(
         color: isSelected ? AppColors.textStrong : AppColors.textPrimary,
@@ -304,16 +322,16 @@ class _IngredientChoiceChip extends StatelessWidget {
   }
 }
 
-class _IngredientChipAvatar extends StatelessWidget {
-  const _IngredientChipAvatar({required this.ingredient});
+class _MarkerChipAvatar extends StatelessWidget {
+  const _MarkerChipAvatar({required this.marker});
 
-  final MealIngredientDefinition ingredient;
+  final ActivityMarkerDefinition marker;
 
   @override
   Widget build(BuildContext context) {
-    final assetPath = ingredient.assetPath;
+    final assetPath = marker.assetPath;
     if (assetPath == null) {
-      return Text(ingredient.emoji);
+      return Text(marker.emoji);
     }
 
     return SizedBox(
@@ -321,10 +339,10 @@ class _IngredientChipAvatar extends StatelessWidget {
       height: 22,
       child: Image.asset(
         assetPath,
-        key: ValueKey('mealIngredientChipImage_${ingredient.id}'),
+        key: ValueKey('activityMarkerChipImage_${marker.id}'),
         fit: BoxFit.contain,
         errorBuilder: (context, error, stackTrace) {
-          return Center(child: Text(ingredient.emoji));
+          return Center(child: Text(marker.emoji));
         },
       ),
     );
