@@ -651,7 +651,6 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
                 final quickStart = _ActivityQuickStartSection(
                   title: texts.home.activityQuickStartTitle,
                   activities: ActivityCatalog.all,
-                  selectedActivityId: _config.activityId,
                   languageCode: languageCode,
                   durationLabel: texts.home.minuteLabel,
                   customTimerTitle: texts.home.customTimerTitle,
@@ -1146,7 +1145,6 @@ class _ActivityQuickStartSection extends StatelessWidget {
   const _ActivityQuickStartSection({
     required this.title,
     required this.activities,
-    required this.selectedActivityId,
     required this.languageCode,
     required this.durationLabel,
     required this.customTimerTitle,
@@ -1156,7 +1154,6 @@ class _ActivityQuickStartSection extends StatelessWidget {
 
   final String title;
   final List<ActivityDefinition> activities;
-  final String selectedActivityId;
   final String languageCode;
   final String Function(int minutes) durationLabel;
   final String customTimerTitle;
@@ -1208,17 +1205,21 @@ class _ActivityQuickStartSection extends StatelessWidget {
                   children: [
                     for (final activity in activities) ...[
                       SizedBox(
-                        width: columns == 1 ? constraints.maxWidth : itemWidth,
+                        width:
+                            activity.id == ActivityCatalog.custom.id ||
+                                columns == 1
+                            ? constraints.maxWidth
+                            : itemWidth,
                         child: _ActivityQuickStartCard(
                           activity: activity,
                           label: activity.id == ActivityCatalog.custom.id
                               ? customTimerTitle
                               : activity.labelForLanguage(languageCode),
-                          isSelected: activity.id == selectedActivityId,
                           durationLabel: durationLabel(
                             activity.defaultDuration.inMinutes,
                           ),
                           startLabel: startLabel,
+                          isWide: activity.id == ActivityCatalog.custom.id,
                           onPressed: () => onStartActivity(activity),
                         ),
                       ),
@@ -1238,28 +1239,29 @@ class _ActivityQuickStartCard extends StatelessWidget {
   const _ActivityQuickStartCard({
     required this.activity,
     required this.label,
-    required this.isSelected,
     required this.durationLabel,
     required this.startLabel,
+    required this.isWide,
     required this.onPressed,
   });
 
   final ActivityDefinition activity;
   final String label;
-  final bool isSelected;
   final String durationLabel;
   final String startLabel;
+  final bool isWide;
   final VoidCallback onPressed;
 
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
+    final isCustomTimer = activity.id == ActivityCatalog.custom.id;
 
     return Material(
       key: ValueKey('activityQuickStartCard_${activity.id}'),
-      color: isSelected
-          ? AppColors.surfaceYellow.withValues(alpha: 0.72)
-          : AppColors.white.withValues(alpha: 0.72),
+      color: isCustomTimer
+          ? AppColors.white.withValues(alpha: 0.88)
+          : AppColors.white.withValues(alpha: 0.82),
       borderRadius: AppRadius.compactCard,
       clipBehavior: Clip.antiAlias,
       child: InkWell(
@@ -1269,72 +1271,191 @@ class _ActivityQuickStartCard extends StatelessWidget {
           decoration: BoxDecoration(
             borderRadius: AppRadius.compactCard,
             border: Border.all(
-              color: isSelected ? AppColors.primary : AppColors.borderSoft,
-              width: isSelected ? 1.6 : 1,
+              color: isCustomTimer
+                  ? AppColors.primarySoft.withValues(alpha: 0.92)
+                  : AppColors.borderSoft,
+              width: isCustomTimer ? 1.2 : 1,
             ),
           ),
           child: Padding(
             padding: const EdgeInsets.all(AppSpacing.md),
             child: ConstrainedBox(
-              constraints: const BoxConstraints(minHeight: 126),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      DecoratedBox(
-                        decoration: BoxDecoration(
-                          color: AppColors.surfaceSoft,
-                          borderRadius: AppRadius.pill,
-                        ),
-                        child: SizedBox(
-                          width: 42,
-                          height: 42,
-                          child: Center(
-                            child: Text(
-                              activity.emoji,
-                              textScaler: TextScaler.noScaling,
-                              style: const TextStyle(fontSize: 25, height: 1),
-                            ),
+              constraints: BoxConstraints(minHeight: isWide ? 64 : 96),
+              child: isWide
+                  ? Row(
+                      children: [
+                        _ActivityEmojiBadge(emoji: activity.emoji),
+                        const SizedBox(width: AppSpacing.md),
+                        Expanded(
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                label,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: textTheme.titleSmall?.copyWith(
+                                  color: AppColors.textStrong,
+                                  fontWeight: FontWeight.w900,
+                                  height: 1.12,
+                                ),
+                              ),
+                              const SizedBox(height: AppSpacing.xs),
+                              _ActivityDurationPill(
+                                durationLabel: durationLabel,
+                              ),
+                            ],
                           ),
                         ),
-                      ),
-                      const SizedBox(width: AppSpacing.sm),
-                      Expanded(
-                        child: Text(
+                        const SizedBox(width: AppSpacing.md),
+                        _ActivityStartIconButton(
+                          key: ValueKey('activityStartButton_${activity.id}'),
+                          label: startLabel,
+                          onPressed: onPressed,
+                        ),
+                      ],
+                    )
+                  : Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            _ActivityEmojiBadge(emoji: activity.emoji),
+                            _ActivityStartIconButton(
+                              key: ValueKey(
+                                'activityStartButton_${activity.id}',
+                              ),
+                              label: startLabel,
+                              onPressed: onPressed,
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: AppSpacing.sm),
+                        Text(
                           label,
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                           style: textTheme.titleSmall?.copyWith(
                             color: AppColors.textStrong,
                             fontWeight: FontWeight.w900,
-                            height: 1.15,
+                            height: 1.12,
                           ),
                         ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: AppSpacing.sm),
-                  Text(
-                    durationLabel,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: textTheme.bodySmall?.copyWith(
-                      color: AppColors.textSecondary,
-                      fontWeight: FontWeight.w700,
+                        const SizedBox(height: AppSpacing.xs),
+                        _ActivityDurationPill(durationLabel: durationLabel),
+                      ],
                     ),
-                  ),
-                  const SizedBox(height: AppSpacing.md),
-                  AppBouncyButton(
-                    key: ValueKey('activityStartButton_${activity.id}'),
-                    label: startLabel,
-                    icon: Icons.play_arrow_rounded,
-                    onPressed: onPressed,
-                    variant: AppButtonVariant.soft,
-                    size: AppButtonSize.compact,
-                    minHeight: 38,
-                  ),
-                ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _ActivityEmojiBadge extends StatelessWidget {
+  const _ActivityEmojiBadge({required this.emoji});
+
+  final String emoji;
+
+  @override
+  Widget build(BuildContext context) {
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: AppColors.surfaceSoft,
+        borderRadius: AppRadius.pill,
+      ),
+      child: SizedBox(
+        width: 40,
+        height: 40,
+        child: Center(
+          child: Text(
+            emoji,
+            textScaler: TextScaler.noScaling,
+            style: const TextStyle(fontSize: 24, height: 1),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _ActivityDurationPill extends StatelessWidget {
+  const _ActivityDurationPill({required this.durationLabel});
+
+  final String durationLabel;
+
+  @override
+  Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
+
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: AppColors.surfaceWarm,
+        borderRadius: AppRadius.pill,
+        border: Border.all(color: AppColors.borderSoft),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.sm,
+          vertical: 5,
+        ),
+        child: Text(
+          durationLabel,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: textTheme.labelSmall?.copyWith(
+            color: AppColors.textSecondary,
+            fontWeight: FontWeight.w900,
+            height: 1,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _ActivityStartIconButton extends StatelessWidget {
+  const _ActivityStartIconButton({
+    super.key,
+    required this.label,
+    required this.onPressed,
+  });
+
+  final String label;
+  final VoidCallback onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    return Tooltip(
+      message: label,
+      child: Semantics(
+        button: true,
+        label: label,
+        child: DecoratedBox(
+          decoration: BoxDecoration(
+            color: AppColors.primarySoft,
+            borderRadius: AppRadius.pill,
+            border: Border.all(color: AppColors.borderWarm),
+            boxShadow: AppShadows.buttonSoft,
+          ),
+          child: Material(
+            color: AppColors.transparent,
+            borderRadius: AppRadius.pill,
+            clipBehavior: Clip.antiAlias,
+            child: InkWell(
+              onTap: onPressed,
+              borderRadius: AppRadius.pill,
+              child: const SizedBox(
+                width: 40,
+                height: 40,
+                child: Icon(
+                  Icons.play_arrow_rounded,
+                  color: AppColors.brown900,
+                  size: 24,
+                ),
               ),
             ),
           ),
