@@ -1,4 +1,4 @@
-package com.moonkong.tickyrider
+package com.moonkong.timeyrider
 
 import io.flutter.embedding.android.FlutterActivity
 

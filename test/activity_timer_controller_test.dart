@@ -1,9 +1,9 @@
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:ticky_rider/controllers/activity_timer_controller.dart';
-import 'package:ticky_rider/models/active_activity_timer_session.dart';
-import 'package:ticky_rider/models/activity_completion_status.dart';
-import 'package:ticky_rider/models/activity_timer_config.dart';
+import 'package:timey_rider/controllers/activity_timer_controller.dart';
+import 'package:timey_rider/models/active_activity_timer_session.dart';
+import 'package:timey_rider/models/activity_completion_status.dart';
+import 'package:timey_rider/models/activity_timer_config.dart';
 
 void main() {
   test(

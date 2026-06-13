@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:ticky_rider/catalogs/activity_catalog.dart';
-import 'package:ticky_rider/models/activity_completion_status.dart';
-import 'package:ticky_rider/models/activity_session_result.dart';
+import 'package:timey_rider/catalogs/activity_catalog.dart';
+import 'package:timey_rider/models/activity_completion_status.dart';
+import 'package:timey_rider/models/activity_session_result.dart';
 
 void main() {
   test('ActivityCatalog.findById returns matching activity', () {

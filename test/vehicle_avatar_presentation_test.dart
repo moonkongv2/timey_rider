@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:ticky_rider/models/activity_timer_config.dart';
-import 'package:ticky_rider/models/vehicle_avatar_presentation.dart';
+import 'package:timey_rider/models/activity_timer_config.dart';
+import 'package:timey_rider/models/vehicle_avatar_presentation.dart';
 
 void main() {
   test(

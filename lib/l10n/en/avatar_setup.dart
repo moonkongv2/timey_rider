@@ -22,7 +22,7 @@ class EnAvatarSetupTexts implements AvatarSetupTextSet {
   String get vehicleSelectionTitle => 'Vehicle for this avatar';
   String get vehicleSelectionSubtitle => 'Prompt reference';
   String get compositePreviewTitle => 'Composite preview';
-  String get compositePreviewSubtitle => 'Use this look for Ticky Rider?';
+  String get compositePreviewSubtitle => 'Use this look for Timey Rider?';
   String get defaultPreviewTitle => 'Default image preview';
   String get useDefaultImageButton => 'Use default image';
   String get adjustmentTitle => 'Adjust avatar position';
@@ -55,6 +55,6 @@ class EnAvatarSetupTexts implements AvatarSetupTextSet {
   String get selectedImageFallback => 'Selected avatar image';
   String get privacyNote =>
       "This app does not generate AI images or upload your child's photo itself.\n"
-      'Create the image with an external AI service you choose, then upload only the finished avatar image to Ticky Rider.\n'
+      'Create the image with an external AI service you choose, then upload only the finished avatar image to Timey Rider.\n'
       'Check the photo and privacy policies before using an external service.';
 }

@@ -10,7 +10,7 @@ class EnUserGuideTexts implements UserGuideTextSet {
       'Review activity missions, cheer videos, and sticker rules.';
   String get introTitle => 'Parent Guide';
   String get introBody =>
-      'Use this guide to understand Ticky Rider activity missions and app rules before starting a ride. This guide is for parents and other caregivers helping with daily routines.';
+      'Use this guide to understand Timey Rider activity missions and app rules before starting a ride. This guide is for parents and other caregivers helping with daily routines.';
   String get basicFlowTitle => startMissionTitle;
   String get markersTitle => courseMarkersTitle;
   String get motivationTitle => 'Motivation videos';
@@ -18,9 +18,9 @@ class EnUserGuideTexts implements UserGuideTextSet {
   String get historyTitle => historyRewardsTitle;
   String get guardianTipsTitle => 'Parent tips';
 
-  String get whatIsTickyRiderTitle => 'What is Ticky Rider?';
-  List<String> get whatIsTickyRiderItems => const [
-    'Ticky Rider turns routines like brushing teeth, reading, cleanup, and play time into small riding missions.',
+  String get whatIsTimeyRiderTitle => 'What is Timey Rider?';
+  List<String> get whatIsTimeyRiderItems => const [
+    'Timey Rider turns routines like brushing teeth, reading, cleanup, and play time into small riding missions.',
     'Children choose a vehicle and follow the course for the set timer duration.',
     'At the end, each activity is recorded through its completion mode: confirm done, time ended, or parent check.',
   ];

@@ -10,47 +10,47 @@ import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:video_player/video_player.dart';
 
-import 'package:ticky_rider/catalogs/activity_catalog.dart';
-import 'package:ticky_rider/catalogs/activity_marker_catalog.dart';
-import 'package:ticky_rider/catalogs/avatar_prompt_catalog.dart';
-import 'package:ticky_rider/catalogs/motivation_asset_catalog.dart';
-import 'package:ticky_rider/catalogs/vehicle_catalog.dart';
-import 'package:ticky_rider/l10n/app_texts.dart';
-import 'package:ticky_rider/main.dart' as app;
-import 'package:ticky_rider/models/active_activity_timer_session.dart';
-import 'package:ticky_rider/models/activity_completion_status.dart';
-import 'package:ticky_rider/models/activity_session_result.dart';
-import 'package:ticky_rider/models/activity_timer_config.dart';
-import 'package:ticky_rider/models/reward_goal.dart';
-import 'package:ticky_rider/models/reward_item.dart';
-import 'package:ticky_rider/models/vehicle.dart';
-import 'package:ticky_rider/models/vehicle_avatar_presentation.dart';
-import 'package:ticky_rider/screens/avatar_setup_screen.dart';
-import 'package:ticky_rider/screens/home_screen.dart';
-import 'package:ticky_rider/screens/activity_history_screen.dart';
-import 'package:ticky_rider/screens/reward_goal_screen.dart';
-import 'package:ticky_rider/screens/result_screen.dart';
-import 'package:ticky_rider/screens/settings_screen.dart';
-import 'package:ticky_rider/screens/timer_screen.dart';
-import 'package:ticky_rider/screens/user_guide_screen.dart';
-import 'package:ticky_rider/services/active_activity_timer_session_store.dart';
-import 'package:ticky_rider/services/avatar_image_picker.dart';
-import 'package:ticky_rider/services/local_avatar_image_service.dart';
-import 'package:ticky_rider/services/local_activity_progress_service.dart';
-import 'package:ticky_rider/services/local_settings_service.dart';
-import 'package:ticky_rider/services/motivation_audio_service.dart';
-import 'package:ticky_rider/services/orientation_service.dart';
-import 'package:ticky_rider/services/screen_awake_service.dart';
-import 'package:ticky_rider/utils/motivation_video_schedule.dart'
+import 'package:timey_rider/catalogs/activity_catalog.dart';
+import 'package:timey_rider/catalogs/activity_marker_catalog.dart';
+import 'package:timey_rider/catalogs/avatar_prompt_catalog.dart';
+import 'package:timey_rider/catalogs/motivation_asset_catalog.dart';
+import 'package:timey_rider/catalogs/vehicle_catalog.dart';
+import 'package:timey_rider/l10n/app_texts.dart';
+import 'package:timey_rider/main.dart' as app;
+import 'package:timey_rider/models/active_activity_timer_session.dart';
+import 'package:timey_rider/models/activity_completion_status.dart';
+import 'package:timey_rider/models/activity_session_result.dart';
+import 'package:timey_rider/models/activity_timer_config.dart';
+import 'package:timey_rider/models/reward_goal.dart';
+import 'package:timey_rider/models/reward_item.dart';
+import 'package:timey_rider/models/vehicle.dart';
+import 'package:timey_rider/models/vehicle_avatar_presentation.dart';
+import 'package:timey_rider/screens/avatar_setup_screen.dart';
+import 'package:timey_rider/screens/home_screen.dart';
+import 'package:timey_rider/screens/activity_history_screen.dart';
+import 'package:timey_rider/screens/reward_goal_screen.dart';
+import 'package:timey_rider/screens/result_screen.dart';
+import 'package:timey_rider/screens/settings_screen.dart';
+import 'package:timey_rider/screens/timer_screen.dart';
+import 'package:timey_rider/screens/user_guide_screen.dart';
+import 'package:timey_rider/services/active_activity_timer_session_store.dart';
+import 'package:timey_rider/services/avatar_image_picker.dart';
+import 'package:timey_rider/services/local_avatar_image_service.dart';
+import 'package:timey_rider/services/local_activity_progress_service.dart';
+import 'package:timey_rider/services/local_settings_service.dart';
+import 'package:timey_rider/services/motivation_audio_service.dart';
+import 'package:timey_rider/services/orientation_service.dart';
+import 'package:timey_rider/services/screen_awake_service.dart';
+import 'package:timey_rider/utils/motivation_video_schedule.dart'
     as motivation_schedule;
-import 'package:ticky_rider/widgets/app/app_bouncy_button.dart';
-import 'package:ticky_rider/widgets/avatar/avatar_composite_preview.dart';
-import 'package:ticky_rider/widgets/road_painter.dart';
-import 'package:ticky_rider/widgets/road_view.dart';
-import 'package:ticky_rider/widgets/reward_sticker_image.dart';
-import 'package:ticky_rider/widgets/timer_control_bar.dart';
-import 'package:ticky_rider/widgets/vehicle_selection_card.dart';
-import 'package:ticky_rider/widgets/vehicle_widget.dart';
+import 'package:timey_rider/widgets/app/app_bouncy_button.dart';
+import 'package:timey_rider/widgets/avatar/avatar_composite_preview.dart';
+import 'package:timey_rider/widgets/road_painter.dart';
+import 'package:timey_rider/widgets/road_view.dart';
+import 'package:timey_rider/widgets/reward_sticker_image.dart';
+import 'package:timey_rider/widgets/timer_control_bar.dart';
+import 'package:timey_rider/widgets/vehicle_selection_card.dart';
+import 'package:timey_rider/widgets/vehicle_widget.dart';
 
 void main() {
   test('Default config uses default avatar image settings', () {
@@ -1634,7 +1634,7 @@ void main() {
 
     await _startApp(tester, const Locale('ko'), completeChildNameSetup: false);
 
-    expect(find.text('누가 Ticky Rider를 탈까?'), findsOneWidget);
+    expect(find.text('누가 Timey Rider를 탈까?'), findsOneWidget);
     expect(find.text('이름 저장'), findsOneWidget);
 
     await tester.enterText(find.byType(TextField), '민준');
@@ -2943,7 +2943,7 @@ void main() {
     expect(find.widgetWithText(FilledButton, '다시 업로드'), findsOneWidget);
     await _scrollAvatarCompositeIntoView(tester);
     expect(find.text('합성 미리보기'), findsOneWidget);
-    expect(find.text('이 모습으로 Ticky Rider를 탈까요?'), findsOneWidget);
+    expect(find.text('이 모습으로 Timey Rider를 탈까요?'), findsOneWidget);
   });
 
   testWidgets('Avatar setup initializes from custom config', (tester) async {
@@ -3359,7 +3359,7 @@ void main() {
       find.text('Review activity missions, cheer videos, and sticker rules.'),
       findsOneWidget,
     );
-    expect(find.text('What is Ticky Rider?'), findsOneWidget);
+    expect(find.text('What is Timey Rider?'), findsOneWidget);
 
     await tester.scrollUntilVisible(
       find.text('Course markers'),

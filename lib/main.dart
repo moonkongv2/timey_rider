@@ -18,7 +18,7 @@ Future<void> main() async {
   final initialConfig = await settingsService.loadConfig();
 
   runApp(
-    TickyRiderApp(
+    TimeyRiderApp(
       settingsService: settingsService,
       activityProgressService: activityProgressService,
       activeSessionStore: activeSessionStore,

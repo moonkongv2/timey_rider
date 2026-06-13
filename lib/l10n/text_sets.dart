@@ -189,8 +189,8 @@ abstract interface class UserGuideTextSet {
   String get resultRewardsTitle;
   String get historyTitle;
   String get guardianTipsTitle;
-  String get whatIsTickyRiderTitle;
-  List<String> get whatIsTickyRiderItems;
+  String get whatIsTimeyRiderTitle;
+  List<String> get whatIsTimeyRiderItems;
   String get startMissionTitle;
   List<String> get startMissionItems;
   String get courseMarkersTitle;

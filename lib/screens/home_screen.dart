@@ -36,7 +36,6 @@ import 'sticker_collection_screen.dart';
 import 'timer_screen.dart';
 
 const _settingsIconAssetPath = 'assets/images/icon_setting_rgba.png';
-const _homeLogoAssetPath = 'assets/images/ticky_rider_logo.png';
 const _activeSessionMaxAge = Duration(hours: 24);
 const _minCustomActivityMinutes = 1;
 const _maxCustomActivityMinutes = 60;
@@ -946,36 +945,27 @@ class _HomeLogo extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
-    final fallbackLogo = Align(
-      alignment: Alignment.centerLeft,
-      child: Text(
-        semanticLabel,
-        maxLines: 1,
-        overflow: TextOverflow.ellipsis,
-        style: textTheme.headlineLarge?.copyWith(
-          fontWeight: FontWeight.w900,
-          color: AppColors.brown900,
-          letterSpacing: 0,
-        ),
-      ),
-    );
 
     return Semantics(
-      image: true,
       label: semanticLabel,
       child: ExcludeSemantics(
         child: Padding(
           padding: const EdgeInsets.only(left: 8),
           child: SizedBox(
             key: const ValueKey('homeLogo'),
-            width: 126,
-            height: 89,
-            child: Image.asset(
-              _homeLogoAssetPath,
-              fit: BoxFit.contain,
+            height: 72,
+            child: Align(
               alignment: Alignment.centerLeft,
-              cacheWidth: 360,
-              errorBuilder: (context, error, stackTrace) => fallbackLogo,
+              child: Text(
+                semanticLabel,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: textTheme.headlineLarge?.copyWith(
+                  fontWeight: FontWeight.w900,
+                  color: AppColors.brown900,
+                  letterSpacing: 0,
+                ),
+              ),
             ),
           ),
         ),

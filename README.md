@@ -1,10 +1,10 @@
-# Ticky Rider
+# Timey Rider
 
-Ticky Rider is a warm, kid-friendly Flutter routine timer that turns everyday activities into small playful rides.
+Timey Rider is a warm, kid-friendly Flutter routine timer that turns everyday activities into small playful rides.
 
 This repository was split from the original rider timer and is being converted into a general kids routine timer.
 
-- Ticky Rider keeps the ride-based timer, vehicles, avatars, rewards, and local progress tracking.
+- Timey Rider keeps the ride-based timer, vehicles, avatars, rewards, and local progress tracking.
 - The product direction is expanding toward routines like brushing teeth, reading, cleanup, play time, and custom timers.
 - Activity-first concepts are being added while keeping the app runnable and localized.
 
@@ -82,9 +82,9 @@ assets/
 
 ## Assets Status / TODO
 
-- Launcher icon: Ticky Rider source icon is configured at `assets/icons/ticky_rider_app_icon.png`.
-- Adaptive icon foreground/background: Ticky Rider adaptive icon assets are configured at `assets/icons/ticky_rider_app_icon_foreground.png` and `assets/icons/ticky_rider_app_icon_background.png`.
-- Ticky Rider logo: place the home logo at `assets/images/ticky_rider_logo.png`; the app falls back to text if the asset is missing.
+- Launcher icon: Timey Rider source icon is configured at `assets/icons/timey_rider_app_icon.png`.
+- Adaptive icon foreground/background: Timey Rider adaptive icon assets are configured at `assets/icons/timey_rider_app_icon_foreground.png` and `assets/icons/timey_rider_app_icon_background.png`.
+- Timey Rider logo: the home header currently uses a text logo; add `assets/images/timey_rider_logo.png` later if a dedicated logo image is needed.
 - Activity marker image assets: add optional marker images under `assets/images/markers/` when emoji-only markers are not enough.
 - Routine-themed stickers: add image assets for routine reward IDs such as `sticker_sparkly_teeth`, `sticker_book_buddy`, `sticker_cleanup_champ`, `sticker_happy_clock`, and `sticker_rocket`.
 

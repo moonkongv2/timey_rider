@@ -3,9 +3,9 @@ import 'dart:convert';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'package:ticky_rider/models/active_activity_timer_session.dart';
-import 'package:ticky_rider/models/activity_timer_config.dart';
-import 'package:ticky_rider/services/active_activity_timer_session_store.dart';
+import 'package:timey_rider/models/active_activity_timer_session.dart';
+import 'package:timey_rider/models/activity_timer_config.dart';
+import 'package:timey_rider/services/active_activity_timer_session_store.dart';
 
 void main() {
   test(

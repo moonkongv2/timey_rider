@@ -38,7 +38,7 @@ class SettingsTexts implements SettingsTextSet {
   String get vehicleSelection => '빠방 고르기';
   String get childNameTitle => '아이 이름';
   String get childNameFieldLabel => '이름';
-  String get childNameSetupTitle => '누가 Ticky Rider를 탈까?';
+  String get childNameSetupTitle => '누가 Timey Rider를 탈까?';
   String get childNameSetupSubtitle => '아이 이름을 먼저 알려줘.';
   String get saveChildName => '이름 저장';
   String get childNameRequiredMessage => '아이 이름을 입력해 주세요.';

@@ -9,7 +9,7 @@ class UserGuideTexts implements UserGuideTextSet {
   String get subtitle => '활동 미션, 응원 영상, 스티커 규칙을 확인해요.';
   String get introTitle => '보호자 가이드';
   String get introBody =>
-      'Ticky Rider를 시작하기 전에 활동 미션 흐름과 앱 규칙을 한눈에 확인할 수 있어요. 부모님뿐 아니라 아이의 루틴을 함께 돕는 보호자도 참고할 수 있어요.';
+      'Timey Rider를 시작하기 전에 활동 미션 흐름과 앱 규칙을 한눈에 확인할 수 있어요. 부모님뿐 아니라 아이의 루틴을 함께 돕는 보호자도 참고할 수 있어요.';
   String get basicFlowTitle => startMissionTitle;
   String get markersTitle => courseMarkersTitle;
   String get motivationTitle => '동기부여 영상';
@@ -17,8 +17,8 @@ class UserGuideTexts implements UserGuideTextSet {
   String get historyTitle => historyRewardsTitle;
   String get guardianTipsTitle => '보호자 사용 팁';
 
-  String get whatIsTickyRiderTitle => 'Ticky Rider는 어떤 앱인가요?';
-  List<String> get whatIsTickyRiderItems => const [
+  String get whatIsTimeyRiderTitle => 'Timey Rider는 어떤 앱인가요?';
+  List<String> get whatIsTimeyRiderItems => const [
     '양치, 책 읽기, 정리, 놀이 같은 활동을 작은 라이딩 미션으로 바꾸는 타이머 앱이에요.',
     '아이가 차량을 고르고, 정해진 시간 동안 코스를 따라가며 루틴을 경험해요.',
     '마지막에는 활동 방식에 따라 완료 확인, 시간 종료, 보호자 확인으로 기록돼요.',

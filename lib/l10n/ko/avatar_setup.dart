@@ -19,7 +19,7 @@ class AvatarSetupTexts implements AvatarSetupTextSet {
   String get vehicleSelectionTitle => '아바타를 태울 차량';
   String get vehicleSelectionSubtitle => '프롬프트 기준';
   String get compositePreviewTitle => '합성 미리보기';
-  String get compositePreviewSubtitle => '이 모습으로 Ticky Rider를 탈까요?';
+  String get compositePreviewSubtitle => '이 모습으로 Timey Rider를 탈까요?';
   String get defaultPreviewTitle => '기본 이미지 미리보기';
   String get useDefaultImageButton => '기본 이미지로 사용하기';
   String get adjustmentTitle => '아바타 위치 조정';
@@ -51,6 +51,6 @@ class AvatarSetupTexts implements AvatarSetupTextSet {
   String get selectedImageFallback => '선택한 아바타 이미지';
   String get privacyNote =>
       '앱이 직접 AI 이미지를 생성하거나 아이 사진을 업로드하지는 않아요.\n'
-      '사용자가 선택한 외부 AI 서비스에서 이미지를 만든 뒤, 완성된 아바타 이미지만 Ticky Rider에 업로드해 주세요.\n'
+      '사용자가 선택한 외부 AI 서비스에서 이미지를 만든 뒤, 완성된 아바타 이미지만 Timey Rider에 업로드해 주세요.\n'
       '외부 서비스 이용 전 사진/개인정보 처리 방침을 확인해 주세요.';
 }

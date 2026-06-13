@@ -12,8 +12,8 @@ import 'services/local_activity_progress_service.dart';
 import 'services/local_settings_service.dart';
 import 'theme/app_theme.dart';
 
-class TickyRiderApp extends StatefulWidget {
-  const TickyRiderApp({
+class TimeyRiderApp extends StatefulWidget {
+  const TimeyRiderApp({
     super.key,
     required this.settingsService,
     required this.activityProgressService,
@@ -27,10 +27,10 @@ class TickyRiderApp extends StatefulWidget {
   final ActiveActivityTimerSessionStore activeSessionStore;
 
   @override
-  State<TickyRiderApp> createState() => _TickyRiderAppState();
+  State<TimeyRiderApp> createState() => _TimeyRiderAppState();
 }
 
-class _TickyRiderAppState extends State<TickyRiderApp> {
+class _TimeyRiderAppState extends State<TimeyRiderApp> {
   late ActivityTimerConfig _config = widget.initialConfig;
   bool _showSplash = true;
 
