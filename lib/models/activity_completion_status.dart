@@ -18,6 +18,16 @@ ActivityCompletionStatus activityCompletionStatusFromJson(
         return status;
       }
     }
+    final legacyStatus = switch (value) {
+      'completedBeforeArrival' => ActivityCompletionStatus.completedBeforeEnd,
+      'completedAtArrival' => ActivityCompletionStatus.completedAtEnd,
+      'completedAfterArrival' => ActivityCompletionStatus.completedAfterEnd,
+      'notCompleted' => ActivityCompletionStatus.needsMoreTime,
+      _ => null,
+    };
+    if (legacyStatus != null) {
+      return legacyStatus;
+    }
   }
 
   if (activityCompleted == false) {

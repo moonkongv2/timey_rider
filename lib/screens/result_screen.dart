@@ -6,7 +6,7 @@ import 'package:video_player/video_player.dart';
 import '../l10n/app_texts.dart';
 import '../l10n/text_sets.dart';
 import '../models/meal_progress_snapshot.dart';
-import '../models/meal_session_result.dart';
+import '../models/activity_session_result.dart';
 import '../models/activity_timer_config.dart';
 import '../models/reward_goal.dart';
 import '../models/reward_item.dart';
@@ -107,7 +107,7 @@ class ResultScreen extends StatefulWidget {
     this.orientationService = const SystemOrientationService(),
   });
 
-  final MealSessionResult result;
+  final ActivitySessionResult result;
   final ActivityTimerConfig config;
   final LocalMealProgressService mealProgressService;
   final ValueChanged<ActivityTimerConfig> onConfigChanged;
@@ -134,7 +134,7 @@ class _ResultScreenState extends State<ResultScreen> {
     _recordedSession = widget.mealProgressService.recordMealResult(
       widget.result,
     );
-    if (!widget.result.mealCompleted) {
+    if (!widget.result.activityCompleted) {
       _introFinished = true;
       return;
     }
@@ -228,7 +228,7 @@ class _ResultScreenState extends State<ResultScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final mealCompleted = widget.result.mealCompleted;
+    final mealCompleted = widget.result.activityCompleted;
     final texts = AppTexts.of(context);
     final failureRiderAssetPath = failureRiderAssetPathForVehicle(
       vehicleId: widget.config.vehicleId,

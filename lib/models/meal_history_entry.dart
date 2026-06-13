@@ -1,4 +1,4 @@
-import 'meal_completion_status.dart';
+import 'activity_completion_status.dart';
 
 class MealHistoryEntry {
   const MealHistoryEntry({
@@ -11,28 +11,28 @@ class MealHistoryEntry {
     required this.rewardIds,
     this.mealCompleted = true,
     this.selectedIngredientIds = const [],
-    MealCompletionStatus? completionStatus,
+    ActivityCompletionStatus? completionStatus,
   }) : completionStatus =
            completionStatus ??
            (mealCompleted
                ? (completedBeforeArrival
-                     ? MealCompletionStatus.completedBeforeArrival
-                     : MealCompletionStatus.completedAfterArrival)
-               : MealCompletionStatus.notCompleted);
+                     ? ActivityCompletionStatus.completedBeforeEnd
+                     : ActivityCompletionStatus.completedAfterEnd)
+               : ActivityCompletionStatus.needsMoreTime);
 
   factory MealHistoryEntry.fromJson(Map<String, Object?> json) {
     final rewardIds = json['rewardIds'];
     final selectedIngredientIds = json['selectedIngredientIds'];
     final completedBeforeArrival =
         json['completedBeforeArrival'] as bool? ?? false;
-    final completionStatus = mealCompletionStatusFromJson(
+    final completionStatus = activityCompletionStatusFromJson(
       json['completionStatus'],
-      completedBeforeArrival: completedBeforeArrival,
-      mealCompleted: json['mealCompleted'] as bool?,
+      completedBeforeEnd: completedBeforeArrival,
+      activityCompleted: json['mealCompleted'] as bool?,
     );
     final mealCompleted =
         json['mealCompleted'] as bool? ??
-        completionStatus != MealCompletionStatus.notCompleted;
+        _activityCompletionStatusIsCompleted(completionStatus);
 
     return MealHistoryEntry(
       id: json['id'] as String,
@@ -59,7 +59,7 @@ class MealHistoryEntry {
   final Duration actualDuration;
   final bool completedBeforeArrival;
   final bool mealCompleted;
-  final MealCompletionStatus completionStatus;
+  final ActivityCompletionStatus completionStatus;
   final List<String> rewardIds;
   final List<String> selectedIngredientIds;
 
@@ -77,4 +77,15 @@ class MealHistoryEntry {
       'selectedIngredientIds': selectedIngredientIds,
     };
   }
+}
+
+bool _activityCompletionStatusIsCompleted(ActivityCompletionStatus status) {
+  return switch (status) {
+    ActivityCompletionStatus.completedBeforeEnd ||
+    ActivityCompletionStatus.completedAtEnd ||
+    ActivityCompletionStatus.completedAfterEnd ||
+    ActivityCompletionStatus.timeEnded => true,
+    ActivityCompletionStatus.needsMoreTime ||
+    ActivityCompletionStatus.canceled => false,
+  };
 }

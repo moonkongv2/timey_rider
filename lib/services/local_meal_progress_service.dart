@@ -5,7 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../models/meal_history_entry.dart';
 import '../models/meal_progress_snapshot.dart';
-import '../models/meal_session_result.dart';
+import '../models/activity_session_result.dart';
 import '../models/reward_goal.dart';
 import '../models/reward_item.dart';
 
@@ -218,7 +218,9 @@ class LocalMealProgressService {
     return true;
   }
 
-  Future<RecordedMealSession> recordMealResult(MealSessionResult result) async {
+  Future<RecordedMealSession> recordMealResult(
+    ActivitySessionResult result,
+  ) async {
     final preferences = await SharedPreferences.getInstance();
     final history = _decodeList(
       preferences.getStringList(_historyKey),
@@ -238,11 +240,11 @@ class LocalMealProgressService {
       endedAt: result.endedAt,
       targetDuration: result.targetDuration,
       actualDuration: result.actualDuration,
-      completedBeforeArrival: result.completedBeforeArrival,
-      mealCompleted: result.mealCompleted,
+      completedBeforeArrival: result.completedBeforeEnd,
+      mealCompleted: result.activityCompleted,
       completionStatus: result.completionStatus,
       rewardIds: awardedRewards.map((reward) => reward.id).toList(),
-      selectedIngredientIds: result.selectedIngredientIds,
+      selectedIngredientIds: result.selectedMarkerIds,
     );
 
     history.insert(0, entry);
@@ -285,8 +287,8 @@ class LocalMealProgressService {
     );
   }
 
-  List<RewardDefinition> _selectRewards(MealSessionResult result) {
-    if (!result.mealCompleted) {
+  List<RewardDefinition> _selectRewards(ActivitySessionResult result) {
+    if (!result.activityCompleted) {
       return const [];
     }
 
@@ -324,10 +326,10 @@ class LocalMealProgressService {
   _RewardGoalUpdate _fillRewardGoalSlotsIfEligible({
     required List<RewardGoal> goals,
     required List<RewardDefinition> awardedRewards,
-    required MealSessionResult result,
+    required ActivitySessionResult result,
     required String mealSessionId,
   }) {
-    if (goals.isEmpty || !result.mealCompleted) {
+    if (goals.isEmpty || !result.activityCompleted) {
       return _RewardGoalUpdate(activeGoals: goals);
     }
 

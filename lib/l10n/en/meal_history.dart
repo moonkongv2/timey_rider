@@ -1,7 +1,7 @@
 // ignore_for_file: annotate_overrides
 
 import '../text_sets.dart';
-import '../../models/meal_completion_status.dart';
+import '../../models/activity_completion_status.dart';
 
 class EnMealHistoryTexts implements MealHistoryTextSet {
   const EnMealHistoryTexts();
@@ -29,8 +29,9 @@ class EnMealHistoryTexts implements MealHistoryTextSet {
   String get deleteRecordConfirmLabel => 'Delete';
   String get deleteRecordSuccessMessage => 'Meal record deleted.';
 
-  String completedStatus(MealCompletionStatus completionStatus) {
-    return completionStatus == MealCompletionStatus.notCompleted
+  String completedStatus(ActivityCompletionStatus completionStatus) {
+    return completionStatus == ActivityCompletionStatus.needsMoreTime ||
+            completionStatus == ActivityCompletionStatus.canceled
         ? 'Incomplete'
         : 'Complete';
   }

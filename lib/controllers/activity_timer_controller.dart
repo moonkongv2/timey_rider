@@ -3,19 +3,19 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 
 import '../models/active_meal_timer_session.dart';
-import '../models/meal_completion_status.dart';
-import '../models/meal_session_result.dart';
+import '../models/activity_completion_status.dart';
+import '../models/activity_session_result.dart';
 import '../models/activity_timer_config.dart';
 
-enum MealTimerState { idle, running, paused, arrived, completed }
+enum ActivityTimerState { idle, running, paused, arrived, completed }
 
-class MealTimerController extends ChangeNotifier {
+class ActivityTimerController extends ChangeNotifier {
   static const _tickerInterval = Duration(milliseconds: 16);
 
-  MealTimerController({required this.config, DateTime Function()? now})
+  ActivityTimerController({required this.config, DateTime Function()? now})
     : _now = now ?? DateTime.now;
 
-  MealTimerController.fromSession({
+  ActivityTimerController.fromSession({
     required ActiveMealTimerSession session,
     DateTime Function()? now,
   }) : config = session.config,
@@ -31,9 +31,9 @@ class MealTimerController extends ChangeNotifier {
   DateTime? _pausedAt;
   Duration _totalPausedDuration = Duration.zero;
   Duration _elapsed = Duration.zero;
-  MealTimerState _state = MealTimerState.idle;
+  ActivityTimerState _state = ActivityTimerState.idle;
 
-  MealTimerState get state => _state;
+  ActivityTimerState get state => _state;
   DateTime? get startedAt => _startedAt;
   DateTime? get pausedAt => _pausedAt;
   Duration get elapsed => _elapsed;
@@ -52,7 +52,7 @@ class MealTimerController extends ChangeNotifier {
     return ratio.clamp(0.0, 1.0);
   }
 
-  bool get isPaused => _state == MealTimerState.paused;
+  bool get isPaused => _state == ActivityTimerState.paused;
   bool get hasArrived => progress >= 1;
 
   void start() {
@@ -60,34 +60,38 @@ class MealTimerController extends ChangeNotifier {
     _pausedAt = null;
     _totalPausedDuration = Duration.zero;
     _elapsed = Duration.zero;
-    _state = MealTimerState.running;
+    _state = ActivityTimerState.running;
     _startTicker();
     notifyListeners();
   }
 
   void pause() {
-    if (_state != MealTimerState.running && _state != MealTimerState.arrived) {
+    if (_state != ActivityTimerState.running &&
+        _state != ActivityTimerState.arrived) {
       return;
     }
     _updateElapsed();
     _pausedAt = _now();
-    _state = MealTimerState.paused;
+    _state = ActivityTimerState.paused;
     notifyListeners();
   }
 
   void resume() {
-    if (_state != MealTimerState.paused || _pausedAt == null) {
+    if (_state != ActivityTimerState.paused || _pausedAt == null) {
       return;
     }
     _totalPausedDuration += _now().difference(_pausedAt!);
     _pausedAt = null;
-    _state = hasArrived ? MealTimerState.arrived : MealTimerState.running;
+    _state = hasArrived
+        ? ActivityTimerState.arrived
+        : ActivityTimerState.running;
     _startTicker();
     notifyListeners();
   }
 
   void refreshFromClock() {
-    if (_state != MealTimerState.running && _state != MealTimerState.arrived) {
+    if (_state != ActivityTimerState.running &&
+        _state != ActivityTimerState.arrived) {
       return;
     }
 
@@ -95,32 +99,34 @@ class MealTimerController extends ChangeNotifier {
     notifyListeners();
   }
 
-  MealSessionResult complete({
-    bool mealCompleted = true,
-    MealCompletionStatus? completionStatus,
-  }) {
+  ActivitySessionResult complete({ActivityCompletionStatus? completionStatus}) {
     _updateElapsed();
-    _state = MealTimerState.completed;
+    _state = ActivityTimerState.completed;
     _ticker?.cancel();
 
     final endedAt = _now();
-    final completedBeforeArrival = progress < 1;
-    return MealSessionResult(
+    final completedBeforeEnd = progress < 1;
+    final resolvedCompletionStatus =
+        completionStatus ??
+        (completedBeforeEnd
+            ? ActivityCompletionStatus.completedBeforeEnd
+            : ActivityCompletionStatus.completedAfterEnd);
+    return ActivitySessionResult(
+      activityId: config.activityId,
       startedAt: _startedAt ?? endedAt,
       endedAt: endedAt,
       targetDuration: config.duration,
       actualDuration: _elapsed,
-      completedBeforeArrival: completedBeforeArrival,
-      mealCompleted: mealCompleted,
-      completionStatus: completionStatus,
+      completedBeforeEnd: completedBeforeEnd,
+      completionStatus: resolvedCompletionStatus,
     );
   }
 
   void _startTicker() {
     _ticker?.cancel();
     _ticker = Timer.periodic(_tickerInterval, (_) {
-      if (_state == MealTimerState.running ||
-          _state == MealTimerState.arrived) {
+      if (_state == ActivityTimerState.running ||
+          _state == ActivityTimerState.arrived) {
         _updateElapsed();
         notifyListeners();
       }
@@ -142,8 +148,8 @@ class MealTimerController extends ChangeNotifier {
       totalPausedDuration: _totalPausedDuration,
     );
 
-    if (_elapsed >= config.duration && _state == MealTimerState.running) {
-      _state = MealTimerState.arrived;
+    if (_elapsed >= config.duration && _state == ActivityTimerState.running) {
+      _state = ActivityTimerState.arrived;
     }
   }
 
@@ -163,19 +169,20 @@ class MealTimerController extends ChangeNotifier {
     );
 
     _state = switch (session.state) {
-      ActiveMealTimerSessionState.paused => MealTimerState.paused,
-      ActiveMealTimerSessionState.arrived => MealTimerState.arrived,
+      ActiveMealTimerSessionState.paused => ActivityTimerState.paused,
+      ActiveMealTimerSessionState.arrived => ActivityTimerState.arrived,
       ActiveMealTimerSessionState.running =>
         _elapsed >= config.duration
-            ? MealTimerState.arrived
-            : MealTimerState.running,
+            ? ActivityTimerState.arrived
+            : ActivityTimerState.running,
     };
 
-    if (_state == MealTimerState.arrived && _elapsed < config.duration) {
+    if (_state == ActivityTimerState.arrived && _elapsed < config.duration) {
       _elapsed = config.duration;
     }
 
-    if (_state == MealTimerState.running || _state == MealTimerState.arrived) {
+    if (_state == ActivityTimerState.running ||
+        _state == ActivityTimerState.arrived) {
       _startTicker();
     }
   }

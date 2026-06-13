@@ -6,13 +6,13 @@ import 'package:flutter/material.dart';
 import '../catalogs/meal_ingredient_catalog.dart';
 import '../catalogs/motivation_asset_catalog.dart';
 import '../catalogs/vehicle_catalog.dart';
-import '../controllers/meal_timer_controller.dart';
+import '../controllers/activity_timer_controller.dart';
 import '../l10n/app_texts.dart';
 import '../l10n/text_sets.dart';
 import '../models/active_meal_timer_session.dart';
-import '../models/meal_completion_status.dart';
+import '../models/activity_completion_status.dart';
 import '../models/meal_ingredient.dart';
-import '../models/meal_session_result.dart';
+import '../models/activity_session_result.dart';
 import '../models/activity_timer_config.dart';
 import '../models/vehicle_avatar_presentation.dart';
 import '../services/active_meal_timer_session_store.dart';
@@ -196,7 +196,7 @@ class _TimerStatusCopy {
 
 class _TimerScreenState extends State<TimerScreen>
     with WidgetsBindingObserver, SingleTickerProviderStateMixin {
-  late final MealTimerController _controller;
+  late final ActivityTimerController _controller;
   late final AnimationController _finishDriveController;
   late final MotivationAudioService _motivationAudioService;
   late final bool _ownsMotivationAudioService;
@@ -215,7 +215,7 @@ class _TimerScreenState extends State<TimerScreen>
   Timer? _arrivalPromptTimer;
   bool _isFinishDriving = false;
   Animation<double>? _finishDriveAnimation;
-  MealSessionResult? _pendingFinishDriveResult;
+  ActivitySessionResult? _pendingFinishDriveResult;
   double _finishDriveStartProgress = 0;
   bool _handoffOrientation = false;
   late final String _activeSessionId;
@@ -230,7 +230,10 @@ class _TimerScreenState extends State<TimerScreen>
     _ownsMotivationAudioService = widget.motivationAudioService == null;
     final restoredSession = widget.restoredSession;
     if (restoredSession == null) {
-      _controller = MealTimerController(config: widget.config, now: widget.now);
+      _controller = ActivityTimerController(
+        config: widget.config,
+        now: widget.now,
+      );
       _activeSessionId = _createActiveSessionId();
       _controller.start();
     } else {
@@ -242,7 +245,7 @@ class _TimerScreenState extends State<TimerScreen>
       _motivationScheduleStartedAt =
           restoredSession.motivationScheduleStartedAt;
       _activeSessionId = restoredSession.sessionId;
-      _controller = MealTimerController.fromSession(
+      _controller = ActivityTimerController.fromSession(
         session: restoredSession,
         now: widget.now,
       );
@@ -333,7 +336,7 @@ class _TimerScreenState extends State<TimerScreen>
     _maybeShowMotivationVideo();
 
     if (_arrivalPromptShown ||
-        _controller.state != MealTimerState.arrived ||
+        _controller.state != ActivityTimerState.arrived ||
         !mounted) {
       return;
     }
@@ -348,7 +351,7 @@ class _TimerScreenState extends State<TimerScreen>
       _arrivalPromptTimer = Timer(const Duration(milliseconds: 900), () {
         if (!mounted ||
             _isFinishDriving ||
-            _controller.state != MealTimerState.arrived) {
+            _controller.state != ActivityTimerState.arrived) {
           return;
         }
         _confirmComplete(showFailureOnDecline: true);
@@ -525,8 +528,8 @@ class _TimerScreenState extends State<TimerScreen>
 
     _exitPromptShown = true;
     final shouldResumeAfterPrompt =
-        _controller.state == MealTimerState.running ||
-        _controller.state == MealTimerState.arrived;
+        _controller.state == ActivityTimerState.running ||
+        _controller.state == ActivityTimerState.arrived;
     if (shouldResumeAfterPrompt) {
       _controller.pause();
       unawaited(_persistActiveSession());
@@ -620,8 +623,7 @@ class _TimerScreenState extends State<TimerScreen>
     if (confirmed != true) {
       if (showFailureOnDecline) {
         final result = _controller.complete(
-          mealCompleted: false,
-          completionStatus: MealCompletionStatus.notCompleted,
+          completionStatus: ActivityCompletionStatus.needsMoreTime,
         );
         unawaited(_clearActiveSession());
         _openResult(result);
@@ -631,18 +633,18 @@ class _TimerScreenState extends State<TimerScreen>
 
     final result = _controller.complete(
       completionStatus: showFailureOnDecline
-          ? MealCompletionStatus.completedAtArrival
+          ? ActivityCompletionStatus.completedAtEnd
           : null,
     );
     unawaited(_clearActiveSession());
-    if (result.completedBeforeArrival) {
+    if (result.completedBeforeEnd) {
       _startFinishDrive(result);
       return;
     }
     _openResult(result);
   }
 
-  void _startFinishDrive(MealSessionResult result) {
+  void _startFinishDrive(ActivitySessionResult result) {
     _motivationVoiceTimer?.cancel();
     unawaited(_motivationAudioService.stop());
 
@@ -680,7 +682,7 @@ class _TimerScreenState extends State<TimerScreen>
     }
   }
 
-  void _openResult(MealSessionResult result) {
+  void _openResult(ActivitySessionResult result) {
     final recordableResult = _resultWithSelectedIngredients(result);
     _handoffOrientation = true;
     Navigator.of(context).pushReplacement(
@@ -696,19 +698,20 @@ class _TimerScreenState extends State<TimerScreen>
     );
   }
 
-  MealSessionResult _resultWithSelectedIngredients(MealSessionResult result) {
+  ActivitySessionResult _resultWithSelectedIngredients(
+    ActivitySessionResult result,
+  ) {
     if (_timerConfig.markerMode != ActivityMarkerMode.manual &&
         _timerConfig.markerMode != ActivityMarkerMode.activityDefault) {
-      return result.copyWith(selectedIngredientIds: const []);
+      return result.copyWith(selectedMarkerIds: const []);
     }
-    return result.copyWith(
-      selectedIngredientIds: _timerConfig.selectedMarkerIds,
-    );
+    return result.copyWith(selectedMarkerIds: _timerConfig.selectedMarkerIds);
   }
 
   ActiveMealTimerSession? _activeSessionSnapshot() {
     final startedAt = _controller.startedAt;
-    if (startedAt == null || _controller.state == MealTimerState.completed) {
+    if (startedAt == null ||
+        _controller.state == ActivityTimerState.completed) {
       return null;
     }
 
@@ -717,8 +720,8 @@ class _TimerScreenState extends State<TimerScreen>
       startedAt: startedAt,
       config: _timerConfig,
       state: switch (_controller.state) {
-        MealTimerState.paused => ActiveMealTimerSessionState.paused,
-        MealTimerState.arrived => ActiveMealTimerSessionState.arrived,
+        ActivityTimerState.paused => ActiveMealTimerSessionState.paused,
+        ActivityTimerState.arrived => ActiveMealTimerSessionState.arrived,
         _ => ActiveMealTimerSessionState.running,
       },
       totalPausedDuration: _controller.totalPausedDuration,
@@ -770,7 +773,7 @@ class _TimerScreenState extends State<TimerScreen>
 
   _TimerStatusCopy _timerStatusCopy(
     TimerTextSet texts,
-    MealTimerState state,
+    ActivityTimerState state,
     double progress,
   ) {
     if (_isFinishDriving) {
@@ -783,25 +786,26 @@ class _TimerScreenState extends State<TimerScreen>
     }
 
     return switch (state) {
-      MealTimerState.running => _TimerStatusCopy(
+      ActivityTimerState.running => _TimerStatusCopy(
         progressMessage: _runningProgressMessage(texts, progress),
         timeLabel: texts.runningArrivalLabel,
         icon: Icons.directions_rounded,
         iconBackgroundColor: AppColors.surfaceMint,
       ),
-      MealTimerState.paused => _TimerStatusCopy(
+      ActivityTimerState.paused => _TimerStatusCopy(
         progressMessage: texts.pausedProgressMessage,
         timeLabel: texts.pausedTimeLabel,
         icon: Icons.local_cafe_rounded,
         iconBackgroundColor: AppColors.surfaceYellow,
       ),
-      MealTimerState.arrived || MealTimerState.completed => _TimerStatusCopy(
+      ActivityTimerState.arrived ||
+      ActivityTimerState.completed => _TimerStatusCopy(
         progressMessage: texts.arrivedProgressMessage,
         timeLabel: texts.arrivedTimeLabel,
         icon: Icons.flag_rounded,
         iconBackgroundColor: AppColors.primarySoft,
       ),
-      MealTimerState.idle => _TimerStatusCopy(
+      ActivityTimerState.idle => _TimerStatusCopy(
         progressMessage: texts.idleProgressMessage,
         timeLabel: texts.idleTimeLabel,
         icon: Icons.timer_rounded,
@@ -910,7 +914,7 @@ class _TimerScreenState extends State<TimerScreen>
                     ingredientClearProgress: displayProgress,
                     isRoadMotionActive:
                         _isFinishDriving ||
-                        _controller.state == MealTimerState.running,
+                        _controller.state == ActivityTimerState.running,
                     courseDuration: _timerConfig.duration,
                   );
                   final landscapeVehicleLayer = isLandscape

@@ -18,8 +18,8 @@ import 'package:ticky_rider/catalogs/vehicle_catalog.dart';
 import 'package:ticky_rider/l10n/app_texts.dart';
 import 'package:ticky_rider/main.dart' as app;
 import 'package:ticky_rider/models/active_meal_timer_session.dart';
-import 'package:ticky_rider/models/meal_completion_status.dart';
-import 'package:ticky_rider/models/meal_session_result.dart';
+import 'package:ticky_rider/models/activity_completion_status.dart';
+import 'package:ticky_rider/models/activity_session_result.dart';
 import 'package:ticky_rider/models/activity_timer_config.dart';
 import 'package:ticky_rider/models/reward_goal.dart';
 import 'package:ticky_rider/models/vehicle.dart';
@@ -680,7 +680,7 @@ void main() {
     expect(snapshot.history.single.mealCompleted, isFalse);
     expect(
       snapshot.history.single.completionStatus,
-      MealCompletionStatus.notCompleted,
+      ActivityCompletionStatus.needsMoreTime,
     );
   });
 
@@ -6424,7 +6424,7 @@ void main() {
 
     final service = LocalMealProgressService();
     final recordedSession = await service.recordMealResult(
-      MealSessionResult(
+      _mealResult(
         startedAt: DateTime(2026, 5, 4, 12),
         endedAt: DateTime(2026, 5, 4, 12, 10),
         targetDuration: const Duration(minutes: 20),
@@ -6441,7 +6441,7 @@ void main() {
 
     final service = LocalMealProgressService();
     final recordedSession = await service.recordMealResult(
-      MealSessionResult(
+      _mealResult(
         startedAt: DateTime(2026, 5, 4, 12),
         endedAt: DateTime(2026, 5, 4, 12, 25),
         targetDuration: const Duration(minutes: 20),
@@ -6458,7 +6458,7 @@ void main() {
 
     final service = LocalMealProgressService();
     final recordedSession = await service.recordMealResult(
-      MealSessionResult(
+      _mealResult(
         startedAt: DateTime(2026, 5, 4, 12),
         endedAt: DateTime(2026, 5, 4, 12, 25),
         targetDuration: const Duration(minutes: 20),
@@ -6472,7 +6472,7 @@ void main() {
     expect(recordedSession.entry.mealCompleted, isFalse);
     expect(
       recordedSession.entry.completionStatus,
-      MealCompletionStatus.notCompleted,
+      ActivityCompletionStatus.needsMoreTime,
     );
     expect(recordedSession.entry.rewardIds, isEmpty);
   });
@@ -6485,18 +6485,18 @@ void main() {
       _mealResult(
         actualDuration: const Duration(minutes: 20),
         completedBeforeArrival: false,
-        completionStatus: MealCompletionStatus.completedAtArrival,
+        completionStatus: ActivityCompletionStatus.completedAtEnd,
       ),
     );
     final snapshot = await service.loadSnapshot();
 
     expect(
       recordedSession.entry.completionStatus,
-      MealCompletionStatus.completedAtArrival,
+      ActivityCompletionStatus.completedAtEnd,
     );
     expect(
       snapshot.history.single.completionStatus,
-      MealCompletionStatus.completedAtArrival,
+      ActivityCompletionStatus.completedAtEnd,
     );
   });
 
@@ -6679,7 +6679,7 @@ void main() {
     expect(snapshot.history.single.mealCompleted, isTrue);
     expect(
       snapshot.history.single.completionStatus,
-      MealCompletionStatus.completedAfterArrival,
+      ActivityCompletionStatus.completedAfterEnd,
     );
     expect(snapshot.history.single.selectedIngredientIds, isEmpty);
   });
@@ -6919,7 +6919,7 @@ void main() {
         targetDuration: const Duration(minutes: 20),
         actualDuration: const Duration(minutes: 25),
         mealCompleted: false,
-        completionStatus: MealCompletionStatus.notCompleted,
+        completionStatus: ActivityCompletionStatus.needsMoreTime,
       ),
     );
 
@@ -7182,7 +7182,7 @@ void main() {
         targetDuration: const Duration(minutes: 20),
         actualDuration: const Duration(minutes: 25),
         mealCompleted: false,
-        completionStatus: MealCompletionStatus.notCompleted,
+        completionStatus: ActivityCompletionStatus.needsMoreTime,
       ),
     );
 
@@ -7202,28 +7202,34 @@ void main() {
   });
 }
 
-MealSessionResult _mealResult({
+ActivitySessionResult _mealResult({
   DateTime? startedAt,
   DateTime? endedAt,
   Duration targetDuration = const Duration(minutes: 20),
   Duration actualDuration = const Duration(minutes: 25),
   bool completedBeforeArrival = false,
   bool mealCompleted = true,
-  MealCompletionStatus? completionStatus,
+  ActivityCompletionStatus? completionStatus,
   List<String> selectedIngredientIds = const [],
 }) {
   final resolvedStartedAt = startedAt ?? DateTime(2026, 5, 4, 12);
   final resolvedEndedAt = endedAt ?? resolvedStartedAt.add(actualDuration);
 
-  return MealSessionResult(
+  return ActivitySessionResult(
+    activityId: ActivityCatalog.defaultActivity.id,
     startedAt: resolvedStartedAt,
     endedAt: resolvedEndedAt,
     targetDuration: targetDuration,
     actualDuration: actualDuration,
-    completedBeforeArrival: completedBeforeArrival,
-    mealCompleted: mealCompleted,
-    completionStatus: completionStatus,
-    selectedIngredientIds: selectedIngredientIds,
+    completedBeforeEnd: completedBeforeArrival,
+    completionStatus:
+        completionStatus ??
+        (mealCompleted
+            ? (completedBeforeArrival
+                  ? ActivityCompletionStatus.completedBeforeEnd
+                  : ActivityCompletionStatus.completedAfterEnd)
+            : ActivityCompletionStatus.needsMoreTime),
+    selectedMarkerIds: selectedIngredientIds,
   );
 }
 

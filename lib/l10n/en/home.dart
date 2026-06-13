@@ -1,7 +1,7 @@
 // ignore_for_file: annotate_overrides
 
 import '../text_sets.dart';
-import '../../models/meal_completion_status.dart';
+import '../../models/activity_completion_status.dart';
 
 class EnHomeTexts implements HomeTextSet {
   const EnHomeTexts();
@@ -61,9 +61,11 @@ class EnHomeTexts implements HomeTextSet {
   String stickerCount(int count) => '$count';
   String recentMealSummary(
     String actualDuration,
-    MealCompletionStatus completionStatus,
+    ActivityCompletionStatus completionStatus,
   ) {
-    final status = completionStatus == MealCompletionStatus.notCompleted
+    final status =
+        completionStatus == ActivityCompletionStatus.needsMoreTime ||
+            completionStatus == ActivityCompletionStatus.canceled
         ? 'incomplete'
         : 'complete';
     return 'Recent meal $actualDuration · $status';

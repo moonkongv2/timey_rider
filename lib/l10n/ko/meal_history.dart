@@ -1,7 +1,7 @@
 // ignore_for_file: annotate_overrides
 
 import '../text_sets.dart';
-import '../../models/meal_completion_status.dart';
+import '../../models/activity_completion_status.dart';
 
 class MealHistoryTexts implements MealHistoryTextSet {
   const MealHistoryTexts();
@@ -28,8 +28,11 @@ class MealHistoryTexts implements MealHistoryTextSet {
   String get deleteRecordConfirmLabel => '삭제';
   String get deleteRecordSuccessMessage => '식사 기록을 삭제했어요.';
 
-  String completedStatus(MealCompletionStatus completionStatus) {
-    return completionStatus == MealCompletionStatus.notCompleted ? '미완료' : '완료';
+  String completedStatus(ActivityCompletionStatus completionStatus) {
+    return completionStatus == ActivityCompletionStatus.needsMoreTime ||
+            completionStatus == ActivityCompletionStatus.canceled
+        ? '미완료'
+        : '완료';
   }
 
   String dateLabel(DateTime dateTime) {

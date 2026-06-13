@@ -1,4 +1,4 @@
-import '../models/meal_completion_status.dart';
+import '../models/activity_completion_status.dart';
 
 abstract interface class CommonTextSet {
   String get appTitle;
@@ -59,7 +59,7 @@ abstract interface class HomeTextSet {
   String stickerCount(int count);
   String recentMealSummary(
     String actualDuration,
-    MealCompletionStatus completionStatus,
+    ActivityCompletionStatus completionStatus,
   );
 }
 
@@ -120,7 +120,7 @@ abstract interface class MealHistoryTextSet {
   String get deleteRecordConfirmLabel;
   String get deleteRecordSuccessMessage;
 
-  String completedStatus(MealCompletionStatus completionStatus);
+  String completedStatus(ActivityCompletionStatus completionStatus);
   String dateLabel(DateTime dateTime);
   String overrunTime(String duration);
 }
