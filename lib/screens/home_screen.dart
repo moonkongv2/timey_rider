@@ -10,6 +10,7 @@ import '../catalogs/vehicle_catalog.dart';
 import '../l10n/app_texts.dart';
 import '../models/active_activity_timer_session.dart';
 import '../models/activity.dart';
+import '../models/activity_marker.dart';
 import '../models/activity_progress_snapshot.dart';
 import '../models/activity_timer_config.dart';
 import '../models/vehicle_avatar_presentation.dart';
@@ -25,7 +26,6 @@ import '../theme/app_spacing.dart';
 import '../utils/duration_format.dart';
 import '../widgets/app/app_bouncy_button.dart';
 import '../widgets/app/app_metric_tile.dart';
-import '../widgets/activity_marker_picker_sheet.dart';
 import '../widgets/reward_sticker_image.dart';
 import '../widgets/vehicle_selection_card.dart';
 import 'avatar_setup_screen.dart';
@@ -66,7 +66,6 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> with RouteAware {
   late ActivityTimerConfig _config = widget.config;
-  late double _customMinutes = _initialCustomMinutes(_config);
   late Future<ActiveActivityTimerSession?> _activeSessionFuture;
   ActiveActivityTimerSession? _activeSession;
   Timer? _activeSessionTicker;
@@ -82,10 +81,6 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.config != widget.config) {
       _config = widget.config;
-    }
-    if (oldWidget.config.duration != _config.duration ||
-        oldWidget.config.activityId != _config.activityId) {
-      _customMinutes = _initialCustomMinutes(_config);
     }
     if (oldWidget.activeSessionStore != widget.activeSessionStore) {
       _refreshProgressSnapshot();
@@ -177,9 +172,6 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
 
   void _updateConfig(ActivityTimerConfig config) {
     setState(() {
-      if (_config.duration != config.duration) {
-        _customMinutes = config.duration.inMinutes.toDouble();
-      }
       _config = config;
     });
     widget.onConfigChanged(config);
@@ -196,32 +188,21 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
     );
   }
 
-  double _initialCustomMinutes(ActivityTimerConfig config) {
-    if (config.activityId == ActivityCatalog.custom.id) {
-      return config.duration.inMinutes.toDouble();
-    }
-    return ActivityCatalog.custom.defaultDuration.inMinutes.toDouble();
-  }
-
   Future<void> _startActivityTimer({
     required ActivityDefinition activity,
     required Duration duration,
+    required ActivityMarkerMode markerMode,
+    required _ActivityMarkerSelection activityMarkerSelection,
   }) async {
     final shouldStartNewTimer = await _resolveActiveSessionBeforeNewTimer();
     if (!mounted || !shouldStartNewTimer) {
       return;
     }
 
-    final activityMarkerSelection = await _activityMarkerSelectionForStart(
-      activity,
-    );
-    if (!mounted || activityMarkerSelection == null) {
-      return;
-    }
-
     final config = _config.copyWith(
       activityId: activity.id,
       duration: duration,
+      markerMode: markerMode,
       markerIds: activityMarkerSelection.markerIds,
       selectedMarkerIds: activityMarkerSelection.selectedMarkerIds,
     );
@@ -341,201 +322,23 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
     }
   }
 
-  Future<_ActivityMarkerSelection?> _activityMarkerSelectionForStart(
-    ActivityDefinition activity,
-  ) async {
-    switch (_config.markerMode) {
-      case ActivityMarkerMode.off:
-        return const _ActivityMarkerSelection(
-          markerIds: [],
-          selectedMarkerIds: [],
-        );
-      case ActivityMarkerMode.random:
-        return _ActivityMarkerSelection(
-          markerIds: ActivityMarkerCatalog.randomSelectionIds(
-            activityId: activity.id,
-          ),
-          selectedMarkerIds: const [],
-        );
-      case ActivityMarkerMode.activityDefault:
-        return _ActivityMarkerSelection(
-          markerIds: List.unmodifiable(activity.markerIds),
-          selectedMarkerIds: const [],
-        );
-      case ActivityMarkerMode.manual:
-        final markerResult =
-            await showModalBottomSheet<ActivityMarkerPickerResult>(
-              context: context,
-              isScrollControlled: true,
-              backgroundColor: AppColors.transparent,
-              builder: (_) => ActivityMarkerPickerSheet(
-                activityId: activity.id,
-                initialSelectedIds: _config.selectedMarkerIds,
-              ),
-            );
-        if (markerResult == null) {
-          return null;
-        }
-        return switch (markerResult) {
-          RandomActivityMarkers() => _ActivityMarkerSelection(
-            markerIds: ActivityMarkerCatalog.randomSelectionIds(
-              activityId: activity.id,
-            ),
-            selectedMarkerIds: const [],
-          ),
-          SelectedActivityMarkers(:final markerIds) => _ActivityMarkerSelection(
-            markerIds: markerIds,
-            selectedMarkerIds: markerIds,
-          ),
-        };
-    }
-  }
-
-  Future<void> _openCustomMinutesSheet() async {
-    final texts = AppTexts.of(context);
-    var sheetMinutes = _customMinutes;
-
-    await showModalBottomSheet<void>(
+  Future<void> _openTimerBuilder() async {
+    final result = await showModalBottomSheet<_TimerBuilderResult>(
       context: context,
       isScrollControlled: true,
       backgroundColor: AppColors.transparent,
-      builder: (sheetContext) {
-        return StatefulBuilder(
-          builder: (context, setSheetState) {
-            void updateSheetMinutes(double value) {
-              final minutes = value.clamp(
-                _minCustomActivityMinutes.toDouble(),
-                _maxCustomActivityMinutes.toDouble(),
-              );
-              setState(() => _customMinutes = minutes);
-              setSheetState(() => sheetMinutes = minutes);
-            }
+      builder: (_) => const _TimerBuilderSheet(),
+    );
 
-            void adjustSheetMinutes(int delta) {
-              updateSheetMinutes((sheetMinutes.round() + delta).toDouble());
-            }
+    if (!mounted || result == null) {
+      return;
+    }
 
-            return SafeArea(
-              top: false,
-              child: Align(
-                alignment: Alignment.bottomCenter,
-                child: ConstrainedBox(
-                  constraints: BoxConstraints(
-                    maxHeight: MediaQuery.sizeOf(context).height * 0.56,
-                  ),
-                  child: DecoratedBox(
-                    decoration: BoxDecoration(
-                      color: AppColors.surfaceWarm,
-                      borderRadius: const BorderRadius.vertical(
-                        top: Radius.circular(AppRadius.xxl),
-                      ),
-                      border: Border.all(color: AppColors.borderWarm),
-                      boxShadow: AppShadows.hero,
-                    ),
-                    child: Padding(
-                      padding: EdgeInsets.fromLTRB(
-                        AppSpacing.xl,
-                        AppSpacing.sm,
-                        AppSpacing.xl,
-                        AppSpacing.xl + MediaQuery.viewInsetsOf(context).bottom,
-                      ),
-                      child: SingleChildScrollView(
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            DecoratedBox(
-                              decoration: BoxDecoration(
-                                color: AppColors.borderSoft,
-                                borderRadius: AppRadius.pill,
-                              ),
-                              child: const SizedBox(width: 44, height: 5),
-                            ),
-                            const SizedBox(height: AppSpacing.md),
-                            Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        texts.home.customSheetTitle,
-                                        maxLines: 2,
-                                        overflow: TextOverflow.ellipsis,
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .titleMedium
-                                            ?.copyWith(
-                                              color: AppColors.textStrong,
-                                              fontWeight: FontWeight.w800,
-                                            ),
-                                      ),
-                                      const SizedBox(height: AppSpacing.xs),
-                                      Text(
-                                        texts.home.minuteLabel(
-                                          sheetMinutes.round(),
-                                        ),
-                                        maxLines: 1,
-                                        overflow: TextOverflow.ellipsis,
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .headlineSmall
-                                            ?.copyWith(
-                                              color: AppColors.textStrong,
-                                              fontWeight: FontWeight.w900,
-                                            ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                IconButton.filledTonal(
-                                  onPressed: () =>
-                                      Navigator.of(sheetContext).pop(),
-                                  icon: const Icon(Icons.close_rounded),
-                                  tooltip: MaterialLocalizations.of(
-                                    context,
-                                  ).closeButtonTooltip,
-                                  style: IconButton.styleFrom(
-                                    backgroundColor: AppColors.white.withValues(
-                                      alpha: 0.72,
-                                    ),
-                                    foregroundColor: AppColors.brown700,
-                                    fixedSize: const Size(44, 44),
-                                    shape: const CircleBorder(),
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: AppSpacing.sm),
-                            _CustomMinutesSheetContent(
-                              sliderLabel: texts.home.minuteLabel(
-                                sheetMinutes.round(),
-                              ),
-                              minutes: sheetMinutes,
-                              startLabel: texts.home.customStartButton,
-                              onChanged: updateSheetMinutes,
-                              onAdjust: adjustSheetMinutes,
-                              onStart: () {
-                                final selectedMinutes = sheetMinutes.round();
-                                Navigator.of(sheetContext).pop();
-                                _startActivityTimer(
-                                  activity: ActivityCatalog.custom,
-                                  duration: Duration(minutes: selectedMinutes),
-                                );
-                              },
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            );
-          },
-        );
-      },
+    await _startActivityTimer(
+      activity: result.activity,
+      duration: result.duration,
+      markerMode: result.markerMode,
+      activityMarkerSelection: result.activityMarkerSelection,
     );
   }
 
@@ -575,7 +378,6 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
     final avatarStateText = isUsingCustomAvatar
         ? texts.home.avatarInlineCustomState
         : texts.home.avatarInlineDefaultState;
-    final languageCode = Localizations.localeOf(context).languageCode;
 
     return Scaffold(
       backgroundColor: AppColors.cream,
@@ -648,23 +450,11 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
                     onPressed: _openAvatarSetup,
                   ),
                 );
-                final quickStart = _ActivityQuickStartSection(
+                final timerBuilder = _TimerBuilderSection(
                   title: texts.home.activityQuickStartTitle,
-                  activities: ActivityCatalog.all,
-                  languageCode: languageCode,
-                  durationLabel: texts.home.minuteLabel,
-                  customTimerTitle: texts.home.customTimerTitle,
-                  startLabel: texts.common.start,
-                  onStartActivity: (activity) {
-                    if (activity.id == ActivityCatalog.custom.id) {
-                      _openCustomMinutesSheet();
-                      return;
-                    }
-                    _startActivityTimer(
-                      activity: activity,
-                      duration: activity.defaultDuration,
-                    );
-                  },
+                  subtitle: texts.home.timerBuilderSubtitle,
+                  buttonLabel: texts.home.timerBuilderButton,
+                  onPressed: _openTimerBuilder,
                 );
                 final activeSessionCard =
                     FutureBuilder<ActiveActivityTimerSession?>(
@@ -699,7 +489,7 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
                     children: [
                       Expanded(
                         child: Column(
-                          children: [activeSessionCard, quickStart],
+                          children: [activeSessionCard, timerBuilder],
                         ),
                       ),
                       const SizedBox(width: AppSpacing.xl),
@@ -711,7 +501,7 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
                 return Column(
                   children: [
                     activeSessionCard,
-                    quickStart,
+                    timerBuilder,
                     const SizedBox(height: AppSpacing.xl),
                     vehicleCard,
                   ],
@@ -776,6 +566,20 @@ class _ActivityMarkerSelection {
 
   final List<String> markerIds;
   final List<String> selectedMarkerIds;
+}
+
+class _TimerBuilderResult {
+  const _TimerBuilderResult({
+    required this.activity,
+    required this.duration,
+    required this.markerMode,
+    required this.activityMarkerSelection,
+  });
+
+  final ActivityDefinition activity;
+  final Duration duration;
+  final ActivityMarkerMode markerMode;
+  final _ActivityMarkerSelection activityMarkerSelection;
 }
 
 enum _ActiveTimerStartChoice { cancel, startNew }
@@ -1141,24 +945,18 @@ class _MinuteAdjustButton extends StatelessWidget {
   }
 }
 
-class _ActivityQuickStartSection extends StatelessWidget {
-  const _ActivityQuickStartSection({
+class _TimerBuilderSection extends StatelessWidget {
+  const _TimerBuilderSection({
     required this.title,
-    required this.activities,
-    required this.languageCode,
-    required this.durationLabel,
-    required this.customTimerTitle,
-    required this.startLabel,
-    required this.onStartActivity,
+    required this.subtitle,
+    required this.buttonLabel,
+    required this.onPressed,
   });
 
   final String title;
-  final List<ActivityDefinition> activities;
-  final String languageCode;
-  final String Function(int minutes) durationLabel;
-  final String customTimerTitle;
-  final String startLabel;
-  final ValueChanged<ActivityDefinition> onStartActivity;
+  final String subtitle;
+  final String buttonLabel;
+  final VoidCallback onPressed;
 
   @override
   Widget build(BuildContext context) {
@@ -1184,49 +982,83 @@ class _ActivityQuickStartSection extends StatelessWidget {
               ),
             ),
             const SizedBox(height: AppSpacing.md),
-            LayoutBuilder(
-              builder: (context, constraints) {
-                const spacing = AppSpacing.sm;
-                final textScale = MediaQuery.textScalerOf(context).scale(1.0);
-                final useSingleColumn =
-                    constraints.maxWidth < 300 || textScale >= 1.25;
-                final columns = useSingleColumn
-                    ? 1
-                    : constraints.maxWidth >= 520
-                    ? 3
-                    : 2;
-                final itemWidth =
-                    (constraints.maxWidth - (spacing * (columns - 1))) /
-                    columns;
-
-                return Wrap(
-                  spacing: spacing,
-                  runSpacing: spacing,
-                  children: [
-                    for (final activity in activities) ...[
-                      SizedBox(
-                        width:
-                            activity.id == ActivityCatalog.custom.id ||
-                                columns == 1
-                            ? constraints.maxWidth
-                            : itemWidth,
-                        child: _ActivityQuickStartCard(
-                          activity: activity,
-                          label: activity.id == ActivityCatalog.custom.id
-                              ? customTimerTitle
-                              : activity.labelForLanguage(languageCode),
-                          durationLabel: durationLabel(
-                            activity.defaultDuration.inMinutes,
+            Material(
+              key: const ValueKey('createTimerCard'),
+              color: AppColors.white.withValues(alpha: 0.82),
+              borderRadius: AppRadius.compactCard,
+              clipBehavior: Clip.antiAlias,
+              child: InkWell(
+                onTap: onPressed,
+                borderRadius: AppRadius.compactCard,
+                child: DecoratedBox(
+                  decoration: BoxDecoration(
+                    borderRadius: AppRadius.compactCard,
+                    border: Border.all(color: AppColors.borderSoft),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(AppSpacing.md),
+                    child: Row(
+                      children: [
+                        DecoratedBox(
+                          decoration: BoxDecoration(
+                            color: AppColors.surfaceSoft,
+                            borderRadius: AppRadius.pill,
                           ),
-                          startLabel: startLabel,
-                          isWide: activity.id == ActivityCatalog.custom.id,
-                          onPressed: () => onStartActivity(activity),
+                          child: const SizedBox(
+                            width: 46,
+                            height: 46,
+                            child: Icon(
+                              Icons.timer_rounded,
+                              color: AppColors.brown700,
+                              size: 25,
+                            ),
+                          ),
                         ),
-                      ),
-                    ],
-                  ],
-                );
-              },
+                        const SizedBox(width: AppSpacing.md),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                buttonLabel,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: textTheme.titleMedium?.copyWith(
+                                  color: AppColors.textStrong,
+                                  fontWeight: FontWeight.w900,
+                                ),
+                              ),
+                              const SizedBox(height: AppSpacing.xs),
+                              Text(
+                                subtitle,
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                                style: textTheme.bodySmall?.copyWith(
+                                  color: AppColors.textSecondary,
+                                  fontWeight: FontWeight.w700,
+                                  height: 1.25,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(width: AppSpacing.sm),
+                        AppBouncyButton(
+                          key: const ValueKey('createTimerButton'),
+                          label: buttonLabel,
+                          icon: Icons.add_rounded,
+                          onPressed: onPressed,
+                          variant: AppButtonVariant.soft,
+                          size: AppButtonSize.compact,
+                          fullWidth: false,
+                          minHeight: 42,
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
             ),
           ],
         ),
@@ -1235,328 +1067,478 @@ class _ActivityQuickStartSection extends StatelessWidget {
   }
 }
 
-class _ActivityQuickStartCard extends StatelessWidget {
-  const _ActivityQuickStartCard({
+class _TimerBuilderSheet extends StatefulWidget {
+  const _TimerBuilderSheet();
+
+  @override
+  State<_TimerBuilderSheet> createState() => _TimerBuilderSheetState();
+}
+
+class _TimerBuilderSheetState extends State<_TimerBuilderSheet> {
+  late ActivityDefinition _selectedActivity = ActivityCatalog.defaultActivity;
+  late double _minutes = _selectedActivity.defaultDuration.inMinutes.toDouble();
+  ActivityMarkerMode _markerMode = ActivityMarkerMode.random;
+  final Set<String> _selectedMarkerIds = {};
+
+  List<ActivityMarkerDefinition> get _availableMarkers {
+    final candidateIds = ActivityMarkerCatalog.defaultSelectionIdsForActivity(
+      _selectedActivity.id,
+    );
+    return List.unmodifiable(
+      candidateIds.map(ActivityMarkerCatalog.findById).nonNulls,
+    );
+  }
+
+  void _selectActivity(ActivityDefinition activity) {
+    setState(() {
+      _selectedActivity = activity;
+      _minutes = activity.defaultDuration.inMinutes.toDouble();
+      _selectedMarkerIds.clear();
+    });
+  }
+
+  void _selectMarkerMode(ActivityMarkerMode mode) {
+    setState(() {
+      _markerMode = mode;
+    });
+  }
+
+  void _toggleMarker(ActivityMarkerDefinition marker) {
+    setState(() {
+      if (_selectedMarkerIds.contains(marker.id)) {
+        _selectedMarkerIds.remove(marker.id);
+        return;
+      }
+      if (_selectedMarkerIds.length <
+          ActivityMarkerCatalog.maxSelectableMarkerCount) {
+        _selectedMarkerIds.add(marker.id);
+      }
+    });
+  }
+
+  void _updateMinutes(double value) {
+    setState(() {
+      _minutes = value.clamp(
+        _minCustomActivityMinutes.toDouble(),
+        _maxCustomActivityMinutes.toDouble(),
+      );
+    });
+  }
+
+  void _adjustMinutes(int delta) {
+    _updateMinutes((_minutes.round() + delta).toDouble());
+  }
+
+  void _start() {
+    if (_markerMode == ActivityMarkerMode.manual &&
+        _selectedMarkerIds.isEmpty) {
+      return;
+    }
+
+    final markerSelection = switch (_markerMode) {
+      ActivityMarkerMode.manual => _ActivityMarkerSelection(
+        markerIds: _selectedMarkerIds.toList(growable: false),
+        selectedMarkerIds: _selectedMarkerIds.toList(growable: false),
+      ),
+      _ => _ActivityMarkerSelection(
+        markerIds: ActivityMarkerCatalog.randomSelectionIds(
+          activityId: _selectedActivity.id,
+        ),
+        selectedMarkerIds: const [],
+      ),
+    };
+
+    Navigator.of(context).pop(
+      _TimerBuilderResult(
+        activity: _selectedActivity,
+        duration: Duration(minutes: _minutes.round()),
+        markerMode: _markerMode,
+        activityMarkerSelection: markerSelection,
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final texts = AppTexts.of(context);
+    final homeTexts = texts.home;
+    final textTheme = Theme.of(context).textTheme;
+    final mediaQuery = MediaQuery.of(context);
+    final languageCode = Localizations.localeOf(context).languageCode;
+    final selectedMinuteLabel = homeTexts.minuteLabel(_minutes.round());
+    final canStart =
+        _markerMode != ActivityMarkerMode.manual ||
+        _selectedMarkerIds.isNotEmpty;
+
+    return Align(
+      alignment: Alignment.bottomCenter,
+      child: ConstrainedBox(
+        constraints: BoxConstraints(maxHeight: mediaQuery.size.height * 0.92),
+        child: DecoratedBox(
+          decoration: BoxDecoration(
+            color: AppColors.surfaceWarm,
+            borderRadius: const BorderRadius.vertical(
+              top: Radius.circular(AppRadius.xxl),
+            ),
+            border: Border.all(color: AppColors.borderWarm),
+            boxShadow: AppShadows.hero,
+          ),
+          child: SafeArea(
+            top: false,
+            bottom: false,
+            child: Padding(
+              padding: EdgeInsets.fromLTRB(
+                AppSpacing.xl,
+                AppSpacing.sm,
+                AppSpacing.xl,
+                AppSpacing.xl +
+                    mediaQuery.padding.bottom +
+                    mediaQuery.viewInsets.bottom,
+              ),
+              child: SingleChildScrollView(
+                child: Column(
+                  key: const ValueKey('timerBuilderSheet'),
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Align(
+                      child: DecoratedBox(
+                        decoration: BoxDecoration(
+                          color: AppColors.borderSoft,
+                          borderRadius: AppRadius.pill,
+                        ),
+                        child: const SizedBox(width: 44, height: 5),
+                      ),
+                    ),
+                    const SizedBox(height: AppSpacing.md),
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Expanded(
+                          child: Text(
+                            homeTexts.timerBuilderSheetTitle,
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                            style: textTheme.titleLarge?.copyWith(
+                              color: AppColors.textStrong,
+                              fontWeight: FontWeight.w900,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: AppSpacing.sm),
+                        IconButton.filledTonal(
+                          onPressed: () => Navigator.of(context).pop(),
+                          icon: const Icon(Icons.close_rounded),
+                          tooltip: MaterialLocalizations.of(
+                            context,
+                          ).closeButtonTooltip,
+                          style: IconButton.styleFrom(
+                            backgroundColor: AppColors.white.withValues(
+                              alpha: 0.72,
+                            ),
+                            foregroundColor: AppColors.brown700,
+                            fixedSize: const Size(44, 44),
+                            shape: const CircleBorder(),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: AppSpacing.lg),
+                    _TimerBuilderStepTitle(
+                      title: homeTexts.timerBuilderActivityStepTitle,
+                    ),
+                    const SizedBox(height: AppSpacing.sm),
+                    Wrap(
+                      spacing: AppSpacing.sm,
+                      runSpacing: AppSpacing.sm,
+                      children: [
+                        for (final activity in ActivityCatalog.all)
+                          _TimerBuilderActivityChip(
+                            activity: activity,
+                            label: activity.labelForLanguage(languageCode),
+                            isSelected: activity.id == _selectedActivity.id,
+                            onSelected: () => _selectActivity(activity),
+                          ),
+                      ],
+                    ),
+                    const SizedBox(height: AppSpacing.lg),
+                    _TimerBuilderStepTitle(
+                      title: homeTexts.timerBuilderMarkerStepTitle,
+                    ),
+                    const SizedBox(height: AppSpacing.sm),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: _TimerBuilderModeButton(
+                            key: const ValueKey('timerBuilderMarkerRandom'),
+                            label: homeTexts.timerBuilderRandomMarkerOption,
+                            icon: Icons.shuffle_rounded,
+                            isSelected:
+                                _markerMode == ActivityMarkerMode.random,
+                            onPressed: () =>
+                                _selectMarkerMode(ActivityMarkerMode.random),
+                          ),
+                        ),
+                        const SizedBox(width: AppSpacing.sm),
+                        Expanded(
+                          child: _TimerBuilderModeButton(
+                            key: const ValueKey('timerBuilderMarkerManual'),
+                            label: homeTexts.timerBuilderManualMarkerOption,
+                            icon: Icons.touch_app_rounded,
+                            isSelected:
+                                _markerMode == ActivityMarkerMode.manual,
+                            onPressed: () =>
+                                _selectMarkerMode(ActivityMarkerMode.manual),
+                          ),
+                        ),
+                      ],
+                    ),
+                    if (_markerMode == ActivityMarkerMode.manual) ...[
+                      const SizedBox(height: AppSpacing.sm),
+                      Text(
+                        homeTexts.timerBuilderSelectedMarkerEmpty,
+                        style: textTheme.labelMedium?.copyWith(
+                          color: AppColors.textSecondary,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                      const SizedBox(height: AppSpacing.sm),
+                      Wrap(
+                        spacing: AppSpacing.sm,
+                        runSpacing: AppSpacing.sm,
+                        children: [
+                          for (final marker in _availableMarkers)
+                            _TimerBuilderMarkerChip(
+                              marker: marker,
+                              isSelected: _selectedMarkerIds.contains(
+                                marker.id,
+                              ),
+                              isEnabled:
+                                  _selectedMarkerIds.contains(marker.id) ||
+                                  _selectedMarkerIds.length <
+                                      ActivityMarkerCatalog
+                                          .maxSelectableMarkerCount,
+                              onSelected: () => _toggleMarker(marker),
+                            ),
+                        ],
+                      ),
+                    ],
+                    const SizedBox(height: AppSpacing.lg),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: _TimerBuilderStepTitle(
+                            title: homeTexts.timerBuilderTimeStepTitle,
+                          ),
+                        ),
+                        Text(
+                          selectedMinuteLabel,
+                          style: textTheme.titleMedium?.copyWith(
+                            color: AppColors.textStrong,
+                            fontWeight: FontWeight.w900,
+                          ),
+                        ),
+                      ],
+                    ),
+                    SliderTheme(
+                      data: SliderTheme.of(context).copyWith(
+                        activeTrackColor: AppColors.primary,
+                        inactiveTrackColor: AppColors.borderSoft,
+                        thumbColor: AppColors.primarySoft,
+                        overlayColor: AppColors.primary.withValues(alpha: 0.12),
+                        valueIndicatorColor: AppColors.brown900,
+                        valueIndicatorTextStyle: textTheme.labelMedium
+                            ?.copyWith(
+                              color: AppColors.white,
+                              fontWeight: FontWeight.w900,
+                            ),
+                        trackHeight: 6,
+                      ),
+                      child: Slider(
+                        key: const ValueKey('timerBuilderMinuteSlider'),
+                        value: _minutes,
+                        min: _minCustomActivityMinutes.toDouble(),
+                        max: _maxCustomActivityMinutes.toDouble(),
+                        label: selectedMinuteLabel,
+                        onChanged: _updateMinutes,
+                      ),
+                    ),
+                    const SizedBox(height: AppSpacing.sm),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: _MinuteAdjustButton(
+                            label: '-5',
+                            onPressed: () => _adjustMinutes(-5),
+                          ),
+                        ),
+                        const SizedBox(width: AppSpacing.sm),
+                        Expanded(
+                          child: _MinuteAdjustButton(
+                            label: '-1',
+                            onPressed: () => _adjustMinutes(-1),
+                          ),
+                        ),
+                        const SizedBox(width: AppSpacing.sm),
+                        Expanded(
+                          child: _MinuteAdjustButton(
+                            label: '+1',
+                            onPressed: () => _adjustMinutes(1),
+                          ),
+                        ),
+                        const SizedBox(width: AppSpacing.sm),
+                        Expanded(
+                          child: _MinuteAdjustButton(
+                            label: '+5',
+                            onPressed: () => _adjustMinutes(5),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: AppSpacing.lg),
+                    AppBouncyButton(
+                      key: const ValueKey('timerBuilderStartButton'),
+                      label: homeTexts.timerBuilderStartButton,
+                      icon: Icons.flag_rounded,
+                      onPressed: canStart ? _start : null,
+                      variant: AppButtonVariant.soft,
+                      size: AppButtonSize.medium,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _TimerBuilderStepTitle extends StatelessWidget {
+  const _TimerBuilderStepTitle({required this.title});
+
+  final String title;
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      title,
+      style: Theme.of(context).textTheme.titleSmall?.copyWith(
+        color: AppColors.textStrong,
+        fontWeight: FontWeight.w900,
+      ),
+    );
+  }
+}
+
+class _TimerBuilderActivityChip extends StatelessWidget {
+  const _TimerBuilderActivityChip({
     required this.activity,
     required this.label,
-    required this.durationLabel,
-    required this.startLabel,
-    required this.isWide,
-    required this.onPressed,
+    required this.isSelected,
+    required this.onSelected,
   });
 
   final ActivityDefinition activity;
   final String label;
-  final String durationLabel;
-  final String startLabel;
-  final bool isWide;
-  final VoidCallback onPressed;
+  final bool isSelected;
+  final VoidCallback onSelected;
 
   @override
   Widget build(BuildContext context) {
-    final textTheme = Theme.of(context).textTheme;
-    final isCustomTimer = activity.id == ActivityCatalog.custom.id;
-
-    return Material(
-      key: ValueKey('activityQuickStartCard_${activity.id}'),
-      color: isCustomTimer
-          ? AppColors.white.withValues(alpha: 0.88)
-          : AppColors.white.withValues(alpha: 0.82),
-      borderRadius: AppRadius.compactCard,
-      clipBehavior: Clip.antiAlias,
-      child: InkWell(
-        onTap: onPressed,
-        borderRadius: AppRadius.compactCard,
-        child: DecoratedBox(
-          decoration: BoxDecoration(
-            borderRadius: AppRadius.compactCard,
-            border: Border.all(
-              color: isCustomTimer
-                  ? AppColors.primarySoft.withValues(alpha: 0.92)
-                  : AppColors.borderSoft,
-              width: isCustomTimer ? 1.2 : 1,
-            ),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.all(AppSpacing.md),
-            child: ConstrainedBox(
-              constraints: BoxConstraints(minHeight: isWide ? 64 : 96),
-              child: isWide
-                  ? Row(
-                      children: [
-                        _ActivityEmojiBadge(emoji: activity.emoji),
-                        const SizedBox(width: AppSpacing.md),
-                        Expanded(
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                label,
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                                style: textTheme.titleSmall?.copyWith(
-                                  color: AppColors.textStrong,
-                                  fontWeight: FontWeight.w900,
-                                  height: 1.12,
-                                ),
-                              ),
-                              const SizedBox(height: AppSpacing.xs),
-                              _ActivityDurationPill(
-                                durationLabel: durationLabel,
-                              ),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(width: AppSpacing.md),
-                        _ActivityStartIconButton(
-                          key: ValueKey('activityStartButton_${activity.id}'),
-                          label: startLabel,
-                          onPressed: onPressed,
-                        ),
-                      ],
-                    )
-                  : Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            _ActivityEmojiBadge(emoji: activity.emoji),
-                            _ActivityStartIconButton(
-                              key: ValueKey(
-                                'activityStartButton_${activity.id}',
-                              ),
-                              label: startLabel,
-                              onPressed: onPressed,
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: AppSpacing.sm),
-                        Text(
-                          label,
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                          style: textTheme.titleSmall?.copyWith(
-                            color: AppColors.textStrong,
-                            fontWeight: FontWeight.w900,
-                            height: 1.12,
-                          ),
-                        ),
-                        const SizedBox(height: AppSpacing.xs),
-                        _ActivityDurationPill(durationLabel: durationLabel),
-                      ],
-                    ),
-            ),
-          ),
-        ),
+    return ChoiceChip(
+      key: ValueKey('timerBuilderActivity_${activity.id}'),
+      selected: isSelected,
+      onSelected: (_) => onSelected(),
+      avatar: Text(activity.emoji, textScaler: TextScaler.noScaling),
+      label: Text(label),
+      labelStyle: Theme.of(context).textTheme.labelLarge?.copyWith(
+        color: isSelected ? AppColors.textStrong : AppColors.textPrimary,
+        fontWeight: FontWeight.w800,
       ),
+      selectedColor: AppColors.surfaceYellow,
+      backgroundColor: AppColors.white.withValues(alpha: 0.82),
+      side: BorderSide(
+        color: isSelected ? AppColors.primarySoft : AppColors.borderSoft,
+      ),
+      showCheckmark: false,
     );
   }
 }
 
-class _ActivityEmojiBadge extends StatelessWidget {
-  const _ActivityEmojiBadge({required this.emoji});
-
-  final String emoji;
-
-  @override
-  Widget build(BuildContext context) {
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        color: AppColors.surfaceSoft,
-        borderRadius: AppRadius.pill,
-      ),
-      child: SizedBox(
-        width: 40,
-        height: 40,
-        child: Center(
-          child: Text(
-            emoji,
-            textScaler: TextScaler.noScaling,
-            style: const TextStyle(fontSize: 24, height: 1),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _ActivityDurationPill extends StatelessWidget {
-  const _ActivityDurationPill({required this.durationLabel});
-
-  final String durationLabel;
-
-  @override
-  Widget build(BuildContext context) {
-    final textTheme = Theme.of(context).textTheme;
-
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        color: AppColors.surfaceWarm,
-        borderRadius: AppRadius.pill,
-        border: Border.all(color: AppColors.borderSoft),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(
-          horizontal: AppSpacing.sm,
-          vertical: 5,
-        ),
-        child: Text(
-          durationLabel,
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-          style: textTheme.labelSmall?.copyWith(
-            color: AppColors.textSecondary,
-            fontWeight: FontWeight.w900,
-            height: 1,
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _ActivityStartIconButton extends StatelessWidget {
-  const _ActivityStartIconButton({
+class _TimerBuilderModeButton extends StatelessWidget {
+  const _TimerBuilderModeButton({
     super.key,
     required this.label,
+    required this.icon,
+    required this.isSelected,
     required this.onPressed,
   });
 
   final String label;
+  final IconData icon;
+  final bool isSelected;
   final VoidCallback onPressed;
 
   @override
   Widget build(BuildContext context) {
-    return Tooltip(
-      message: label,
-      child: Semantics(
-        button: true,
-        label: label,
-        child: DecoratedBox(
-          decoration: BoxDecoration(
-            color: AppColors.primarySoft,
-            borderRadius: AppRadius.pill,
-            border: Border.all(color: AppColors.borderWarm),
-            boxShadow: AppShadows.buttonSoft,
-          ),
-          child: Material(
-            color: AppColors.transparent,
-            borderRadius: AppRadius.pill,
-            clipBehavior: Clip.antiAlias,
-            child: InkWell(
-              onTap: onPressed,
-              borderRadius: AppRadius.pill,
-              child: const SizedBox(
-                width: 40,
-                height: 40,
-                child: Icon(
-                  Icons.play_arrow_rounded,
-                  color: AppColors.brown900,
-                  size: 24,
-                ),
-              ),
-            ),
-          ),
+    return OutlinedButton.icon(
+      onPressed: onPressed,
+      icon: Icon(icon),
+      label: Text(label, overflow: TextOverflow.ellipsis),
+      style: OutlinedButton.styleFrom(
+        backgroundColor: isSelected
+            ? AppColors.surfaceYellow
+            : AppColors.white.withValues(alpha: 0.78),
+        foregroundColor: AppColors.textPrimary,
+        side: BorderSide(
+          color: isSelected ? AppColors.primarySoft : AppColors.borderSoft,
+          width: isSelected ? 1.4 : 1,
         ),
+        shape: const StadiumBorder(),
+        minimumSize: const Size.fromHeight(44),
       ),
     );
   }
 }
 
-class _CustomMinutesSheetContent extends StatelessWidget {
-  const _CustomMinutesSheetContent({
-    required this.sliderLabel,
-    required this.minutes,
-    required this.startLabel,
-    required this.onChanged,
-    required this.onAdjust,
-    required this.onStart,
+class _TimerBuilderMarkerChip extends StatelessWidget {
+  const _TimerBuilderMarkerChip({
+    required this.marker,
+    required this.isSelected,
+    required this.isEnabled,
+    required this.onSelected,
   });
 
-  final String sliderLabel;
-  final double minutes;
-  final String startLabel;
-  final ValueChanged<double> onChanged;
-  final ValueChanged<int> onAdjust;
-  final VoidCallback onStart;
+  final ActivityMarkerDefinition marker;
+  final bool isSelected;
+  final bool isEnabled;
+  final VoidCallback onSelected;
 
   @override
   Widget build(BuildContext context) {
-    final textTheme = Theme.of(context).textTheme;
+    final label = marker.labelForLanguage(
+      Localizations.localeOf(context).languageCode,
+    );
 
-    return Padding(
-      padding: const EdgeInsets.all(AppSpacing.lg),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          SliderTheme(
-            data: SliderTheme.of(context).copyWith(
-              activeTrackColor: AppColors.primary,
-              inactiveTrackColor: AppColors.borderSoft,
-              thumbColor: AppColors.primarySoft,
-              overlayColor: AppColors.primary.withValues(alpha: 0.12),
-              valueIndicatorColor: AppColors.brown900,
-              valueIndicatorTextStyle: textTheme.labelMedium?.copyWith(
-                color: AppColors.white,
-                fontWeight: FontWeight.w900,
-              ),
-              trackHeight: 6,
-            ),
-            child: Slider(
-              value: minutes,
-              min: _minCustomActivityMinutes.toDouble(),
-              max: _maxCustomActivityMinutes.toDouble(),
-              label: sliderLabel,
-              onChanged: onChanged,
-            ),
-          ),
-          const SizedBox(height: AppSpacing.sm),
-          Row(
-            children: [
-              Expanded(
-                child: _MinuteAdjustButton(
-                  label: '-5',
-                  onPressed: () => onAdjust(-5),
-                ),
-              ),
-              const SizedBox(width: AppSpacing.sm),
-              Expanded(
-                child: _MinuteAdjustButton(
-                  label: '-1',
-                  onPressed: () => onAdjust(-1),
-                ),
-              ),
-              const SizedBox(width: AppSpacing.sm),
-              Expanded(
-                child: _MinuteAdjustButton(
-                  label: '+1',
-                  onPressed: () => onAdjust(1),
-                ),
-              ),
-              const SizedBox(width: AppSpacing.sm),
-              Expanded(
-                child: _MinuteAdjustButton(
-                  label: '+5',
-                  onPressed: () => onAdjust(5),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: AppSpacing.lg),
-          SizedBox(
-            width: double.infinity,
-            child: AppBouncyButton(
-              label: startLabel,
-              icon: Icons.flag_rounded,
-              onPressed: onStart,
-              variant: AppButtonVariant.soft,
-              size: AppButtonSize.medium,
-            ),
-          ),
-        ],
+    return ChoiceChip(
+      key: ValueKey('timerBuilderMarker_${marker.id}'),
+      selected: isSelected,
+      onSelected: isEnabled ? (_) => onSelected() : null,
+      avatar: Text(marker.emoji, textScaler: TextScaler.noScaling),
+      label: Text(label),
+      labelStyle: Theme.of(context).textTheme.labelLarge?.copyWith(
+        color: isSelected ? AppColors.textStrong : AppColors.textPrimary,
+        fontWeight: FontWeight.w800,
       ),
+      selectedColor: AppColors.surfaceYellow,
+      backgroundColor: AppColors.white.withValues(alpha: 0.82),
+      disabledColor: AppColors.white.withValues(alpha: 0.44),
+      side: BorderSide(
+        color: isSelected ? AppColors.primarySoft : AppColors.borderSoft,
+      ),
+      showCheckmark: false,
     );
   }
 }

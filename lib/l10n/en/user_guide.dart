@@ -28,8 +28,8 @@ class EnUserGuideTexts implements UserGuideTextSet {
   String get startMissionTitle => 'Start an activity mission';
   List<String> get startMissionItems => const [
     'After setting the child name, choose a vehicle from the home screen.',
-    'Pick an activity card on Home to use its default duration.',
-    'For Custom Timer, choose the duration before starting.',
+    'Tap Create Timer on Home, then choose a mission, markers, and duration.',
+    'Use Other in the same flow when the routine does not match a preset mission.',
     'Pausing during the timer is not a failure; the mission can resume when needed.',
   ];
 

@@ -19,7 +19,18 @@ class EnHomeTexts implements HomeTextSet {
   String get activityQuickStartTitle => "Today's Mission";
   String get customStartButton => 'Start Custom Ride';
   String get customSheetTitle => 'Custom time';
-  String get customTimerTitle => 'Custom Timer';
+  String get customTimerTitle => 'Other';
+  String get timerBuilderButton => 'Create Timer';
+  String get timerBuilderSubtitle =>
+      'Choose a mission, markers, and time before starting.';
+  String get timerBuilderSheetTitle => 'Create Timer';
+  String get timerBuilderActivityStepTitle => '1. Mission';
+  String get timerBuilderMarkerStepTitle => '2. Markers';
+  String get timerBuilderRandomMarkerOption => 'Auto';
+  String get timerBuilderManualMarkerOption => 'Choose';
+  String get timerBuilderTimeStepTitle => '3. Time';
+  String get timerBuilderStartButton => 'Start';
+  String get timerBuilderSelectedMarkerEmpty => 'Choose at least one marker.';
   String get activitySummaryLabel => 'Missions';
   String get stickerKindSummaryLabel => 'Kinds';
   String get stickerSummaryLabel => 'Stickers';

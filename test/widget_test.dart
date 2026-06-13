@@ -1656,14 +1656,24 @@ void main() {
     expect(find.text('기본 얼굴 사용 중'), findsOneWidget);
     expect(find.text('만들기'), findsOneWidget);
     expect(find.text('오늘의 미션'), findsOneWidget);
+    expect(find.text('타이머 만들기'), findsWidgets);
+    expect(find.byKey(const ValueKey('createTimerButton')), findsOneWidget);
+    expect(find.textContaining('미션, 마커, 시간을'), findsOneWidget);
+    expect(find.text('양치'), findsNothing);
+    expect(find.text('식사'), findsNothing);
+    expect(find.text('기타'), findsNothing);
+
+    await _openTimerBuilder(tester);
+
     expect(find.text('양치'), findsOneWidget);
     expect(find.text('책 읽기'), findsOneWidget);
     expect(find.text('정리'), findsOneWidget);
     expect(find.text('놀이'), findsOneWidget);
-    expect(find.textContaining('직접 설정'), findsOneWidget);
+    expect(find.text('식사'), findsOneWidget);
+    expect(find.text('기타'), findsOneWidget);
     for (final activity in ActivityCatalog.all) {
       expect(
-        find.byKey(ValueKey('activityQuickStartCard_${activity.id}')),
+        find.byKey(ValueKey('timerBuilderActivity_${activity.id}')),
         findsOneWidget,
       );
     }
@@ -2052,12 +2062,8 @@ void main() {
     );
     await tester.pump();
 
-    tester
-        .widget<AppBouncyButton>(
-          find.byKey(const ValueKey('activityStartButton_brushing')),
-        )
-        .onPressed!();
-    await tester.pump();
+    await _openTimerBuilder(tester);
+    await _startTimerBuilder(tester);
 
     expect(find.text('진행 중인 타이머가 있어요'), findsOneWidget);
     expect(
@@ -2075,7 +2081,7 @@ void main() {
     expect(timerScreen.config.duration, const Duration(minutes: 2));
   });
 
-  testWidgets('Starting an activity opens the marker picker first', (
+  testWidgets('Timer builder shows manual marker choices for an activity', (
     tester,
   ) async {
     SharedPreferences.setMockInitialValues({});
@@ -2105,29 +2111,22 @@ void main() {
     );
     await tester.pump();
 
-    tester
-        .widget<AppBouncyButton>(
-          find.byKey(const ValueKey('activityStartButton_brushing')),
-        )
-        .onPressed!();
+    await _openTimerBuilder(tester);
+    await tester.tap(find.byKey(const ValueKey('timerBuilderMarkerManual')));
     expect(tester.takeException(), isNull);
     await tester.pump();
-    await tester.pump(const Duration(milliseconds: 400));
 
+    expect(find.byKey(const ValueKey('timerBuilderSheet')), findsOneWidget);
     expect(
-      find.byKey(const ValueKey('activityMarkerPickerSheet')),
+      find.byKey(const ValueKey('timerBuilderMarker_top_teeth')),
       findsOneWidget,
     );
     expect(
-      find.byKey(const ValueKey('activityMarkerChip_top_teeth')),
+      find.byKey(const ValueKey('timerBuilderMarker_bottom_teeth')),
       findsOneWidget,
     );
     expect(
-      find.byKey(const ValueKey('activityMarkerChip_bottom_teeth')),
-      findsOneWidget,
-    );
-    expect(
-      find.byKey(const ValueKey('activityMarkerChip_front_teeth')),
+      find.byKey(const ValueKey('timerBuilderMarker_front_teeth')),
       findsOneWidget,
     );
     expect(find.text('어금니'), findsOneWidget);
@@ -2135,7 +2134,7 @@ void main() {
     expect(find.byType(TimerScreen), findsNothing);
   });
 
-  testWidgets('Activity marker picker help opens help text', (tester) async {
+  testWidgets('Timer builder can switch to manual marker mode', (tester) async {
     await tester.pumpWidget(
       MaterialApp(
         locale: const Locale('ko'),
@@ -2158,32 +2157,21 @@ void main() {
     );
     await tester.pump();
 
-    tester
-        .widget<AppBouncyButton>(
-          find.byKey(const ValueKey('activityStartButton_brushing')),
-        )
-        .onPressed!();
+    await _openTimerBuilder(tester);
+
+    expect(find.byKey(const ValueKey('timerBuilderSheet')), findsOneWidget);
+    expect(find.text('2. 마커'), findsOneWidget);
+
+    await tester.tap(find.byKey(const ValueKey('timerBuilderMarkerManual')));
     await tester.pump();
-    await tester.pump(const Duration(seconds: 1));
-    await tester.pump();
-    await tester.pumpAndSettle();
 
     expect(
-      find.byKey(const ValueKey('activityMarkerPickerSheet')),
+      find.byKey(const ValueKey('timerBuilderMarker_top_teeth')),
       findsOneWidget,
     );
-    expect(find.text('코스 마커 안내'), findsOneWidget);
-
-    await tester.tap(
-      find.byKey(const ValueKey('activityMarkerPickerHelpButton')),
-    );
-    await tester.pumpAndSettle();
-
-    expect(find.byKey(const ValueKey('appHelpSheet')), findsOneWidget);
-    expect(find.textContaining('직접 고른 마커'), findsWidgets);
   });
 
-  testWidgets('Activity marker off starts timer without picker', (
+  testWidgets('Timer builder auto marker starts timer without manual choices', (
     tester,
   ) async {
     SharedPreferences.setMockInitialValues({});
@@ -2213,23 +2201,14 @@ void main() {
     );
     await tester.pump();
 
-    tester
-        .widget<AppBouncyButton>(
-          find.byKey(const ValueKey('activityStartButton_brushing')),
-        )
-        .onPressed!();
-    await tester.pump();
-    await tester.pump(const Duration(seconds: 1));
-    await tester.pump();
+    await _openTimerBuilder(tester);
+    await _startTimerBuilder(tester);
 
-    expect(
-      find.byKey(const ValueKey('activityMarkerPickerSheet')),
-      findsNothing,
-    );
+    expect(find.byKey(const ValueKey('timerBuilderSheet')), findsNothing);
     expect(find.byType(TimerScreen), findsOneWidget);
     expect(
       tester.widget<TimerScreen>(find.byType(TimerScreen)).config.markerIds,
-      isEmpty,
+      hasLength(ActivityMarkerCatalog.maxSelectableMarkerCount),
     );
     expect(
       tester
@@ -2240,9 +2219,7 @@ void main() {
     );
   });
 
-  testWidgets('Activity marker random starts timer without picker', (
-    tester,
-  ) async {
+  testWidgets('Timer builder random marker starts timer', (tester) async {
     SharedPreferences.setMockInitialValues({});
     addTearDown(() async {
       await const ActiveActivityTimerSessionStore().clear();
@@ -2270,19 +2247,10 @@ void main() {
     );
     await tester.pump();
 
-    tester
-        .widget<AppBouncyButton>(
-          find.byKey(const ValueKey('activityStartButton_brushing')),
-        )
-        .onPressed!();
-    await tester.pump();
-    await tester.pump(const Duration(seconds: 1));
-    await tester.pump();
+    await _openTimerBuilder(tester);
+    await _startTimerBuilder(tester);
 
-    expect(
-      find.byKey(const ValueKey('activityMarkerPickerSheet')),
-      findsNothing,
-    );
+    expect(find.byKey(const ValueKey('timerBuilderSheet')), findsNothing);
     expect(find.byType(TimerScreen), findsOneWidget);
     expect(
       tester.widget<TimerScreen>(find.byType(TimerScreen)).config.markerIds,
@@ -2297,7 +2265,7 @@ void main() {
     );
   });
 
-  testWidgets('Tapping random start opens timer screen', (tester) async {
+  testWidgets('Starting timer builder opens timer screen', (tester) async {
     SharedPreferences.setMockInitialValues({});
     addTearDown(() async {
       await const ActiveActivityTimerSessionStore().clear();
@@ -2325,20 +2293,8 @@ void main() {
     );
     await tester.pump();
 
-    tester
-        .widget<AppBouncyButton>(
-          find.byKey(const ValueKey('activityStartButton_brushing')),
-        )
-        .onPressed!();
-    await tester.pump();
-    await tester.pump(const Duration(milliseconds: 400));
-
-    final randomStartButton = find.byKey(
-      const ValueKey('randomStartActivityMarkersButton'),
-    );
-    tester.widget<OutlinedButton>(randomStartButton).onPressed!();
-    await tester.pump();
-    await tester.pump(const Duration(milliseconds: 400));
+    await _openTimerBuilder(tester);
+    await _startTimerBuilder(tester);
 
     expect(find.byType(TimerScreen), findsOneWidget);
     expect(
@@ -2351,126 +2307,14 @@ void main() {
     );
   });
 
-  testWidgets('Selecting brushing markers opens timer with selected markers', (
-    tester,
-  ) async {
-    SharedPreferences.setMockInitialValues({});
-    addTearDown(() async {
-      await const ActiveActivityTimerSessionStore().clear();
-    });
-
-    await tester.pumpWidget(
-      MaterialApp(
-        locale: const Locale('ko'),
-        supportedLocales: const [Locale('ko'), Locale('en')],
-        localizationsDelegates: const [
-          GlobalMaterialLocalizations.delegate,
-          GlobalCupertinoLocalizations.delegate,
-          GlobalWidgetsLocalizations.delegate,
-        ],
-        home: HomeScreen(
-          config: ActivityTimerConfig.defaults().copyWith(
-            childName: '지율',
-            duration: const Duration(minutes: 25),
-            markerMode: ActivityMarkerMode.manual,
-          ),
-          activityProgressService: LocalActivityProgressService(),
-          onConfigChanged: (_) {},
-        ),
-      ),
-    );
-    await tester.pump();
-
-    tester
-        .widget<AppBouncyButton>(
-          find.byKey(const ValueKey('activityStartButton_brushing')),
-        )
-        .onPressed!();
-    await tester.pump();
-    await tester.pump(const Duration(milliseconds: 400));
-
-    final topTeethChip = find.byKey(
-      const ValueKey('activityMarkerChip_top_teeth'),
-    );
-    tester.widget<ChoiceChip>(topTeethChip).onSelected!(true);
-    await tester.pump();
-    final bottomTeethChip = find.byKey(
-      const ValueKey('activityMarkerChip_bottom_teeth'),
-    );
-    tester.widget<ChoiceChip>(bottomTeethChip).onSelected!(true);
-    await tester.pump();
-    final startSelectedButton = find.byKey(
-      const ValueKey('startSelectedActivityMarkersButton'),
-    );
-    tester.widget<FilledButton>(startSelectedButton).onPressed!();
-    await tester.pump();
-    await tester.pump(const Duration(milliseconds: 400));
-
-    expect(
-      tester.widget<TimerScreen>(find.byType(TimerScreen)).config.markerIds,
-      ['top_teeth', 'bottom_teeth'],
-    );
-    expect(
-      tester
-          .widget<TimerScreen>(find.byType(TimerScreen))
-          .config
-          .selectedMarkerIds,
-      ['top_teeth', 'bottom_teeth'],
-    );
-  });
-
-  testWidgets('Dismissing the marker picker does not open timer screen', (
-    tester,
-  ) async {
-    SharedPreferences.setMockInitialValues({});
-    addTearDown(() async {
-      await const ActiveActivityTimerSessionStore().clear();
-    });
-
-    await tester.pumpWidget(
-      MaterialApp(
-        locale: const Locale('ko'),
-        supportedLocales: const [Locale('ko'), Locale('en')],
-        localizationsDelegates: const [
-          GlobalMaterialLocalizations.delegate,
-          GlobalCupertinoLocalizations.delegate,
-          GlobalWidgetsLocalizations.delegate,
-        ],
-        home: HomeScreen(
-          config: ActivityTimerConfig.defaults().copyWith(
-            childName: '지율',
-            duration: const Duration(minutes: 25),
-            markerMode: ActivityMarkerMode.manual,
-          ),
-          activityProgressService: LocalActivityProgressService(),
-          onConfigChanged: (_) {},
-        ),
-      ),
-    );
-    await tester.pump();
-
-    tester
-        .widget<AppBouncyButton>(
-          find.byKey(const ValueKey('activityStartButton_brushing')),
-        )
-        .onPressed!();
-    await tester.pump();
-    await tester.pump(const Duration(milliseconds: 400));
-
-    await tester.tapAt(const Offset(10, 10));
-    await tester.pump();
-    await tester.pump(const Duration(milliseconds: 400));
-
-    expect(
-      find.byKey(const ValueKey('activityMarkerPickerSheet')),
-      findsNothing,
-    );
-    expect(find.byType(TimerScreen), findsNothing);
-  });
-
   testWidgets(
-    'Activity quick start shows MVP activities and default durations',
+    'Selecting timer builder markers opens timer with selected markers',
     (tester) async {
+      SharedPreferences.setMockInitialValues({});
+      addTearDown(() async {
+        await const ActiveActivityTimerSessionStore().clear();
+      });
+
       await tester.pumpWidget(
         MaterialApp(
           locale: const Locale('ko'),
@@ -2483,7 +2327,8 @@ void main() {
           home: HomeScreen(
             config: ActivityTimerConfig.defaults().copyWith(
               childName: '지율',
-              duration: const Duration(minutes: 15),
+              duration: const Duration(minutes: 25),
+              markerMode: ActivityMarkerMode.manual,
             ),
             activityProgressService: LocalActivityProgressService(),
             onConfigChanged: (_) {},
@@ -2492,20 +2337,108 @@ void main() {
       );
       await tester.pump();
 
-      expect(find.text('양치'), findsOneWidget);
-      expect(find.text('책 읽기'), findsOneWidget);
-      expect(find.text('정리'), findsOneWidget);
-      expect(find.text('놀이'), findsOneWidget);
-      expect(find.text('직접 설정'), findsWidgets);
-      expect(find.text('2분'), findsOneWidget);
-      expect(find.text('15분'), findsWidgets);
-      expect(find.text('5분'), findsOneWidget);
-      expect(find.text('20분'), findsOneWidget);
-      expect(find.text('10분'), findsOneWidget);
+      await _openTimerBuilder(tester);
+      await _selectTimerBuilderManualMarkers(tester, [
+        'top_teeth',
+        'bottom_teeth',
+      ]);
+      await _startTimerBuilder(tester);
+
+      expect(
+        tester.widget<TimerScreen>(find.byType(TimerScreen)).config.markerIds,
+        ['top_teeth', 'bottom_teeth'],
+      );
+      expect(
+        tester
+            .widget<TimerScreen>(find.byType(TimerScreen))
+            .config
+            .selectedMarkerIds,
+        ['top_teeth', 'bottom_teeth'],
+      );
     },
   );
 
-  testWidgets('Activity quick start does not overwrite default duration', (
+  testWidgets('Dismissing the timer builder does not open timer screen', (
+    tester,
+  ) async {
+    SharedPreferences.setMockInitialValues({});
+    addTearDown(() async {
+      await const ActiveActivityTimerSessionStore().clear();
+    });
+
+    await tester.pumpWidget(
+      MaterialApp(
+        locale: const Locale('ko'),
+        supportedLocales: const [Locale('ko'), Locale('en')],
+        localizationsDelegates: const [
+          GlobalMaterialLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+        ],
+        home: HomeScreen(
+          config: ActivityTimerConfig.defaults().copyWith(
+            childName: '지율',
+            duration: const Duration(minutes: 25),
+            markerMode: ActivityMarkerMode.manual,
+          ),
+          activityProgressService: LocalActivityProgressService(),
+          onConfigChanged: (_) {},
+        ),
+      ),
+    );
+    await tester.pump();
+
+    await _openTimerBuilder(tester);
+
+    await tester.tapAt(const Offset(10, 10));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 400));
+
+    expect(find.byKey(const ValueKey('timerBuilderSheet')), findsNothing);
+    expect(find.byType(TimerScreen), findsNothing);
+  });
+
+  testWidgets('Timer builder shows MVP activities and default durations', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        locale: const Locale('ko'),
+        supportedLocales: const [Locale('ko'), Locale('en')],
+        localizationsDelegates: const [
+          GlobalMaterialLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+        ],
+        home: HomeScreen(
+          config: ActivityTimerConfig.defaults().copyWith(
+            childName: '지율',
+            duration: const Duration(minutes: 15),
+          ),
+          activityProgressService: LocalActivityProgressService(),
+          onConfigChanged: (_) {},
+        ),
+      ),
+    );
+    await tester.pump();
+
+    expect(find.byKey(const ValueKey('createTimerButton')), findsOneWidget);
+    await _openTimerBuilder(tester);
+
+    expect(find.text('양치'), findsOneWidget);
+    expect(find.text('책 읽기'), findsOneWidget);
+    expect(find.text('정리'), findsOneWidget);
+    expect(find.text('놀이'), findsOneWidget);
+    expect(find.text('식사'), findsOneWidget);
+    expect(find.text('기타'), findsOneWidget);
+    expect(find.text('2분'), findsOneWidget);
+
+    await _selectTimerBuilderActivity(tester, 'reading');
+
+    expect(find.text('15분'), findsOneWidget);
+  });
+
+  testWidgets('Timer builder does not overwrite default duration', (
     tester,
   ) async {
     SharedPreferences.setMockInitialValues({});
@@ -2536,26 +2469,13 @@ void main() {
     );
     await tester.pump();
 
-    tester
-        .widget<AppBouncyButton>(
-          find.byKey(const ValueKey('activityStartButton_reading')),
-        )
-        .onPressed!();
-    await tester.pump();
-    await tester.pump(const Duration(milliseconds: 400));
+    await _openTimerBuilder(tester);
+    await _selectTimerBuilderActivity(tester, 'reading');
 
-    expect(
-      find.byKey(const ValueKey('activityMarkerPickerSheet')),
-      findsOneWidget,
-    );
+    expect(find.byKey(const ValueKey('timerBuilderSheet')), findsOneWidget);
     expect(find.byType(TimerScreen), findsNothing);
 
-    final randomStartButton = find.byKey(
-      const ValueKey('randomStartActivityMarkersButton'),
-    );
-    tester.widget<OutlinedButton>(randomStartButton).onPressed!();
-    await tester.pump();
-    await tester.pump(const Duration(milliseconds: 400));
+    await _startTimerBuilder(tester);
 
     expect(find.byType(TimerScreen), findsOneWidget);
     expect(
@@ -2600,19 +2520,9 @@ void main() {
       );
       await tester.pump();
 
-      tester
-          .widget<AppBouncyButton>(
-            find.byKey(const ValueKey('activityStartButton_reading')),
-          )
-          .onPressed!();
-      await tester.pump();
-      await tester.pump(const Duration(milliseconds: 400));
-      final randomStartButton = find.byKey(
-        const ValueKey('randomStartActivityMarkersButton'),
-      );
-      tester.widget<OutlinedButton>(randomStartButton).onPressed!();
-      await tester.pump();
-      await tester.pump(const Duration(milliseconds: 400));
+      await _openTimerBuilder(tester);
+      await _selectTimerBuilderActivity(tester, 'reading');
+      await _startTimerBuilder(tester);
 
       expect(find.byType(TimerScreen), findsOneWidget);
       expect(
@@ -3296,12 +3206,8 @@ void main() {
     await tester.tap(find.byType(BackButton));
     await tester.pumpAndSettle();
 
-    tester
-        .widget<AppBouncyButton>(
-          find.byKey(const ValueKey('activityStartButton_brushing')),
-        )
-        .onPressed!();
-    await tester.pump();
+    await _openTimerBuilder(tester);
+    await _startTimerBuilder(tester);
 
     expect(find.textContaining('남은 시간'), findsNothing);
   });
@@ -3690,19 +3596,8 @@ void main() {
     expect(changedConfig?.motivationVideoUseCustomInterval, isTrue);
     expect(changedConfig?.motivationVideoInterval, const Duration(minutes: 5));
 
-    tester
-        .widget<AppBouncyButton>(
-          find.byKey(const ValueKey('activityStartButton_brushing')),
-        )
-        .onPressed!();
-    await tester.pump();
-    await tester.pump(const Duration(milliseconds: 400));
-    final randomStartButton = find.byKey(
-      const ValueKey('randomStartActivityMarkersButton'),
-    );
-    tester.widget<OutlinedButton>(randomStartButton).onPressed!();
-    await tester.pump();
-    await tester.pump(const Duration(milliseconds: 400));
+    await _openTimerBuilder(tester);
+    await _startTimerBuilder(tester);
 
     final timerConfig = tester
         .widget<TimerScreen>(find.byType(TimerScreen))
@@ -3765,7 +3660,7 @@ void main() {
     expect(find.byType(VehicleSelectionCard), findsNothing);
   });
 
-  testWidgets('Home screen shows activity quick starts above vehicle choices', (
+  testWidgets('Home screen shows timer builder above vehicle choices', (
     tester,
   ) async {
     SharedPreferences.setMockInitialValues({});
@@ -3773,14 +3668,8 @@ void main() {
     await _startApp(tester, const Locale('ko'));
 
     expect(find.text('오늘의 미션'), findsOneWidget);
-    expect(
-      find.byKey(const ValueKey('activityQuickStartCard_brushing')),
-      findsOneWidget,
-    );
-    expect(
-      find.byKey(const ValueKey('activityQuickStartCard_reading')),
-      findsOneWidget,
-    );
+    expect(find.byKey(const ValueKey('createTimerCard')), findsOneWidget);
+    expect(find.byKey(const ValueKey('createTimerButton')), findsOneWidget);
     expect(find.text('빠방 고르기'), findsNothing);
     expect(find.text('오토바이'), findsNothing);
     expect(find.text('소방차'), findsNothing);
@@ -3844,12 +3733,10 @@ void main() {
     expect((thirdRowCenterX - firstRowCenterX).abs(), lessThan(1.0));
 
     final vehicleTitleTop = tester.getTopLeft(find.text('오늘의 빠방')).dy;
-    final firstActivityTop = tester
-        .getTopLeft(
-          find.byKey(const ValueKey('activityQuickStartCard_brushing')),
-        )
+    final timerBuilderTop = tester
+        .getTopLeft(find.byKey(const ValueKey('createTimerCard')))
         .dy;
-    expect(firstActivityTop, greaterThan(vehicleTitleTop));
+    expect(timerBuilderTop, greaterThan(vehicleTitleTop));
   });
 
   testWidgets(
@@ -6534,14 +6421,22 @@ void main() {
     expect(find.byKey(const ValueKey('homeLogo')), findsOneWidget);
     expect(find.text("Today's Mission"), findsOneWidget);
     expect(find.text("Today's vehicle"), findsOneWidget);
+    expect(find.text('Create Timer'), findsWidgets);
+    expect(find.byKey(const ValueKey('createTimerButton')), findsOneWidget);
+
+    await _openTimerBuilder(tester);
+
     expect(find.text('Brush Teeth'), findsOneWidget);
     expect(find.text('Reading'), findsOneWidget);
     expect(find.text('Cleanup'), findsOneWidget);
     expect(find.text('Play Time'), findsOneWidget);
-    expect(find.text('Custom Timer'), findsOneWidget);
+    expect(find.text('Meal'), findsOneWidget);
+    expect(find.text('Other'), findsOneWidget);
     expect(find.text('2 min'), findsOneWidget);
-    expect(find.text('15 min'), findsWidgets);
-    expect(find.text('20 min'), findsOneWidget);
+
+    await _selectTimerBuilderActivity(tester, 'reading');
+
+    expect(find.text('15 min'), findsOneWidget);
   });
 
   testWidgets('English locale shows English timer progress copy', (
@@ -6603,7 +6498,7 @@ void main() {
     await _startApp(tester, const Locale('ja'));
 
     expect(find.byKey(const ValueKey('homeLogo')), findsOneWidget);
-    expect(find.textContaining('Custom Timer'), findsOneWidget);
+    expect(find.textContaining('Create Timer'), findsWidgets);
   });
 
   test('Fast activity awards only one random sticker', () async {
@@ -7573,6 +7468,53 @@ Future<void> _startApp(
   await tester.pump();
   await tester.tap(find.byType(FilledButton).first);
   await tester.pumpAndSettle();
+}
+
+Future<void> _openTimerBuilder(WidgetTester tester) async {
+  tester
+      .widget<AppBouncyButton>(find.byKey(const ValueKey('createTimerButton')))
+      .onPressed!();
+  await tester.pump();
+  await tester.pump(const Duration(milliseconds: 400));
+}
+
+Future<void> _selectTimerBuilderActivity(
+  WidgetTester tester,
+  String activityId,
+) async {
+  tester
+      .widget<ChoiceChip>(
+        find.byKey(ValueKey('timerBuilderActivity_$activityId')),
+      )
+      .onSelected!(true);
+  await tester.pump();
+}
+
+Future<void> _selectTimerBuilderManualMarkers(
+  WidgetTester tester,
+  List<String> markerIds,
+) async {
+  await tester.tap(find.byKey(const ValueKey('timerBuilderMarkerManual')));
+  await tester.pump();
+
+  for (final markerId in markerIds) {
+    tester
+        .widget<ChoiceChip>(
+          find.byKey(ValueKey('timerBuilderMarker_$markerId')),
+        )
+        .onSelected!(true);
+    await tester.pump();
+  }
+}
+
+Future<void> _startTimerBuilder(WidgetTester tester) async {
+  tester
+      .widget<AppBouncyButton>(
+        find.byKey(const ValueKey('timerBuilderStartButton')),
+      )
+      .onPressed!();
+  await tester.pump();
+  await tester.pump(const Duration(milliseconds: 400));
 }
 
 Future<void> _pumpAvatarSetupScreen(

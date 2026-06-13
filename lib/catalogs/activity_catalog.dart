@@ -65,10 +65,26 @@ abstract final class ActivityCatalog {
     markerIds: [],
   );
 
+  static const meal = ActivityDefinition(
+    id: 'meal',
+    labelKo: '식사',
+    labelEn: 'Meal',
+    emoji: '🍽️',
+    defaultDuration: Duration(minutes: 20),
+    presetDurations: [
+      Duration(minutes: 10),
+      Duration(minutes: 20),
+      Duration(minutes: 30),
+    ],
+    completionMode: ActivityCompletionMode.parentCheck,
+    rewardEnabledByDefault: false,
+    markerIds: [],
+  );
+
   static const custom = ActivityDefinition(
     id: 'custom',
-    labelKo: '직접 설정',
-    labelEn: 'Custom Timer',
+    labelKo: '기타',
+    labelEn: 'Other',
     emoji: '⭐',
     defaultDuration: Duration(minutes: 10),
     presetDurations: [
@@ -81,7 +97,7 @@ abstract final class ActivityCatalog {
     markerIds: [],
   );
 
-  static const all = [brushing, reading, cleanup, play, custom];
+  static const all = [brushing, play, cleanup, reading, meal, custom];
 
   static const defaultActivity = brushing;
 

@@ -27,6 +27,16 @@ abstract interface class HomeTextSet {
   String get customStartButton;
   String get customSheetTitle;
   String get customTimerTitle;
+  String get timerBuilderButton;
+  String get timerBuilderSubtitle;
+  String get timerBuilderSheetTitle;
+  String get timerBuilderActivityStepTitle;
+  String get timerBuilderMarkerStepTitle;
+  String get timerBuilderRandomMarkerOption;
+  String get timerBuilderManualMarkerOption;
+  String get timerBuilderTimeStepTitle;
+  String get timerBuilderStartButton;
+  String get timerBuilderSelectedMarkerEmpty;
   String get activitySummaryLabel;
   String get stickerKindSummaryLabel;
   String get stickerSummaryLabel;
