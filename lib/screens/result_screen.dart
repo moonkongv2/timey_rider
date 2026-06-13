@@ -7,7 +7,7 @@ import '../l10n/app_texts.dart';
 import '../l10n/text_sets.dart';
 import '../models/meal_progress_snapshot.dart';
 import '../models/meal_session_result.dart';
-import '../models/meal_timer_config.dart';
+import '../models/activity_timer_config.dart';
 import '../models/reward_goal.dart';
 import '../models/reward_item.dart';
 import '../services/local_meal_progress_service.dart';
@@ -108,9 +108,9 @@ class ResultScreen extends StatefulWidget {
   });
 
   final MealSessionResult result;
-  final MealTimerConfig config;
+  final ActivityTimerConfig config;
   final LocalMealProgressService mealProgressService;
-  final ValueChanged<MealTimerConfig> onConfigChanged;
+  final ValueChanged<ActivityTimerConfig> onConfigChanged;
   final ResultIntroControllerFactory? introControllerFactory;
   final OrientationService orientationService;
 

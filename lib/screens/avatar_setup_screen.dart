@@ -6,7 +6,7 @@ import 'package:flutter/services.dart';
 import '../catalogs/avatar_prompt_catalog.dart';
 import '../catalogs/vehicle_catalog.dart';
 import '../l10n/app_texts.dart';
-import '../models/meal_timer_config.dart';
+import '../models/activity_timer_config.dart';
 import '../models/vehicle.dart';
 import '../models/vehicle_avatar_presentation.dart';
 import '../services/avatar_image_picker.dart';
@@ -27,8 +27,8 @@ class AvatarSetupScreen extends StatefulWidget {
     this.avatarImageService,
   });
 
-  final MealTimerConfig config;
-  final ValueChanged<MealTimerConfig> onConfigChanged;
+  final ActivityTimerConfig config;
+  final ValueChanged<ActivityTimerConfig> onConfigChanged;
   final AvatarImagePicker? imagePicker;
   final LocalAvatarImageService? avatarImageService;
 
@@ -37,7 +37,7 @@ class AvatarSetupScreen extends StatefulWidget {
 }
 
 class _AvatarSetupScreenState extends State<AvatarSetupScreen> {
-  late MealTimerConfig _config = widget.config;
+  late ActivityTimerConfig _config = widget.config;
   late AvatarImageMode _avatarMode = _avatarModeForConfig(widget.config);
   String? _pendingAvatarImagePath;
   late double _avatarScale = _avatarConfigForVehicle(widget.config).scale;
@@ -79,16 +79,16 @@ class _AvatarSetupScreenState extends State<AvatarSetupScreen> {
     }
   }
 
-  void _updateConfig(MealTimerConfig config) {
+  void _updateConfig(ActivityTimerConfig config) {
     setState(() => _config = config);
     widget.onConfigChanged(config);
   }
 
-  AvatarImageMode _avatarModeForConfig(MealTimerConfig config) {
+  AvatarImageMode _avatarModeForConfig(ActivityTimerConfig config) {
     return config.avatarModeForVehicle(config.vehicleId);
   }
 
-  VehicleAvatarConfig _avatarConfigForVehicle(MealTimerConfig config) {
+  VehicleAvatarConfig _avatarConfigForVehicle(ActivityTimerConfig config) {
     return config.customAvatarConfigForVehicle(config.vehicleId) ??
         const VehicleAvatarConfig(
           imagePath: '',

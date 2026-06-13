@@ -152,11 +152,12 @@ abstract interface class SettingsTextSet {
   String get keepScreenAwake;
   String get savedOnlySubtitle;
   String get keepScreenAwakeSubtitle;
-  String get courseIngredientModeTitle;
-  String get courseIngredientModeOff;
-  String get courseIngredientModeManual;
-  String get courseIngredientModeRandom;
-  String get courseIngredientModeDescription;
+  String get markerModeTitle;
+  String get markerModeOff;
+  String get markerModeManual;
+  String get markerModeRandom;
+  String get markerModeActivityDefault;
+  String get markerModeDescription;
   String get defaultMealDuration;
   String get vehicleSelection;
   String get childNameTitle;

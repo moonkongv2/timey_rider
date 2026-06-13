@@ -1,4 +1,4 @@
-import 'meal_timer_config.dart';
+import 'activity_timer_config.dart';
 
 enum ActiveMealTimerSessionState { running, paused, arrived }
 
@@ -54,7 +54,7 @@ class ActiveMealTimerSession {
 
   final String sessionId;
   final DateTime startedAt;
-  final MealTimerConfig config;
+  final ActivityTimerConfig config;
   final ActiveMealTimerSessionState state;
   final Duration totalPausedDuration;
   final DateTime? pausedAt;
@@ -65,7 +65,7 @@ class ActiveMealTimerSession {
   Duration get duration => config.duration;
 
   ActiveMealTimerSession copyWith({
-    MealTimerConfig? config,
+    ActivityTimerConfig? config,
     ActiveMealTimerSessionState? state,
     Duration? totalPausedDuration,
     Object? pausedAt = _pausedAtUnset,
@@ -110,7 +110,7 @@ class ActiveMealTimerSession {
   }
 }
 
-Map<String, Object?> _configToJson(MealTimerConfig config) {
+Map<String, Object?> _configToJson(ActivityTimerConfig config) {
   return {
     'durationMs': config.duration.inMilliseconds,
     'showRemainingTime': config.showRemainingTime,
@@ -119,6 +119,7 @@ Map<String, Object?> _configToJson(MealTimerConfig config) {
     'motivationVideoUseCustomInterval': config.motivationVideoUseCustomInterval,
     'motivationVideoIntervalMs': config.motivationVideoInterval.inMilliseconds,
     'keepScreenAwake': config.keepScreenAwake,
+    'activityId': config.activityId,
     'courseId': config.courseId,
     'vehicleId': config.vehicleId,
     'childName': config.childName,
@@ -132,14 +133,14 @@ Map<String, Object?> _configToJson(MealTimerConfig config) {
     'customAvatarsByVehicle': config.customAvatarsByVehicle.map(
       (vehicleId, avatarConfig) => MapEntry(vehicleId, avatarConfig.toJson()),
     ),
-    'courseIngredientMode': config.courseIngredientMode.name,
-    'courseIngredientIds': config.courseIngredientIds,
-    'selectedCourseIngredientIds': config.selectedCourseIngredientIds,
+    'markerMode': config.markerMode.name,
+    'markerIds': config.markerIds,
+    'selectedMarkerIds': config.selectedMarkerIds,
   };
 }
 
-MealTimerConfig _configFromJson(Map<String, Object?> json) {
-  final defaults = MealTimerConfig.defaults();
+ActivityTimerConfig _configFromJson(Map<String, Object?> json) {
+  final defaults = ActivityTimerConfig.defaults();
   return defaults.copyWith(
     duration: _durationFromJson(json['durationMs'], defaults.duration),
     showRemainingTime:
@@ -177,12 +178,16 @@ MealTimerConfig _configFromJson(Map<String, Object?> json) {
       defaults.avatarRotationDegrees,
     ),
     customAvatarsByVehicle: _avatarMapFromJson(json['customAvatarsByVehicle']),
-    courseIngredientMode: _courseIngredientModeFromJson(
-      json['courseIngredientMode'],
+    markerMode: _markerModeFromJson(
+      json['markerMode'] ?? json['courseIngredientMode'],
+      fallback: defaults.markerMode,
     ),
-    courseIngredientIds: _stringListFromJson(json['courseIngredientIds']),
-    selectedCourseIngredientIds: _stringListFromJson(
-      json['selectedCourseIngredientIds'],
+    activityId: _stringFromJson(json['activityId']) ?? defaults.activityId,
+    markerIds: _stringListFromJson(
+      json['markerIds'] ?? json['courseIngredientIds'],
+    ),
+    selectedMarkerIds: _stringListFromJson(
+      json['selectedMarkerIds'] ?? json['selectedCourseIngredientIds'],
     ),
   );
 }
@@ -207,14 +212,17 @@ AvatarImageMode _avatarModeFromJson(Object? value) {
   return AvatarImageMode.defaultImage;
 }
 
-CourseIngredientMode _courseIngredientModeFromJson(Object? value) {
+ActivityMarkerMode _markerModeFromJson(
+  Object? value, {
+  required ActivityMarkerMode fallback,
+}) {
   final name = _stringFromJson(value);
-  for (final mode in CourseIngredientMode.values) {
+  for (final mode in ActivityMarkerMode.values) {
     if (mode.name == name) {
       return mode;
     }
   }
-  return CourseIngredientMode.manual;
+  return fallback;
 }
 
 Map<String, VehicleAvatarConfig> _avatarMapFromJson(Object? value) {

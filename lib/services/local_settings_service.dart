@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../models/meal_timer_config.dart';
+import '../models/activity_timer_config.dart';
 
 class LocalSettingsService {
   static const _durationMinutesKey = 'durationMinutes';
@@ -14,6 +14,7 @@ class LocalSettingsService {
   static const _motivationVideoIntervalMinutesKey =
       'motivationVideoIntervalMinutes';
   static const _keepScreenAwakeKey = 'keepScreenAwake';
+  static const _activityIdKey = 'activityId';
   static const _vehicleIdKey = 'vehicleId';
   static const _childNameKey = 'childName';
   static const _avatarModeKey = 'avatarMode';
@@ -24,11 +25,12 @@ class LocalSettingsService {
   static const _avatarOffsetYKey = 'avatarOffsetY';
   static const _avatarRotationDegreesKey = 'avatarRotationDegrees';
   static const _customAvatarsByVehicleKey = 'customAvatarsByVehicle';
-  static const _courseIngredientModeKey = 'courseIngredientMode';
+  static const _markerModeKey = 'markerMode';
+  static const _legacyCourseIngredientModeKey = 'courseIngredientMode';
 
-  Future<MealTimerConfig> loadConfig() async {
+  Future<ActivityTimerConfig> loadConfig() async {
     final preferences = await SharedPreferences.getInstance();
-    final defaults = MealTimerConfig.defaults();
+    final defaults = ActivityTimerConfig.defaults();
     final vehicleId =
         preferences.getString(_vehicleIdKey) ?? defaults.vehicleId;
     final avatarMode = _avatarModeFromString(
@@ -93,6 +95,7 @@ class LocalSettingsService {
       ),
       keepScreenAwake:
           preferences.getBool(_keepScreenAwakeKey) ?? defaults.keepScreenAwake,
+      activityId: preferences.getString(_activityIdKey) ?? defaults.activityId,
       vehicleId: vehicleId,
       childName: preferences.getString(_childNameKey) ?? defaults.childName,
       avatarMode: avatarMode,
@@ -105,13 +108,15 @@ class LocalSettingsService {
       avatarRotationDegrees:
           activeAvatarConfig?.rotationDegrees ?? avatarRotationDegrees,
       customAvatarsByVehicle: customAvatarsByVehicle,
-      courseIngredientMode: _courseIngredientModeFromString(
-        preferences.getString(_courseIngredientModeKey),
+      markerMode: _markerModeFromString(
+        preferences.getString(_markerModeKey) ??
+            preferences.getString(_legacyCourseIngredientModeKey),
+        fallback: defaults.markerMode,
       ),
     );
   }
 
-  Future<void> saveConfig(MealTimerConfig config) async {
+  Future<void> saveConfig(ActivityTimerConfig config) async {
     final preferences = await SharedPreferences.getInstance();
     await preferences.setInt(_durationMinutesKey, config.duration.inMinutes);
     await preferences.setBool(_showRemainingTimeKey, config.showRemainingTime);
@@ -129,6 +134,7 @@ class LocalSettingsService {
       config.motivationVideoInterval.inMinutes,
     );
     await preferences.setBool(_keepScreenAwakeKey, config.keepScreenAwake);
+    await preferences.setString(_activityIdKey, config.activityId);
     await preferences.setString(_vehicleIdKey, config.vehicleId);
     await preferences.setString(_childNameKey, config.childName);
     await preferences.setString(
@@ -178,9 +184,10 @@ class LocalSettingsService {
       );
     }
     await preferences.setString(
-      _courseIngredientModeKey,
-      _courseIngredientModeToString(config.courseIngredientMode),
+      _markerModeKey,
+      _markerModeToString(config.markerMode),
     );
+    await preferences.remove(_legacyCourseIngredientModeKey);
   }
 
   AvatarImageMode _avatarModeFromString(String? value) {
@@ -197,20 +204,25 @@ class LocalSettingsService {
     };
   }
 
-  CourseIngredientMode _courseIngredientModeFromString(String? value) {
+  ActivityMarkerMode _markerModeFromString(
+    String? value, {
+    required ActivityMarkerMode fallback,
+  }) {
     return switch (value) {
-      'off' => CourseIngredientMode.off,
-      'random' => CourseIngredientMode.random,
-      'manual' => CourseIngredientMode.manual,
-      _ => CourseIngredientMode.manual,
+      'off' => ActivityMarkerMode.off,
+      'random' => ActivityMarkerMode.random,
+      'manual' => ActivityMarkerMode.manual,
+      'activityDefault' => ActivityMarkerMode.activityDefault,
+      _ => fallback,
     };
   }
 
-  String _courseIngredientModeToString(CourseIngredientMode mode) {
+  String _markerModeToString(ActivityMarkerMode mode) {
     return switch (mode) {
-      CourseIngredientMode.off => 'off',
-      CourseIngredientMode.manual => 'manual',
-      CourseIngredientMode.random => 'random',
+      ActivityMarkerMode.off => 'off',
+      ActivityMarkerMode.manual => 'manual',
+      ActivityMarkerMode.random => 'random',
+      ActivityMarkerMode.activityDefault => 'activityDefault',
     };
   }
 
@@ -268,7 +280,7 @@ class LocalSettingsService {
   }
 
   Map<String, VehicleAvatarConfig> _customAvatarsForSaving(
-    MealTimerConfig config,
+    ActivityTimerConfig config,
   ) {
     final avatarsByVehicle = Map<String, VehicleAvatarConfig>.from(
       config.customAvatarsByVehicle,

@@ -1,4 +1,4 @@
-import 'meal_timer_config.dart';
+import 'activity_timer_config.dart';
 
 const Object _imagePathUnset = Object();
 
@@ -13,7 +13,7 @@ class VehicleAvatarPresentation {
   });
 
   factory VehicleAvatarPresentation.fromConfig({
-    required MealTimerConfig config,
+    required ActivityTimerConfig config,
     required String vehicleId,
   }) {
     final mode = config.avatarModeForVehicle(vehicleId);
@@ -68,7 +68,7 @@ class VehicleAvatarPresentation {
   }
 }
 
-extension VehicleAvatarPresentationMealTimerConfigX on MealTimerConfig {
+extension VehicleAvatarPresentationActivityTimerConfigX on ActivityTimerConfig {
   VehicleAvatarPresentation avatarPresentationForVehicle(String vehicleId) {
     return VehicleAvatarPresentation.fromConfig(
       config: this,

@@ -30,11 +30,12 @@ class EnSettingsTexts implements SettingsTextSet {
   String get savedOnlySubtitle => 'Turns sounds during the timer on or off.';
   String get keepScreenAwakeSubtitle =>
       'Applies while the meal timer is running.';
-  String get courseIngredientModeTitle => 'Road ingredients';
-  String get courseIngredientModeOff => 'Off';
-  String get courseIngredientModeManual => 'Manual';
-  String get courseIngredientModeRandom => 'Auto';
-  String get courseIngredientModeDescription =>
+  String get markerModeTitle => 'Road ingredients';
+  String get markerModeOff => 'Off';
+  String get markerModeManual => 'Manual';
+  String get markerModeRandom => 'Auto';
+  String get markerModeActivityDefault => 'Default';
+  String get markerModeDescription =>
       'Only manually chosen ingredients are saved to meal records. Auto selections appear on the road only.';
   String get defaultMealDuration => 'Default meal time';
   String get vehicleSelection => 'Choose vehicle';

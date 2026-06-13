@@ -29,11 +29,12 @@ class SettingsTexts implements SettingsTextSet {
   String get keepScreenAwake => '화면 계속 켜두기';
   String get savedOnlySubtitle => '타이머 진행 중 나오는 소리를 켜고 꺼요';
   String get keepScreenAwakeSubtitle => '식사 타이머 중에 적용돼요';
-  String get courseIngredientModeTitle => '도로 위 식재료';
-  String get courseIngredientModeOff => '사용 안 함';
-  String get courseIngredientModeManual => '직접 선택';
-  String get courseIngredientModeRandom => '자동 선택';
-  String get courseIngredientModeDescription =>
+  String get markerModeTitle => '도로 위 식재료';
+  String get markerModeOff => '사용 안 함';
+  String get markerModeManual => '직접 선택';
+  String get markerModeRandom => '자동 선택';
+  String get markerModeActivityDefault => '기본';
+  String get markerModeDescription =>
       '직접 선택한 식재료만 식사 기록에 남아요. 자동 선택은 도로에만 표시돼요.';
   String get defaultMealDuration => '기본 식사 시간';
   String get vehicleSelection => '빠방 고르기';

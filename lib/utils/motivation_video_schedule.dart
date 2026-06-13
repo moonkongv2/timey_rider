@@ -1,4 +1,4 @@
-import '../models/meal_timer_config.dart';
+import '../models/activity_timer_config.dart';
 
 const motivationLongCourseThreshold = Duration(minutes: 30);
 const motivationDefaultTimedVideoInterval = Duration(minutes: 3);
@@ -10,7 +10,7 @@ class MotivationVideoSchedule {
     required this.customInterval,
   });
 
-  factory MotivationVideoSchedule.fromConfig(MealTimerConfig config) {
+  factory MotivationVideoSchedule.fromConfig(ActivityTimerConfig config) {
     return MotivationVideoSchedule(
       enabled: config.motivationVideoEnabled,
       useCustomInterval: config.motivationVideoUseCustomInterval,

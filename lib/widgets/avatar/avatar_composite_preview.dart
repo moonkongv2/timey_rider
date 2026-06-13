@@ -3,7 +3,7 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
-import '../../models/meal_timer_config.dart';
+import '../../models/activity_timer_config.dart';
 import '../../models/vehicle.dart';
 import '../../models/vehicle_avatar_presentation.dart';
 

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ticky_rider/catalogs/vehicle_catalog.dart';
-import 'package:ticky_rider/models/meal_timer_config.dart';
+import 'package:ticky_rider/models/activity_timer_config.dart';
 import 'package:ticky_rider/models/vehicle_avatar_presentation.dart';
 import 'package:ticky_rider/widgets/avatar/avatar_composite_preview.dart';
 

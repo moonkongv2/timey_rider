@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import '../catalogs/meal_course_catalog.dart';
 import '../l10n/app_texts.dart';
 import '../l10n/text_sets.dart';
-import '../models/meal_timer_config.dart';
+import '../models/activity_timer_config.dart';
 import '../theme/app_colors.dart';
 import '../widgets/app/app_help_sheet.dart';
 import 'user_guide_screen.dart';
@@ -22,14 +22,12 @@ int _normalizedMotivationVideoIntervalMinutes(Duration interval) {
   return _motivationVideoIntervalOptions.first.inMinutes;
 }
 
-String _courseIngredientModeLabel(
-  SettingsTextSet texts,
-  CourseIngredientMode mode,
-) {
+String _markerModeLabel(SettingsTextSet texts, ActivityMarkerMode mode) {
   return switch (mode) {
-    CourseIngredientMode.off => texts.courseIngredientModeOff,
-    CourseIngredientMode.manual => texts.courseIngredientModeManual,
-    CourseIngredientMode.random => texts.courseIngredientModeRandom,
+    ActivityMarkerMode.off => texts.markerModeOff,
+    ActivityMarkerMode.manual => texts.markerModeManual,
+    ActivityMarkerMode.random => texts.markerModeRandom,
+    ActivityMarkerMode.activityDefault => texts.markerModeActivityDefault,
   };
 }
 
@@ -40,15 +38,15 @@ class SettingsScreen extends StatefulWidget {
     required this.onConfigChanged,
   });
 
-  final MealTimerConfig config;
-  final ValueChanged<MealTimerConfig> onConfigChanged;
+  final ActivityTimerConfig config;
+  final ValueChanged<ActivityTimerConfig> onConfigChanged;
 
   @override
   State<SettingsScreen> createState() => _SettingsScreenState();
 }
 
 class _SettingsScreenState extends State<SettingsScreen> {
-  late MealTimerConfig _config = widget.config;
+  late ActivityTimerConfig _config = widget.config;
   late final TextEditingController _childNameController = TextEditingController(
     text: widget.config.childName,
   );
@@ -68,7 +66,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     super.dispose();
   }
 
-  void _update(MealTimerConfig config) {
+  void _update(ActivityTimerConfig config) {
     setState(() => _config = config);
     widget.onConfigChanged(config);
   }
@@ -227,12 +225,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     children: [
                       Expanded(
                         child: Text(
-                          texts.settings.courseIngredientModeTitle,
+                          texts.settings.markerModeTitle,
                           style: sectionTitleStyle,
                         ),
                       ),
                       IconButton(
-                        key: const ValueKey('courseIngredientModeHelpButton'),
+                        key: const ValueKey('markerModeHelpButton'),
                         tooltip: texts.mealIngredient.helpLinkLabel,
                         onPressed: _showIngredientHelp,
                         icon: const Icon(Icons.help_outline_rounded),
@@ -245,10 +243,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     builder: (context, constraints) {
                       return SizedBox(
                         width: constraints.maxWidth,
-                        child: SegmentedButton<CourseIngredientMode>(
-                          key: const ValueKey(
-                            'courseIngredientModeSegmentedButton',
-                          ),
+                        child: SegmentedButton<ActivityMarkerMode>(
+                          key: const ValueKey('markerModeSegmentedButton'),
                           showSelectedIcon: false,
                           style: const ButtonStyle(
                             padding: WidgetStatePropertyAll(
@@ -262,31 +258,26 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             ),
                           ),
                           segments: [
-                            for (final mode in CourseIngredientMode.values)
+                            for (final mode in ActivityMarkerMode.values)
                               ButtonSegment(
                                 value: mode,
                                 label: FittedBox(
                                   fit: BoxFit.scaleDown,
                                   child: Text(
-                                    _courseIngredientModeLabel(
-                                      texts.settings,
-                                      mode,
-                                    ),
+                                    _markerModeLabel(texts.settings, mode),
                                     maxLines: 1,
                                     softWrap: false,
                                   ),
                                 ),
                               ),
                           ],
-                          selected: {_config.courseIngredientMode},
+                          selected: {_config.markerMode},
                           onSelectionChanged: (selected) {
                             if (selected.isEmpty) {
                               return;
                             }
                             _update(
-                              _config.copyWith(
-                                courseIngredientMode: selected.first,
-                              ),
+                              _config.copyWith(markerMode: selected.first),
                             );
                           },
                         ),
@@ -295,7 +286,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   ),
                   const SizedBox(height: 10),
                   Text(
-                    texts.settings.courseIngredientModeDescription,
+                    texts.settings.markerModeDescription,
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                       color: AppColors.textSecondary,
                       fontWeight: FontWeight.w700,

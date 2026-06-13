@@ -2,7 +2,7 @@ import 'package:flutter_test/flutter_test.dart';
 
 import 'package:ticky_rider/controllers/meal_timer_controller.dart';
 import 'package:ticky_rider/models/active_meal_timer_session.dart';
-import 'package:ticky_rider/models/meal_timer_config.dart';
+import 'package:ticky_rider/models/activity_timer_config.dart';
 
 void main() {
   test(
@@ -14,7 +14,7 @@ void main() {
         session: ActiveMealTimerSession(
           sessionId: 'session-1',
           startedAt: startedAt,
-          config: MealTimerConfig.defaults().copyWith(
+          config: ActivityTimerConfig.defaults().copyWith(
             duration: const Duration(minutes: 30),
           ),
           state: ActiveMealTimerSessionState.running,
@@ -39,7 +39,7 @@ void main() {
         session: ActiveMealTimerSession(
           sessionId: 'session-2',
           startedAt: DateTime.utc(2026, 6, 10, 1, 0),
-          config: MealTimerConfig.defaults().copyWith(
+          config: ActivityTimerConfig.defaults().copyWith(
             duration: const Duration(minutes: 30),
           ),
           state: ActiveMealTimerSessionState.running,
@@ -65,7 +65,7 @@ void main() {
         session: ActiveMealTimerSession(
           sessionId: 'session-3',
           startedAt: DateTime.utc(2026, 6, 10, 1, 0),
-          config: MealTimerConfig.defaults().copyWith(
+          config: ActivityTimerConfig.defaults().copyWith(
             duration: const Duration(minutes: 30),
           ),
           state: ActiveMealTimerSessionState.paused,
@@ -98,7 +98,7 @@ void main() {
         session: ActiveMealTimerSession(
           sessionId: 'session-5',
           startedAt: DateTime.utc(2026, 6, 10, 1, 0),
-          config: MealTimerConfig.defaults().copyWith(
+          config: ActivityTimerConfig.defaults().copyWith(
             duration: const Duration(minutes: 30),
           ),
           state: ActiveMealTimerSessionState.paused,
@@ -125,7 +125,7 @@ void main() {
     () {
       var now = DateTime.utc(2026, 6, 10, 1, 0);
       final controller = MealTimerController(
-        config: MealTimerConfig.defaults().copyWith(
+        config: ActivityTimerConfig.defaults().copyWith(
           duration: const Duration(minutes: 30),
         ),
         now: () => now,
@@ -148,7 +148,7 @@ void main() {
       session: ActiveMealTimerSession(
         sessionId: 'session-4',
         startedAt: DateTime.utc(2026, 6, 10, 1, 0),
-        config: MealTimerConfig.defaults().copyWith(
+        config: ActivityTimerConfig.defaults().copyWith(
           duration: const Duration(minutes: 30),
         ),
         state: ActiveMealTimerSessionState.arrived,

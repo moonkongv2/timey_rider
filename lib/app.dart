@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
 import 'l10n/app_texts.dart';
-import 'models/meal_timer_config.dart';
+import 'models/activity_timer_config.dart';
 import 'navigation/app_route_observer.dart';
 import 'screens/child_name_setup_screen.dart';
 import 'screens/home_screen.dart';
@@ -23,7 +23,7 @@ class TickyRiderApp extends StatefulWidget {
 
   final LocalSettingsService settingsService;
   final LocalMealProgressService mealProgressService;
-  final MealTimerConfig initialConfig;
+  final ActivityTimerConfig initialConfig;
   final ActiveMealTimerSessionStore activeSessionStore;
 
   @override
@@ -31,10 +31,10 @@ class TickyRiderApp extends StatefulWidget {
 }
 
 class _TickyRiderAppState extends State<TickyRiderApp> {
-  late MealTimerConfig _config = widget.initialConfig;
+  late ActivityTimerConfig _config = widget.initialConfig;
   bool _showSplash = true;
 
-  Future<void> _saveConfig(MealTimerConfig config) async {
+  Future<void> _saveConfig(ActivityTimerConfig config) async {
     setState(() => _config = config);
     await widget.settingsService.saveConfig(config);
   }

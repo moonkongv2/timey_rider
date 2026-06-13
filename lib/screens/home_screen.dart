@@ -10,7 +10,7 @@ import '../catalogs/vehicle_catalog.dart';
 import '../l10n/app_texts.dart';
 import '../models/active_meal_timer_session.dart';
 import '../models/meal_progress_snapshot.dart';
-import '../models/meal_timer_config.dart';
+import '../models/activity_timer_config.dart';
 import '../models/vehicle_avatar_presentation.dart';
 import '../navigation/app_route_observer.dart';
 import '../models/reward_goal.dart';
@@ -51,9 +51,9 @@ class HomeScreen extends StatefulWidget {
     this.now,
   });
 
-  final MealTimerConfig config;
+  final ActivityTimerConfig config;
   final LocalMealProgressService mealProgressService;
-  final ValueChanged<MealTimerConfig> onConfigChanged;
+  final ValueChanged<ActivityTimerConfig> onConfigChanged;
   final ActiveMealTimerSessionStore activeSessionStore;
   final Widget Function(BuildContext context, String imagePath)?
   avatarImageBuilder;
@@ -64,7 +64,7 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> with RouteAware {
-  late MealTimerConfig _config = widget.config;
+  late ActivityTimerConfig _config = widget.config;
   late double _customMinutes = _config.duration.inMinutes.toDouble();
   late Future<ActiveMealTimerSession?> _activeSessionFuture;
   ActiveMealTimerSession? _activeSession;
@@ -173,7 +173,7 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
     _refreshProgressSnapshot();
   }
 
-  void _updateConfig(MealTimerConfig config) {
+  void _updateConfig(ActivityTimerConfig config) {
     setState(() {
       if (_config.duration != config.duration) {
         _customMinutes = config.duration.inMinutes.toDouble();
@@ -183,7 +183,7 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
     widget.onConfigChanged(config);
   }
 
-  void _updateTimerRuntimeConfig(MealTimerConfig config) {
+  void _updateTimerRuntimeConfig(ActivityTimerConfig config) {
     _updateConfig(
       _config.copyWith(
         motivationVideoEnabled: config.motivationVideoEnabled,
@@ -208,9 +208,8 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
 
     final config = _config.copyWith(
       duration: Duration(minutes: minutes),
-      courseIngredientIds: courseIngredientSelection.courseIngredientIds,
-      selectedCourseIngredientIds:
-          courseIngredientSelection.selectedCourseIngredientIds,
+      markerIds: courseIngredientSelection.markerIds,
+      selectedMarkerIds: courseIngredientSelection.selectedMarkerIds,
     );
     await Navigator.of(context).push(
       MaterialPageRoute(
@@ -330,18 +329,19 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
 
   Future<_CourseIngredientSelection?>
   _courseIngredientSelectionForStart() async {
-    switch (_config.courseIngredientMode) {
-      case CourseIngredientMode.off:
+    switch (_config.markerMode) {
+      case ActivityMarkerMode.off:
         return const _CourseIngredientSelection(
-          courseIngredientIds: [],
-          selectedCourseIngredientIds: [],
+          markerIds: [],
+          selectedMarkerIds: [],
         );
-      case CourseIngredientMode.random:
+      case ActivityMarkerMode.random:
         return _CourseIngredientSelection(
-          courseIngredientIds: MealIngredientCatalog.randomSelectionIds(),
-          selectedCourseIngredientIds: const [],
+          markerIds: MealIngredientCatalog.randomSelectionIds(),
+          selectedMarkerIds: const [],
         );
-      case CourseIngredientMode.manual:
+      case ActivityMarkerMode.activityDefault:
+      case ActivityMarkerMode.manual:
         final ingredientResult =
             await showModalBottomSheet<MealIngredientPickerResult>(
               context: context,
@@ -354,13 +354,13 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
         }
         return switch (ingredientResult) {
           RandomMealIngredients() => _CourseIngredientSelection(
-            courseIngredientIds: MealIngredientCatalog.randomSelectionIds(),
-            selectedCourseIngredientIds: const [],
+            markerIds: MealIngredientCatalog.randomSelectionIds(),
+            selectedMarkerIds: const [],
           ),
           SelectedMealIngredients(:final ingredientIds) =>
             _CourseIngredientSelection(
-              courseIngredientIds: ingredientIds,
-              selectedCourseIngredientIds: ingredientIds,
+              markerIds: ingredientIds,
+              selectedMarkerIds: ingredientIds,
             ),
         };
     }
@@ -761,12 +761,12 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
 
 class _CourseIngredientSelection {
   const _CourseIngredientSelection({
-    required this.courseIngredientIds,
-    required this.selectedCourseIngredientIds,
+    required this.markerIds,
+    required this.selectedMarkerIds,
   });
 
-  final List<String> courseIngredientIds;
-  final List<String> selectedCourseIngredientIds;
+  final List<String> markerIds;
+  final List<String> selectedMarkerIds;
 }
 
 enum _ActiveTimerStartChoice { cancel, startNew }

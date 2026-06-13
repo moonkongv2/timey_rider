@@ -5,7 +5,7 @@ import 'package:flutter/foundation.dart';
 import '../models/active_meal_timer_session.dart';
 import '../models/meal_completion_status.dart';
 import '../models/meal_session_result.dart';
-import '../models/meal_timer_config.dart';
+import '../models/activity_timer_config.dart';
 
 enum MealTimerState { idle, running, paused, arrived, completed }
 
@@ -23,7 +23,7 @@ class MealTimerController extends ChangeNotifier {
     _restoreFromSession(session);
   }
 
-  final MealTimerConfig config;
+  final ActivityTimerConfig config;
   final DateTime Function() _now;
 
   Timer? _ticker;

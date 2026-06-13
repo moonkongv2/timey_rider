@@ -1,8 +1,9 @@
-import '../catalogs/meal_course_catalog.dart';
+import '../catalogs/activity_catalog.dart';
+import 'activity.dart';
+
+export 'activity.dart' show ActivityMarkerMode;
 
 enum AvatarImageMode { defaultImage, custom }
-
-enum CourseIngredientMode { off, manual, random }
 
 const Object _customAvatarImagePathUnset = Object();
 const Object _customAvatarVehicleIdUnset = Object();
@@ -45,8 +46,9 @@ class VehicleAvatarConfig {
   bool get hasImagePath => imagePath.trim().isNotEmpty;
 }
 
-class MealTimerConfig {
-  const MealTimerConfig({
+class ActivityTimerConfig {
+  const ActivityTimerConfig({
+    required this.activityId,
     required this.duration,
     required this.showRemainingTime,
     required this.soundEnabled,
@@ -65,14 +67,16 @@ class MealTimerConfig {
     required this.avatarOffsetY,
     required this.avatarRotationDegrees,
     required this.customAvatarsByVehicle,
-    required this.courseIngredientMode,
-    this.courseIngredientIds = const [],
-    List<String> selectedCourseIngredientIds = const [],
-  }) : _selectedCourseIngredientIds = selectedCourseIngredientIds;
+    required this.markerMode,
+    this.markerIds = const [],
+    List<String> selectedMarkerIds = const [],
+  }) : _selectedMarkerIds = selectedMarkerIds;
 
-  factory MealTimerConfig.defaults() {
-    return const MealTimerConfig(
-      duration: MealCourseCatalog.defaultDuration,
+  factory ActivityTimerConfig.defaults() {
+    const defaultActivity = ActivityCatalog.defaultActivity;
+    return ActivityTimerConfig(
+      activityId: defaultActivity.id,
+      duration: defaultActivity.defaultDuration,
       showRemainingTime: true,
       soundEnabled: true,
       motivationVideoEnabled: true,
@@ -90,12 +94,13 @@ class MealTimerConfig {
       avatarOffsetY: 0.0,
       avatarRotationDegrees: 0.0,
       customAvatarsByVehicle: {},
-      courseIngredientMode: CourseIngredientMode.manual,
-      courseIngredientIds: [],
-      selectedCourseIngredientIds: [],
+      markerMode: ActivityMarkerMode.activityDefault,
+      markerIds: defaultActivity.markerIds,
+      selectedMarkerIds: const [],
     );
   }
 
+  final String activityId;
   final Duration duration;
   final bool showRemainingTime;
   final bool soundEnabled;
@@ -114,13 +119,13 @@ class MealTimerConfig {
   final double avatarOffsetY;
   final double avatarRotationDegrees;
   final Map<String, VehicleAvatarConfig> customAvatarsByVehicle;
-  final CourseIngredientMode courseIngredientMode;
-  final List<String> courseIngredientIds;
-  final List<String>? _selectedCourseIngredientIds;
-  List<String> get selectedCourseIngredientIds =>
-      _selectedCourseIngredientIds ?? const [];
+  final ActivityMarkerMode markerMode;
+  final List<String> markerIds;
+  final List<String>? _selectedMarkerIds;
+  List<String> get selectedMarkerIds => _selectedMarkerIds ?? const [];
 
-  MealTimerConfig copyWith({
+  ActivityTimerConfig copyWith({
+    String? activityId,
     Duration? duration,
     bool? showRemainingTime,
     bool? soundEnabled,
@@ -139,9 +144,9 @@ class MealTimerConfig {
     double? avatarOffsetY,
     double? avatarRotationDegrees,
     Map<String, VehicleAvatarConfig>? customAvatarsByVehicle,
-    CourseIngredientMode? courseIngredientMode,
-    List<String>? courseIngredientIds,
-    List<String>? selectedCourseIngredientIds,
+    ActivityMarkerMode? markerMode,
+    List<String>? markerIds,
+    List<String>? selectedMarkerIds,
   }) {
     final nextAvatarMode = avatarMode ?? this.avatarMode;
     final nextCustomAvatarImagePath =
@@ -175,7 +180,8 @@ class MealTimerConfig {
           avatarRotationDegrees != null,
     );
 
-    return MealTimerConfig(
+    return ActivityTimerConfig(
+      activityId: activityId ?? this.activityId,
       duration: duration ?? this.duration,
       showRemainingTime: showRemainingTime ?? this.showRemainingTime,
       soundEnabled: soundEnabled ?? this.soundEnabled,
@@ -198,12 +204,10 @@ class MealTimerConfig {
       avatarOffsetY: nextAvatarOffsetY,
       avatarRotationDegrees: nextAvatarRotationDegrees,
       customAvatarsByVehicle: Map.unmodifiable(nextCustomAvatarsByVehicle),
-      courseIngredientMode: courseIngredientMode ?? this.courseIngredientMode,
-      courseIngredientIds: List.unmodifiable(
-        courseIngredientIds ?? this.courseIngredientIds,
-      ),
-      selectedCourseIngredientIds: List.unmodifiable(
-        selectedCourseIngredientIds ?? this.selectedCourseIngredientIds,
+      markerMode: markerMode ?? this.markerMode,
+      markerIds: List.unmodifiable(markerIds ?? this.markerIds),
+      selectedMarkerIds: List.unmodifiable(
+        selectedMarkerIds ?? this.selectedMarkerIds,
       ),
     );
   }

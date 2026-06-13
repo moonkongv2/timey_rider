@@ -13,7 +13,7 @@ import '../models/active_meal_timer_session.dart';
 import '../models/meal_completion_status.dart';
 import '../models/meal_ingredient.dart';
 import '../models/meal_session_result.dart';
-import '../models/meal_timer_config.dart';
+import '../models/activity_timer_config.dart';
 import '../models/vehicle_avatar_presentation.dart';
 import '../services/active_meal_timer_session_store.dart';
 import '../services/local_meal_progress_service.dart';
@@ -166,9 +166,9 @@ class TimerScreen extends StatefulWidget {
     this.now,
   });
 
-  final MealTimerConfig config;
+  final ActivityTimerConfig config;
   final LocalMealProgressService mealProgressService;
-  final ValueChanged<MealTimerConfig> onConfigChanged;
+  final ValueChanged<ActivityTimerConfig> onConfigChanged;
   final ScreenAwakeService screenAwakeService;
   final OrientationService orientationService;
   final ActiveMealTimerSessionStore activeSessionStore;
@@ -200,7 +200,7 @@ class _TimerScreenState extends State<TimerScreen>
   late final AnimationController _finishDriveController;
   late final MotivationAudioService _motivationAudioService;
   late final bool _ownsMotivationAudioService;
-  late MealTimerConfig _timerConfig;
+  late ActivityTimerConfig _timerConfig;
   final math.Random _motivationRandom = math.Random();
   final Set<int> _shownMotivationMilestones = {};
   bool _arrivalPromptShown = false;
@@ -697,11 +697,12 @@ class _TimerScreenState extends State<TimerScreen>
   }
 
   MealSessionResult _resultWithSelectedIngredients(MealSessionResult result) {
-    if (_timerConfig.courseIngredientMode != CourseIngredientMode.manual) {
+    if (_timerConfig.markerMode != ActivityMarkerMode.manual &&
+        _timerConfig.markerMode != ActivityMarkerMode.activityDefault) {
       return result.copyWith(selectedIngredientIds: const []);
     }
     return result.copyWith(
-      selectedIngredientIds: _timerConfig.selectedCourseIngredientIds,
+      selectedIngredientIds: _timerConfig.selectedMarkerIds,
     );
   }
 
@@ -821,10 +822,10 @@ class _TimerScreenState extends State<TimerScreen>
           vehicle.id,
         );
         final courseIngredients =
-            _timerConfig.courseIngredientMode == CourseIngredientMode.off
+            _timerConfig.markerMode == ActivityMarkerMode.off
             ? const <MealIngredientDefinition>[]
             : MealIngredientCatalog.courseSlotsFor(
-                _timerConfig.courseIngredientIds,
+                _timerConfig.markerIds,
                 slotCount: MealIngredientCatalog.courseSlotCountForDuration(
                   _timerConfig.duration,
                 ),
@@ -1379,7 +1380,7 @@ class _MotivationVideoSettingsResult {
 class _MotivationVideoSettingsSheet extends StatefulWidget {
   const _MotivationVideoSettingsSheet({required this.config});
 
-  final MealTimerConfig config;
+  final ActivityTimerConfig config;
 
   @override
   State<_MotivationVideoSettingsSheet> createState() =>

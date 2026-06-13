@@ -11,6 +11,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:video_player/video_player.dart';
 
 import 'package:ticky_rider/catalogs/avatar_prompt_catalog.dart';
+import 'package:ticky_rider/catalogs/activity_catalog.dart';
 import 'package:ticky_rider/catalogs/meal_ingredient_catalog.dart';
 import 'package:ticky_rider/catalogs/motivation_asset_catalog.dart';
 import 'package:ticky_rider/catalogs/vehicle_catalog.dart';
@@ -19,7 +20,7 @@ import 'package:ticky_rider/main.dart' as app;
 import 'package:ticky_rider/models/active_meal_timer_session.dart';
 import 'package:ticky_rider/models/meal_completion_status.dart';
 import 'package:ticky_rider/models/meal_session_result.dart';
-import 'package:ticky_rider/models/meal_timer_config.dart';
+import 'package:ticky_rider/models/activity_timer_config.dart';
 import 'package:ticky_rider/models/reward_goal.dart';
 import 'package:ticky_rider/models/vehicle.dart';
 import 'package:ticky_rider/models/vehicle_avatar_presentation.dart';
@@ -51,7 +52,7 @@ import 'package:ticky_rider/widgets/vehicle_widget.dart';
 
 void main() {
   test('Default config uses default avatar image settings', () {
-    final config = MealTimerConfig.defaults();
+    final config = ActivityTimerConfig.defaults();
 
     expect(config.avatarMode, AvatarImageMode.defaultImage);
     expect(config.customAvatarImagePath, isNull);
@@ -61,14 +62,16 @@ void main() {
     expect(config.motivationVideoEnabled, isTrue);
     expect(config.motivationVideoUseCustomInterval, isFalse);
     expect(config.motivationVideoInterval, const Duration(minutes: 3));
-    expect(config.courseIngredientMode, CourseIngredientMode.manual);
+    expect(config.activityId, ActivityCatalog.defaultActivity.id);
+    expect(config.duration, ActivityCatalog.defaultActivity.defaultDuration);
+    expect(config.markerMode, ActivityMarkerMode.activityDefault);
     expect(config.avatarScale, 1.0);
     expect(config.avatarOffsetX, 0.0);
     expect(config.avatarOffsetY, 0.0);
     expect(config.avatarRotationDegrees, 0.0);
     expect(config.customAvatarsByVehicle, isEmpty);
-    expect(config.courseIngredientIds, isEmpty);
-    expect(config.selectedCourseIngredientIds, isEmpty);
+    expect(config.markerIds, ActivityCatalog.defaultActivity.markerIds);
+    expect(config.selectedMarkerIds, isEmpty);
   });
 
   test('Meal ingredient catalog has non-empty unique ids', () {
@@ -192,27 +195,27 @@ void main() {
   );
 
   test(
-    'MealTimerConfig copyWith preserves and updates course ingredient ids',
+    'ActivityTimerConfig copyWith preserves and updates course ingredient ids',
     () {
-      final config = MealTimerConfig.defaults().copyWith(
-        courseIngredientIds: const ['carrot', 'egg'],
-        selectedCourseIngredientIds: const ['carrot'],
+      final config = ActivityTimerConfig.defaults().copyWith(
+        markerIds: const ['carrot', 'egg'],
+        selectedMarkerIds: const ['carrot'],
       );
       final preservedConfig = config.copyWith(vehicleId: 'bus');
       final updatedConfig = config.copyWith(
-        courseIngredientIds: const ['rice', 'tomato'],
-        selectedCourseIngredientIds: const ['rice'],
+        markerIds: const ['rice', 'tomato'],
+        selectedMarkerIds: const ['rice'],
       );
 
-      expect(preservedConfig.courseIngredientIds, ['carrot', 'egg']);
-      expect(preservedConfig.selectedCourseIngredientIds, ['carrot']);
-      expect(updatedConfig.courseIngredientIds, ['rice', 'tomato']);
-      expect(updatedConfig.selectedCourseIngredientIds, ['rice']);
+      expect(preservedConfig.markerIds, ['carrot', 'egg']);
+      expect(preservedConfig.selectedMarkerIds, ['carrot']);
+      expect(updatedConfig.markerIds, ['rice', 'tomato']);
+      expect(updatedConfig.selectedMarkerIds, ['rice']);
     },
   );
 
-  test('MealTimerConfig copyWith updates motivation video settings', () {
-    final config = MealTimerConfig.defaults().copyWith(
+  test('ActivityTimerConfig copyWith updates motivation video settings', () {
+    final config = ActivityTimerConfig.defaults().copyWith(
       motivationVideoEnabled: false,
       motivationVideoUseCustomInterval: true,
       motivationVideoInterval: const Duration(minutes: 5),
@@ -232,17 +235,15 @@ void main() {
     expect(updatedConfig.motivationVideoInterval, const Duration(minutes: 10));
   });
 
-  test('MealTimerConfig copyWith updates course ingredient mode', () {
-    final config = MealTimerConfig.defaults().copyWith(
-      courseIngredientMode: CourseIngredientMode.random,
+  test('ActivityTimerConfig copyWith updates course ingredient mode', () {
+    final config = ActivityTimerConfig.defaults().copyWith(
+      markerMode: ActivityMarkerMode.random,
     );
     final preservedConfig = config.copyWith(vehicleId: 'bus');
-    final updatedConfig = config.copyWith(
-      courseIngredientMode: CourseIngredientMode.off,
-    );
+    final updatedConfig = config.copyWith(markerMode: ActivityMarkerMode.off);
 
-    expect(preservedConfig.courseIngredientMode, CourseIngredientMode.random);
-    expect(updatedConfig.courseIngredientMode, CourseIngredientMode.off);
+    expect(preservedConfig.markerMode, ActivityMarkerMode.random);
+    expect(updatedConfig.markerMode, ActivityMarkerMode.off);
   });
 
   test('Local settings saves and loads avatar settings', () async {
@@ -250,7 +251,7 @@ void main() {
 
     final service = LocalSettingsService();
     await service.saveConfig(
-      MealTimerConfig.defaults().copyWith(
+      ActivityTimerConfig.defaults().copyWith(
         childName: '지율',
         vehicleId: 'police_car',
         avatarMode: AvatarImageMode.custom,
@@ -260,7 +261,7 @@ void main() {
         avatarOffsetX: 8.0,
         avatarOffsetY: -6.0,
         avatarRotationDegrees: 12.0,
-        courseIngredientIds: const ['carrot', 'egg'],
+        markerIds: const ['carrot', 'egg'],
       ),
     );
 
@@ -276,8 +277,9 @@ void main() {
     expect(loadedConfig.avatarOffsetX, 8.0);
     expect(loadedConfig.avatarOffsetY, -6.0);
     expect(loadedConfig.avatarRotationDegrees, 12.0);
-    expect(loadedConfig.courseIngredientIds, isEmpty);
-    expect(preferences.getStringList('courseIngredientIds'), isNull);
+    expect(loadedConfig.markerIds, ActivityCatalog.defaultActivity.markerIds);
+    expect(preferences.getStringList('markerIds'), isNull);
+    expect(preferences.getString('activityId'), 'brushing');
     final policeCarAvatar = loadedConfig.customAvatarConfigForVehicle(
       'police_car',
     );
@@ -293,7 +295,7 @@ void main() {
 
     final service = LocalSettingsService();
     await service.saveConfig(
-      MealTimerConfig.defaults().copyWith(
+      ActivityTimerConfig.defaults().copyWith(
         motivationVideoEnabled: false,
         motivationVideoUseCustomInterval: true,
         motivationVideoInterval: const Duration(minutes: 5),
@@ -315,29 +317,38 @@ void main() {
 
     final service = LocalSettingsService();
     await service.saveConfig(
-      MealTimerConfig.defaults().copyWith(
-        courseIngredientMode: CourseIngredientMode.random,
+      ActivityTimerConfig.defaults().copyWith(
+        markerMode: ActivityMarkerMode.random,
       ),
     );
 
     final loadedConfig = await service.loadConfig();
     final preferences = await SharedPreferences.getInstance();
-    expect(loadedConfig.courseIngredientMode, CourseIngredientMode.random);
-    expect(preferences.getString('courseIngredientMode'), 'random');
+    expect(loadedConfig.markerMode, ActivityMarkerMode.random);
+    expect(preferences.getString('markerMode'), 'random');
+    expect(preferences.getString('courseIngredientMode'), isNull);
   });
 
   test(
-    'Local settings falls back for invalid course ingredient mode',
+    'Local settings reads legacy course ingredient mode as marker mode',
     () async {
       SharedPreferences.setMockInitialValues({
-        'courseIngredientMode': 'unknown',
+        'courseIngredientMode': 'manual',
       });
 
       final loadedConfig = await LocalSettingsService().loadConfig();
 
-      expect(loadedConfig.courseIngredientMode, CourseIngredientMode.manual);
+      expect(loadedConfig.markerMode, ActivityMarkerMode.manual);
     },
   );
+
+  test('Local settings falls back for invalid marker mode', () async {
+    SharedPreferences.setMockInitialValues({'markerMode': 'unknown'});
+
+    final loadedConfig = await LocalSettingsService().loadConfig();
+
+    expect(loadedConfig.markerMode, ActivityMarkerMode.activityDefault);
+  });
 
   test(
     'Local settings falls back for invalid motivation video interval',
@@ -361,7 +372,7 @@ void main() {
 
     final service = LocalSettingsService();
     await service.saveConfig(
-      MealTimerConfig.defaults().copyWith(
+      ActivityTimerConfig.defaults().copyWith(
         avatarMode: AvatarImageMode.custom,
         vehicleId: 'bus',
         customAvatarsByVehicle: const {
@@ -405,13 +416,13 @@ void main() {
 
     final service = LocalSettingsService();
     await service.saveConfig(
-      MealTimerConfig.defaults().copyWith(
+      ActivityTimerConfig.defaults().copyWith(
         avatarMode: AvatarImageMode.custom,
         customAvatarImagePath: '/local/avatar.png',
       ),
     );
     await service.saveConfig(
-      MealTimerConfig.defaults().copyWith(customAvatarImagePath: null),
+      ActivityTimerConfig.defaults().copyWith(customAvatarImagePath: null),
     );
 
     final loadedConfig = await service.loadConfig();
@@ -556,7 +567,7 @@ void main() {
         ],
         home: ResultScreen(
           result: _mealResult(completedBeforeArrival: true),
-          config: MealTimerConfig.defaults(),
+          config: ActivityTimerConfig.defaults(),
           mealProgressService: LocalMealProgressService(),
           onConfigChanged: (_) {},
           introControllerFactory: (assetPath) {
@@ -593,7 +604,7 @@ void main() {
         ],
         home: ResultScreen(
           result: _mealResult(completedBeforeArrival: false),
-          config: MealTimerConfig.defaults(),
+          config: ActivityTimerConfig.defaults(),
           mealProgressService: LocalMealProgressService(),
           onConfigChanged: (_) {},
           introControllerFactory: (assetPath) {
@@ -636,7 +647,7 @@ void main() {
         ],
         home: ResultScreen(
           result: _mealResult(mealCompleted: false),
-          config: MealTimerConfig.defaults(),
+          config: ActivityTimerConfig.defaults(),
           mealProgressService: service,
           onConfigChanged: (_) {},
           introControllerFactory: (assetPath) {
@@ -695,7 +706,7 @@ void main() {
         ],
         home: ResultScreen(
           result: _mealResult(completedBeforeArrival: true),
-          config: MealTimerConfig.defaults(),
+          config: ActivityTimerConfig.defaults(),
           mealProgressService: LocalMealProgressService(),
           onConfigChanged: (_) {},
           introControllerFactory: (_) {
@@ -736,7 +747,7 @@ void main() {
         ],
         home: ResultScreen(
           result: _mealResult(completedBeforeArrival: true),
-          config: MealTimerConfig.defaults(),
+          config: ActivityTimerConfig.defaults(),
           mealProgressService: LocalMealProgressService(),
           onConfigChanged: (_) {},
           introControllerFactory: (_) {
@@ -790,7 +801,7 @@ void main() {
         ],
         home: ResultScreen(
           result: _mealResult(mealCompleted: false),
-          config: MealTimerConfig.defaults(),
+          config: ActivityTimerConfig.defaults(),
           mealProgressService: LocalMealProgressService(),
           onConfigChanged: (_) {},
         ),
@@ -839,7 +850,7 @@ void main() {
         ],
         home: ResultScreen(
           result: _mealResult(completedBeforeArrival: true),
-          config: MealTimerConfig.defaults(),
+          config: ActivityTimerConfig.defaults(),
           mealProgressService: LocalMealProgressService(),
           onConfigChanged: (_) {},
           introControllerFactory: (_) {
@@ -891,7 +902,7 @@ void main() {
         ],
         home: ResultScreen(
           result: _mealResult(mealCompleted: false),
-          config: MealTimerConfig.defaults(),
+          config: ActivityTimerConfig.defaults(),
           mealProgressService: LocalMealProgressService(),
           onConfigChanged: (_) {},
         ),
@@ -932,7 +943,7 @@ void main() {
         ],
         home: ResultScreen(
           result: _mealResult(mealCompleted: false),
-          config: MealTimerConfig.defaults().copyWith(vehicleId: 'bus'),
+          config: ActivityTimerConfig.defaults().copyWith(vehicleId: 'bus'),
           mealProgressService: LocalMealProgressService(),
           onConfigChanged: (_) {},
         ),
@@ -981,7 +992,7 @@ void main() {
         ],
         home: ResultScreen(
           result: _mealResult(completedBeforeArrival: true),
-          config: MealTimerConfig.defaults(),
+          config: ActivityTimerConfig.defaults(),
           mealProgressService: LocalMealProgressService(),
           onConfigChanged: (_) {},
           introControllerFactory: (_) {
@@ -1038,7 +1049,7 @@ void main() {
         ],
         home: ResultScreen(
           result: _mealResult(mealCompleted: false),
-          config: MealTimerConfig.defaults(),
+          config: ActivityTimerConfig.defaults(),
           mealProgressService: LocalMealProgressService(),
           onConfigChanged: (_) {},
           orientationService: orientationService,
@@ -1288,7 +1299,7 @@ void main() {
 
   test('Motivation schedule can be disabled from config', () {
     final schedule = motivation_schedule.MotivationVideoSchedule.fromConfig(
-      MealTimerConfig.defaults().copyWith(motivationVideoEnabled: false),
+      ActivityTimerConfig.defaults().copyWith(motivationVideoEnabled: false),
     );
 
     expect(schedule.usesTimedSchedule(const Duration(minutes: 60)), isFalse);
@@ -1314,7 +1325,7 @@ void main() {
 
   test('Custom motivation interval ignores percent milestones', () {
     final schedule = motivation_schedule.MotivationVideoSchedule.fromConfig(
-      MealTimerConfig.defaults().copyWith(
+      ActivityTimerConfig.defaults().copyWith(
         motivationVideoUseCustomInterval: true,
         motivationVideoInterval: const Duration(minutes: 5),
       ),
@@ -1352,7 +1363,7 @@ void main() {
 
   test('Custom motivation interval longer than timer duration never plays', () {
     final schedule = motivation_schedule.MotivationVideoSchedule.fromConfig(
-      MealTimerConfig.defaults().copyWith(
+      ActivityTimerConfig.defaults().copyWith(
         motivationVideoUseCustomInterval: true,
         motivationVideoInterval: const Duration(minutes: 10),
       ),
@@ -1380,7 +1391,7 @@ void main() {
 
   test('Timed motivation schedule can restart from an elapsed offset', () {
     final schedule = motivation_schedule.MotivationVideoSchedule.fromConfig(
-      MealTimerConfig.defaults().copyWith(
+      ActivityTimerConfig.defaults().copyWith(
         motivationVideoUseCustomInterval: true,
         motivationVideoInterval: const Duration(minutes: 3),
       ),
@@ -1565,7 +1576,8 @@ void main() {
     expect(find.text('만들기'), findsOneWidget);
     expect(find.text('다른 코스'), findsOneWidget);
     expect(find.text('15분 코스'), findsOneWidget);
-    expect(find.textContaining('25분 보통 코스'), findsOneWidget);
+    expect(find.textContaining('2분 보통 코스'), findsOneWidget);
+    expect(find.text('25분 코스'), findsOneWidget);
     expect(find.text('35분 코스'), findsOneWidget);
     expect(find.textContaining('직접 설정'), findsOneWidget);
   });
@@ -1580,7 +1592,7 @@ void main() {
     final session = ActiveMealTimerSession(
       sessionId: 'active-session',
       startedAt: startedAt,
-      config: MealTimerConfig.defaults().copyWith(
+      config: ActivityTimerConfig.defaults().copyWith(
         childName: '지율',
         duration: const Duration(minutes: 35),
         vehicleId: 'bus',
@@ -1599,7 +1611,10 @@ void main() {
           GlobalWidgetsLocalizations.delegate,
         ],
         home: HomeScreen(
-          config: MealTimerConfig.defaults().copyWith(childName: '지율'),
+          config: ActivityTimerConfig.defaults().copyWith(
+            childName: '지율',
+            duration: const Duration(minutes: 25),
+          ),
           mealProgressService: LocalMealProgressService(),
           onConfigChanged: (_) {},
           now: () => now,
@@ -1632,7 +1647,7 @@ void main() {
       ActiveMealTimerSession(
         sessionId: 'active-session',
         startedAt: DateTime(2026, 6, 10, 8),
-        config: MealTimerConfig.defaults().copyWith(childName: '지율'),
+        config: ActivityTimerConfig.defaults().copyWith(childName: '지율'),
         state: ActiveMealTimerSessionState.running,
       ),
     );
@@ -1647,7 +1662,7 @@ void main() {
           GlobalWidgetsLocalizations.delegate,
         ],
         home: HomeScreen(
-          config: MealTimerConfig.defaults().copyWith(childName: '지율'),
+          config: ActivityTimerConfig.defaults().copyWith(childName: '지율'),
           mealProgressService: LocalMealProgressService(),
           onConfigChanged: (_) {},
           now: () => now,
@@ -1683,7 +1698,7 @@ void main() {
       ActiveMealTimerSession(
         sessionId: 'active-session',
         startedAt: now.subtract(Duration(minutes: 24, seconds: 50)),
-        config: MealTimerConfig.defaults().copyWith(
+        config: ActivityTimerConfig.defaults().copyWith(
           childName: '지율',
           duration: const Duration(minutes: 25),
         ),
@@ -1701,7 +1716,7 @@ void main() {
           GlobalWidgetsLocalizations.delegate,
         ],
         home: HomeScreen(
-          config: MealTimerConfig.defaults().copyWith(childName: '지율'),
+          config: ActivityTimerConfig.defaults().copyWith(childName: '지율'),
           mealProgressService: LocalMealProgressService(),
           onConfigChanged: (_) {},
           now: () => now,
@@ -1743,7 +1758,7 @@ void main() {
       ActiveMealTimerSession(
         sessionId: 'active-session',
         startedAt: now.subtract(const Duration(minutes: 30)),
-        config: MealTimerConfig.defaults().copyWith(
+        config: ActivityTimerConfig.defaults().copyWith(
           childName: '지율',
           duration: const Duration(minutes: 25),
         ),
@@ -1761,7 +1776,7 @@ void main() {
           GlobalWidgetsLocalizations.delegate,
         ],
         home: HomeScreen(
-          config: MealTimerConfig.defaults().copyWith(childName: '지율'),
+          config: ActivityTimerConfig.defaults().copyWith(childName: '지율'),
           mealProgressService: LocalMealProgressService(),
           onConfigChanged: (_) {},
           now: () => now,
@@ -1785,7 +1800,7 @@ void main() {
       ActiveMealTimerSession(
         sessionId: 'stale-session',
         startedAt: now.subtract(const Duration(hours: 25)),
-        config: MealTimerConfig.defaults().copyWith(childName: '지율'),
+        config: ActivityTimerConfig.defaults().copyWith(childName: '지율'),
         state: ActiveMealTimerSessionState.running,
       ),
     );
@@ -1800,7 +1815,7 @@ void main() {
           GlobalWidgetsLocalizations.delegate,
         ],
         home: HomeScreen(
-          config: MealTimerConfig.defaults().copyWith(childName: '지율'),
+          config: ActivityTimerConfig.defaults().copyWith(childName: '지율'),
           mealProgressService: LocalMealProgressService(),
           onConfigChanged: (_) {},
           now: () => now,
@@ -1825,7 +1840,7 @@ void main() {
       ActiveMealTimerSession(
         sessionId: 'finished-session',
         startedAt: now.subtract(const Duration(minutes: 30)),
-        config: MealTimerConfig.defaults().copyWith(
+        config: ActivityTimerConfig.defaults().copyWith(
           childName: '지율',
           duration: const Duration(minutes: 25),
         ),
@@ -1843,7 +1858,7 @@ void main() {
           GlobalWidgetsLocalizations.delegate,
         ],
         home: HomeScreen(
-          config: MealTimerConfig.defaults().copyWith(childName: '지율'),
+          config: ActivityTimerConfig.defaults().copyWith(childName: '지율'),
           mealProgressService: LocalMealProgressService(),
           onConfigChanged: (_) {},
           now: () => now,
@@ -1871,7 +1886,7 @@ void main() {
       ActiveMealTimerSession(
         sessionId: 'active-session',
         startedAt: DateTime(2026, 6, 10, 8),
-        config: MealTimerConfig.defaults().copyWith(
+        config: ActivityTimerConfig.defaults().copyWith(
           childName: '지율',
           duration: const Duration(minutes: 35),
         ),
@@ -1889,9 +1904,10 @@ void main() {
           GlobalWidgetsLocalizations.delegate,
         ],
         home: HomeScreen(
-          config: MealTimerConfig.defaults().copyWith(
+          config: ActivityTimerConfig.defaults().copyWith(
             childName: '지율',
-            courseIngredientMode: CourseIngredientMode.off,
+            duration: const Duration(minutes: 25),
+            markerMode: ActivityMarkerMode.off,
           ),
           mealProgressService: LocalMealProgressService(),
           onConfigChanged: (_) {},
@@ -1938,7 +1954,7 @@ void main() {
           GlobalWidgetsLocalizations.delegate,
         ],
         home: HomeScreen(
-          config: MealTimerConfig.defaults().copyWith(
+          config: ActivityTimerConfig.defaults().copyWith(
             childName: '지율',
             duration: const Duration(minutes: 35),
           ),
@@ -2000,7 +2016,10 @@ void main() {
           GlobalWidgetsLocalizations.delegate,
         ],
         home: HomeScreen(
-          config: MealTimerConfig.defaults().copyWith(childName: '지율'),
+          config: ActivityTimerConfig.defaults().copyWith(
+            childName: '지율',
+            duration: const Duration(minutes: 25),
+          ),
           mealProgressService: LocalMealProgressService(),
           onConfigChanged: (_) {},
         ),
@@ -2052,10 +2071,10 @@ void main() {
           GlobalWidgetsLocalizations.delegate,
         ],
         home: HomeScreen(
-          config: MealTimerConfig.defaults().copyWith(
+          config: ActivityTimerConfig.defaults().copyWith(
             childName: '지율',
             duration: const Duration(minutes: 35),
-            courseIngredientMode: CourseIngredientMode.off,
+            markerMode: ActivityMarkerMode.off,
           ),
           mealProgressService: LocalMealProgressService(),
           onConfigChanged: (_) {},
@@ -2074,17 +2093,14 @@ void main() {
     );
     expect(find.byType(TimerScreen), findsOneWidget);
     expect(
-      tester
-          .widget<TimerScreen>(find.byType(TimerScreen))
-          .config
-          .courseIngredientIds,
+      tester.widget<TimerScreen>(find.byType(TimerScreen)).config.markerIds,
       isEmpty,
     );
     expect(
       tester
           .widget<TimerScreen>(find.byType(TimerScreen))
           .config
-          .selectedCourseIngredientIds,
+          .selectedMarkerIds,
       isEmpty,
     );
   });
@@ -2107,10 +2123,10 @@ void main() {
           GlobalWidgetsLocalizations.delegate,
         ],
         home: HomeScreen(
-          config: MealTimerConfig.defaults().copyWith(
+          config: ActivityTimerConfig.defaults().copyWith(
             childName: '지율',
             duration: const Duration(minutes: 35),
-            courseIngredientMode: CourseIngredientMode.random,
+            markerMode: ActivityMarkerMode.random,
           ),
           mealProgressService: LocalMealProgressService(),
           onConfigChanged: (_) {},
@@ -2129,17 +2145,14 @@ void main() {
     );
     expect(find.byType(TimerScreen), findsOneWidget);
     expect(
-      tester
-          .widget<TimerScreen>(find.byType(TimerScreen))
-          .config
-          .courseIngredientIds,
+      tester.widget<TimerScreen>(find.byType(TimerScreen)).config.markerIds,
       hasLength(MealIngredientCatalog.maxSelectableIngredientCount),
     );
     expect(
       tester
           .widget<TimerScreen>(find.byType(TimerScreen))
           .config
-          .selectedCourseIngredientIds,
+          .selectedMarkerIds,
       isEmpty,
     );
   });
@@ -2160,7 +2173,7 @@ void main() {
           GlobalWidgetsLocalizations.delegate,
         ],
         home: HomeScreen(
-          config: MealTimerConfig.defaults().copyWith(
+          config: ActivityTimerConfig.defaults().copyWith(
             childName: '지율',
             duration: const Duration(minutes: 35),
           ),
@@ -2194,10 +2207,7 @@ void main() {
       const Duration(minutes: 35),
     );
     expect(
-      tester
-          .widget<TimerScreen>(find.byType(TimerScreen))
-          .config
-          .courseIngredientIds,
+      tester.widget<TimerScreen>(find.byType(TimerScreen)).config.markerIds,
       hasLength(MealIngredientCatalog.maxSelectableIngredientCount),
     );
   });
@@ -2220,7 +2230,10 @@ void main() {
             GlobalWidgetsLocalizations.delegate,
           ],
           home: HomeScreen(
-            config: MealTimerConfig.defaults().copyWith(childName: '지율'),
+            config: ActivityTimerConfig.defaults().copyWith(
+              childName: '지율',
+              duration: const Duration(minutes: 25),
+            ),
             mealProgressService: LocalMealProgressService(),
             onConfigChanged: (_) {},
           ),
@@ -2254,17 +2267,14 @@ void main() {
       await tester.pump(const Duration(milliseconds: 400));
 
       expect(
-        tester
-            .widget<TimerScreen>(find.byType(TimerScreen))
-            .config
-            .courseIngredientIds,
+        tester.widget<TimerScreen>(find.byType(TimerScreen)).config.markerIds,
         ['carrot', 'egg'],
       );
       expect(
         tester
             .widget<TimerScreen>(find.byType(TimerScreen))
             .config
-            .selectedCourseIngredientIds,
+            .selectedMarkerIds,
         ['carrot', 'egg'],
       );
     },
@@ -2288,7 +2298,10 @@ void main() {
           GlobalWidgetsLocalizations.delegate,
         ],
         home: HomeScreen(
-          config: MealTimerConfig.defaults().copyWith(childName: '지율'),
+          config: ActivityTimerConfig.defaults().copyWith(
+            childName: '지율',
+            duration: const Duration(minutes: 25),
+          ),
           mealProgressService: LocalMealProgressService(),
           onConfigChanged: (_) {},
         ),
@@ -2330,7 +2343,7 @@ void main() {
           GlobalWidgetsLocalizations.delegate,
         ],
         home: HomeScreen(
-          config: MealTimerConfig.defaults().copyWith(
+          config: ActivityTimerConfig.defaults().copyWith(
             childName: '지율',
             duration: const Duration(minutes: 15),
           ),
@@ -2354,7 +2367,7 @@ void main() {
     addTearDown(() async {
       await const ActiveMealTimerSessionStore().clear();
     });
-    MealTimerConfig? changedConfig;
+    ActivityTimerConfig? changedConfig;
 
     await tester.pumpWidget(
       MaterialApp(
@@ -2366,7 +2379,7 @@ void main() {
           GlobalWidgetsLocalizations.delegate,
         ],
         home: HomeScreen(
-          config: MealTimerConfig.defaults().copyWith(
+          config: ActivityTimerConfig.defaults().copyWith(
             childName: '지율',
             duration: const Duration(minutes: 35),
           ),
@@ -2414,7 +2427,7 @@ void main() {
       addTearDown(() async {
         await const ActiveMealTimerSessionStore().clear();
       });
-      MealTimerConfig? changedConfig;
+      ActivityTimerConfig? changedConfig;
 
       await tester.pumpWidget(
         MaterialApp(
@@ -2426,7 +2439,7 @@ void main() {
             GlobalWidgetsLocalizations.delegate,
           ],
           home: HomeScreen(
-            config: MealTimerConfig.defaults().copyWith(
+            config: ActivityTimerConfig.defaults().copyWith(
               childName: '지율',
               duration: const Duration(minutes: 35),
             ),
@@ -2474,7 +2487,10 @@ void main() {
 
       expect(changedConfig?.duration, const Duration(minutes: 35));
       expect(changedConfig?.motivationVideoEnabled, isFalse);
-      expect(changedConfig?.courseIngredientIds, isEmpty);
+      expect(
+        changedConfig?.markerIds,
+        ActivityCatalog.defaultActivity.markerIds,
+      );
     },
   );
 
@@ -2494,7 +2510,7 @@ void main() {
           GlobalWidgetsLocalizations.delegate,
         ],
         home: HomeScreen(
-          config: MealTimerConfig.defaults().copyWith(
+          config: ActivityTimerConfig.defaults().copyWith(
             childName: '지율',
             avatarMode: AvatarImageMode.custom,
             customAvatarsByVehicle: {
@@ -2556,7 +2572,7 @@ void main() {
           GlobalWidgetsLocalizations.delegate,
         ],
         home: HomeScreen(
-          config: MealTimerConfig.defaults().copyWith(
+          config: ActivityTimerConfig.defaults().copyWith(
             childName: '지율',
             vehicleId: 'excavator',
             avatarMode: AvatarImageMode.custom,
@@ -2622,7 +2638,7 @@ void main() {
   testWidgets('Avatar setup screen shows guide text and prompt copy button', (
     tester,
   ) async {
-    await _pumpAvatarSetupScreen(tester, MealTimerConfig.defaults());
+    await _pumpAvatarSetupScreen(tester, ActivityTimerConfig.defaults());
 
     await tester.tap(find.text('직접 만든 아바타 사용'));
     await tester.pump();
@@ -2639,7 +2655,7 @@ void main() {
   testWidgets('English locale shows English avatar setup copy', (tester) async {
     await _pumpAvatarSetupScreen(
       tester,
-      MealTimerConfig.defaults(),
+      ActivityTimerConfig.defaults(),
       locale: const Locale('en'),
     );
 
@@ -2662,7 +2678,7 @@ void main() {
   ) async {
     await _pumpAvatarSetupScreen(
       tester,
-      MealTimerConfig.defaults().copyWith(vehicleId: 'fire_truck'),
+      ActivityTimerConfig.defaults().copyWith(vehicleId: 'fire_truck'),
     );
 
     await tester.tap(find.text('직접 만든 아바타 사용'));
@@ -2676,7 +2692,7 @@ void main() {
   ) async {
     await _pumpAvatarSetupScreen(
       tester,
-      MealTimerConfig.defaults().copyWith(vehicleId: 'police_car'),
+      ActivityTimerConfig.defaults().copyWith(vehicleId: 'police_car'),
     );
 
     await tester.tap(find.text('직접 만든 아바타 사용'));
@@ -2688,10 +2704,10 @@ void main() {
   testWidgets('Avatar setup vehicle selection updates prompt and config', (
     tester,
   ) async {
-    MealTimerConfig? changedConfig;
+    ActivityTimerConfig? changedConfig;
     await _pumpAvatarSetupScreen(
       tester,
-      MealTimerConfig.defaults(),
+      ActivityTimerConfig.defaults(),
       onConfigChanged: (config) => changedConfig = config,
     );
 
@@ -2711,7 +2727,7 @@ void main() {
   testWidgets('Avatar setup shows upload button in custom mode', (
     tester,
   ) async {
-    await _pumpAvatarSetupScreen(tester, MealTimerConfig.defaults());
+    await _pumpAvatarSetupScreen(tester, ActivityTimerConfig.defaults());
 
     await tester.tap(find.text('직접 만든 아바타 사용'));
     await tester.pump();
@@ -2726,10 +2742,10 @@ void main() {
   testWidgets('Avatar setup picker cancellation does not update config', (
     tester,
   ) async {
-    MealTimerConfig? changedConfig;
+    ActivityTimerConfig? changedConfig;
     await _pumpAvatarSetupScreen(
       tester,
-      MealTimerConfig.defaults(),
+      ActivityTimerConfig.defaults(),
       imagePicker: _FakeAvatarImagePicker(),
       avatarImageService: _FakeLocalAvatarImageService('/tmp/avatar.png'),
       onConfigChanged: (config) => changedConfig = config,
@@ -2750,11 +2766,11 @@ void main() {
   testWidgets('Avatar setup successful upload shows pending preview', (
     tester,
   ) async {
-    MealTimerConfig? changedConfig;
+    ActivityTimerConfig? changedConfig;
     final avatarFile = _createTemporaryAvatarImage();
     await _pumpAvatarSetupScreen(
       tester,
-      MealTimerConfig.defaults(),
+      ActivityTimerConfig.defaults(),
       imagePicker: _FakeAvatarImagePicker(
         XFile.fromData(
           Uint8List.fromList([1, 2, 3]),
@@ -2785,7 +2801,7 @@ void main() {
     final avatarFile = _createTemporaryAvatarImage();
     await _pumpAvatarSetupScreen(
       tester,
-      MealTimerConfig.defaults().copyWith(
+      ActivityTimerConfig.defaults().copyWith(
         avatarMode: AvatarImageMode.custom,
         customAvatarImagePath: avatarFile.path,
         customAvatarVehicleId: 'motorcycle',
@@ -2807,7 +2823,7 @@ void main() {
   ) async {
     await _pumpAvatarSetupScreen(
       tester,
-      MealTimerConfig.defaults().copyWith(
+      ActivityTimerConfig.defaults().copyWith(
         avatarMode: AvatarImageMode.custom,
         customAvatarImagePath: '/missing/avatar.png',
         customAvatarVehicleId: 'motorcycle',
@@ -2827,7 +2843,7 @@ void main() {
     final avatarFile = _createTemporaryAvatarImage();
     await _pumpAvatarSetupScreen(
       tester,
-      MealTimerConfig.defaults().copyWith(
+      ActivityTimerConfig.defaults().copyWith(
         avatarMode: AvatarImageMode.custom,
         customAvatarImagePath: avatarFile.path,
         customAvatarVehicleId: 'motorcycle',
@@ -2849,7 +2865,7 @@ void main() {
     final avatarFile = _createTemporaryAvatarImage();
     await _pumpAvatarSetupScreen(
       tester,
-      MealTimerConfig.defaults().copyWith(
+      ActivityTimerConfig.defaults().copyWith(
         avatarMode: AvatarImageMode.custom,
         customAvatarImagePath: avatarFile.path,
         customAvatarVehicleId: 'motorcycle',
@@ -2875,11 +2891,11 @@ void main() {
   testWidgets('Avatar setup confirm saves custom avatar adjustment', (
     tester,
   ) async {
-    MealTimerConfig? changedConfig;
+    ActivityTimerConfig? changedConfig;
     final avatarFile = _createTemporaryAvatarImage();
     await _pumpAvatarSetupScreen(
       tester,
-      MealTimerConfig.defaults().copyWith(
+      ActivityTimerConfig.defaults().copyWith(
         avatarMode: AvatarImageMode.custom,
         customAvatarImagePath: avatarFile.path,
         customAvatarVehicleId: 'motorcycle',
@@ -2921,11 +2937,11 @@ void main() {
   testWidgets('Avatar setup default image button saves default avatar mode', (
     tester,
   ) async {
-    MealTimerConfig? changedConfig;
+    ActivityTimerConfig? changedConfig;
     final avatarFile = _createTemporaryAvatarImage();
     await _pumpAvatarSetupScreen(
       tester,
-      MealTimerConfig.defaults().copyWith(
+      ActivityTimerConfig.defaults().copyWith(
         avatarMode: AvatarImageMode.custom,
         customAvatarImagePath: avatarFile.path,
         customAvatarVehicleId: 'motorcycle',
@@ -2956,12 +2972,12 @@ void main() {
   });
 
   testWidgets('Avatar setup stores custom avatars per vehicle', (tester) async {
-    MealTimerConfig? changedConfig;
+    ActivityTimerConfig? changedConfig;
     final busAvatarFile = _createTemporaryAvatarImage();
     final fireTruckAvatarFile = _createTemporaryAvatarImage();
     await _pumpAvatarSetupScreen(
       tester,
-      MealTimerConfig.defaults().copyWith(
+      ActivityTimerConfig.defaults().copyWith(
         vehicleId: 'bus',
         avatarMode: AvatarImageMode.custom,
         customAvatarsByVehicle: {
@@ -3020,12 +3036,12 @@ void main() {
   testWidgets(
     'Avatar setup default image clears only selected vehicle avatar',
     (tester) async {
-      MealTimerConfig? changedConfig;
+      ActivityTimerConfig? changedConfig;
       final busAvatarFile = _createTemporaryAvatarImage();
       final fireTruckAvatarFile = _createTemporaryAvatarImage();
       await _pumpAvatarSetupScreen(
         tester,
-        MealTimerConfig.defaults().copyWith(
+        ActivityTimerConfig.defaults().copyWith(
           vehicleId: 'fire_truck',
           avatarMode: AvatarImageMode.custom,
           customAvatarsByVehicle: {
@@ -3067,10 +3083,10 @@ void main() {
   testWidgets('Avatar setup default mode save keeps default avatar mode', (
     tester,
   ) async {
-    MealTimerConfig? changedConfig;
+    ActivityTimerConfig? changedConfig;
     await _pumpAvatarSetupScreen(
       tester,
-      MealTimerConfig.defaults(),
+      ActivityTimerConfig.defaults(),
       onConfigChanged: (config) => changedConfig = config,
     );
 
@@ -3088,10 +3104,10 @@ void main() {
   testWidgets('Avatar setup confirm without image is disabled and safe', (
     tester,
   ) async {
-    MealTimerConfig? changedConfig;
+    ActivityTimerConfig? changedConfig;
     await _pumpAvatarSetupScreen(
       tester,
-      MealTimerConfig.defaults(),
+      ActivityTimerConfig.defaults(),
       onConfigChanged: (config) => changedConfig = config,
     );
 
@@ -3107,7 +3123,10 @@ void main() {
   });
 
   testWidgets('Remaining time setting can be turned off', (tester) async {
-    SharedPreferences.setMockInitialValues({});
+    SharedPreferences.setMockInitialValues({
+      'durationMinutes': 25,
+      'markerMode': 'off',
+    });
 
     await _startApp(tester, const Locale('ko'));
 
@@ -3146,7 +3165,7 @@ void main() {
           GlobalWidgetsLocalizations.delegate,
         ],
         home: SettingsScreen(
-          config: MealTimerConfig.defaults(),
+          config: ActivityTimerConfig.defaults(),
           onConfigChanged: (_) {},
         ),
       ),
@@ -3269,27 +3288,22 @@ void main() {
           GlobalWidgetsLocalizations.delegate,
         ],
         home: SettingsScreen(
-          config: MealTimerConfig.defaults(),
+          config: ActivityTimerConfig.defaults(),
           onConfigChanged: (_) {},
         ),
       ),
     );
 
     await tester.scrollUntilVisible(
-      find.byKey(const ValueKey('courseIngredientModeHelpButton')),
+      find.byKey(const ValueKey('markerModeHelpButton')),
       200,
       scrollable: find.byType(Scrollable).first,
     );
     await tester.pumpAndSettle();
 
-    expect(
-      find.byKey(const ValueKey('courseIngredientModeHelpButton')),
-      findsOneWidget,
-    );
+    expect(find.byKey(const ValueKey('markerModeHelpButton')), findsOneWidget);
 
-    await tester.tap(
-      find.byKey(const ValueKey('courseIngredientModeHelpButton')),
-    );
+    await tester.tap(find.byKey(const ValueKey('markerModeHelpButton')));
     await tester.pumpAndSettle();
 
     expect(find.byKey(const ValueKey('appHelpSheet')), findsOneWidget);
@@ -3303,7 +3317,7 @@ void main() {
       tester.view.resetPhysicalSize();
       tester.view.resetDevicePixelRatio();
     });
-    var latestConfig = MealTimerConfig.defaults();
+    var latestConfig = ActivityTimerConfig.defaults();
 
     await tester.pumpWidget(
       MaterialApp(
@@ -3323,36 +3337,38 @@ void main() {
 
     expect(find.text('도로 위 식재료'), findsOneWidget);
     final segmentedButtonFinder = find.byKey(
-      const ValueKey('courseIngredientModeSegmentedButton'),
+      const ValueKey('markerModeSegmentedButton'),
     );
-    final segmentedButton = tester
-        .widget<SegmentedButton<CourseIngredientMode>>(segmentedButtonFinder);
+    final segmentedButton = tester.widget<SegmentedButton<ActivityMarkerMode>>(
+      segmentedButtonFinder,
+    );
     final segmentedButtonRect = tester.getRect(segmentedButtonFinder);
     final cardRect = tester.getRect(
       find.ancestor(of: segmentedButtonFinder, matching: find.byType(Card)),
     );
-    expect(segmentedButton.selected, {CourseIngredientMode.manual});
+    expect(segmentedButton.selected, {ActivityMarkerMode.activityDefault});
     expect(segmentedButton.showSelectedIcon, isFalse);
     expect(segmentedButtonRect.left, greaterThanOrEqualTo(cardRect.left));
     expect(segmentedButtonRect.right, lessThanOrEqualTo(cardRect.right));
     expect(find.text('사용 안 함'), findsOneWidget);
     expect(find.text('직접 선택'), findsOneWidget);
     expect(find.text('자동 선택'), findsOneWidget);
+    expect(find.text('기본'), findsOneWidget);
     expect(
       find.text('직접 선택한 식재료만 식사 기록에 남아요. 자동 선택은 도로에만 표시돼요.'),
       findsOneWidget,
     );
 
-    segmentedButton.onSelectionChanged!({CourseIngredientMode.random});
+    segmentedButton.onSelectionChanged!({ActivityMarkerMode.random});
     await tester.pump();
 
-    expect(latestConfig.courseIngredientMode, CourseIngredientMode.random);
+    expect(latestConfig.markerMode, ActivityMarkerMode.random);
   });
 
   testWidgets('Settings screen updates motivation video settings', (
     tester,
   ) async {
-    var latestConfig = MealTimerConfig.defaults();
+    var latestConfig = ActivityTimerConfig.defaults();
 
     await tester.pumpWidget(
       MaterialApp(
@@ -3439,7 +3455,7 @@ void main() {
           GlobalWidgetsLocalizations.delegate,
         ],
         home: SettingsScreen(
-          config: MealTimerConfig.defaults(),
+          config: ActivityTimerConfig.defaults(),
           onConfigChanged: (_) {},
         ),
       ),
@@ -3473,7 +3489,7 @@ void main() {
     addTearDown(() async {
       await const ActiveMealTimerSessionStore().clear();
     });
-    MealTimerConfig? changedConfig;
+    ActivityTimerConfig? changedConfig;
 
     await tester.pumpWidget(
       MaterialApp(
@@ -3485,7 +3501,10 @@ void main() {
           GlobalWidgetsLocalizations.delegate,
         ],
         home: HomeScreen(
-          config: MealTimerConfig.defaults().copyWith(childName: '지율'),
+          config: ActivityTimerConfig.defaults().copyWith(
+            childName: '지율',
+            duration: const Duration(minutes: 25),
+          ),
           mealProgressService: LocalMealProgressService(),
           onConfigChanged: (config) => changedConfig = config,
         ),
@@ -3581,7 +3600,7 @@ void main() {
           GlobalWidgetsLocalizations.delegate,
         ],
         home: SettingsScreen(
-          config: MealTimerConfig.defaults().copyWith(
+          config: ActivityTimerConfig.defaults().copyWith(
             avatarMode: AvatarImageMode.custom,
             customAvatarImagePath: avatarFile.path,
             customAvatarVehicleId: 'motorcycle',
@@ -3751,6 +3770,12 @@ void main() {
 
     await _startApp(tester, const Locale('ko'));
 
+    await tester.scrollUntilVisible(
+      _vehicleChoiceFinder('police_car'),
+      220,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.pumpAndSettle();
     await tester.tap(_vehicleChoiceFinder('police_car'));
     await tester.pump();
 
@@ -3770,12 +3795,12 @@ void main() {
     tester,
   ) async {
     SharedPreferences.setMockInitialValues({});
-    MealTimerConfig? changedConfig;
+    ActivityTimerConfig? changedConfig;
 
     await tester.pumpWidget(
       MaterialApp(
         home: HomeScreen(
-          config: MealTimerConfig.defaults().copyWith(
+          config: ActivityTimerConfig.defaults().copyWith(
             childName: '지율',
             vehicleId: 'fire_truck',
           ),
@@ -3789,6 +3814,12 @@ void main() {
     final unselectedColor = _vehicleChoiceMaterial(tester, 'police_car').color;
     expect(selectedColor, isNot(unselectedColor));
 
+    await tester.scrollUntilVisible(
+      _vehicleChoiceFinder('police_car'),
+      220,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.pumpAndSettle();
     await tester.tap(_vehicleChoiceFinder('police_car'));
     await tester.pump();
 
@@ -4833,7 +4864,7 @@ void main() {
       MaterialApp(
         locale: const Locale('ko'),
         home: TimerScreen(
-          config: MealTimerConfig.defaults().copyWith(
+          config: ActivityTimerConfig.defaults().copyWith(
             vehicleId: 'excavator',
             avatarMode: AvatarImageMode.custom,
             customAvatarImagePath: avatarFile.path,
@@ -4865,7 +4896,7 @@ void main() {
       MaterialApp(
         locale: const Locale('ko'),
         home: TimerScreen(
-          config: MealTimerConfig.defaults().copyWith(
+          config: ActivityTimerConfig.defaults().copyWith(
             vehicleId: 'fire_truck',
             avatarMode: AvatarImageMode.custom,
             customAvatarsByVehicle: {
@@ -4901,8 +4932,8 @@ void main() {
       MaterialApp(
         locale: const Locale('ko'),
         home: TimerScreen(
-          config: MealTimerConfig.defaults().copyWith(
-            courseIngredientIds: const ['carrot', 'egg'],
+          config: ActivityTimerConfig.defaults().copyWith(
+            markerIds: const ['carrot', 'egg'],
           ),
           mealProgressService: LocalMealProgressService(),
           onConfigChanged: (_) {},
@@ -4916,7 +4947,7 @@ void main() {
       roadView.ingredients,
       hasLength(
         MealIngredientCatalog.courseSlotCountForDuration(
-          MealTimerConfig.defaults().duration,
+          ActivityTimerConfig.defaults().duration,
         ),
       ),
     );
@@ -4934,9 +4965,9 @@ void main() {
       MaterialApp(
         locale: const Locale('ko'),
         home: TimerScreen(
-          config: MealTimerConfig.defaults().copyWith(
-            courseIngredientMode: CourseIngredientMode.off,
-            courseIngredientIds: const [],
+          config: ActivityTimerConfig.defaults().copyWith(
+            markerMode: ActivityMarkerMode.off,
+            markerIds: const [],
           ),
           mealProgressService: LocalMealProgressService(),
           onConfigChanged: (_) {},
@@ -4957,7 +4988,7 @@ void main() {
       MaterialApp(
         locale: const Locale('ko'),
         home: TimerScreen(
-          config: MealTimerConfig.defaults().copyWith(
+          config: ActivityTimerConfig.defaults().copyWith(
             duration: const Duration(minutes: 60),
           ),
           mealProgressService: LocalMealProgressService(),
@@ -4983,7 +5014,7 @@ void main() {
       MaterialApp(
         locale: const Locale('ko'),
         home: TimerScreen(
-          config: MealTimerConfig.defaults().copyWith(
+          config: ActivityTimerConfig.defaults().copyWith(
             duration: const Duration(minutes: 35),
             childName: '지율',
             vehicleId: 'bus',
@@ -5021,7 +5052,7 @@ void main() {
       MaterialApp(
         locale: const Locale('ko'),
         home: TimerScreen(
-          config: MealTimerConfig.defaults().copyWith(
+          config: ActivityTimerConfig.defaults().copyWith(
             duration: const Duration(minutes: 35),
           ),
           mealProgressService: LocalMealProgressService(),
@@ -5071,7 +5102,7 @@ void main() {
       MaterialApp(
         locale: const Locale('ko'),
         home: TimerScreen(
-          config: MealTimerConfig.defaults().copyWith(
+          config: ActivityTimerConfig.defaults().copyWith(
             duration: const Duration(minutes: 10),
           ),
           mealProgressService: LocalMealProgressService(),
@@ -5105,7 +5136,7 @@ void main() {
     final session = ActiveMealTimerSession(
       sessionId: 'active-session',
       startedAt: startedAt,
-      config: MealTimerConfig.defaults().copyWith(
+      config: ActivityTimerConfig.defaults().copyWith(
         duration: const Duration(minutes: 60),
         vehicleId: 'bus',
       ),
@@ -5116,7 +5147,7 @@ void main() {
       MaterialApp(
         locale: const Locale('ko'),
         home: TimerScreen(
-          config: MealTimerConfig.defaults(),
+          config: ActivityTimerConfig.defaults(),
           restoredSession: session,
           mealProgressService: LocalMealProgressService(),
           now: () => now,
@@ -5150,7 +5181,7 @@ void main() {
     final session = ActiveMealTimerSession(
       sessionId: 'paused-session',
       startedAt: DateTime(2026, 6, 10, 8),
-      config: MealTimerConfig.defaults().copyWith(
+      config: ActivityTimerConfig.defaults().copyWith(
         duration: const Duration(minutes: 30),
       ),
       state: ActiveMealTimerSessionState.paused,
@@ -5161,7 +5192,7 @@ void main() {
       MaterialApp(
         locale: const Locale('ko'),
         home: TimerScreen(
-          config: MealTimerConfig.defaults(),
+          config: ActivityTimerConfig.defaults(),
           restoredSession: session,
           mealProgressService: LocalMealProgressService(),
           now: () => now,
@@ -5206,7 +5237,7 @@ void main() {
       MaterialApp(
         locale: const Locale('ko'),
         home: TimerScreen(
-          config: MealTimerConfig.defaults().copyWith(
+          config: ActivityTimerConfig.defaults().copyWith(
             duration: const Duration(minutes: 25),
           ),
           mealProgressService: LocalMealProgressService(),
@@ -5239,7 +5270,7 @@ void main() {
       MaterialApp(
         locale: const Locale('ko'),
         home: TimerScreen(
-          config: MealTimerConfig.defaults().copyWith(
+          config: ActivityTimerConfig.defaults().copyWith(
             duration: const Duration(minutes: 10),
           ),
           mealProgressService: LocalMealProgressService(),
@@ -5274,7 +5305,7 @@ void main() {
       MaterialApp(
         locale: const Locale('ko'),
         home: TimerScreen(
-          config: MealTimerConfig.defaults().copyWith(
+          config: ActivityTimerConfig.defaults().copyWith(
             duration: const Duration(seconds: 100),
           ),
           mealProgressService: LocalMealProgressService(),
@@ -5315,7 +5346,7 @@ void main() {
       MaterialApp(
         locale: const Locale('ko'),
         home: TimerScreen(
-          config: MealTimerConfig.defaults().copyWith(
+          config: ActivityTimerConfig.defaults().copyWith(
             duration: const Duration(minutes: 10),
           ),
           mealProgressService: LocalMealProgressService(),
@@ -5349,7 +5380,7 @@ void main() {
       MaterialApp(
         locale: const Locale('ko'),
         home: TimerScreen(
-          config: MealTimerConfig.defaults().copyWith(
+          config: ActivityTimerConfig.defaults().copyWith(
             duration: const Duration(seconds: 1),
           ),
           mealProgressService: LocalMealProgressService(),
@@ -5386,11 +5417,11 @@ void main() {
       MaterialApp(
         locale: const Locale('ko'),
         home: TimerScreen(
-          config: MealTimerConfig.defaults().copyWith(
+          config: ActivityTimerConfig.defaults().copyWith(
             duration: const Duration(seconds: 1),
-            courseIngredientMode: CourseIngredientMode.manual,
-            courseIngredientIds: const ['carrot', 'egg'],
-            selectedCourseIngredientIds: const ['carrot', 'egg'],
+            markerMode: ActivityMarkerMode.manual,
+            markerIds: const ['carrot', 'egg'],
+            selectedMarkerIds: const ['carrot', 'egg'],
           ),
           mealProgressService: service,
           now: () => now,
@@ -5425,7 +5456,7 @@ void main() {
       MaterialApp(
         locale: const Locale('ko'),
         home: TimerScreen(
-          config: MealTimerConfig.defaults().copyWith(
+          config: ActivityTimerConfig.defaults().copyWith(
             duration: const Duration(seconds: 1),
           ),
           mealProgressService: LocalMealProgressService(),
@@ -5477,7 +5508,7 @@ void main() {
           GlobalWidgetsLocalizations.delegate,
         ],
         home: TimerScreen(
-          config: MealTimerConfig.defaults().copyWith(
+          config: ActivityTimerConfig.defaults().copyWith(
             duration: const Duration(seconds: 100),
             soundEnabled: true,
           ),
@@ -5525,7 +5556,7 @@ void main() {
             GlobalWidgetsLocalizations.delegate,
           ],
           home: TimerScreen(
-            config: MealTimerConfig.defaults().copyWith(
+            config: ActivityTimerConfig.defaults().copyWith(
               duration: const Duration(minutes: 60),
               soundEnabled: false,
             ),
@@ -5581,7 +5612,7 @@ void main() {
             GlobalWidgetsLocalizations.delegate,
           ],
           home: TimerScreen(
-            config: MealTimerConfig.defaults().copyWith(
+            config: ActivityTimerConfig.defaults().copyWith(
               duration: const Duration(minutes: 15),
               soundEnabled: false,
               motivationVideoUseCustomInterval: true,
@@ -5627,7 +5658,7 @@ void main() {
   testWidgets('Timer screen closes active motivation video when disabled', (
     tester,
   ) async {
-    MealTimerConfig? changedConfig;
+    ActivityTimerConfig? changedConfig;
     var now = DateTime(2026);
 
     await tester.pumpWidget(
@@ -5640,7 +5671,7 @@ void main() {
           GlobalWidgetsLocalizations.delegate,
         ],
         home: TimerScreen(
-          config: MealTimerConfig.defaults().copyWith(
+          config: ActivityTimerConfig.defaults().copyWith(
             duration: const Duration(minutes: 60),
             soundEnabled: false,
           ),
@@ -5691,7 +5722,7 @@ void main() {
   testWidgets(
     'Timer motivation settings dismiss keeps pending changes unapplied',
     (tester) async {
-      MealTimerConfig? changedConfig;
+      ActivityTimerConfig? changedConfig;
       var now = DateTime(2026);
 
       await tester.pumpWidget(
@@ -5704,7 +5735,7 @@ void main() {
             GlobalWidgetsLocalizations.delegate,
           ],
           home: TimerScreen(
-            config: MealTimerConfig.defaults().copyWith(
+            config: ActivityTimerConfig.defaults().copyWith(
               duration: const Duration(minutes: 60),
               soundEnabled: false,
             ),
@@ -5767,7 +5798,7 @@ void main() {
             GlobalWidgetsLocalizations.delegate,
           ],
           home: TimerScreen(
-            config: MealTimerConfig.defaults().copyWith(
+            config: ActivityTimerConfig.defaults().copyWith(
               duration: const Duration(minutes: 60),
               soundEnabled: false,
             ),
@@ -5835,7 +5866,7 @@ void main() {
           GlobalWidgetsLocalizations.delegate,
         ],
         home: TimerScreen(
-          config: MealTimerConfig.defaults().copyWith(
+          config: ActivityTimerConfig.defaults().copyWith(
             duration: const Duration(minutes: 60),
             soundEnabled: false,
             motivationVideoEnabled: false,
@@ -5874,7 +5905,7 @@ void main() {
       MaterialApp(
         locale: const Locale('ko'),
         home: TimerScreen(
-          config: MealTimerConfig.defaults().copyWith(
+          config: ActivityTimerConfig.defaults().copyWith(
             duration: const Duration(minutes: 60),
           ),
           mealProgressService: LocalMealProgressService(),
@@ -5925,7 +5956,7 @@ void main() {
       MaterialApp(
         locale: const Locale('ko'),
         home: TimerScreen(
-          config: MealTimerConfig.defaults().copyWith(
+          config: ActivityTimerConfig.defaults().copyWith(
             duration: const Duration(minutes: 5),
           ),
           mealProgressService: LocalMealProgressService(),
@@ -6030,7 +6061,7 @@ void main() {
       MaterialApp(
         locale: const Locale('ko'),
         home: TimerScreen(
-          config: MealTimerConfig.defaults().copyWith(
+          config: ActivityTimerConfig.defaults().copyWith(
             duration: const Duration(minutes: 60),
           ),
           mealProgressService: LocalMealProgressService(),
@@ -6073,7 +6104,7 @@ void main() {
         MaterialApp(
           locale: const Locale('en'),
           home: TimerScreen(
-            config: MealTimerConfig.defaults(),
+            config: ActivityTimerConfig.defaults(),
             mealProgressService: LocalMealProgressService(),
             onConfigChanged: (_) {},
           ),
@@ -6130,7 +6161,7 @@ void main() {
       MaterialApp(
         locale: const Locale('en'),
         home: TimerScreen(
-          config: MealTimerConfig.defaults().copyWith(
+          config: ActivityTimerConfig.defaults().copyWith(
             motivationVideoUseCustomInterval: true,
           ),
           mealProgressService: LocalMealProgressService(),
@@ -6163,7 +6194,7 @@ void main() {
     await tester.pumpWidget(
       MaterialApp(
         home: TimerScreen(
-          config: MealTimerConfig.defaults(),
+          config: ActivityTimerConfig.defaults(),
           mealProgressService: LocalMealProgressService(),
           onConfigChanged: (_) {},
           orientationService: orientationService,
@@ -6191,7 +6222,9 @@ void main() {
     await tester.pumpWidget(
       MaterialApp(
         home: TimerScreen(
-          config: MealTimerConfig.defaults().copyWith(keepScreenAwake: true),
+          config: ActivityTimerConfig.defaults().copyWith(
+            keepScreenAwake: true,
+          ),
           mealProgressService: LocalMealProgressService(),
           onConfigChanged: (_) {},
           screenAwakeService: screenAwakeService,
@@ -6216,7 +6249,9 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           home: TimerScreen(
-            config: MealTimerConfig.defaults().copyWith(keepScreenAwake: false),
+            config: ActivityTimerConfig.defaults().copyWith(
+              keepScreenAwake: false,
+            ),
             mealProgressService: LocalMealProgressService(),
             onConfigChanged: (_) {},
             screenAwakeService: screenAwakeService,
@@ -6262,7 +6297,7 @@ void main() {
     navigatorKey.currentState!.push(
       MaterialPageRoute(
         builder: (_) => TimerScreen(
-          config: MealTimerConfig.defaults(),
+          config: ActivityTimerConfig.defaults(),
           mealProgressService: LocalMealProgressService(),
           onConfigChanged: (_) {},
         ),
@@ -6312,7 +6347,8 @@ void main() {
     expect(find.text("Today's vehicle"), findsOneWidget);
     expect(find.text('15-min Ride'), findsOneWidget);
     expect(find.text('A light warm-up'), findsOneWidget);
-    expect(find.textContaining('25-min Regular Ride'), findsOneWidget);
+    expect(find.textContaining('2-min Regular Ride'), findsOneWidget);
+    expect(find.text('25-min Ride'), findsOneWidget);
     expect(find.text('Other rides'), findsOneWidget);
     expect(find.text('35-min Ride'), findsOneWidget);
     expect(find.text('Cruise to the finish'), findsOneWidget);
@@ -6334,7 +6370,7 @@ void main() {
       MaterialApp(
         locale: const Locale('en'),
         home: TimerScreen(
-          config: MealTimerConfig.defaults(),
+          config: ActivityTimerConfig.defaults(),
           mealProgressService: LocalMealProgressService(),
           onConfigChanged: (_) {},
         ),
@@ -6355,7 +6391,7 @@ void main() {
       MaterialApp(
         locale: const Locale('en'),
         home: TimerScreen(
-          config: MealTimerConfig.defaults(),
+          config: ActivityTimerConfig.defaults(),
           mealProgressService: LocalMealProgressService(),
           onConfigChanged: (_) {},
         ),
@@ -6825,7 +6861,7 @@ void main() {
       MaterialApp(
         locale: const Locale('en'),
         home: HomeScreen(
-          config: MealTimerConfig.defaults().copyWith(childName: 'Jiyul'),
+          config: ActivityTimerConfig.defaults().copyWith(childName: 'Jiyul'),
           mealProgressService: LocalMealProgressService(),
           onConfigChanged: (_) {},
         ),
@@ -6854,7 +6890,7 @@ void main() {
       MaterialApp(
         locale: const Locale('en'),
         home: HomeScreen(
-          config: MealTimerConfig.defaults().copyWith(childName: 'Jiyul'),
+          config: ActivityTimerConfig.defaults().copyWith(childName: 'Jiyul'),
           mealProgressService: service,
           onConfigChanged: (_) {},
         ),
@@ -6893,7 +6929,7 @@ void main() {
         localizationsDelegates: GlobalMaterialLocalizations.delegates,
         supportedLocales: AppTexts.supportedLocales,
         home: HomeScreen(
-          config: MealTimerConfig.defaults().copyWith(childName: '강우'),
+          config: ActivityTimerConfig.defaults().copyWith(childName: '강우'),
           mealProgressService: service,
           onConfigChanged: (_) {},
         ),
@@ -7230,9 +7266,9 @@ Future<void> _startApp(
 
 Future<void> _pumpAvatarSetupScreen(
   WidgetTester tester,
-  MealTimerConfig config, {
+  ActivityTimerConfig config, {
   Locale locale = const Locale('ko'),
-  ValueChanged<MealTimerConfig>? onConfigChanged,
+  ValueChanged<ActivityTimerConfig>? onConfigChanged,
   AvatarImagePicker? imagePicker,
   LocalAvatarImageService? avatarImageService,
 }) async {

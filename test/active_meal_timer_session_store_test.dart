@@ -2,7 +2,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:ticky_rider/models/active_meal_timer_session.dart';
-import 'package:ticky_rider/models/meal_timer_config.dart';
+import 'package:ticky_rider/models/activity_timer_config.dart';
 import 'package:ticky_rider/services/active_meal_timer_session_store.dart';
 
 void main() {
@@ -12,15 +12,15 @@ void main() {
       SharedPreferences.setMockInitialValues({});
       final store = ActiveMealTimerSessionStore();
       final startedAt = DateTime.utc(2026, 6, 10, 1, 30);
-      final config = MealTimerConfig.defaults().copyWith(
+      final config = ActivityTimerConfig.defaults().copyWith(
         duration: const Duration(minutes: 35),
         childName: '지율',
         vehicleId: 'bus',
         motivationVideoUseCustomInterval: true,
         motivationVideoInterval: const Duration(minutes: 3),
-        courseIngredientMode: CourseIngredientMode.manual,
-        courseIngredientIds: const ['egg', 'tofu'],
-        selectedCourseIngredientIds: const ['egg', 'tofu'],
+        markerMode: ActivityMarkerMode.manual,
+        markerIds: const ['egg', 'tofu'],
+        selectedMarkerIds: const ['egg', 'tofu'],
         customAvatarsByVehicle: const {
           'bus': VehicleAvatarConfig(
             imagePath: '/local/bus.png',
@@ -58,12 +58,9 @@ void main() {
         loadedSession.config.motivationVideoInterval,
         const Duration(minutes: 3),
       );
-      expect(
-        loadedSession.config.courseIngredientMode,
-        CourseIngredientMode.manual,
-      );
-      expect(loadedSession.config.courseIngredientIds, ['egg', 'tofu']);
-      expect(loadedSession.config.selectedCourseIngredientIds, ['egg', 'tofu']);
+      expect(loadedSession.config.markerMode, ActivityMarkerMode.manual);
+      expect(loadedSession.config.markerIds, ['egg', 'tofu']);
+      expect(loadedSession.config.selectedMarkerIds, ['egg', 'tofu']);
       expect(
         loadedSession.config.customAvatarConfigForVehicle('bus')?.imagePath,
         '/local/bus.png',
@@ -94,7 +91,7 @@ void main() {
         ActiveMealTimerSession(
           sessionId: 'session-2',
           startedAt: DateTime.utc(2026, 6, 10, 1, 30),
-          config: MealTimerConfig.defaults(),
+          config: ActivityTimerConfig.defaults(),
           state: ActiveMealTimerSessionState.paused,
           totalPausedDuration: const Duration(minutes: 1),
           pausedAt: pausedAt,
@@ -114,7 +111,7 @@ void main() {
     final session = ActiveMealTimerSession(
       sessionId: 'session-3',
       startedAt: DateTime.utc(2026, 6, 10, 1, 30),
-      config: MealTimerConfig.defaults(),
+      config: ActivityTimerConfig.defaults(),
       state: ActiveMealTimerSessionState.paused,
       pausedAt: DateTime.utc(2026, 6, 10, 1, 35),
       lastMotivationVideoShownAt: const Duration(minutes: 3),
@@ -148,7 +145,7 @@ void main() {
       ActiveMealTimerSession(
         sessionId: 'session-4',
         startedAt: DateTime.utc(2026, 6, 10, 1, 30),
-        config: MealTimerConfig.defaults(),
+        config: ActivityTimerConfig.defaults(),
         state: ActiveMealTimerSessionState.running,
       ),
     );

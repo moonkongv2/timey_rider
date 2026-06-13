@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:ticky_rider/models/meal_timer_config.dart';
+import 'package:ticky_rider/models/activity_timer_config.dart';
 import 'package:ticky_rider/models/vehicle_avatar_presentation.dart';
 
 void main() {
@@ -16,7 +16,7 @@ void main() {
   );
 
   test('fromConfig returns custom presentation for a vehicle avatar', () {
-    final config = MealTimerConfig.defaults().copyWith(
+    final config = ActivityTimerConfig.defaults().copyWith(
       avatarMode: AvatarImageMode.custom,
       customAvatarsByVehicle: const {
         'bus': VehicleAvatarConfig(
@@ -41,7 +41,7 @@ void main() {
   });
 
   test('fromConfig returns default presentation without a vehicle avatar', () {
-    final config = MealTimerConfig.defaults().copyWith(
+    final config = ActivityTimerConfig.defaults().copyWith(
       avatarMode: AvatarImageMode.custom,
       customAvatarsByVehicle: const {
         'bus': VehicleAvatarConfig(
