@@ -36,15 +36,14 @@ The app is designed around one simple goal: make daily routines feel like cozy j
 ## App Flow
 
 1. Launch the app and enter the child's name on first run.
-2. Pick a rider vehicle on the home screen.
-3. Start a preset course or configure a custom duration.
-4. Choose course markers or let the app match markers to the selected activity.
-5. Watch the selected vehicle move along its course as the timer progresses.
-6. See short motivation videos at progress milestones.
-7. If sound is enabled, hear a short locale-based cheer voice with the motivation video.
-8. Pause, resume, complete, or respond to the arrival prompt when needed.
-9. Review the result and earned stickers.
-10. Track activity history, sticker inventory, and reward goals from the home screen.
+2. Pick an activity mission such as brushing teeth, reading, cleanup, play time, or custom timer.
+3. Pick a rider vehicle on the home screen.
+4. Start the activity timer with matching, random, or selected course markers.
+5. Watch the selected rider move along the course as the timer progresses.
+6. See short motivation videos and optional cheer audio during the timer.
+7. Complete the activity, let time end, or record that more time is needed.
+8. Review the result and earned stickers.
+9. Track activity history, sticker inventory, and reward goals from the home screen.
 
 ## Motivation Media
 
@@ -132,7 +131,7 @@ lib/
   screens/
     splash_screen.dart               # Splash video
     child_name_setup_screen.dart     # First-run child name setup
-    home_screen.dart                 # Course selection, vehicle picker, progress summary
+    home_screen.dart                 # Activity selection, vehicle picker, progress summary
     activity_history_screen.dart     # Stored activity record list
     timer_screen.dart                # Active activity ride experience
     result_screen.dart               # Completion feedback and rewards

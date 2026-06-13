@@ -1669,6 +1669,53 @@ void main() {
     }
   });
 
+  testWidgets('Initial app UI does not show legacy domain copy', (
+    tester,
+  ) async {
+    const legacyCopyTerms = [
+      'Ya'
+          'myam',
+      'ya'
+          'myam',
+      '냠'
+          '냠',
+      '식'
+          '사',
+      '식재'
+          '료',
+      'me'
+          'al',
+      'ingred'
+          'ient',
+      'fo'
+          'od',
+      'eat'
+          'ing',
+      'tas'
+          'ty',
+    ];
+
+    for (final locale in const [Locale('ko'), Locale('en')]) {
+      SharedPreferences.setMockInitialValues({});
+      await _startApp(tester, locale);
+      await tester.pumpAndSettle();
+
+      final visibleCopy = tester
+          .widgetList<Text>(find.byType(Text))
+          .map((text) => text.data ?? text.textSpan?.toPlainText() ?? '')
+          .where((text) => text.isNotEmpty)
+          .join('\n');
+
+      expect(
+        legacyCopyTerms.any(
+          (term) => visibleCopy.toLowerCase().contains(term.toLowerCase()),
+        ),
+        isFalse,
+        reason: 'Legacy copy appeared for ${locale.languageCode}: $visibleCopy',
+      );
+    }
+  });
+
   testWidgets('Home screen opens a saved active timer session', (tester) async {
     SharedPreferences.setMockInitialValues({});
     addTearDown(() async {
