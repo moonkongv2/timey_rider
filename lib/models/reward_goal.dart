@@ -43,6 +43,8 @@ class RewardGoalSlot {
   static RewardGoalSlot? tryFromJson(Map<String, Object?> json) {
     final rewardId = json['rewardId'];
     final filledAt = _tryParseDateTime(json['filledAt']);
+    // Migration fallback: keep old saved reward-goal slots readable while
+    // writing only activitySessionId in toJson().
     final activitySessionId =
         json['activitySessionId'] ?? json['mealSessionId'];
     if (rewardId is! String ||

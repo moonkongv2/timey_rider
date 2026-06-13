@@ -8,6 +8,8 @@ class ActiveActivityTimerSessionStore {
   const ActiveActivityTimerSessionStore();
 
   static const _sessionKey = 'activeActivityTimerSession';
+  // Migration fallback: read an old paused/running session, then save only the
+  // activeActivityTimerSession key.
   static const _legacySessionKey = 'activeMealTimerSession';
 
   Future<void> save(ActiveActivityTimerSession session) async {

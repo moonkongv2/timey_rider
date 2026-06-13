@@ -15,6 +15,8 @@ class LocalActivityProgressService {
   LocalActivityProgressService({Random? random}) : _random = random ?? Random();
 
   static const _historyKey = 'activityHistory';
+  // Migration fallback: old local keys are read once, then new saves use the
+  // activity* keys below.
   static const _legacyHistoryKey = 'mealHistory';
   static const _inventoryKey = 'activityRewardInventory';
   static const _legacyInventoryKey = 'rewardInventory';

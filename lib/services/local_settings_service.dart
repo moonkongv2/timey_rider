@@ -26,6 +26,7 @@ class LocalSettingsService {
   static const _avatarRotationDegreesKey = 'avatarRotationDegrees';
   static const _customAvatarsByVehicleKey = 'customAvatarsByVehicle';
   static const _markerModeKey = 'markerMode';
+  // Migration fallback: read old marker mode key, but save only markerMode.
   static const _legacyMarkerModeKey = 'courseIngredientMode';
 
   Future<ActivityTimerConfig> loadConfig() async {
