@@ -12,7 +12,8 @@ The app is designed around one simple goal: make daily routines feel like cozy j
 
 ## Highlights
 
-- First-run child name setup and local settings persistence
+- First-run empathy onboarding cards before child name setup
+- Child name setup and local settings persistence
 - Activity quick starts for brushing teeth, reading, cleanup, play time, and custom timers
 - Custom timer duration from 1 to 60 minutes
 - Course marker setup with activity defaults, random, or selected markers
@@ -35,15 +36,16 @@ The app is designed around one simple goal: make daily routines feel like cozy j
 
 ## App Flow
 
-1. Launch the app and enter the child's name on first run.
-2. Pick an activity mission such as brushing teeth, reading, cleanup, play time, or custom timer.
-3. Pick a rider vehicle on the home screen.
-4. Start the activity timer with matching, random, or selected course markers.
-5. Watch the selected rider move along the course as the timer progresses.
-6. See short motivation videos and optional cheer audio during the timer.
-7. Complete the activity, let time end, or record that more time is needed.
-8. Review the result and earned stickers.
-9. Track activity history, sticker inventory, and reward goals from the home screen.
+1. Review the first-run onboarding cards.
+2. Enter the child's name on first setup.
+3. Pick an activity mission such as brushing teeth, reading, cleanup, play time, or custom timer.
+4. Pick a rider vehicle on the home screen.
+5. Start the activity timer with matching, random, or selected course markers.
+6. Watch the selected rider move along the course as the timer progresses.
+7. See short motivation videos and optional cheer audio during the timer.
+8. Complete the activity, let time end, or record that more time is needed.
+9. Review the result and earned stickers.
+10. Track activity history, sticker inventory, and reward goals from the home screen.
 
 ## Motivation Media
 
@@ -238,6 +240,7 @@ dart run flutter_launcher_icons
 - Custom avatar images are stored per vehicle, so multiple vehicle tiles can keep their own custom avatar previews.
 - User-facing guide and help copy should stay synchronized with actual timer, marker, motivation, and reward rules.
 - Settings, activity progress, sticker inventory, reward goals, and avatar config are stored locally with `SharedPreferences`.
+- First-run onboarding state is stored locally; existing users with a saved child name skip onboarding by default.
 - Motivation video paths and voice paths should be registered through `MotivationAssetCatalog`.
 - Vehicle and sticker assets should keep consistent canvas size, padding, and visual scale when adding new artwork.
 - UI polish should use the shared design tokens in `lib/theme/` and reusable app widgets in `lib/widgets/app/`.
