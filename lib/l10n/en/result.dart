@@ -1,5 +1,6 @@
 // ignore_for_file: annotate_overrides
 
+import '../../models/activity_completion_status.dart';
 import '../text_sets.dart';
 
 class EnResultTexts implements ResultTextSet {
@@ -8,127 +9,253 @@ class EnResultTexts implements ResultTextSet {
   String get rewardLoading => 'Getting your reward ready...';
   String get recordSaved => "Today's record is saved.";
 
-  String title(bool mealCompleted) =>
-      mealCompleted ? 'Ride complete!' : 'Almost there!';
+  String title(ActivityCompletionStatus status) {
+    return switch (status) {
+      ActivityCompletionStatus.completedBeforeEnd ||
+      ActivityCompletionStatus.completedAtEnd ||
+      ActivityCompletionStatus.completedAfterEnd => 'Mission Complete!',
+      ActivityCompletionStatus.timeEnded => "Time's Up!",
+      ActivityCompletionStatus.needsMoreTime => 'Need a little more time',
+      ActivityCompletionStatus.canceled => 'Mission Paused',
+    };
+  }
 
-  String primaryMessage(bool mealCompleted, {String? vehicleId}) =>
-      mealCompleted
-      ? 'You finished today\'s mealtime ride.'
-      : _failedPrimaryMessagesByVehicle[vehicleId] ??
-            'The motorcycle passed by...';
+  String primaryMessage(ActivityCompletionStatus status, {String? vehicleId}) {
+    return switch (status) {
+      ActivityCompletionStatus.completedBeforeEnd ||
+      ActivityCompletionStatus.completedAtEnd ||
+      ActivityCompletionStatus.completedAfterEnd =>
+        "You finished today's little mission.",
+      ActivityCompletionStatus.timeEnded => 'The timer reached the finish.',
+      ActivityCompletionStatus.needsMoreTime =>
+        _needsMoreTimeMessagesByVehicle[vehicleId] ??
+            'A little more time would help.',
+      ActivityCompletionStatus.canceled => "Let's pause here for today.",
+    };
+  }
 
-  String secondaryMessage(bool mealCompleted) => mealCompleted
-      ? 'You finished before the rider passed by and earned a reward!'
-      : "Let's try again on the next ride.";
+  String secondaryMessage(ActivityCompletionStatus status) {
+    return switch (status) {
+      ActivityCompletionStatus.completedBeforeEnd ||
+      ActivityCompletionStatus.completedAtEnd ||
+      ActivityCompletionStatus.completedAfterEnd =>
+        'You did a great job today.',
+      ActivityCompletionStatus.timeEnded =>
+        "Let's move to the next little mission.",
+      ActivityCompletionStatus.needsMoreTime =>
+        "That's okay. We can try a little more time next round.",
+      ActivityCompletionStatus.canceled => 'We can try again next time.',
+    };
+  }
 
   String get parentTipLabel => 'Parent tips';
 
-  String parentTipTitle(bool mealCompleted) =>
-      mealCompleted ? 'Try saying this' : 'Encourage the next try';
+  String parentTipTitle(ActivityCompletionStatus status) {
+    return switch (status) {
+      ActivityCompletionStatus.completedBeforeEnd ||
+      ActivityCompletionStatus.completedAtEnd ||
+      ActivityCompletionStatus.completedAfterEnd => 'Try saying this',
+      ActivityCompletionStatus.timeEnded => 'Guide the next step calmly',
+      ActivityCompletionStatus.needsMoreTime ||
+      ActivityCompletionStatus.canceled => 'Encourage the next try',
+    };
+  }
 
-  String parentTipSubtitle(bool mealCompleted) => mealCompleted
-      ? 'Focus on the effort, not just the sticker.'
-      : 'It’s a clue for the next ride, not a punishment.';
+  String parentTipSubtitle(ActivityCompletionStatus status) {
+    return switch (status) {
+      ActivityCompletionStatus.completedBeforeEnd ||
+      ActivityCompletionStatus.completedAtEnd ||
+      ActivityCompletionStatus.completedAfterEnd =>
+        'Focus on the effort, not just the sticker.',
+      ActivityCompletionStatus.timeEnded =>
+        'A timer ending can be a normal part of the routine.',
+      ActivityCompletionStatus.needsMoreTime ||
+      ActivityCompletionStatus.canceled =>
+        'It is a clue for the next try, not a punishment.',
+    };
+  }
 
-  String parentTipSemanticLabel(bool mealCompleted) => mealCompleted
-      ? 'View parent tips for a completed meal'
-      : 'View parent tips for an incomplete meal';
+  String parentTipSemanticLabel(ActivityCompletionStatus status) {
+    return switch (status) {
+      ActivityCompletionStatus.completedBeforeEnd ||
+      ActivityCompletionStatus.completedAtEnd ||
+      ActivityCompletionStatus.completedAfterEnd =>
+        'View parent tips for a completed activity',
+      ActivityCompletionStatus.timeEnded =>
+        'View parent tips for a time-ended activity',
+      ActivityCompletionStatus.needsMoreTime ||
+      ActivityCompletionStatus.canceled =>
+        'View parent tips for an incomplete activity',
+    };
+  }
 
-  String helpButtonLabel(bool mealCompleted) => mealCompleted
-      ? 'Success and encouragement tips'
-      : 'Incomplete result and next-try tips';
+  String helpButtonLabel(ActivityCompletionStatus status) {
+    return switch (status) {
+      ActivityCompletionStatus.completedBeforeEnd ||
+      ActivityCompletionStatus.completedAtEnd ||
+      ActivityCompletionStatus.completedAfterEnd =>
+        'Completion and encouragement tips',
+      ActivityCompletionStatus.timeEnded => 'Time-ended routine tips',
+      ActivityCompletionStatus.needsMoreTime ||
+      ActivityCompletionStatus.canceled => 'Next-try tips',
+    };
+  }
 
-  String helpTitle(bool mealCompleted) => mealCompleted
-      ? 'Success and encouragement tips'
-      : 'Incomplete result and next-try tips';
+  String helpTitle(ActivityCompletionStatus status) => helpButtonLabel(status);
 
-  List<String> helpBodyParagraphs(bool mealCompleted) => mealCompleted
-      ? const [
-          'When you confirm the meal is finished, it’s recorded as complete.',
-        ]
-      : const [
-          'If the timer arrives first and the meal is not finished, it is saved as incomplete.',
-        ];
+  List<String> helpBodyParagraphs(ActivityCompletionStatus status) {
+    return switch (status) {
+      ActivityCompletionStatus.completedBeforeEnd ||
+      ActivityCompletionStatus.completedAtEnd ||
+      ActivityCompletionStatus.completedAfterEnd => const [
+        'When you confirm the activity is finished, it is recorded as complete.',
+      ],
+      ActivityCompletionStatus.timeEnded => const [
+        'This activity finished because the timer reached the end.',
+      ],
+      ActivityCompletionStatus.needsMoreTime ||
+      ActivityCompletionStatus.canceled => const [
+        'If the activity was not finished, keep the record as guidance for the next try.',
+      ],
+    };
+  }
 
-  List<String> helpBulletItems(bool mealCompleted) => mealCompleted
-      ? const [
-          'A completed meal earns 1 random success sticker.',
-          'If a reward goal is active, the sticker can fill one goal slot.',
-        ]
-      : const [
-          'Incomplete meals stay in meal history, but no sticker is awarded.',
-          'An incomplete result is a record for the next try, not a punishment.',
-        ];
+  List<String> helpBulletItems(ActivityCompletionStatus status) {
+    return switch (status) {
+      ActivityCompletionStatus.completedBeforeEnd ||
+      ActivityCompletionStatus.completedAtEnd ||
+      ActivityCompletionStatus.completedAfterEnd => const [
+        'A completed mission can earn one random success sticker.',
+        'If a reward goal is active, the sticker can fill one goal slot.',
+      ],
+      ActivityCompletionStatus.timeEnded => const [
+        'A time-ended activity is still recorded as part of the routine.',
+        'Move to the next activity without adding sticker pressure.',
+      ],
+      ActivityCompletionStatus.needsMoreTime ||
+      ActivityCompletionStatus.canceled => const [
+        'Incomplete activity records do not award stickers.',
+        'An incomplete result is a planning clue, not a punishment.',
+      ],
+    };
+  }
 
-  String resultHelpMeaningTitle(bool mealCompleted) =>
+  String resultHelpMeaningTitle(ActivityCompletionStatus status) =>
       'What does this result mean?';
 
-  List<String> resultHelpMeaningItems(bool mealCompleted) => mealCompleted
-      ? const [
-          'When you confirm the meal is finished, it’s recorded as complete.',
-          'A completed meal earns one random success sticker.',
-          'If a reward goal is active, the sticker can fill one goal slot.',
-        ]
-      : const [
-          'The rider arrived first, so the meal was recorded as incomplete.',
-          'Incomplete meals stay in meal history, but no sticker is awarded.',
-          'An incomplete result is a record for the next try, not a punishment.',
-        ];
+  List<String> resultHelpMeaningItems(ActivityCompletionStatus status) {
+    return switch (status) {
+      ActivityCompletionStatus.completedBeforeEnd ||
+      ActivityCompletionStatus.completedAtEnd ||
+      ActivityCompletionStatus.completedAfterEnd => const [
+        'The activity was confirmed finished and recorded as complete.',
+        'A completed mission can earn one random success sticker.',
+        'If a reward goal is active, the sticker can fill one goal slot.',
+      ],
+      ActivityCompletionStatus.timeEnded => const [
+        'The timer reached the end and the activity was recorded.',
+        'This is a routine transition, not a pass-or-fail result.',
+        'No sticker is added for this outcome.',
+      ],
+      ActivityCompletionStatus.needsMoreTime ||
+      ActivityCompletionStatus.canceled => const [
+        'The activity needed a little more time.',
+        'Incomplete activity records do not award stickers.',
+        'Use the record to adjust the next try.',
+      ],
+    };
+  }
 
-  String resultHelpSayTitle(bool mealCompleted) => 'Try saying this';
+  String resultHelpSayTitle(ActivityCompletionStatus status) =>
+      'Try saying this';
 
-  List<String> resultHelpSayItems(bool mealCompleted) => mealCompleted
-      ? const [
-          'I liked how you kept trying until the end.',
-          'You stuck with today’s ride all the way to the end.',
-          'The sticker is fun, but finishing your meal is the biggest win.',
-        ]
-      : const [
-          'The rider arrived first today. That’s okay—we can try again next time.',
-          'Let’s look at how far you got.',
-          'Today felt a little hard. I can give you more time next time.',
-        ];
+  List<String> resultHelpSayItems(ActivityCompletionStatus status) {
+    return switch (status) {
+      ActivityCompletionStatus.completedBeforeEnd ||
+      ActivityCompletionStatus.completedAtEnd ||
+      ActivityCompletionStatus.completedAfterEnd => const [
+        'I liked how you kept trying until the end.',
+        'You finished today’s mission.',
+        'The sticker is fun, but your effort matters most.',
+      ],
+      ActivityCompletionStatus.timeEnded => const [
+        'Time is up. Let’s move to the next mission.',
+        'You stayed with it for the time we planned.',
+        'What little mission should we do next?',
+      ],
+      ActivityCompletionStatus.needsMoreTime ||
+      ActivityCompletionStatus.canceled => const [
+        'That needed a little more time today. That’s okay.',
+        'Let’s look at how far you got.',
+        'I can give you more time next round.',
+      ],
+    };
+  }
 
-  String resultHelpAvoidTitle(bool mealCompleted) => 'Try to avoid';
+  String resultHelpAvoidTitle(ActivityCompletionStatus status) =>
+      'Try to avoid';
 
-  List<String> resultHelpAvoidItems(bool mealCompleted) => mealCompleted
-      ? const [
-          'Good job eating fast.',
-          'You have to succeed every time.',
-          'You need to do better if you want a sticker.',
-        ]
-      : const [
-          'You failed.',
-          'Why did you only eat this much?',
-          'You didn’t get a sticker because you didn’t do well.',
-        ];
+  List<String> resultHelpAvoidItems(ActivityCompletionStatus status) {
+    return switch (status) {
+      ActivityCompletionStatus.completedBeforeEnd ||
+      ActivityCompletionStatus.completedAtEnd ||
+      ActivityCompletionStatus.completedAfterEnd => const [
+        'Good job being fast.',
+        'You have to succeed every time.',
+        'You need to do better if you want a sticker.',
+      ],
+      ActivityCompletionStatus.timeEnded => const [
+        'Time is up, so you have to stop now.',
+        'Why did you not do more?',
+        'Hurry to the next thing.',
+      ],
+      ActivityCompletionStatus.needsMoreTime ||
+      ActivityCompletionStatus.canceled => const [
+        'You failed.',
+        'Why did you only do this much?',
+        'You did not get a sticker because you did not do well.',
+      ],
+    };
+  }
 
-  String resultHelpNextCourseTitle(bool mealCompleted) => 'For the next ride';
+  String resultHelpNextCourseTitle(ActivityCompletionStatus status) =>
+      'For the next mission';
 
-  List<String> resultHelpNextCourseItems(bool mealCompleted) => mealCompleted
-      ? const [
-          'If the meal felt rushed, try a slightly longer timer next time.',
-          'If your child seemed comfortable, repeat the same duration to build confidence.',
-          'Praise the mealtime rhythm and effort more than the sticker.',
-        ]
-      : const [
-          'If incomplete results happen often, try a longer default meal duration.',
-          'If your child gets stuck on certain foods, use manual ingredient selection to make the course feel more familiar.',
-          'Use the record to understand mealtime patterns, not to grade the child.',
-        ];
+  List<String> resultHelpNextCourseItems(ActivityCompletionStatus status) {
+    return switch (status) {
+      ActivityCompletionStatus.completedBeforeEnd ||
+      ActivityCompletionStatus.completedAtEnd ||
+      ActivityCompletionStatus.completedAfterEnd => const [
+        'If the activity felt rushed, try a slightly longer timer next time.',
+        'If your child seemed comfortable, repeat the same duration to build confidence.',
+        'Praise the routine flow and effort more than the sticker.',
+      ],
+      ActivityCompletionStatus.timeEnded => const [
+        'For activities that end by time, keeping the same duration may be enough.',
+        'If your child wanted more time, try a slightly longer timer next time.',
+        'Give a short cue before moving to the next activity.',
+      ],
+      ActivityCompletionStatus.needsMoreTime ||
+      ActivityCompletionStatus.canceled => const [
+        'If incomplete results happen often, try a longer default duration.',
+        'If the activity feels hard, break it into smaller visible steps.',
+        'Use the record to understand routine patterns, not to grade the child.',
+      ],
+    };
+  }
 }
 
-const _failedPrimaryMessagesByVehicle = {
-  'motorcycle': 'The motorcycle passed by...',
-  'fire_truck': 'The fire truck headed out...',
-  'police_car': 'The police car passed by...',
-  'excavator': 'The excavator moved on...',
-  'airplane': 'The airplane flew away...',
-  'bus': 'The bus pulled away...',
-  'supercar': 'The supercar sped ahead...',
-  'train': 'The train left first...',
-  't_rex': 'The T-rex stomped by...',
-  'shark': 'The shark swam away...',
-  'brachio': 'The brachio walked on...',
-  'pteranodon': 'The pteranodon flew away...',
+const _needsMoreTimeMessagesByVehicle = {
+  'motorcycle': 'The motorcycle reached the finish first.',
+  'fire_truck': 'The fire truck reached the finish first.',
+  'police_car': 'The police car reached the finish first.',
+  'excavator': 'The excavator reached the finish first.',
+  'airplane': 'The airplane reached the finish first.',
+  'bus': 'The bus reached the finish first.',
+  'supercar': 'The supercar reached the finish first.',
+  'train': 'The train reached the finish first.',
+  't_rex': 'The T-rex reached the finish first.',
+  'shark': 'The shark reached the finish first.',
+  'brachio': 'The brachio reached the finish first.',
+  'pteranodon': 'The pteranodon reached the finish first.',
 };

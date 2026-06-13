@@ -5,6 +5,7 @@ import 'package:video_player/video_player.dart';
 
 import '../l10n/app_texts.dart';
 import '../l10n/text_sets.dart';
+import '../models/activity_completion_status.dart';
 import '../models/activity_progress_snapshot.dart';
 import '../models/activity_session_result.dart';
 import '../models/activity_timer_config.dart';
@@ -45,39 +46,61 @@ const _resultVideoPathsByVehicle = {
   'pteranodon': 'assets/videos/result_pteranodon_success.mp4',
 };
 
+bool isPositiveResult(ActivityCompletionStatus status) {
+  return switch (status) {
+    ActivityCompletionStatus.completedBeforeEnd ||
+    ActivityCompletionStatus.completedAtEnd ||
+    ActivityCompletionStatus.completedAfterEnd ||
+    ActivityCompletionStatus.timeEnded => true,
+    ActivityCompletionStatus.needsMoreTime ||
+    ActivityCompletionStatus.canceled => false,
+  };
+}
+
+bool isRewardableResult(ActivityCompletionStatus status) {
+  return switch (status) {
+    ActivityCompletionStatus.completedBeforeEnd ||
+    ActivityCompletionStatus.completedAtEnd ||
+    ActivityCompletionStatus.completedAfterEnd => true,
+    ActivityCompletionStatus.timeEnded ||
+    ActivityCompletionStatus.needsMoreTime ||
+    ActivityCompletionStatus.canceled => false,
+  };
+}
+
 List<AppHelpSection> _resultHelpSections(
   ResultTextSet texts,
-  bool mealCompleted,
+  ActivityCompletionStatus status,
 ) {
   return [
     AppHelpSection(
-      title: texts.resultHelpMeaningTitle(mealCompleted),
-      bulletItems: texts.resultHelpMeaningItems(mealCompleted),
+      title: texts.resultHelpMeaningTitle(status),
+      bulletItems: texts.resultHelpMeaningItems(status),
     ),
     AppHelpSection(
-      title: texts.resultHelpSayTitle(mealCompleted),
-      bulletItems: texts.resultHelpSayItems(mealCompleted),
+      title: texts.resultHelpSayTitle(status),
+      bulletItems: texts.resultHelpSayItems(status),
     ),
     AppHelpSection(
-      title: texts.resultHelpAvoidTitle(mealCompleted),
-      bulletItems: texts.resultHelpAvoidItems(mealCompleted),
+      title: texts.resultHelpAvoidTitle(status),
+      bulletItems: texts.resultHelpAvoidItems(status),
     ),
     AppHelpSection(
-      title: texts.resultHelpNextCourseTitle(mealCompleted),
-      bulletItems: texts.resultHelpNextCourseItems(mealCompleted),
+      title: texts.resultHelpNextCourseTitle(status),
+      bulletItems: texts.resultHelpNextCourseItems(status),
     ),
   ];
 }
 
 Future<void> _showResultHelpSheet(
   BuildContext context, {
-  required bool mealCompleted,
+  required ActivityCompletionStatus status,
 }) {
   final texts = AppTexts.of(context).result;
   return showAppHelpSheet(
     context: context,
-    title: texts.helpTitle(mealCompleted),
-    sections: _resultHelpSections(texts, mealCompleted),
+    title: texts.helpTitle(status),
+    sections: _resultHelpSections(texts, status),
   );
 }
 
@@ -134,7 +157,7 @@ class _ResultScreenState extends State<ResultScreen> {
     _recordedSession = widget.activityProgressService.recordActivityResult(
       widget.result,
     );
-    if (!widget.result.activityCompleted) {
+    if (!isRewardableResult(widget.result.completionStatus)) {
       _introFinished = true;
       return;
     }
@@ -222,13 +245,15 @@ class _ResultScreenState extends State<ResultScreen> {
     Navigator.of(context).popUntil((route) => route.isFirst);
   }
 
-  void _showResultHelp(bool mealCompleted) {
-    _showResultHelpSheet(context, mealCompleted: mealCompleted);
+  void _showResultHelp(ActivityCompletionStatus status) {
+    _showResultHelpSheet(context, status: status);
   }
 
   @override
   Widget build(BuildContext context) {
-    final mealCompleted = widget.result.activityCompleted;
+    final completionStatus = widget.result.completionStatus;
+    final isPositive = isPositiveResult(completionStatus);
+    final isRewardable = isRewardableResult(completionStatus);
     final texts = AppTexts.of(context);
     final failureRiderAssetPath = failureRiderAssetPathForVehicle(
       vehicleId: widget.config.vehicleId,
@@ -246,7 +271,7 @@ class _ResultScreenState extends State<ResultScreen> {
     return Scaffold(
       body: Stack(
         children: [
-          _ResultBackground(mealCompleted: mealCompleted),
+          _ResultBackground(isPositive: isPositive),
           SafeArea(
             child: Padding(
               padding: const EdgeInsets.all(AppSpacing.xl),
@@ -256,11 +281,11 @@ class _ResultScreenState extends State<ResultScreen> {
                       constraints.maxWidth > constraints.maxHeight &&
                       constraints.maxHeight < 430;
                   final isPortraitSuccess =
-                      mealCompleted &&
+                      isRewardable &&
                       constraints.maxHeight >= constraints.maxWidth;
                   if (isCompactLandscape) {
                     return _CompactLandscapeResultLayout(
-                      mealCompleted: mealCompleted,
+                      completionStatus: completionStatus,
                       recordedSession: _recordedSession,
                       activityProgressService: widget.activityProgressService,
                       orientationService: widget.orientationService,
@@ -290,16 +315,19 @@ class _ResultScreenState extends State<ResultScreen> {
                                 padding: const EdgeInsets.all(AppSpacing.xxl),
                                 child: Column(
                                   children: [
-                                    if (!mealCompleted) ...[
+                                    if (!isPositive) ...[
                                       _FailureRiderImage(
                                         assetPath: failureRiderAssetPath,
                                         maxSize: 240,
                                         fallbackIconSize: 96,
                                       ),
                                       const SizedBox(height: AppSpacing.lg),
+                                    ] else if (!isRewardable) ...[
+                                      const _NeutralResultIcon(),
+                                      const SizedBox(height: AppSpacing.lg),
                                     ],
                                     Text(
-                                      texts.result.title(mealCompleted),
+                                      texts.result.title(completionStatus),
                                       textAlign: TextAlign.center,
                                       style: Theme.of(context)
                                           .textTheme
@@ -308,7 +336,7 @@ class _ResultScreenState extends State<ResultScreen> {
                                             fontWeight: FontWeight.w900,
                                           ),
                                     ),
-                                    if (mealCompleted) ...[
+                                    if (isRewardable) ...[
                                       SizedBox(
                                         height: isPortraitSuccess
                                             ? AppSpacing.lg
@@ -360,7 +388,7 @@ class _ResultScreenState extends State<ResultScreen> {
                                       const SizedBox(height: AppSpacing.lg),
                                     Text(
                                       texts.result.primaryMessage(
-                                        mealCompleted,
+                                        completionStatus,
                                         vehicleId: widget.config.vehicleId,
                                       ),
                                       textAlign: TextAlign.center,
@@ -372,7 +400,7 @@ class _ResultScreenState extends State<ResultScreen> {
                                     const SizedBox(height: AppSpacing.sm),
                                     Text(
                                       texts.result.secondaryMessage(
-                                        mealCompleted,
+                                        completionStatus,
                                       ),
                                       textAlign: TextAlign.center,
                                       style: Theme.of(context)
@@ -388,8 +416,9 @@ class _ResultScreenState extends State<ResultScreen> {
                             ),
                             const SizedBox(height: AppSpacing.lg),
                             _ResultGuardianTipCard(
-                              mealCompleted: mealCompleted,
-                              onPressed: () => _showResultHelp(mealCompleted),
+                              completionStatus: completionStatus,
+                              onPressed: () =>
+                                  _showResultHelp(completionStatus),
                             ),
                             Spacer(flex: isPortraitSuccess ? 2 : 1),
                             FilledButton.icon(
@@ -424,27 +453,28 @@ class _ResultScreenState extends State<ResultScreen> {
 
 class _ResultGuardianTipCard extends StatelessWidget {
   const _ResultGuardianTipCard({
-    required this.mealCompleted,
+    required this.completionStatus,
     required this.onPressed,
   });
 
-  final bool mealCompleted;
+  final ActivityCompletionStatus completionStatus;
   final VoidCallback onPressed;
 
   @override
   Widget build(BuildContext context) {
     final texts = AppTexts.of(context).result;
     final textTheme = Theme.of(context).textTheme;
-    final icon = mealCompleted ? Icons.favorite_rounded : Icons.spa_rounded;
+    final isPositive = isPositiveResult(completionStatus);
+    final icon = isPositive ? Icons.favorite_rounded : Icons.spa_rounded;
     final key = ValueKey(
-      mealCompleted
+      isPositive
           ? 'completedResultGuardianTipCard'
           : 'incompleteResultGuardianTipCard',
     );
 
     return Semantics(
       button: true,
-      label: texts.parentTipSemanticLabel(mealCompleted),
+      label: texts.parentTipSemanticLabel(completionStatus),
       child: ExcludeSemantics(
         child: Material(
           key: key,
@@ -488,7 +518,7 @@ class _ResultGuardianTipCard extends StatelessWidget {
                         ),
                         const SizedBox(height: AppSpacing.xs),
                         Text(
-                          texts.parentTipTitle(mealCompleted),
+                          texts.parentTipTitle(completionStatus),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: textTheme.titleSmall?.copyWith(
@@ -498,7 +528,7 @@ class _ResultGuardianTipCard extends StatelessWidget {
                         ),
                         const SizedBox(height: AppSpacing.xs),
                         Text(
-                          texts.parentTipSubtitle(mealCompleted),
+                          texts.parentTipSubtitle(completionStatus),
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                           style: textTheme.bodySmall?.copyWith(
@@ -526,28 +556,29 @@ class _ResultGuardianTipCard extends StatelessWidget {
 
 class _ResultGuardianTipButton extends StatelessWidget {
   const _ResultGuardianTipButton({
-    required this.mealCompleted,
+    required this.completionStatus,
     required this.onPressed,
   });
 
-  final bool mealCompleted;
+  final ActivityCompletionStatus completionStatus;
   final VoidCallback onPressed;
 
   @override
   Widget build(BuildContext context) {
     final texts = AppTexts.of(context).result;
+    final isPositive = isPositiveResult(completionStatus);
     final key = ValueKey(
-      mealCompleted
+      isPositive
           ? 'completedResultGuardianTipButton'
           : 'incompleteResultGuardianTipButton',
     );
 
     return Semantics(
       button: true,
-      label: texts.parentTipSemanticLabel(mealCompleted),
+      label: texts.parentTipSemanticLabel(completionStatus),
       child: ExcludeSemantics(
         child: Tooltip(
-          message: texts.parentTipSemanticLabel(mealCompleted),
+          message: texts.parentTipSemanticLabel(completionStatus),
           child: Material(
             key: key,
             color: AppColors.white.withValues(alpha: 0.78),
@@ -563,9 +594,7 @@ class _ResultGuardianTipButton extends StatelessWidget {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Icon(
-                      mealCompleted
-                          ? Icons.favorite_rounded
-                          : Icons.spa_rounded,
+                      isPositive ? Icons.favorite_rounded : Icons.spa_rounded,
                       size: 18,
                       color: AppColors.primary,
                     ),
@@ -593,9 +622,9 @@ class _ResultGuardianTipButton extends StatelessWidget {
 }
 
 class _ResultBackground extends StatelessWidget {
-  const _ResultBackground({required this.mealCompleted});
+  const _ResultBackground({required this.isPositive});
 
-  final bool mealCompleted;
+  final bool isPositive;
 
   @override
   Widget build(BuildContext context) {
@@ -603,7 +632,7 @@ class _ResultBackground extends StatelessWidget {
       child: LayoutBuilder(
         builder: (context, constraints) {
           final isLandscape = constraints.maxWidth > constraints.maxHeight;
-          final assetPath = mealCompleted
+          final assetPath = isPositive
               ? (isLandscape
                     ? _successResultBackgroundLandscapePath
                     : _successResultBackgroundPortraitPath)
@@ -629,7 +658,7 @@ class _ResultBackground extends StatelessWidget {
 
 class _CompactLandscapeResultLayout extends StatelessWidget {
   const _CompactLandscapeResultLayout({
-    required this.mealCompleted,
+    required this.completionStatus,
     required this.recordedSession,
     required this.activityProgressService,
     required this.orientationService,
@@ -639,7 +668,7 @@ class _CompactLandscapeResultLayout extends StatelessWidget {
     required this.onHome,
   });
 
-  final bool mealCompleted;
+  final ActivityCompletionStatus completionStatus;
   final Future<RecordedActivitySession> recordedSession;
   final LocalActivityProgressService activityProgressService;
   final OrientationService orientationService;
@@ -652,6 +681,8 @@ class _CompactLandscapeResultLayout extends StatelessWidget {
   Widget build(BuildContext context) {
     final texts = AppTexts.of(context);
     final theme = Theme.of(context);
+    final isPositive = isPositiveResult(completionStatus);
+    final isRewardable = isRewardableResult(completionStatus);
 
     return SizedBox.expand(
       child: Card(
@@ -666,7 +697,7 @@ class _CompactLandscapeResultLayout extends StatelessWidget {
             children: [
               Expanded(
                 flex: 5,
-                child: mealCompleted
+                child: isRewardable
                     ? FutureBuilder<RecordedActivitySession>(
                         future: recordedSession,
                         builder: (context, snapshot) {
@@ -706,13 +737,15 @@ class _CompactLandscapeResultLayout extends StatelessWidget {
                           );
                         },
                       )
-                    : Center(
+                    : !isPositive
+                    ? Center(
                         child: _FailureRiderImage(
                           assetPath: failureRiderAssetPath,
                           maxSize: 220,
                           fallbackIconSize: 88,
                         ),
-                      ),
+                      )
+                    : const Center(child: _NeutralResultIcon()),
               ),
               const SizedBox(width: AppSpacing.xxl),
               Expanded(
@@ -728,7 +761,7 @@ class _CompactLandscapeResultLayout extends StatelessWidget {
                           children: [
                             Expanded(
                               child: Text(
-                                texts.result.title(mealCompleted),
+                                texts.result.title(completionStatus),
                                 textAlign: TextAlign.left,
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
@@ -739,10 +772,10 @@ class _CompactLandscapeResultLayout extends StatelessWidget {
                               ),
                             ),
                             _ResultGuardianTipButton(
-                              mealCompleted: mealCompleted,
+                              completionStatus: completionStatus,
                               onPressed: () => _showResultHelpSheet(
                                 context,
-                                mealCompleted: mealCompleted,
+                                status: completionStatus,
                               ),
                             ),
                           ],
@@ -750,7 +783,7 @@ class _CompactLandscapeResultLayout extends StatelessWidget {
                         const SizedBox(height: AppSpacing.md),
                         Text(
                           texts.result.primaryMessage(
-                            mealCompleted,
+                            completionStatus,
                             vehicleId: vehicleId,
                           ),
                           maxLines: 2,
@@ -761,7 +794,7 @@ class _CompactLandscapeResultLayout extends StatelessWidget {
                         ),
                         const SizedBox(height: AppSpacing.sm),
                         Text(
-                          texts.result.secondaryMessage(mealCompleted),
+                          texts.result.secondaryMessage(completionStatus),
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                           style: theme.textTheme.titleMedium?.copyWith(
@@ -837,6 +870,25 @@ class _FailureRiderImage extends StatelessWidget {
             size: fallbackIconSize,
           );
         },
+      ),
+    );
+  }
+}
+
+class _NeutralResultIcon extends StatelessWidget {
+  const _NeutralResultIcon();
+
+  @override
+  Widget build(BuildContext context) {
+    return DecoratedBox(
+      decoration: const BoxDecoration(
+        color: AppColors.primarySoft,
+        shape: BoxShape.circle,
+      ),
+      child: SizedBox(
+        width: 132,
+        height: 132,
+        child: Icon(Icons.timer_rounded, color: AppColors.primary, size: 72),
       ),
     );
   }

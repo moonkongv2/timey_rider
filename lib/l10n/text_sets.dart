@@ -239,25 +239,25 @@ abstract interface class ResultTextSet {
   String get rewardLoading;
   String get recordSaved;
 
-  String title(bool mealCompleted);
-  String primaryMessage(bool mealCompleted, {String? vehicleId});
-  String secondaryMessage(bool mealCompleted);
+  String title(ActivityCompletionStatus status);
+  String primaryMessage(ActivityCompletionStatus status, {String? vehicleId});
+  String secondaryMessage(ActivityCompletionStatus status);
   String get parentTipLabel;
-  String parentTipTitle(bool mealCompleted);
-  String parentTipSubtitle(bool mealCompleted);
-  String parentTipSemanticLabel(bool mealCompleted);
-  String helpButtonLabel(bool mealCompleted);
-  String helpTitle(bool mealCompleted);
-  List<String> helpBodyParagraphs(bool mealCompleted);
-  List<String> helpBulletItems(bool mealCompleted);
-  String resultHelpMeaningTitle(bool mealCompleted);
-  List<String> resultHelpMeaningItems(bool mealCompleted);
-  String resultHelpSayTitle(bool mealCompleted);
-  List<String> resultHelpSayItems(bool mealCompleted);
-  String resultHelpAvoidTitle(bool mealCompleted);
-  List<String> resultHelpAvoidItems(bool mealCompleted);
-  String resultHelpNextCourseTitle(bool mealCompleted);
-  List<String> resultHelpNextCourseItems(bool mealCompleted);
+  String parentTipTitle(ActivityCompletionStatus status);
+  String parentTipSubtitle(ActivityCompletionStatus status);
+  String parentTipSemanticLabel(ActivityCompletionStatus status);
+  String helpButtonLabel(ActivityCompletionStatus status);
+  String helpTitle(ActivityCompletionStatus status);
+  List<String> helpBodyParagraphs(ActivityCompletionStatus status);
+  List<String> helpBulletItems(ActivityCompletionStatus status);
+  String resultHelpMeaningTitle(ActivityCompletionStatus status);
+  List<String> resultHelpMeaningItems(ActivityCompletionStatus status);
+  String resultHelpSayTitle(ActivityCompletionStatus status);
+  List<String> resultHelpSayItems(ActivityCompletionStatus status);
+  String resultHelpAvoidTitle(ActivityCompletionStatus status);
+  List<String> resultHelpAvoidItems(ActivityCompletionStatus status);
+  String resultHelpNextCourseTitle(ActivityCompletionStatus status);
+  List<String> resultHelpNextCourseItems(ActivityCompletionStatus status);
 }
 
 abstract interface class RewardTextSet {

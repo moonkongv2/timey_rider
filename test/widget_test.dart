@@ -46,6 +46,7 @@ import 'package:ticky_rider/widgets/app/app_bouncy_button.dart';
 import 'package:ticky_rider/widgets/avatar/avatar_composite_preview.dart';
 import 'package:ticky_rider/widgets/road_painter.dart';
 import 'package:ticky_rider/widgets/road_view.dart';
+import 'package:ticky_rider/widgets/reward_sticker_image.dart';
 import 'package:ticky_rider/widgets/timer_control_bar.dart';
 import 'package:ticky_rider/widgets/vehicle_selection_card.dart';
 import 'package:ticky_rider/widgets/vehicle_widget.dart';
@@ -606,7 +607,9 @@ void main() {
     await tester.pump();
   });
 
-  testWidgets('Failed result screen skips the intro video', (tester) async {
+  testWidgets('Needs-more-time result screen skips the intro video', (
+    tester,
+  ) async {
     SharedPreferences.setMockInitialValues({});
     tester.view.physicalSize = const Size(390, 844);
     tester.view.devicePixelRatio = 1;
@@ -646,8 +649,8 @@ void main() {
 
     expect(introVideoPaths, isEmpty);
     expect(find.byKey(const ValueKey('resultIntroScreen')), findsNothing);
-    expect(find.text('아쉽지만 조금 늦었어'), findsOneWidget);
-    expect(find.text('오토바이가 먼저 지나갔어.'), findsOneWidget);
+    expect(find.text('조금 더 필요했어'), findsOneWidget);
+    expect(find.text('오토바이가 먼저 도착했어.'), findsOneWidget);
     expect(
       _assetImage('assets/images/result_failed_bg_portrait.png'),
       findsOneWidget,
@@ -664,6 +667,51 @@ void main() {
       snapshot.history.single.completionStatus,
       ActivityCompletionStatus.needsMoreTime,
     );
+  });
+
+  testWidgets('Time-ended result skips reward intro and sticker copy', (
+    tester,
+  ) async {
+    SharedPreferences.setMockInitialValues({});
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(() {
+      tester.view.resetPhysicalSize();
+      tester.view.resetDevicePixelRatio();
+    });
+
+    final introVideoPaths = <String>[];
+
+    await tester.pumpWidget(
+      MaterialApp(
+        locale: const Locale('en'),
+        supportedLocales: const [Locale('ko'), Locale('en')],
+        localizationsDelegates: const [
+          GlobalMaterialLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+        ],
+        home: ResultScreen(
+          result: _activityResult(
+            completionStatus: ActivityCompletionStatus.timeEnded,
+          ),
+          config: ActivityTimerConfig.defaults(),
+          activityProgressService: LocalActivityProgressService(),
+          onConfigChanged: (_) {},
+          introControllerFactory: (assetPath) {
+            introVideoPaths.add(assetPath);
+            return VideoPlayerController.asset(assetPath);
+          },
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(introVideoPaths, isEmpty);
+    expect(find.text("Time's Up!"), findsOneWidget);
+    expect(find.text("Let's move to the next little mission."), findsOneWidget);
+    expect(find.byType(RewardStickerImage), findsNothing);
+    expect(find.textContaining('sticker'), findsNothing);
   });
 
   testWidgets('Success result screen uses portrait background after intro', (
@@ -702,7 +750,7 @@ void main() {
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 100));
 
-    expect(find.text('식사 완주 성공!'), findsOneWidget);
+    expect(find.text('미션 완료!'), findsOneWidget);
     expect(
       _assetImage('assets/images/result_success_bg_portrait.png'),
       findsOneWidget,
@@ -756,8 +804,8 @@ void main() {
 
     expect(find.byKey(const ValueKey('appHelpSheet')), findsOneWidget);
     expect(find.text('아이에게 이렇게 말해보세요'), findsWidgets);
-    expect(find.text('끝까지 먹어보려고 한 게 정말 좋았어.'), findsOneWidget);
-    expect(find.text('빨리 먹어서 잘했어.'), findsOneWidget);
+    expect(find.text('끝까지 해보려고 한 게 정말 좋았어.'), findsOneWidget);
+    expect(find.text('빨리 해서 잘했어.'), findsOneWidget);
     expect(find.textContaining('스티커 1개'), findsOneWidget);
   });
 
@@ -805,8 +853,8 @@ void main() {
 
     expect(find.byKey(const ValueKey('appHelpSheet')), findsOneWidget);
     expect(find.text('아이에게 이렇게 말해보세요'), findsOneWidget);
-    expect(find.textContaining('오늘은 빠방이 먼저 도착했네'), findsOneWidget);
-    expect(find.textContaining('미완료는 벌이 아니라 다음 도전을 위한 기록'), findsOneWidget);
+    expect(find.textContaining('오늘은 시간이 조금 더 필요했네'), findsOneWidget);
+    expect(find.textContaining('미완료는 벌이 아니라 다음 조절을 위한 기록'), findsOneWidget);
     expect(find.text('실패했네.'), findsOneWidget);
   });
 
@@ -855,7 +903,7 @@ void main() {
 
     expect(find.byKey(const ValueKey('appHelpSheet')), findsOneWidget);
     expect(
-      find.textContaining('When you confirm the meal is finished'),
+      find.textContaining('The activity was confirmed finished'),
       findsOneWidget,
     );
     expect(find.text('Try saying this'), findsWidgets);
@@ -941,7 +989,7 @@ void main() {
       find.byKey(const ValueKey('incompleteResultGuardianTipButton')),
       findsOneWidget,
     );
-    expect(find.text('버스가 먼저 출발했어.'), findsOneWidget);
+    expect(find.text('버스가 먼저 도착했어.'), findsOneWidget);
     expect(
       _assetImage('assets/images/result_failed_bg_landscape.png'),
       findsOneWidget,
@@ -993,7 +1041,7 @@ void main() {
     final restartButton = find.widgetWithText(FilledButton, '다시 출발');
     final homeButton = find.widgetWithText(OutlinedButton, '홈으로');
 
-    expect(find.text('식사 완주 성공!'), findsOneWidget);
+    expect(find.text('미션 완료!'), findsOneWidget);
     expect(
       find.byKey(const ValueKey('completedResultGuardianTipButton')),
       findsOneWidget,
@@ -1430,6 +1478,19 @@ void main() {
       ),
       isTrue,
     );
+  });
+
+  test('Result outcome helpers separate positive and rewardable statuses', () {
+    expect(
+      isPositiveResult(ActivityCompletionStatus.completedBeforeEnd),
+      isTrue,
+    );
+    expect(isPositiveResult(ActivityCompletionStatus.timeEnded), isTrue);
+    expect(isPositiveResult(ActivityCompletionStatus.needsMoreTime), isFalse);
+
+    expect(isRewardableResult(ActivityCompletionStatus.completedAtEnd), isTrue);
+    expect(isRewardableResult(ActivityCompletionStatus.timeEnded), isFalse);
+    expect(isRewardableResult(ActivityCompletionStatus.canceled), isFalse);
   });
 
   test('Arrival dialog copy uses the selected vehicle label', () {
