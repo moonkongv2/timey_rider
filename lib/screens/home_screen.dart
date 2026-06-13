@@ -35,8 +35,8 @@ import 'settings_screen.dart';
 import 'sticker_collection_screen.dart';
 import 'timer_screen.dart';
 
-const _homeLogoAssetPath = 'assets/images/logo_eng.png';
 const _settingsIconAssetPath = 'assets/images/icon_setting_rgba.png';
+const _homeLogoAssetPath = 'assets/images/ticky_rider_logo.png';
 const _activeSessionMaxAge = Duration(hours: 24);
 const _minCustomActivityMinutes = 1;
 const _maxCustomActivityMinutes = 60;
@@ -946,41 +946,36 @@ class _HomeLogo extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
+    final fallbackLogo = Align(
+      alignment: Alignment.centerLeft,
+      child: Text(
+        semanticLabel,
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+        style: textTheme.headlineLarge?.copyWith(
+          fontWeight: FontWeight.w900,
+          color: AppColors.brown900,
+          letterSpacing: 0,
+        ),
+      ),
+    );
 
     return Semantics(
       image: true,
       label: semanticLabel,
       child: ExcludeSemantics(
-        child: SizedBox(
-          width: 260,
-          height: 88,
-          child: Transform.translate(
-            offset: const Offset(-18, 0),
-            child: Transform.scale(
-              scale: 1.42,
+        child: Padding(
+          padding: const EdgeInsets.only(left: 8),
+          child: SizedBox(
+            key: const ValueKey('homeLogo'),
+            width: 126,
+            height: 89,
+            child: Image.asset(
+              _homeLogoAssetPath,
+              fit: BoxFit.contain,
               alignment: Alignment.centerLeft,
-              child: Image.asset(
-                _homeLogoAssetPath,
-                key: const ValueKey('homeLogo'),
-                fit: BoxFit.contain,
-                alignment: Alignment.centerLeft,
-                cacheWidth: 740,
-                errorBuilder: (context, error, stackTrace) {
-                  return ColoredBox(
-                    color: AppColors.transparent,
-                    child: Align(
-                      alignment: Alignment.centerLeft,
-                      child: Text(
-                        semanticLabel,
-                        style: textTheme.headlineMedium?.copyWith(
-                          fontWeight: FontWeight.w900,
-                          color: AppColors.brown900,
-                        ),
-                      ),
-                    ),
-                  );
-                },
-              ),
+              cacheWidth: 360,
+              errorBuilder: (context, error, stackTrace) => fallbackLogo,
             ),
           ),
         ),

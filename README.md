@@ -80,6 +80,14 @@ assets/
       en_2.mp3
 ```
 
+## Assets Status / TODO
+
+- Launcher icon: Ticky Rider source icon is configured at `assets/icons/ticky_rider_app_icon.png`.
+- Adaptive icon foreground/background: Ticky Rider adaptive icon assets are configured at `assets/icons/ticky_rider_app_icon_foreground.png` and `assets/icons/ticky_rider_app_icon_background.png`.
+- Ticky Rider logo: place the home logo at `assets/images/ticky_rider_logo.png`; the app falls back to text if the asset is missing.
+- Activity marker image assets: add optional marker images under `assets/images/markers/` when emoji-only markers are not enough.
+- Routine-themed stickers: add image assets for routine reward IDs such as `sticker_sparkly_teeth`, `sticker_book_buddy`, `sticker_cleanup_champ`, `sticker_happy_clock`, and `sticker_rocket`.
+
 ## Tech Stack
 
 - Flutter
