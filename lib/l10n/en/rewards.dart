@@ -14,7 +14,7 @@ class EnRewardTexts implements RewardTextSet {
   String get createRewardGoal => 'Create Reward Promise';
   String get rewardGoalEmptyTitle => 'Create a new reward promise';
   String get rewardGoalEmptyBody =>
-      'Each completed mission fills one space on the reward board.';
+      'Each completed activity mission fills one space on the reward board.';
   String get rewardGoalRewardFieldLabel => 'Reward';
   String get rewardGoalRequiredStickerCountLabel => 'Stickers needed';
   String get rewardGoalSaveButton => 'Save Promise';
@@ -66,12 +66,12 @@ class EnRewardTexts implements RewardTextSet {
     return switch (rewardId) {
       RewardCatalog.finishFlagStickerId => 'Finish Flag Sticker',
       RewardCatalog.twinkleStarStickerId => 'Twinkle Star Sticker',
-      RewardCatalog.riceBowlStickerId => 'Steady Smile Sticker',
-      RewardCatalog.yumSpoonStickerId => 'Cheer Star Sticker',
-      RewardCatalog.crunchyCarrotStickerId => 'Bright Badge Sticker',
-      RewardCatalog.sunnyMissionStickerId => 'Sunny Mission Sticker',
+      RewardCatalog.sparklyTeethStickerId => 'Sparkly Teeth Sticker',
+      RewardCatalog.bookBuddyStickerId => 'Book Buddy Sticker',
+      RewardCatalog.cleanupChampStickerId => 'Cleanup Champ Sticker',
+      RewardCatalog.happyClockStickerId => 'Happy Clock Sticker',
       RewardCatalog.rainbowCourseStickerId => 'Rainbow Ride Sticker',
-      RewardCatalog.rocketBiteStickerId => 'Rocket Boost Sticker',
+      RewardCatalog.rocketStickerId => 'Rocket Sticker',
       _ => rewardId,
     };
   }

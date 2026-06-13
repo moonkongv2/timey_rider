@@ -22,6 +22,7 @@ import 'package:ticky_rider/models/activity_completion_status.dart';
 import 'package:ticky_rider/models/activity_session_result.dart';
 import 'package:ticky_rider/models/activity_timer_config.dart';
 import 'package:ticky_rider/models/reward_goal.dart';
+import 'package:ticky_rider/models/reward_item.dart';
 import 'package:ticky_rider/models/vehicle.dart';
 import 'package:ticky_rider/models/vehicle_avatar_presentation.dart';
 import 'package:ticky_rider/screens/avatar_setup_screen.dart';
@@ -150,6 +151,40 @@ void main() {
       'bottom_teeth',
       'front_teeth',
     });
+  });
+
+  test('Reward catalog uses routine activity stickers', () {
+    final ids = RewardCatalog.successStickers
+        .map((reward) => reward.id)
+        .toList();
+
+    expect(ids, [
+      'sticker_finish_flag',
+      'sticker_twinkle_star',
+      'sticker_sparkly_teeth',
+      'sticker_book_buddy',
+      'sticker_cleanup_champ',
+      'sticker_happy_clock',
+      'sticker_rainbow_course',
+      'sticker_rocket',
+    ]);
+    expect(RewardCatalog.sparklyTeethSticker.emoji, '✨');
+    expect(RewardCatalog.bookBuddySticker.emoji, '📚');
+    expect(RewardCatalog.cleanupChampSticker.emoji, '🧸');
+    expect(RewardCatalog.happyClockSticker.emoji, '⏰');
+  });
+
+  testWidgets('Reward sticker image falls back for missing routine assets', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      const MaterialApp(
+        home: RewardStickerImage(reward: RewardCatalog.sparklyTeethSticker),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('✨'), findsOneWidget);
   });
 
   test('Activity marker course slots fall back for invalid selected ids', () {
@@ -6580,6 +6615,48 @@ void main() {
 
     expect(recordedSession.awardedRewards, isEmpty);
     expect(recordedSession.entry.activityCompleted, isTrue);
+  });
+
+  test('Play time ended does not award stickers', () async {
+    SharedPreferences.setMockInitialValues({});
+
+    final service = LocalActivityProgressService();
+    final recordedSession = await service.recordActivityResult(
+      _activityResult(
+        activityId: 'play',
+        completionStatus: ActivityCompletionStatus.timeEnded,
+      ),
+    );
+
+    expect(recordedSession.awardedRewards, isEmpty);
+    expect(recordedSession.entry.activityId, 'play');
+    expect(
+      recordedSession.entry.completionStatus,
+      ActivityCompletionStatus.timeEnded,
+    );
+  });
+
+  test('Brushing completed at end awards one routine sticker', () async {
+    SharedPreferences.setMockInitialValues({});
+
+    final service = LocalActivityProgressService();
+    final recordedSession = await service.recordActivityResult(
+      _activityResult(
+        activityId: 'brushing',
+        completionStatus: ActivityCompletionStatus.completedAtEnd,
+      ),
+    );
+
+    expect(recordedSession.awardedRewards, hasLength(1));
+    expect(
+      RewardCatalog.successStickers,
+      contains(recordedSession.awardedRewards.single),
+    );
+    expect(recordedSession.entry.activityId, 'brushing');
+    expect(
+      recordedSession.entry.completionStatus,
+      ActivityCompletionStatus.completedAtEnd,
+    );
   });
 
   test('Incomplete activity does not award stickers', () async {

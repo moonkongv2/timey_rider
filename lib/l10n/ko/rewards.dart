@@ -13,7 +13,7 @@ class RewardTexts implements RewardTextSet {
   String get rewardGoalTitle => '보상 약속';
   String get createRewardGoal => '보상 약속 만들기';
   String get rewardGoalEmptyTitle => '새 보상 약속을 만들어 주세요';
-  String get rewardGoalEmptyBody => '미션을 완료할 때마다 보상판이 한 칸씩 채워져요.';
+  String get rewardGoalEmptyBody => '활동 미션을 완료할 때마다 보상판이 한 칸씩 채워져요.';
   String get rewardGoalRewardFieldLabel => '받을 보상';
   String get rewardGoalRequiredStickerCountLabel => '필요한 스티커 수';
   String get rewardGoalSaveButton => '약속 저장';
@@ -61,12 +61,12 @@ class RewardTexts implements RewardTextSet {
     return switch (rewardId) {
       RewardCatalog.finishFlagStickerId => '도착 깃발 스티커',
       RewardCatalog.twinkleStarStickerId => '반짝 별 스티커',
-      RewardCatalog.riceBowlStickerId => '든든 미소 스티커',
-      RewardCatalog.yumSpoonStickerId => '응원 별 스티커',
-      RewardCatalog.crunchyCarrotStickerId => '반짝 배지 스티커',
-      RewardCatalog.sunnyMissionStickerId => '햇살 미션 스티커',
+      RewardCatalog.sparklyTeethStickerId => '반짝 양치 스티커',
+      RewardCatalog.bookBuddyStickerId => '책 친구 스티커',
+      RewardCatalog.cleanupChampStickerId => '정리 챔피언 스티커',
+      RewardCatalog.happyClockStickerId => '해피 시계 스티커',
       RewardCatalog.rainbowCourseStickerId => '무지개 코스 스티커',
-      RewardCatalog.rocketBiteStickerId => '로켓 부스트 스티커',
+      RewardCatalog.rocketStickerId => '로켓 스티커',
       _ => rewardId,
     };
   }
