@@ -23,12 +23,14 @@ abstract interface class HomeTextSet {
   String get slowCourse;
   String get slowCourseSubtitle;
   String get quickCourseTitle;
+  String get activityQuickStartTitle;
   String get customStartButton;
   String get customSheetTitle;
-  String get mealSummaryLabel;
+  String get customTimerTitle;
+  String get activitySummaryLabel;
   String get stickerKindSummaryLabel;
   String get stickerSummaryLabel;
-  String get noMealHistory;
+  String get noActivityHistory;
   String get openStickerCollection;
   String get avatarCtaSubtitle;
   String get avatarCtaButton;
@@ -54,10 +56,10 @@ abstract interface class HomeTextSet {
   String alternateCourse(int minutes);
   String alternateCourseSubtitle(int minutes);
   String progressTitle(String childName);
-  String mealCount(int count);
+  String activityCount(int count);
   String stickerKindCount(int count);
   String stickerCount(int count);
-  String recentMealSummary(
+  String recentActivitySummary(
     String actualDuration,
     ActivityCompletionStatus completionStatus,
   );

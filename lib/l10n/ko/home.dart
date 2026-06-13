@@ -6,21 +6,23 @@ import '../../models/activity_completion_status.dart';
 class HomeTexts implements HomeTextSet {
   const HomeTexts();
 
-  String get subtitle => '오늘도 냠냠 코스를 달려볼까?';
-  String get heroMissionTitle => '오늘의 냠냠 미션';
-  String get heroMissionSubtitle => '라이더가 맛있는 완주를 기다리고 있어요';
+  String get subtitle => '오늘도 작은 라이딩으로 루틴을 시작해볼까?';
+  String get heroMissionTitle => '오늘의 미션';
+  String get heroMissionSubtitle => '라이더가 즐거운 완주를 기다리고 있어요';
   String get todayVehicleTitle => '오늘의 빠방';
   String get morningCourse => '15분 코스';
   String get morningCourseSubtitle => '가볍게 워밍업';
   String get slowCourse => '35분 코스';
   String get slowCourseSubtitle => '천천히 완주하기';
-  String get quickCourseTitle => '다른 코스';
+  String get quickCourseTitle => '다른 활동';
+  String get activityQuickStartTitle => '오늘의 미션';
   String get customStartButton => '직접 설정으로 출발';
   String get customSheetTitle => '직접 설정';
-  String get mealSummaryLabel => '식사';
+  String get customTimerTitle => '직접 설정';
+  String get activitySummaryLabel => '활동';
   String get stickerKindSummaryLabel => '종류';
   String get stickerSummaryLabel => '스티커';
-  String get noMealHistory => '아직 저장된 식사 이력이 없어.';
+  String get noActivityHistory => '아직 저장된 활동 기록이 없어.';
   String get openStickerCollection => '스티커 보관함 보기';
   String get avatarCtaSubtitle => '아이 얼굴을 빠방에 태워보세요.';
   String get avatarCtaButton => '만들기';
@@ -29,15 +31,15 @@ class HomeTexts implements HomeTextSet {
   String get avatarCtaEditSemantics => '아바타 편집';
   String get avatarInlineDefaultState => '기본 얼굴 사용 중';
   String get avatarInlineCustomState => '아이 얼굴 탑승 중';
-  String get activeTimerTitle => '진행 중인 식사 타이머';
+  String get activeTimerTitle => '진행 중인 활동 타이머';
   String get activeTimerResumeButton => '이어가기';
   String get activeTimerCancelButton => '취소하기';
   String get activeTimerCancelDialogTitle => '진행 중인 타이머를 취소할까요?';
-  String get activeTimerCancelDialogMessage => '취소하면 이 식사 타이머는 기록에 남지 않아요.';
+  String get activeTimerCancelDialogMessage => '취소하면 이 활동 타이머는 기록에 남지 않아요.';
   String get activeTimerNewTimerDialogTitle => '진행 중인 타이머가 있어요';
   String get activeTimerNewTimerDialogMessage => '새 타이머를 시작하면 진행 중인 타이머는 취소돼요.';
   String get activeTimerStartNewButton => '새로 시작';
-  String get activeTimerArrivedSubtitle => '식사 시간이 끝났어요';
+  String get activeTimerArrivedSubtitle => '활동 시간이 끝났어요';
 
   String recentCustomMinutes(int minutes) => '최근 $minutes분';
   String minuteLabel(int minutes) => '$minutes분';
@@ -54,11 +56,11 @@ class HomeTexts implements HomeTextSet {
   }
 
   String progressTitle(String childName) =>
-      '${_casualKoreanName(childName)}의 냠냠 기록';
-  String mealCount(int count) => '$count번';
+      '${_casualKoreanName(childName)}의 활동 기록';
+  String activityCount(int count) => '$count번';
   String stickerKindCount(int count) => '$count개';
   String stickerCount(int count) => '$count장';
-  String recentMealSummary(
+  String recentActivitySummary(
     String actualDuration,
     ActivityCompletionStatus completionStatus,
   ) {
@@ -67,7 +69,7 @@ class HomeTexts implements HomeTextSet {
             completionStatus == ActivityCompletionStatus.canceled
         ? '미완료'
         : '완료';
-    return '최근 식사 $actualDuration · $status';
+    return '최근 활동 $actualDuration · $status';
   }
 }
 

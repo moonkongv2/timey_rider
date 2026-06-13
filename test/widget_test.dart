@@ -1548,7 +1548,7 @@ void main() {
     expect(preferences.getString('childName'), '민준');
   });
 
-  testWidgets('Home screen shows meal timer actions', (tester) async {
+  testWidgets('Home screen shows activity timer actions', (tester) async {
     SharedPreferences.setMockInitialValues({});
 
     await _startApp(tester, const Locale('ko'));
@@ -1556,12 +1556,18 @@ void main() {
     expect(find.byKey(const ValueKey('homeLogo')), findsOneWidget);
     expect(find.text('기본 얼굴 사용 중'), findsOneWidget);
     expect(find.text('만들기'), findsOneWidget);
-    expect(find.text('다른 코스'), findsOneWidget);
-    expect(find.text('15분 코스'), findsOneWidget);
-    expect(find.textContaining('2분 보통 코스'), findsOneWidget);
-    expect(find.text('25분 코스'), findsOneWidget);
-    expect(find.text('35분 코스'), findsOneWidget);
+    expect(find.text('오늘의 미션'), findsOneWidget);
+    expect(find.text('양치'), findsOneWidget);
+    expect(find.text('책 읽기'), findsOneWidget);
+    expect(find.text('정리'), findsOneWidget);
+    expect(find.text('놀이'), findsOneWidget);
     expect(find.textContaining('직접 설정'), findsOneWidget);
+    for (final activity in ActivityCatalog.all) {
+      expect(
+        find.byKey(ValueKey('activityQuickStartCard_${activity.id}')),
+        findsOneWidget,
+      );
+    }
   });
 
   testWidgets('Home screen opens a saved active timer session', (tester) async {
@@ -1607,7 +1613,7 @@ void main() {
     await tester.pump();
 
     expect(find.byKey(const ValueKey('activeTimerResumeCard')), findsOneWidget);
-    expect(find.text('진행 중인 식사 타이머'), findsOneWidget);
+    expect(find.text('진행 중인 활동 타이머'), findsOneWidget);
 
     await tester.tap(find.text('이어가기'));
     await tester.pump();
@@ -1769,7 +1775,7 @@ void main() {
     await tester.pump();
 
     expect(find.byKey(const ValueKey('activeTimerResumeCard')), findsOneWidget);
-    expect(find.text('식사 시간이 끝났어요'), findsOneWidget);
+    expect(find.text('활동 시간이 끝났어요'), findsOneWidget);
     expect(find.textContaining('남은 시간'), findsNothing);
   });
 
@@ -1900,7 +1906,11 @@ void main() {
     );
     await tester.pump();
 
-    await tester.tap(find.textContaining('25분 보통 코스'));
+    tester
+        .widget<AppBouncyButton>(
+          find.byKey(const ValueKey('activityStartButton_brushing')),
+        )
+        .onPressed!();
     await tester.pump();
 
     expect(find.text('진행 중인 타이머가 있어요'), findsOneWidget);
@@ -1916,10 +1926,10 @@ void main() {
 
     final timerScreen = tester.widget<TimerScreen>(find.byType(TimerScreen));
     expect(timerScreen.restoredSession, isNull);
-    expect(timerScreen.config.duration, const Duration(minutes: 25));
+    expect(timerScreen.config.duration, const Duration(minutes: 2));
   });
 
-  testWidgets('Starting a course opens the marker picker first', (
+  testWidgets('Starting an activity opens the marker picker first', (
     tester,
   ) async {
     SharedPreferences.setMockInitialValues({});
@@ -1949,15 +1959,11 @@ void main() {
     );
     await tester.pump();
 
-    expect(find.textContaining('35분 보통 코스'), findsOneWidget);
-
-    final regularCourseButton = tester.widget<AppBouncyButton>(
-      find.ancestor(
-        of: find.textContaining('35분 보통 코스'),
-        matching: find.byType(AppBouncyButton),
-      ),
-    );
-    regularCourseButton.onPressed!();
+    tester
+        .widget<AppBouncyButton>(
+          find.byKey(const ValueKey('activityStartButton_brushing')),
+        )
+        .onPressed!();
     expect(tester.takeException(), isNull);
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 400));
@@ -2006,15 +2012,14 @@ void main() {
     );
     await tester.pump();
 
-    final regularCourseButton = tester.widget<AppBouncyButton>(
-      find.ancestor(
-        of: find.textContaining('25분 보통 코스'),
-        matching: find.byType(AppBouncyButton),
-      ),
-    );
-    regularCourseButton.onPressed!();
+    tester
+        .widget<AppBouncyButton>(
+          find.byKey(const ValueKey('activityStartButton_brushing')),
+        )
+        .onPressed!();
     await tester.pump();
-    await tester.pump(const Duration(milliseconds: 400));
+    await tester.pump(const Duration(seconds: 1));
+    await tester.pump();
     await tester.pumpAndSettle();
 
     expect(
@@ -2062,9 +2067,14 @@ void main() {
     );
     await tester.pump();
 
-    await tester.tap(find.textContaining('35분 보통 코스'));
+    tester
+        .widget<AppBouncyButton>(
+          find.byKey(const ValueKey('activityStartButton_brushing')),
+        )
+        .onPressed!();
     await tester.pump();
-    await tester.pump(const Duration(milliseconds: 400));
+    await tester.pump(const Duration(seconds: 1));
+    await tester.pump();
 
     expect(
       find.byKey(const ValueKey('activityMarkerPickerSheet')),
@@ -2114,9 +2124,14 @@ void main() {
     );
     await tester.pump();
 
-    await tester.tap(find.textContaining('35분 보통 코스'));
+    tester
+        .widget<AppBouncyButton>(
+          find.byKey(const ValueKey('activityStartButton_brushing')),
+        )
+        .onPressed!();
     await tester.pump();
-    await tester.pump(const Duration(milliseconds: 400));
+    await tester.pump(const Duration(seconds: 1));
+    await tester.pump();
 
     expect(
       find.byKey(const ValueKey('activityMarkerPickerSheet')),
@@ -2164,13 +2179,11 @@ void main() {
     );
     await tester.pump();
 
-    final regularCourseButton = tester.widget<AppBouncyButton>(
-      find.ancestor(
-        of: find.textContaining('35분 보통 코스'),
-        matching: find.byType(AppBouncyButton),
-      ),
-    );
-    regularCourseButton.onPressed!();
+    tester
+        .widget<AppBouncyButton>(
+          find.byKey(const ValueKey('activityStartButton_brushing')),
+        )
+        .onPressed!();
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 400));
 
@@ -2184,7 +2197,7 @@ void main() {
     expect(find.byType(TimerScreen), findsOneWidget);
     expect(
       tester.widget<TimerScreen>(find.byType(TimerScreen)).config.duration,
-      const Duration(minutes: 35),
+      const Duration(minutes: 2),
     );
     expect(
       tester.widget<TimerScreen>(find.byType(TimerScreen)).config.markerIds,
@@ -2222,13 +2235,11 @@ void main() {
     );
     await tester.pump();
 
-    final regularCourseButton = tester.widget<AppBouncyButton>(
-      find.ancestor(
-        of: find.textContaining('25분 보통 코스'),
-        matching: find.byType(AppBouncyButton),
-      ),
-    );
-    regularCourseButton.onPressed!();
+    tester
+        .widget<AppBouncyButton>(
+          find.byKey(const ValueKey('activityStartButton_brushing')),
+        )
+        .onPressed!();
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 400));
 
@@ -2292,13 +2303,11 @@ void main() {
     );
     await tester.pump();
 
-    final regularCourseButton = tester.widget<AppBouncyButton>(
-      find.ancestor(
-        of: find.textContaining('25분 보통 코스'),
-        matching: find.byType(AppBouncyButton),
-      ),
-    );
-    regularCourseButton.onPressed!();
+    tester
+        .widget<AppBouncyButton>(
+          find.byKey(const ValueKey('activityStartButton_brushing')),
+        )
+        .onPressed!();
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 400));
 
@@ -2313,37 +2322,44 @@ void main() {
     expect(find.byType(TimerScreen), findsNothing);
   });
 
-  testWidgets('Alternate courses exclude the selected default duration', (
-    tester,
-  ) async {
-    await tester.pumpWidget(
-      MaterialApp(
-        locale: const Locale('ko'),
-        supportedLocales: const [Locale('ko'), Locale('en')],
-        localizationsDelegates: const [
-          GlobalMaterialLocalizations.delegate,
-          GlobalCupertinoLocalizations.delegate,
-          GlobalWidgetsLocalizations.delegate,
-        ],
-        home: HomeScreen(
-          config: ActivityTimerConfig.defaults().copyWith(
-            childName: '지율',
-            duration: const Duration(minutes: 15),
+  testWidgets(
+    'Activity quick start shows MVP activities and default durations',
+    (tester) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          locale: const Locale('ko'),
+          supportedLocales: const [Locale('ko'), Locale('en')],
+          localizationsDelegates: const [
+            GlobalMaterialLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+          ],
+          home: HomeScreen(
+            config: ActivityTimerConfig.defaults().copyWith(
+              childName: '지율',
+              duration: const Duration(minutes: 15),
+            ),
+            activityProgressService: LocalActivityProgressService(),
+            onConfigChanged: (_) {},
           ),
-          activityProgressService: LocalActivityProgressService(),
-          onConfigChanged: (_) {},
         ),
-      ),
-    );
-    await tester.pump();
+      );
+      await tester.pump();
 
-    expect(find.textContaining('15분 보통 코스'), findsOneWidget);
-    expect(find.text('15분 코스'), findsNothing);
-    expect(find.text('25분 코스'), findsOneWidget);
-    expect(find.text('35분 코스'), findsOneWidget);
-  });
+      expect(find.text('양치'), findsOneWidget);
+      expect(find.text('책 읽기'), findsOneWidget);
+      expect(find.text('정리'), findsOneWidget);
+      expect(find.text('놀이'), findsOneWidget);
+      expect(find.text('직접 설정'), findsWidgets);
+      expect(find.text('2분'), findsOneWidget);
+      expect(find.text('15분'), findsWidgets);
+      expect(find.text('5분'), findsOneWidget);
+      expect(find.text('20분'), findsOneWidget);
+      expect(find.text('10분'), findsOneWidget);
+    },
+  );
 
-  testWidgets('Quick courses do not overwrite default meal duration', (
+  testWidgets('Activity quick start does not overwrite default duration', (
     tester,
   ) async {
     SharedPreferences.setMockInitialValues({});
@@ -2374,12 +2390,11 @@ void main() {
     );
     await tester.pump();
 
-    final quickCourseButton = tester.widget<InkWell>(
-      find
-          .ancestor(of: find.text('25분 코스'), matching: find.byType(InkWell))
-          .first,
-    );
-    quickCourseButton.onTap!();
+    tester
+        .widget<AppBouncyButton>(
+          find.byKey(const ValueKey('activityStartButton_reading')),
+        )
+        .onPressed!();
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 400));
 
@@ -2399,13 +2414,17 @@ void main() {
     expect(find.byType(TimerScreen), findsOneWidget);
     expect(
       tester.widget<TimerScreen>(find.byType(TimerScreen)).config.duration,
-      const Duration(minutes: 25),
+      const Duration(minutes: 15),
+    );
+    expect(
+      tester.widget<TimerScreen>(find.byType(TimerScreen)).config.activityId,
+      'reading',
     );
     expect(changedConfig, isNull);
   });
 
   testWidgets(
-    'Timer motivation settings do not overwrite default meal duration',
+    'Timer motivation settings do not overwrite default activity duration',
     (tester) async {
       SharedPreferences.setMockInitialValues({});
       addTearDown(() async {
@@ -2435,12 +2454,11 @@ void main() {
       );
       await tester.pump();
 
-      final quickCourseButton = tester.widget<InkWell>(
-        find
-            .ancestor(of: find.text('25분 코스'), matching: find.byType(InkWell))
-            .first,
-      );
-      quickCourseButton.onTap!();
+      tester
+          .widget<AppBouncyButton>(
+            find.byKey(const ValueKey('activityStartButton_reading')),
+          )
+          .onPressed!();
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 400));
       final randomStartButton = find.byKey(
@@ -2453,7 +2471,7 @@ void main() {
       expect(find.byType(TimerScreen), findsOneWidget);
       expect(
         tester.widget<TimerScreen>(find.byType(TimerScreen)).config.duration,
-        const Duration(minutes: 25),
+        const Duration(minutes: 15),
       );
 
       await tester.tap(find.byKey(const ValueKey('motivationSettingsButton')));
@@ -2521,12 +2539,12 @@ void main() {
     );
     await tester.pump();
 
-    expect(find.text('오늘의 냠냠 미션'), findsOneWidget);
+    expect(find.text('오늘의 미션'), findsOneWidget);
     expect(find.text('오늘의 빠방'), findsOneWidget);
     expect(find.text('아이 얼굴 탑승 중'), findsOneWidget);
     expect(
       find.byKey(const ValueKey('avatarCompositeOverlayImage')),
-      findsNWidgets(3),
+      findsNWidgets(2),
     );
     final customAvatarPreview = find.byWidgetPredicate((widget) {
       return widget is AvatarCompositePreview &&
@@ -2535,7 +2553,7 @@ void main() {
           widget.avatarOffsetY == -0.03 &&
           widget.avatarRotationDegrees == 5.0;
     });
-    expect(customAvatarPreview, findsNWidgets(3));
+    expect(customAvatarPreview, findsNWidgets(2));
 
     await tester.pumpWidget(const SizedBox.shrink());
     await tester.pump();
@@ -3132,7 +3150,11 @@ void main() {
     await tester.tap(find.byType(BackButton));
     await tester.pumpAndSettle();
 
-    await tester.tap(find.textContaining('25분 보통 코스'));
+    tester
+        .widget<AppBouncyButton>(
+          find.byKey(const ValueKey('activityStartButton_brushing')),
+        )
+        .onPressed!();
     await tester.pump();
 
     expect(find.textContaining('남은 시간'), findsNothing);
@@ -3528,13 +3550,11 @@ void main() {
     expect(changedConfig?.motivationVideoUseCustomInterval, isTrue);
     expect(changedConfig?.motivationVideoInterval, const Duration(minutes: 5));
 
-    final regularCourseButton = tester.widget<AppBouncyButton>(
-      find.ancestor(
-        of: find.textContaining('25분 보통 코스'),
-        matching: find.byType(AppBouncyButton),
-      ),
-    );
-    regularCourseButton.onPressed!();
+    tester
+        .widget<AppBouncyButton>(
+          find.byKey(const ValueKey('activityStartButton_brushing')),
+        )
+        .onPressed!();
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 400));
     final randomStartButton = find.byKey(
@@ -3547,7 +3567,7 @@ void main() {
     final timerConfig = tester
         .widget<TimerScreen>(find.byType(TimerScreen))
         .config;
-    expect(timerConfig.duration, const Duration(minutes: 25));
+    expect(timerConfig.duration, const Duration(minutes: 2));
     expect(timerConfig.motivationVideoUseCustomInterval, isTrue);
     expect(timerConfig.motivationVideoInterval, const Duration(minutes: 5));
   });
@@ -3605,13 +3625,22 @@ void main() {
     expect(find.byType(VehicleSelectionCard), findsNothing);
   });
 
-  testWidgets('Home screen shows quick courses above vehicle choices', (
+  testWidgets('Home screen shows activity quick starts above vehicle choices', (
     tester,
   ) async {
     SharedPreferences.setMockInitialValues({});
 
     await _startApp(tester, const Locale('ko'));
 
+    expect(find.text('오늘의 미션'), findsOneWidget);
+    expect(
+      find.byKey(const ValueKey('activityQuickStartCard_brushing')),
+      findsOneWidget,
+    );
+    expect(
+      find.byKey(const ValueKey('activityQuickStartCard_reading')),
+      findsOneWidget,
+    );
     expect(find.text('빠방 고르기'), findsNothing);
     expect(find.text('오토바이'), findsNothing);
     expect(find.text('소방차'), findsNothing);
@@ -3675,8 +3704,12 @@ void main() {
     expect((thirdRowCenterX - firstRowCenterX).abs(), lessThan(1.0));
 
     final vehicleTitleTop = tester.getTopLeft(find.text('오늘의 빠방')).dy;
-    final firstCourseTop = tester.getTopLeft(find.text('15분 코스')).dy;
-    expect(firstCourseTop, lessThan(vehicleTitleTop));
+    final firstActivityTop = tester
+        .getTopLeft(
+          find.byKey(const ValueKey('activityQuickStartCard_brushing')),
+        )
+        .dy;
+    expect(firstActivityTop, greaterThan(vehicleTitleTop));
   });
 
   testWidgets(
@@ -3838,7 +3871,7 @@ void main() {
     await tester.drag(find.byType(ListView), const Offset(0, -700));
     await tester.pumpAndSettle();
 
-    expect(find.text('서아의 냠냠 기록'), findsOneWidget);
+    expect(find.text('서아의 활동 기록'), findsOneWidget);
   });
 
   testWidgets('Empty child name in settings shows validation message', (
@@ -6320,20 +6353,16 @@ void main() {
     await _startApp(tester, const Locale('en'));
 
     expect(find.byKey(const ValueKey('homeLogo')), findsOneWidget);
-    expect(find.text("Today's Yamyam Mission"), findsOneWidget);
-    expect(
-      find.text('Your rider is waiting for a tasty finish'),
-      findsOneWidget,
-    );
+    expect(find.text("Today's Mission"), findsOneWidget);
     expect(find.text("Today's vehicle"), findsOneWidget);
-    expect(find.text('15-min Ride'), findsOneWidget);
-    expect(find.text('A light warm-up'), findsOneWidget);
-    expect(find.textContaining('2-min Regular Ride'), findsOneWidget);
-    expect(find.text('25-min Ride'), findsOneWidget);
-    expect(find.text('Other rides'), findsOneWidget);
-    expect(find.text('35-min Ride'), findsOneWidget);
-    expect(find.text('Cruise to the finish'), findsOneWidget);
-    expect(find.textContaining('Custom time'), findsOneWidget);
+    expect(find.text('Brush Teeth'), findsOneWidget);
+    expect(find.text('Reading'), findsOneWidget);
+    expect(find.text('Cleanup'), findsOneWidget);
+    expect(find.text('Play Time'), findsOneWidget);
+    expect(find.text('Custom Timer'), findsOneWidget);
+    expect(find.text('2 min'), findsOneWidget);
+    expect(find.text('15 min'), findsWidgets);
+    expect(find.text('20 min'), findsOneWidget);
   });
 
   testWidgets('English locale shows English timer progress copy', (
@@ -6395,9 +6424,7 @@ void main() {
     await _startApp(tester, const Locale('ja'));
 
     expect(find.byKey(const ValueKey('homeLogo')), findsOneWidget);
-    await tester.drag(find.byType(ListView), const Offset(0, -500));
-    await tester.pumpAndSettle();
-    expect(find.textContaining('Custom time'), findsOneWidget);
+    expect(find.textContaining('Custom Timer'), findsOneWidget);
   });
 
   test('Fast meal awards only one random sticker', () async {
@@ -6914,7 +6941,7 @@ void main() {
     expect(find.text('Create Reward Promise'), findsOneWidget);
   });
 
-  testWidgets('Home meal records summary opens meal history screen', (
+  testWidgets('Home activity history summary opens activity history screen', (
     tester,
   ) async {
     SharedPreferences.setMockInitialValues({});
@@ -6940,16 +6967,16 @@ void main() {
     await tester.drag(find.byType(ListView), const Offset(0, -700));
     await tester.pumpAndSettle();
 
-    expect(find.text('Recent meal 20:00 · complete'), findsOneWidget);
+    expect(find.text('Recent activity 20:00 · complete'), findsOneWidget);
 
-    await tester.tap(find.text("Jiyul's meal records"));
+    await tester.tap(find.text("Jiyul's activity history"));
     await tester.pumpAndSettle();
 
     expect(find.byType(ActivityHistoryScreen), findsOneWidget);
     expect(find.text('Meal Records'), findsOneWidget);
   });
 
-  testWidgets('Home meal records summary shows incomplete status', (
+  testWidgets('Home activity history summary shows incomplete status', (
     tester,
   ) async {
     SharedPreferences.setMockInitialValues({});
@@ -6979,7 +7006,7 @@ void main() {
     await tester.drag(find.byType(ListView), const Offset(0, -700));
     await tester.pumpAndSettle();
 
-    expect(find.text('최근 식사 20:00 · 미완료 · 스티커 없음 · 초과 +05:00'), findsOneWidget);
+    expect(find.text('최근 활동 20:00 · 미완료 · 스티커 없음 · 초과 +05:00'), findsOneWidget);
   });
 
   testWidgets('Reward goal creation form saves a goal', (tester) async {
