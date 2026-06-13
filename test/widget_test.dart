@@ -1435,8 +1435,14 @@ void main() {
   test('Arrival dialog copy uses the selected vehicle label', () {
     final timerTexts = AppTexts.ko.timer;
 
-    expect(timerTexts.arrivalDialogMessage('경찰차'), '경찰차가 지나갔어. 식사를 마무리했어?');
-    expect(timerTexts.arrivalDialogMessage('포크레인'), '포크레인이 지나갔어. 식사를 마무리했어?');
+    expect(
+      timerTexts.arrivalDialogMessage('경찰차', '양치'),
+      '경찰차가 도착했어. 양치 미션을 마쳤어?',
+    );
+    expect(
+      timerTexts.arrivalDialogMessage('포크레인', '정리'),
+      '포크레인이 도착했어. 정리 미션을 마쳤어?',
+    );
   });
 
   test('Timer arrival dialog copy uses the configured vehicle', () {
@@ -1445,16 +1451,18 @@ void main() {
         texts: AppTexts.ko.timer,
         vehicleId: 'excavator',
         languageCode: 'ko',
+        activityLabel: '양치',
       ),
-      '포크레인이 지나갔어. 식사를 마무리했어?',
+      '포크레인이 도착했어. 양치 미션을 마쳤어?',
     );
     expect(
       timerArrivalDialogMessage(
         texts: AppTexts.en.timer,
         vehicleId: 'police_car',
         languageCode: 'en',
+        activityLabel: 'Brush Teeth',
       ),
-      'The police car passed by... did you finish your meal?',
+      'The police car arrived. Did you finish Brush Teeth?',
     );
   });
 
@@ -5416,6 +5424,47 @@ void main() {
     await tester.pump();
   });
 
+  testWidgets('Time-ended activity opens result automatically at arrival', (
+    tester,
+  ) async {
+    SharedPreferences.setMockInitialValues({});
+
+    var now = DateTime(2026);
+    final service = LocalActivityProgressService();
+
+    await tester.pumpWidget(
+      MaterialApp(
+        locale: const Locale('ko'),
+        home: TimerScreen(
+          config: ActivityTimerConfig.defaults().copyWith(
+            activityId: ActivityCatalog.play.id,
+            duration: const Duration(seconds: 1),
+          ),
+          activityProgressService: service,
+          now: () => now,
+          onConfigChanged: (_) {},
+        ),
+      ),
+    );
+    await tester.pump();
+    now = now.add(const Duration(seconds: 2));
+    await tester.pump(const Duration(milliseconds: 250));
+    await tester.pump(const Duration(milliseconds: 900));
+    await tester.pump();
+
+    expect(find.byType(ResultScreen), findsOneWidget);
+    expect(find.byType(AlertDialog), findsNothing);
+
+    final snapshot = await service.loadSnapshot();
+    expect(
+      snapshot.history.single.completionStatus,
+      ActivityCompletionStatus.timeEnded,
+    );
+
+    await tester.pumpWidget(const SizedBox.shrink());
+    await tester.pump();
+  });
+
   testWidgets('Timer records directly selected markers on completion', (
     tester,
   ) async {
@@ -6320,21 +6369,21 @@ void main() {
 
     await tester.pump();
     await tester.pump(const Duration(seconds: 1));
-    expect(find.text('오늘의 냠냠코스'), findsOneWidget);
+    expect(find.text('오늘의 미션'), findsOneWidget);
 
     await tester.tap(find.byType(BackButton));
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 320));
 
     expect(find.text('코스를 그만할까요?'), findsOneWidget);
-    expect(find.text('지금 나가면 진행 중인 냠냠코스가 저장되지 않아요.'), findsOneWidget);
+    expect(find.text('지금 나가면 진행 중인 미션이 저장되지 않아요.'), findsOneWidget);
 
     await tester.tap(find.text('계속하기'));
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 320));
 
     expect(find.text('코스를 그만할까요?'), findsNothing);
-    expect(find.text('오늘의 냠냠코스'), findsOneWidget);
+    expect(find.text('오늘의 미션'), findsOneWidget);
 
     await tester.tap(find.byType(BackButton));
     await tester.pump();
@@ -6344,7 +6393,7 @@ void main() {
     await tester.pump(const Duration(seconds: 1));
 
     expect(find.text('타이머 열기'), findsOneWidget);
-    expect(find.text('오늘의 냠냠코스'), findsNothing);
+    expect(find.text('오늘의 미션'), findsNothing);
   });
 
   testWidgets('English locale shows English home copy', (tester) async {
@@ -6388,9 +6437,9 @@ void main() {
     );
     await tester.pump();
 
-    expect(find.text("Today's Yamyam Ride"), findsOneWidget);
+    expect(find.text("Today's Mission"), findsOneWidget);
     expect(find.text("We're off!"), findsOneWidget);
-    expect(find.text('Mealtime left'), findsOneWidget);
+    expect(find.text('Time left'), findsOneWidget);
     expect(find.text('출발했어요!'), findsNothing);
   });
 

@@ -10,12 +10,14 @@ class TimerControlBar extends StatelessWidget {
     required this.isPaused,
     required this.onPauseResume,
     required this.onComplete,
+    this.completeLabel,
     this.isVertical = false,
   });
 
   final bool isPaused;
   final VoidCallback? onPauseResume;
   final VoidCallback? onComplete;
+  final String? completeLabel;
   final bool isVertical;
 
   @override
@@ -30,7 +32,7 @@ class TimerControlBar extends StatelessWidget {
       minHeight: 58,
     );
     final completeButton = AppBouncyButton(
-      label: texts.timer.completeMealButton,
+      label: completeLabel ?? texts.timer.completeActivityButton('custom'),
       icon: Icons.check_circle_rounded,
       onPressed: onComplete,
       variant: AppButtonVariant.primary,

@@ -3,6 +3,7 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
+import '../catalogs/activity_catalog.dart';
 import '../catalogs/activity_marker_catalog.dart';
 import '../catalogs/motivation_asset_catalog.dart';
 import '../catalogs/vehicle_catalog.dart';
@@ -10,6 +11,7 @@ import '../controllers/activity_timer_controller.dart';
 import '../l10n/app_texts.dart';
 import '../l10n/text_sets.dart';
 import '../models/active_activity_timer_session.dart';
+import '../models/activity.dart';
 import '../models/activity_completion_status.dart';
 import '../models/activity_marker.dart';
 import '../models/activity_session_result.dart';
@@ -146,10 +148,11 @@ String timerArrivalDialogMessage({
   required TimerTextSet texts,
   required String vehicleId,
   required String languageCode,
+  required String activityLabel,
 }) {
   final vehicle = VehicleCatalog.findById(vehicleId);
   final vehicleLabel = vehicle.labelForLanguage(languageCode);
-  return texts.arrivalDialogMessage(vehicleLabel);
+  return texts.arrivalDialogMessage(vehicleLabel, activityLabel);
 }
 
 class TimerScreen extends StatefulWidget {
@@ -219,6 +222,9 @@ class _TimerScreenState extends State<TimerScreen>
   double _finishDriveStartProgress = 0;
   bool _handoffOrientation = false;
   late final String _activeSessionId;
+
+  ActivityDefinition get _activity =>
+      ActivityCatalog.findById(_timerConfig.activityId);
 
   @override
   void initState() {
@@ -354,9 +360,23 @@ class _TimerScreenState extends State<TimerScreen>
             _controller.state != ActivityTimerState.arrived) {
           return;
         }
-        _confirmComplete(showFailureOnDecline: true);
+        _handleArrival();
       });
     });
+  }
+
+  Future<void> _handleArrival() async {
+    if (_activity.completionMode ==
+        ActivityCompletionMode.timeEndsAutomatically) {
+      final result = _controller.complete(
+        completionStatus: ActivityCompletionStatus.timeEnded,
+      );
+      unawaited(_clearActiveSession());
+      _openResult(result);
+      return;
+    }
+
+    await _confirmComplete(fromArrival: true);
   }
 
   void _maybeShowMotivationVideo() {
@@ -579,28 +599,32 @@ class _TimerScreenState extends State<TimerScreen>
     }
   }
 
-  Future<void> _confirmComplete({bool showFailureOnDecline = false}) async {
+  Future<void> _confirmComplete({bool fromArrival = false}) async {
     if (_isFinishDriving) {
       return;
     }
     _arrivalPromptTimer?.cancel();
 
     final texts = AppTexts.of(context);
+    final activity = _activity;
+    final languageCode = Localizations.localeOf(context).languageCode;
+    final activityLabel = activity.labelForLanguage(languageCode);
     final arrivalDialogMessage = timerArrivalDialogMessage(
       texts: texts.timer,
       vehicleId: _timerConfig.vehicleId,
-      languageCode: Localizations.localeOf(context).languageCode,
+      languageCode: languageCode,
+      activityLabel: activityLabel,
     );
     final confirmed = await showDialog<bool>(
       context: context,
-      barrierDismissible: !showFailureOnDecline,
+      barrierDismissible: !fromArrival,
       builder: (context) {
         return AlertDialog(
-          title: Text(texts.timer.completeDialogTitle),
+          title: Text(texts.timer.completeDialogTitle(activityLabel)),
           content: Text(
-            showFailureOnDecline
+            fromArrival
                 ? arrivalDialogMessage
-                : texts.timer.completeDialogMessage,
+                : texts.timer.completeDialogMessage(activityLabel),
           ),
           actions: [
             TextButton(
@@ -621,7 +645,7 @@ class _TimerScreenState extends State<TimerScreen>
     }
 
     if (confirmed != true) {
-      if (showFailureOnDecline) {
+      if (fromArrival) {
         final result = _controller.complete(
           completionStatus: ActivityCompletionStatus.needsMoreTime,
         );
@@ -631,11 +655,12 @@ class _TimerScreenState extends State<TimerScreen>
       return;
     }
 
-    final result = _controller.complete(
-      completionStatus: showFailureOnDecline
-          ? ActivityCompletionStatus.completedAtEnd
-          : null,
-    );
+    final completionStatus = fromArrival
+        ? ActivityCompletionStatus.completedAtEnd
+        : _controller.state == ActivityTimerState.arrived
+        ? ActivityCompletionStatus.completedAfterEnd
+        : ActivityCompletionStatus.completedBeforeEnd;
+    final result = _controller.complete(completionStatus: completionStatus);
     unawaited(_clearActiveSession());
     if (result.completedBeforeEnd) {
       _startFinishDrive(result);
@@ -788,7 +813,7 @@ class _TimerScreenState extends State<TimerScreen>
     return switch (state) {
       ActivityTimerState.running => _TimerStatusCopy(
         progressMessage: _runningProgressMessage(texts, progress),
-        timeLabel: texts.runningArrivalLabel,
+        timeLabel: texts.remainingTimeLabel,
         icon: Icons.directions_rounded,
         iconBackgroundColor: AppColors.surfaceMint,
       ),
@@ -821,6 +846,7 @@ class _TimerScreenState extends State<TimerScreen>
     return AnimatedBuilder(
       animation: Listenable.merge([_controller, _finishDriveController]),
       builder: (context, _) {
+        final activity = _activity;
         final vehicle = VehicleCatalog.findById(_timerConfig.vehicleId);
         final vehicleAvatar = _timerConfig.avatarPresentationForVehicle(
           vehicle.id,
@@ -874,7 +900,7 @@ class _TimerScreenState extends State<TimerScreen>
             appBar: isScreenLandscape
                 ? null
                 : AppBar(
-                    title: Text(texts.timer.courseTitle),
+                    title: Text(texts.timer.missionTitle),
                     backgroundColor: AppColors.cream,
                     foregroundColor: AppColors.brown900,
                     elevation: 0,
@@ -980,6 +1006,9 @@ class _TimerScreenState extends State<TimerScreen>
                       onMotivationSettings: _openMotivationSettings,
                       controls: TimerControlBar(
                         isPaused: _controller.isPaused,
+                        completeLabel: texts.timer.completeActivityButton(
+                          activity.id,
+                        ),
                         onPauseResume: _isFinishDriving
                             ? null
                             : handlePauseResume,
@@ -987,6 +1016,9 @@ class _TimerScreenState extends State<TimerScreen>
                       ),
                       compactControls: _CompactLandscapeControls(
                         isPaused: _controller.isPaused,
+                        completeLabel: texts.timer.completeActivityButton(
+                          activity.id,
+                        ),
                         onMotivationSettings: _openMotivationSettings,
                         onPauseResume: _isFinishDriving
                             ? null
@@ -1018,6 +1050,9 @@ class _TimerScreenState extends State<TimerScreen>
                         const SizedBox(height: AppSpacing.md),
                         TimerControlBar(
                           isPaused: _controller.isPaused,
+                          completeLabel: texts.timer.completeActivityButton(
+                            activity.id,
+                          ),
                           onPauseResume: _isFinishDriving
                               ? null
                               : handlePauseResume,
@@ -1114,12 +1149,14 @@ class _LandscapeTimerLayout extends StatelessWidget {
 class _CompactLandscapeControls extends StatelessWidget {
   const _CompactLandscapeControls({
     required this.isPaused,
+    required this.completeLabel,
     required this.onMotivationSettings,
     required this.onPauseResume,
     required this.onComplete,
   });
 
   final bool isPaused;
+  final String completeLabel;
   final VoidCallback onMotivationSettings;
   final VoidCallback? onPauseResume;
   final VoidCallback? onComplete;
@@ -1148,7 +1185,7 @@ class _CompactLandscapeControls extends StatelessWidget {
         ),
         const SizedBox(height: AppSpacing.sm),
         _CompactLandscapeButton(
-          label: texts.timer.completeMealButton,
+          label: completeLabel,
           icon: Icons.check_circle_rounded,
           onPressed: onComplete,
           variant: _CompactLandscapeButtonVariant.primary,

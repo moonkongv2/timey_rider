@@ -206,21 +206,21 @@ abstract interface class UserGuideTextSet {
 }
 
 abstract interface class TimerTextSet {
-  String get courseTitle;
+  String get missionTitle;
   String get progressJustStarted;
   String get progressGoingWell;
   String get progressPastHalfway;
   String get progressAlmostThere;
   String get progressArrived;
-  String get completeDialogTitle;
-  String get completeDialogMessage;
+  String completeDialogTitle(String activityLabel);
+  String completeDialogMessage(String activityLabel);
   String get exitDialogTitle;
   String get exitDialogMessage;
   String get exitDialogCancelButton;
   String get exitDialogConfirmButton;
   String get pauseButton;
-  String get completeMealButton;
-  String get runningArrivalLabel;
+  String completeActivityButton(String activityId);
+  String get remainingTimeLabel;
   String get pausedTimeLabel;
   String get arrivedTimeLabel;
   String get idleTimeLabel;
@@ -230,7 +230,7 @@ abstract interface class TimerTextSet {
   String get finishDriveProgressMessage;
   String get finishDriveTimeLabel;
 
-  String arrivalDialogMessage(String vehicleLabel);
+  String arrivalDialogMessage(String vehicleLabel, String activityLabel);
   String remainingTime(String remaining);
   String remainingTimeSemanticLabel(String label, String remaining);
 }

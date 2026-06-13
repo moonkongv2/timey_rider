@@ -5,21 +5,31 @@ import '../text_sets.dart';
 class TimerTexts implements TimerTextSet {
   const TimerTexts();
 
-  String get courseTitle => '오늘의 냠냠코스';
+  String get missionTitle => '오늘의 미션';
   String get progressJustStarted => '출발했어요!';
   String get progressGoingWell => '잘 가고 있어요!';
   String get progressPastHalfway => '벌써 많이 왔어요!';
   String get progressAlmostThere => '거의 도착했어요!';
   String get progressArrived => '도착했어요!';
-  String get completeDialogTitle => '식사를 완료했어?';
-  String get completeDialogMessage => '오늘의 냠냠코스를 마무리할까?';
+  String completeDialogTitle(String activityLabel) => '$activityLabel 완료했어?';
+  String completeDialogMessage(String activityLabel) =>
+      '$activityLabel 미션을 마무리할까?';
   String get exitDialogTitle => '코스를 그만할까요?';
-  String get exitDialogMessage => '지금 나가면 진행 중인 냠냠코스가 저장되지 않아요.';
+  String get exitDialogMessage => '지금 나가면 진행 중인 미션이 저장되지 않아요.';
   String get exitDialogCancelButton => '계속하기';
   String get exitDialogConfirmButton => '그만하기';
   String get pauseButton => '일시정지';
-  String get completeMealButton => '식사 완료';
-  String get runningArrivalLabel => '남은 식사 시간';
+  String completeActivityButton(String activityId) {
+    return switch (activityId) {
+      'brushing' => '양치 완료',
+      'reading' => '읽기 완료',
+      'cleanup' => '정리 완료',
+      'play' => '놀이 끝',
+      _ => '미션 완료',
+    };
+  }
+
+  String get remainingTimeLabel => '남은 시간';
   String get pausedTimeLabel => '잠깐 쉬는 중';
   String get arrivedTimeLabel => '도착 완료';
   String get idleTimeLabel => '준비 중';
@@ -29,8 +39,8 @@ class TimerTexts implements TimerTextSet {
   String get finishDriveProgressMessage => '마무리하러 가고 있어요!';
   String get finishDriveTimeLabel => '마무리 중';
 
-  String arrivalDialogMessage(String vehicleLabel) {
-    return '$vehicleLabel${_subjectParticle(vehicleLabel)} 지나갔어. 식사를 마무리했어?';
+  String arrivalDialogMessage(String vehicleLabel, String activityLabel) {
+    return '$vehicleLabel${_subjectParticle(vehicleLabel)} 도착했어. $activityLabel 미션을 마쳤어?';
   }
 
   String remainingTime(String remaining) => '남은 시간 $remaining';
