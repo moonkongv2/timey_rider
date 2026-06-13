@@ -1,8 +1,8 @@
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:jy_yamyam/controllers/meal_timer_controller.dart';
-import 'package:jy_yamyam/models/active_meal_timer_session.dart';
-import 'package:jy_yamyam/models/meal_timer_config.dart';
+import 'package:ticky_rider/controllers/meal_timer_controller.dart';
+import 'package:ticky_rider/models/active_meal_timer_session.dart';
+import 'package:ticky_rider/models/meal_timer_config.dart';
 
 void main() {
   test(

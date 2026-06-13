@@ -5,7 +5,7 @@ import '../text_sets.dart';
 class CommonTexts implements CommonTextSet {
   const CommonTexts();
 
-  String get appTitle => '냠냠 라이더';
+  String get appTitle => 'Ticky Rider';
   String get apply => '적용';
   String get cancel => '취소';
   String get defaultChildName => '지율';

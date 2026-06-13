@@ -1,9 +1,9 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'package:jy_yamyam/models/active_meal_timer_session.dart';
-import 'package:jy_yamyam/models/meal_timer_config.dart';
-import 'package:jy_yamyam/services/active_meal_timer_session_store.dart';
+import 'package:ticky_rider/models/active_meal_timer_session.dart';
+import 'package:ticky_rider/models/meal_timer_config.dart';
+import 'package:ticky_rider/services/active_meal_timer_session_store.dart';
 
 void main() {
   test(

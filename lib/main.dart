@@ -18,7 +18,7 @@ Future<void> main() async {
   final initialConfig = await settingsService.loadConfig();
 
   runApp(
-    YamyamRiderApp(
+    TickyRiderApp(
       settingsService: settingsService,
       mealProgressService: mealProgressService,
       activeSessionStore: activeSessionStore,

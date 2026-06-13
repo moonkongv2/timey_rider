@@ -5,7 +5,7 @@ import '../text_sets.dart';
 class EnCommonTexts implements CommonTextSet {
   const EnCommonTexts();
 
-  String get appTitle => 'Yamyam Rider';
+  String get appTitle => 'Ticky Rider';
   String get apply => 'Apply';
   String get cancel => 'Cancel';
   String get defaultChildName => 'Jiyul';

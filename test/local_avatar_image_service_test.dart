@@ -4,7 +4,7 @@ import 'dart:typed_data';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:image/image.dart' as image;
 import 'package:image_picker/image_picker.dart';
-import 'package:jy_yamyam/services/local_avatar_image_service.dart';
+import 'package:ticky_rider/services/local_avatar_image_service.dart';
 
 void main() {
   test('Normalizes a small image into square image bytes', () {

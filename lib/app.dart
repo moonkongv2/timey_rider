@@ -12,8 +12,8 @@ import 'services/local_meal_progress_service.dart';
 import 'services/local_settings_service.dart';
 import 'theme/app_theme.dart';
 
-class YamyamRiderApp extends StatefulWidget {
-  const YamyamRiderApp({
+class TickyRiderApp extends StatefulWidget {
+  const TickyRiderApp({
     super.key,
     required this.settingsService,
     required this.mealProgressService,
@@ -27,10 +27,10 @@ class YamyamRiderApp extends StatefulWidget {
   final ActiveMealTimerSessionStore activeSessionStore;
 
   @override
-  State<YamyamRiderApp> createState() => _YamyamRiderAppState();
+  State<TickyRiderApp> createState() => _TickyRiderAppState();
 }
 
-class _YamyamRiderAppState extends State<YamyamRiderApp> {
+class _TickyRiderAppState extends State<TickyRiderApp> {
   late MealTimerConfig _config = widget.initialConfig;
   bool _showSplash = true;
 

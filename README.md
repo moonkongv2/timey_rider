@@ -1,6 +1,12 @@
-# Yamyam Rider
+# Ticky Rider
 
-Yamyam Rider is a warm, kid-friendly Flutter meal timer that turns eating into a small ride. Children choose a rider vehicle, start a meal course, and follow the character along a playful road until the meal mission is complete.
+Ticky Rider is a warm, kid-friendly Flutter routine timer that turns everyday activities into small playful rides.
+
+This repository was split from Yamyam Rider and is being converted from a meal timer into a general kids routine timer.
+
+- Ticky Rider keeps the ride-based timer, vehicles, avatars, rewards, and local progress tracking.
+- The product direction is expanding toward routines like brushing teeth, reading, cleanup, play time, and custom timers.
+- Meal-specific concepts are being renamed gradually while keeping the app runnable and localized.
 
 The app is designed around one simple goal: make mealtime pacing feel like a cozy journey instead of a plain countdown.
 
