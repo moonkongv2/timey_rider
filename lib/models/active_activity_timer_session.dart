@@ -1,12 +1,12 @@
 import 'activity_timer_config.dart';
 
-enum ActiveMealTimerSessionState { running, paused, arrived }
+enum ActiveActivityTimerSessionState { running, paused, arrived }
 
 const Object _pausedAtUnset = Object();
 const Object _lastMotivationVideoShownAtUnset = Object();
 
-class ActiveMealTimerSession {
-  const ActiveMealTimerSession({
+class ActiveActivityTimerSession {
+  const ActiveActivityTimerSession({
     required this.sessionId,
     required this.startedAt,
     required this.config,
@@ -18,7 +18,7 @@ class ActiveMealTimerSession {
     this.motivationScheduleStartedAt = Duration.zero,
   });
 
-  factory ActiveMealTimerSession.fromJson(Map<String, Object?> json) {
+  factory ActiveActivityTimerSession.fromJson(Map<String, Object?> json) {
     final sessionId = _stringFromJson(json['sessionId']);
     final startedAt = _dateTimeFromJson(json['startedAt']);
     final configJson = json['config'];
@@ -26,10 +26,10 @@ class ActiveMealTimerSession {
         sessionId.trim().isEmpty ||
         startedAt == null ||
         configJson is! Map) {
-      throw const FormatException('Invalid active meal timer session.');
+      throw const FormatException('Invalid active activity timer session.');
     }
 
-    return ActiveMealTimerSession(
+    return ActiveActivityTimerSession(
       sessionId: sessionId,
       startedAt: startedAt,
       config: _configFromJson(Map<String, Object?>.from(configJson)),
@@ -55,7 +55,7 @@ class ActiveMealTimerSession {
   final String sessionId;
   final DateTime startedAt;
   final ActivityTimerConfig config;
-  final ActiveMealTimerSessionState state;
+  final ActiveActivityTimerSessionState state;
   final Duration totalPausedDuration;
   final DateTime? pausedAt;
   final Set<int> shownMotivationMilestones;
@@ -64,16 +64,16 @@ class ActiveMealTimerSession {
 
   Duration get duration => config.duration;
 
-  ActiveMealTimerSession copyWith({
+  ActiveActivityTimerSession copyWith({
     ActivityTimerConfig? config,
-    ActiveMealTimerSessionState? state,
+    ActiveActivityTimerSessionState? state,
     Duration? totalPausedDuration,
     Object? pausedAt = _pausedAtUnset,
     Set<int>? shownMotivationMilestones,
     Object? lastMotivationVideoShownAt = _lastMotivationVideoShownAtUnset,
     Duration? motivationScheduleStartedAt,
   }) {
-    return ActiveMealTimerSession(
+    return ActiveActivityTimerSession(
       sessionId: sessionId,
       startedAt: startedAt,
       config: config ?? this.config,
@@ -192,14 +192,14 @@ ActivityTimerConfig _configFromJson(Map<String, Object?> json) {
   );
 }
 
-ActiveMealTimerSessionState _stateFromJson(Object? value) {
+ActiveActivityTimerSessionState _stateFromJson(Object? value) {
   final name = _stringFromJson(value);
-  for (final state in ActiveMealTimerSessionState.values) {
+  for (final state in ActiveActivityTimerSessionState.values) {
     if (state.name == name) {
       return state;
     }
   }
-  return ActiveMealTimerSessionState.running;
+  return ActiveActivityTimerSessionState.running;
 }
 
 AvatarImageMode _avatarModeFromJson(Object? value) {

@@ -2,21 +2,25 @@ import 'dart:convert';
 
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../models/active_meal_timer_session.dart';
+import '../models/active_activity_timer_session.dart';
 
-class ActiveMealTimerSessionStore {
-  const ActiveMealTimerSessionStore();
+class ActiveActivityTimerSessionStore {
+  const ActiveActivityTimerSessionStore();
 
-  static const _sessionKey = 'activeMealTimerSession';
+  static const _sessionKey = 'activeActivityTimerSession';
+  static const _legacySessionKey = 'activeMealTimerSession';
 
-  Future<void> save(ActiveMealTimerSession session) async {
+  Future<void> save(ActiveActivityTimerSession session) async {
     final preferences = await SharedPreferences.getInstance();
     await preferences.setString(_sessionKey, jsonEncode(session.toJson()));
+    await preferences.remove(_legacySessionKey);
   }
 
-  Future<ActiveMealTimerSession?> load() async {
+  Future<ActiveActivityTimerSession?> load() async {
     final preferences = await SharedPreferences.getInstance();
-    final rawSession = preferences.getString(_sessionKey);
+    final rawSession =
+        preferences.getString(_sessionKey) ??
+        preferences.getString(_legacySessionKey);
     if (rawSession == null || rawSession.trim().isEmpty) {
       return null;
     }
@@ -27,7 +31,7 @@ class ActiveMealTimerSessionStore {
         return null;
       }
 
-      return ActiveMealTimerSession.fromJson(
+      return ActiveActivityTimerSession.fromJson(
         Map<String, Object?>.from(decoded),
       );
     } catch (_) {
@@ -38,5 +42,6 @@ class ActiveMealTimerSessionStore {
   Future<void> clear() async {
     final preferences = await SharedPreferences.getInstance();
     await preferences.remove(_sessionKey);
+    await preferences.remove(_legacySessionKey);
   }
 }

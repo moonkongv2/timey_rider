@@ -17,7 +17,7 @@ import 'package:ticky_rider/catalogs/motivation_asset_catalog.dart';
 import 'package:ticky_rider/catalogs/vehicle_catalog.dart';
 import 'package:ticky_rider/l10n/app_texts.dart';
 import 'package:ticky_rider/main.dart' as app;
-import 'package:ticky_rider/models/active_meal_timer_session.dart';
+import 'package:ticky_rider/models/active_activity_timer_session.dart';
 import 'package:ticky_rider/models/activity_completion_status.dart';
 import 'package:ticky_rider/models/activity_session_result.dart';
 import 'package:ticky_rider/models/activity_timer_config.dart';
@@ -32,7 +32,7 @@ import 'package:ticky_rider/screens/result_screen.dart';
 import 'package:ticky_rider/screens/settings_screen.dart';
 import 'package:ticky_rider/screens/timer_screen.dart';
 import 'package:ticky_rider/screens/user_guide_screen.dart';
-import 'package:ticky_rider/services/active_meal_timer_session_store.dart';
+import 'package:ticky_rider/services/active_activity_timer_session_store.dart';
 import 'package:ticky_rider/services/avatar_image_picker.dart';
 import 'package:ticky_rider/services/local_avatar_image_service.dart';
 import 'package:ticky_rider/services/local_meal_progress_service.dart';
@@ -1585,11 +1585,11 @@ void main() {
   testWidgets('Home screen opens a saved active timer session', (tester) async {
     SharedPreferences.setMockInitialValues({});
     addTearDown(() async {
-      await const ActiveMealTimerSessionStore().clear();
+      await const ActiveActivityTimerSessionStore().clear();
     });
     final startedAt = DateTime(2026, 6, 10, 8);
     final now = startedAt.add(const Duration(minutes: 10));
-    final session = ActiveMealTimerSession(
+    final session = ActiveActivityTimerSession(
       sessionId: 'active-session',
       startedAt: startedAt,
       config: ActivityTimerConfig.defaults().copyWith(
@@ -1597,9 +1597,9 @@ void main() {
         duration: const Duration(minutes: 35),
         vehicleId: 'bus',
       ),
-      state: ActiveMealTimerSessionState.running,
+      state: ActiveActivityTimerSessionState.running,
     );
-    await const ActiveMealTimerSessionStore().save(session);
+    await const ActiveActivityTimerSessionStore().save(session);
 
     await tester.pumpWidget(
       MaterialApp(
@@ -1640,15 +1640,15 @@ void main() {
   ) async {
     SharedPreferences.setMockInitialValues({});
     addTearDown(() async {
-      await const ActiveMealTimerSessionStore().clear();
+      await const ActiveActivityTimerSessionStore().clear();
     });
     final now = DateTime(2026, 6, 10, 8, 10);
-    await const ActiveMealTimerSessionStore().save(
-      ActiveMealTimerSession(
+    await const ActiveActivityTimerSessionStore().save(
+      ActiveActivityTimerSession(
         sessionId: 'active-session',
         startedAt: DateTime(2026, 6, 10, 8),
         config: ActivityTimerConfig.defaults().copyWith(childName: '지율'),
-        state: ActiveMealTimerSessionState.running,
+        state: ActiveActivityTimerSessionState.running,
       ),
     );
 
@@ -1681,7 +1681,7 @@ void main() {
     await tester.tap(find.byType(FilledButton).last);
     await tester.pump();
 
-    expect(await const ActiveMealTimerSessionStore().load(), isNull);
+    expect(await const ActiveActivityTimerSessionStore().load(), isNull);
     await tester.pump();
     expect(find.byKey(const ValueKey('activeTimerResumeCard')), findsNothing);
   });
@@ -1691,18 +1691,18 @@ void main() {
   ) async {
     SharedPreferences.setMockInitialValues({});
     addTearDown(() async {
-      await const ActiveMealTimerSessionStore().clear();
+      await const ActiveActivityTimerSessionStore().clear();
     });
     var now = DateTime(2026, 6, 10, 8);
-    await const ActiveMealTimerSessionStore().save(
-      ActiveMealTimerSession(
+    await const ActiveActivityTimerSessionStore().save(
+      ActiveActivityTimerSession(
         sessionId: 'active-session',
         startedAt: now.subtract(Duration(minutes: 24, seconds: 50)),
         config: ActivityTimerConfig.defaults().copyWith(
           childName: '지율',
           duration: const Duration(minutes: 25),
         ),
-        state: ActiveMealTimerSessionState.running,
+        state: ActiveActivityTimerSessionState.running,
       ),
     );
 
@@ -1751,18 +1751,18 @@ void main() {
   ) async {
     SharedPreferences.setMockInitialValues({});
     addTearDown(() async {
-      await const ActiveMealTimerSessionStore().clear();
+      await const ActiveActivityTimerSessionStore().clear();
     });
     final now = DateTime(2026, 6, 10, 8);
-    await const ActiveMealTimerSessionStore().save(
-      ActiveMealTimerSession(
+    await const ActiveActivityTimerSessionStore().save(
+      ActiveActivityTimerSession(
         sessionId: 'active-session',
         startedAt: now.subtract(const Duration(minutes: 30)),
         config: ActivityTimerConfig.defaults().copyWith(
           childName: '지율',
           duration: const Duration(minutes: 25),
         ),
-        state: ActiveMealTimerSessionState.running,
+        state: ActiveActivityTimerSessionState.running,
       ),
     );
 
@@ -1793,15 +1793,15 @@ void main() {
   testWidgets('Home screen clears stale active timer sessions', (tester) async {
     SharedPreferences.setMockInitialValues({});
     addTearDown(() async {
-      await const ActiveMealTimerSessionStore().clear();
+      await const ActiveActivityTimerSessionStore().clear();
     });
     final now = DateTime(2026, 6, 10, 8);
-    await const ActiveMealTimerSessionStore().save(
-      ActiveMealTimerSession(
+    await const ActiveActivityTimerSessionStore().save(
+      ActiveActivityTimerSession(
         sessionId: 'stale-session',
         startedAt: now.subtract(const Duration(hours: 25)),
         config: ActivityTimerConfig.defaults().copyWith(childName: '지율'),
-        state: ActiveMealTimerSessionState.running,
+        state: ActiveActivityTimerSessionState.running,
       ),
     );
 
@@ -1824,7 +1824,7 @@ void main() {
     );
     await tester.pump();
 
-    expect(await const ActiveMealTimerSessionStore().load(), isNull);
+    expect(await const ActiveActivityTimerSessionStore().load(), isNull);
     expect(find.byKey(const ValueKey('activeTimerResumeCard')), findsNothing);
   });
 
@@ -1833,18 +1833,18 @@ void main() {
   ) async {
     SharedPreferences.setMockInitialValues({});
     addTearDown(() async {
-      await const ActiveMealTimerSessionStore().clear();
+      await const ActiveActivityTimerSessionStore().clear();
     });
     final now = DateTime(2026, 6, 10, 8);
-    await const ActiveMealTimerSessionStore().save(
-      ActiveMealTimerSession(
+    await const ActiveActivityTimerSessionStore().save(
+      ActiveActivityTimerSession(
         sessionId: 'finished-session',
         startedAt: now.subtract(const Duration(minutes: 30)),
         config: ActivityTimerConfig.defaults().copyWith(
           childName: '지율',
           duration: const Duration(minutes: 25),
         ),
-        state: ActiveMealTimerSessionState.running,
+        state: ActiveActivityTimerSessionState.running,
       ),
     );
 
@@ -1879,18 +1879,18 @@ void main() {
   ) async {
     SharedPreferences.setMockInitialValues({});
     addTearDown(() async {
-      await const ActiveMealTimerSessionStore().clear();
+      await const ActiveActivityTimerSessionStore().clear();
     });
     final now = DateTime(2026, 6, 10, 8, 10);
-    await const ActiveMealTimerSessionStore().save(
-      ActiveMealTimerSession(
+    await const ActiveActivityTimerSessionStore().save(
+      ActiveActivityTimerSession(
         sessionId: 'active-session',
         startedAt: DateTime(2026, 6, 10, 8),
         config: ActivityTimerConfig.defaults().copyWith(
           childName: '지율',
           duration: const Duration(minutes: 35),
         ),
-        state: ActiveMealTimerSessionState.running,
+        state: ActiveActivityTimerSessionState.running,
       ),
     );
 
@@ -1941,7 +1941,7 @@ void main() {
   ) async {
     SharedPreferences.setMockInitialValues({});
     addTearDown(() async {
-      await const ActiveMealTimerSessionStore().clear();
+      await const ActiveActivityTimerSessionStore().clear();
     });
 
     await tester.pumpWidget(
@@ -2058,7 +2058,7 @@ void main() {
   ) async {
     SharedPreferences.setMockInitialValues({});
     addTearDown(() async {
-      await const ActiveMealTimerSessionStore().clear();
+      await const ActiveActivityTimerSessionStore().clear();
     });
 
     await tester.pumpWidget(
@@ -2110,7 +2110,7 @@ void main() {
   ) async {
     SharedPreferences.setMockInitialValues({});
     addTearDown(() async {
-      await const ActiveMealTimerSessionStore().clear();
+      await const ActiveActivityTimerSessionStore().clear();
     });
 
     await tester.pumpWidget(
@@ -2160,7 +2160,7 @@ void main() {
   testWidgets('Tapping random start opens timer screen', (tester) async {
     SharedPreferences.setMockInitialValues({});
     addTearDown(() async {
-      await const ActiveMealTimerSessionStore().clear();
+      await const ActiveActivityTimerSessionStore().clear();
     });
 
     await tester.pumpWidget(
@@ -2217,7 +2217,7 @@ void main() {
     (tester) async {
       SharedPreferences.setMockInitialValues({});
       addTearDown(() async {
-        await const ActiveMealTimerSessionStore().clear();
+        await const ActiveActivityTimerSessionStore().clear();
       });
 
       await tester.pumpWidget(
@@ -2285,7 +2285,7 @@ void main() {
   ) async {
     SharedPreferences.setMockInitialValues({});
     addTearDown(() async {
-      await const ActiveMealTimerSessionStore().clear();
+      await const ActiveActivityTimerSessionStore().clear();
     });
 
     await tester.pumpWidget(
@@ -2365,7 +2365,7 @@ void main() {
   ) async {
     SharedPreferences.setMockInitialValues({});
     addTearDown(() async {
-      await const ActiveMealTimerSessionStore().clear();
+      await const ActiveActivityTimerSessionStore().clear();
     });
     ActivityTimerConfig? changedConfig;
 
@@ -2425,7 +2425,7 @@ void main() {
     (tester) async {
       SharedPreferences.setMockInitialValues({});
       addTearDown(() async {
-        await const ActiveMealTimerSessionStore().clear();
+        await const ActiveActivityTimerSessionStore().clear();
       });
       ActivityTimerConfig? changedConfig;
 
@@ -3487,7 +3487,7 @@ void main() {
   ) async {
     SharedPreferences.setMockInitialValues({});
     addTearDown(() async {
-      await const ActiveMealTimerSessionStore().clear();
+      await const ActiveActivityTimerSessionStore().clear();
     });
     ActivityTimerConfig? changedConfig;
 
@@ -5008,7 +5008,7 @@ void main() {
   ) async {
     SharedPreferences.setMockInitialValues({});
     final startedAt = DateTime(2026, 6, 10, 8);
-    final store = ActiveMealTimerSessionStore();
+    final store = ActiveActivityTimerSessionStore();
 
     await tester.pumpWidget(
       MaterialApp(
@@ -5033,7 +5033,7 @@ void main() {
     expect(session.duration, const Duration(minutes: 35));
     expect(session.config.childName, '지율');
     expect(session.config.vehicleId, 'bus');
-    expect(session.state, ActiveMealTimerSessionState.running);
+    expect(session.state, ActiveActivityTimerSessionState.running);
     expect(session.totalPausedDuration, Duration.zero);
     expect(session.pausedAt, isNull);
 
@@ -5046,7 +5046,7 @@ void main() {
   ) async {
     SharedPreferences.setMockInitialValues({});
     var now = DateTime(2026, 6, 10, 8);
-    final store = ActiveMealTimerSessionStore();
+    final store = ActiveActivityTimerSessionStore();
 
     await tester.pumpWidget(
       MaterialApp(
@@ -5072,7 +5072,7 @@ void main() {
 
     final pausedSession = await store.load();
     expect(pausedSession, isNotNull);
-    expect(pausedSession!.state, ActiveMealTimerSessionState.paused);
+    expect(pausedSession!.state, ActiveActivityTimerSessionState.paused);
     expect(pausedSession.pausedAt, now);
     expect(pausedSession.totalPausedDuration, Duration.zero);
 
@@ -5084,7 +5084,7 @@ void main() {
 
     final resumedSession = await store.load();
     expect(resumedSession, isNotNull);
-    expect(resumedSession!.state, ActiveMealTimerSessionState.running);
+    expect(resumedSession!.state, ActiveActivityTimerSessionState.running);
     expect(resumedSession.pausedAt, isNull);
     expect(resumedSession.totalPausedDuration, const Duration(minutes: 3));
 
@@ -5096,7 +5096,7 @@ void main() {
     tester,
   ) async {
     SharedPreferences.setMockInitialValues({});
-    final store = ActiveMealTimerSessionStore();
+    final store = ActiveActivityTimerSessionStore();
 
     await tester.pumpWidget(
       MaterialApp(
@@ -5129,18 +5129,18 @@ void main() {
   ) async {
     SharedPreferences.setMockInitialValues({});
     addTearDown(() async {
-      await const ActiveMealTimerSessionStore().clear();
+      await const ActiveActivityTimerSessionStore().clear();
     });
     final startedAt = DateTime(2026, 6, 10, 8);
     final now = startedAt.add(const Duration(minutes: 20));
-    final session = ActiveMealTimerSession(
+    final session = ActiveActivityTimerSession(
       sessionId: 'active-session',
       startedAt: startedAt,
       config: ActivityTimerConfig.defaults().copyWith(
         duration: const Duration(minutes: 60),
         vehicleId: 'bus',
       ),
-      state: ActiveMealTimerSessionState.running,
+      state: ActiveActivityTimerSessionState.running,
     );
 
     await tester.pumpWidget(
@@ -5175,16 +5175,16 @@ void main() {
   ) async {
     SharedPreferences.setMockInitialValues({});
     addTearDown(() async {
-      await const ActiveMealTimerSessionStore().clear();
+      await const ActiveActivityTimerSessionStore().clear();
     });
     var now = DateTime(2026, 6, 10, 8, 30);
-    final session = ActiveMealTimerSession(
+    final session = ActiveActivityTimerSession(
       sessionId: 'paused-session',
       startedAt: DateTime(2026, 6, 10, 8),
       config: ActivityTimerConfig.defaults().copyWith(
         duration: const Duration(minutes: 30),
       ),
-      state: ActiveMealTimerSessionState.paused,
+      state: ActiveActivityTimerSessionState.paused,
       pausedAt: DateTime(2026, 6, 10, 8, 10),
     );
 
@@ -5229,7 +5229,7 @@ void main() {
   ) async {
     SharedPreferences.setMockInitialValues({});
     addTearDown(() async {
-      await const ActiveMealTimerSessionStore().clear();
+      await const ActiveActivityTimerSessionStore().clear();
     });
     var now = DateTime(2026, 6, 10, 8);
 

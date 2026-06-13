@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:ticky_rider/controllers/activity_timer_controller.dart';
-import 'package:ticky_rider/models/active_meal_timer_session.dart';
+import 'package:ticky_rider/models/active_activity_timer_session.dart';
 import 'package:ticky_rider/models/activity_completion_status.dart';
 import 'package:ticky_rider/models/activity_timer_config.dart';
 
@@ -12,13 +12,13 @@ void main() {
       final startedAt = DateTime.utc(2026, 6, 10, 1, 0);
       final now = DateTime.utc(2026, 6, 10, 1, 20);
       final controller = ActivityTimerController.fromSession(
-        session: ActiveMealTimerSession(
+        session: ActiveActivityTimerSession(
           sessionId: 'session-1',
           startedAt: startedAt,
           config: ActivityTimerConfig.defaults().copyWith(
             duration: const Duration(minutes: 30),
           ),
-          state: ActiveMealTimerSessionState.running,
+          state: ActiveActivityTimerSessionState.running,
         ),
         now: () => now,
       );
@@ -37,13 +37,13 @@ void main() {
     'ActivityTimerController restores over-duration running sessions as arrived',
     () {
       final controller = ActivityTimerController.fromSession(
-        session: ActiveMealTimerSession(
+        session: ActiveActivityTimerSession(
           sessionId: 'session-2',
           startedAt: DateTime.utc(2026, 6, 10, 1, 0),
           config: ActivityTimerConfig.defaults().copyWith(
             duration: const Duration(minutes: 30),
           ),
-          state: ActiveMealTimerSessionState.running,
+          state: ActiveActivityTimerSessionState.running,
         ),
         now: () => DateTime.utc(2026, 6, 10, 1, 35),
       );
@@ -63,13 +63,13 @@ void main() {
       var now = DateTime.utc(2026, 6, 10, 1, 30);
       final pausedAt = DateTime.utc(2026, 6, 10, 1, 12);
       final controller = ActivityTimerController.fromSession(
-        session: ActiveMealTimerSession(
+        session: ActiveActivityTimerSession(
           sessionId: 'session-3',
           startedAt: DateTime.utc(2026, 6, 10, 1, 0),
           config: ActivityTimerConfig.defaults().copyWith(
             duration: const Duration(minutes: 30),
           ),
-          state: ActiveMealTimerSessionState.paused,
+          state: ActiveActivityTimerSessionState.paused,
           totalPausedDuration: const Duration(minutes: 2),
           pausedAt: pausedAt,
         ),
@@ -96,13 +96,13 @@ void main() {
     () async {
       var now = DateTime.utc(2026, 6, 10, 1, 30);
       final controller = ActivityTimerController.fromSession(
-        session: ActiveMealTimerSession(
+        session: ActiveActivityTimerSession(
           sessionId: 'session-5',
           startedAt: DateTime.utc(2026, 6, 10, 1, 0),
           config: ActivityTimerConfig.defaults().copyWith(
             duration: const Duration(minutes: 30),
           ),
-          state: ActiveMealTimerSessionState.paused,
+          state: ActiveActivityTimerSessionState.paused,
           pausedAt: DateTime.utc(2026, 6, 10, 1, 10),
         ),
         now: () => now,
@@ -148,13 +148,13 @@ void main() {
     'ActivityTimerController keeps restored arrived sessions at the finish',
     () {
       final controller = ActivityTimerController.fromSession(
-        session: ActiveMealTimerSession(
+        session: ActiveActivityTimerSession(
           sessionId: 'session-4',
           startedAt: DateTime.utc(2026, 6, 10, 1, 0),
           config: ActivityTimerConfig.defaults().copyWith(
             duration: const Duration(minutes: 30),
           ),
-          state: ActiveMealTimerSessionState.arrived,
+          state: ActiveActivityTimerSessionState.arrived,
         ),
         now: () => DateTime.utc(2026, 6, 10, 1, 20),
       );

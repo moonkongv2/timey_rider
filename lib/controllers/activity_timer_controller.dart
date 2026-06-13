@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 
-import '../models/active_meal_timer_session.dart';
+import '../models/active_activity_timer_session.dart';
 import '../models/activity_completion_status.dart';
 import '../models/activity_session_result.dart';
 import '../models/activity_timer_config.dart';
@@ -16,7 +16,7 @@ class ActivityTimerController extends ChangeNotifier {
     : _now = now ?? DateTime.now;
 
   ActivityTimerController.fromSession({
-    required ActiveMealTimerSession session,
+    required ActiveActivityTimerSession session,
     DateTime Function()? now,
   }) : config = session.config,
        _now = now ?? DateTime.now {
@@ -153,11 +153,11 @@ class ActivityTimerController extends ChangeNotifier {
     }
   }
 
-  void _restoreFromSession(ActiveMealTimerSession session) {
+  void _restoreFromSession(ActiveActivityTimerSession session) {
     _ticker?.cancel();
     _startedAt = session.startedAt;
     _totalPausedDuration = _nonNegativeDuration(session.totalPausedDuration);
-    _pausedAt = session.state == ActiveMealTimerSessionState.paused
+    _pausedAt = session.state == ActiveActivityTimerSessionState.paused
         ? session.pausedAt ?? _now()
         : null;
 
@@ -169,9 +169,9 @@ class ActivityTimerController extends ChangeNotifier {
     );
 
     _state = switch (session.state) {
-      ActiveMealTimerSessionState.paused => ActivityTimerState.paused,
-      ActiveMealTimerSessionState.arrived => ActivityTimerState.arrived,
-      ActiveMealTimerSessionState.running =>
+      ActiveActivityTimerSessionState.paused => ActivityTimerState.paused,
+      ActiveActivityTimerSessionState.arrived => ActivityTimerState.arrived,
+      ActiveActivityTimerSessionState.running =>
         _elapsed >= config.duration
             ? ActivityTimerState.arrived
             : ActivityTimerState.running,

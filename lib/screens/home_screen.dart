@@ -8,7 +8,7 @@ import '../catalogs/meal_ingredient_catalog.dart';
 import '../catalogs/meal_course_catalog.dart';
 import '../catalogs/vehicle_catalog.dart';
 import '../l10n/app_texts.dart';
-import '../models/active_meal_timer_session.dart';
+import '../models/active_activity_timer_session.dart';
 import '../models/meal_progress_snapshot.dart';
 import '../models/activity_timer_config.dart';
 import '../models/vehicle_avatar_presentation.dart';
@@ -16,7 +16,7 @@ import '../navigation/app_route_observer.dart';
 import '../models/reward_goal.dart';
 import '../models/reward_item.dart';
 import '../models/vehicle.dart';
-import '../services/active_meal_timer_session_store.dart';
+import '../services/active_activity_timer_session_store.dart';
 import '../services/local_meal_progress_service.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_radius.dart';
@@ -46,7 +46,7 @@ class HomeScreen extends StatefulWidget {
     required this.config,
     required this.mealProgressService,
     required this.onConfigChanged,
-    this.activeSessionStore = const ActiveMealTimerSessionStore(),
+    this.activeSessionStore = const ActiveActivityTimerSessionStore(),
     this.avatarImageBuilder,
     this.now,
   });
@@ -54,7 +54,7 @@ class HomeScreen extends StatefulWidget {
   final ActivityTimerConfig config;
   final LocalMealProgressService mealProgressService;
   final ValueChanged<ActivityTimerConfig> onConfigChanged;
-  final ActiveMealTimerSessionStore activeSessionStore;
+  final ActiveActivityTimerSessionStore activeSessionStore;
   final Widget Function(BuildContext context, String imagePath)?
   avatarImageBuilder;
   final DateTime Function()? now;
@@ -66,8 +66,8 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> with RouteAware {
   late ActivityTimerConfig _config = widget.config;
   late double _customMinutes = _config.duration.inMinutes.toDouble();
-  late Future<ActiveMealTimerSession?> _activeSessionFuture;
-  ActiveMealTimerSession? _activeSession;
+  late Future<ActiveActivityTimerSession?> _activeSessionFuture;
+  ActiveActivityTimerSession? _activeSession;
   Timer? _activeSessionTicker;
 
   @override
@@ -98,7 +98,7 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
 
   DateTime _now() => widget.now?.call() ?? DateTime.now();
 
-  Future<ActiveMealTimerSession?> _loadActiveSession() async {
+  Future<ActiveActivityTimerSession?> _loadActiveSession() async {
     var session = await widget.activeSessionStore.load();
     if (session != null && _isStaleActiveSession(session, now: _now())) {
       await widget.activeSessionStore.clear();
@@ -111,8 +111,8 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
     return session;
   }
 
-  void _updateActiveSessionTicker(ActiveMealTimerSession? session) {
-    if (session?.state == ActiveMealTimerSessionState.running &&
+  void _updateActiveSessionTicker(ActiveActivityTimerSession? session) {
+    if (session?.state == ActiveActivityTimerSessionState.running &&
         _remainingForActiveSession(session!, now: _now()) > Duration.zero) {
       _activeSessionTicker ??= Timer.periodic(
         const Duration(seconds: 1),
@@ -134,7 +134,7 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
       return;
     }
 
-    if (session.state != ActiveMealTimerSessionState.running ||
+    if (session.state != ActiveActivityTimerSessionState.running ||
         _remainingForActiveSession(session, now: _now()) <= Duration.zero) {
       _stopActiveSessionTicker();
     }
@@ -278,7 +278,7 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
     }
   }
 
-  Future<void> _resumeActiveTimer(ActiveMealTimerSession session) async {
+  Future<void> _resumeActiveTimer(ActiveActivityTimerSession session) async {
     await Navigator.of(context).push(
       MaterialPageRoute(
         builder: (_) => TimerScreen(
@@ -653,7 +653,7 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
                   ],
                 );
                 final activeSessionCard =
-                    FutureBuilder<ActiveMealTimerSession?>(
+                    FutureBuilder<ActiveActivityTimerSession?>(
                       future: _activeSessionFuture,
                       builder: (context, snapshot) {
                         final activeSession = snapshot.data;
@@ -771,26 +771,32 @@ class _CourseIngredientSelection {
 
 enum _ActiveTimerStartChoice { cancel, startNew }
 
-bool _isStaleActiveSession(ActiveMealTimerSession session, {DateTime? now}) {
+bool _isStaleActiveSession(
+  ActiveActivityTimerSession session, {
+  DateTime? now,
+}) {
   final currentTime = now ?? DateTime.now();
   return currentTime.difference(session.startedAt) > _activeSessionMaxAge;
 }
 
-bool _hasActiveSessionArrived(ActiveMealTimerSession session, {DateTime? now}) {
-  return session.state == ActiveMealTimerSessionState.arrived ||
+bool _hasActiveSessionArrived(
+  ActiveActivityTimerSession session, {
+  DateTime? now,
+}) {
+  return session.state == ActiveActivityTimerSessionState.arrived ||
       _remainingForActiveSession(session, now: now) <= Duration.zero;
 }
 
 Duration _remainingForActiveSession(
-  ActiveMealTimerSession session, {
+  ActiveActivityTimerSession session, {
   DateTime? now,
 }) {
-  if (session.state == ActiveMealTimerSessionState.arrived) {
+  if (session.state == ActiveActivityTimerSessionState.arrived) {
     return Duration.zero;
   }
 
   final currentTime = now ?? DateTime.now();
-  final referenceTime = session.state == ActiveMealTimerSessionState.paused
+  final referenceTime = session.state == ActiveActivityTimerSessionState.paused
       ? session.pausedAt ?? currentTime
       : currentTime;
   final elapsed =

@@ -1,16 +1,18 @@
+import 'dart:convert';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'package:ticky_rider/models/active_meal_timer_session.dart';
+import 'package:ticky_rider/models/active_activity_timer_session.dart';
 import 'package:ticky_rider/models/activity_timer_config.dart';
-import 'package:ticky_rider/services/active_meal_timer_session_store.dart';
+import 'package:ticky_rider/services/active_activity_timer_session_store.dart';
 
 void main() {
   test(
-    'Active meal timer session store saves and loads a running session',
+    'Active activity timer session store saves and loads a running session',
     () async {
       SharedPreferences.setMockInitialValues({});
-      final store = ActiveMealTimerSessionStore();
+      final store = ActiveActivityTimerSessionStore();
       final startedAt = DateTime.utc(2026, 6, 10, 1, 30);
       final config = ActivityTimerConfig.defaults().copyWith(
         duration: const Duration(minutes: 35),
@@ -33,17 +35,30 @@ void main() {
       );
 
       await store.save(
-        ActiveMealTimerSession(
+        ActiveActivityTimerSession(
           sessionId: 'session-1',
           startedAt: startedAt,
           config: config,
-          state: ActiveMealTimerSessionState.running,
+          state: ActiveActivityTimerSessionState.running,
           totalPausedDuration: const Duration(minutes: 2),
           shownMotivationMilestones: const {10, 20},
           lastMotivationVideoShownAt: const Duration(minutes: 6),
           motivationScheduleStartedAt: const Duration(minutes: 1),
         ),
       );
+
+      final preferences = await SharedPreferences.getInstance();
+      final rawSession = preferences.getString('activeActivityTimerSession');
+      expect(rawSession, isNotNull);
+      expect(preferences.getString('activeMealTimerSession'), isNull);
+      final decoded = Map<String, Object?>.from(jsonDecode(rawSession!) as Map);
+      final configJson = Map<String, Object?>.from(decoded['config'] as Map);
+      expect(configJson['markerMode'], 'manual');
+      expect(configJson['markerIds'], ['egg', 'tofu']);
+      expect(configJson['selectedMarkerIds'], ['egg', 'tofu']);
+      expect(configJson.containsKey('courseIngredientMode'), isFalse);
+      expect(configJson.containsKey('courseIngredientIds'), isFalse);
+      expect(configJson.containsKey('selectedCourseIngredientIds'), isFalse);
 
       final loadedSession = await store.load();
 
@@ -65,7 +80,7 @@ void main() {
         loadedSession.config.customAvatarConfigForVehicle('bus')?.imagePath,
         '/local/bus.png',
       );
-      expect(loadedSession.state, ActiveMealTimerSessionState.running);
+      expect(loadedSession.state, ActiveActivityTimerSessionState.running);
       expect(loadedSession.totalPausedDuration, const Duration(minutes: 2));
       expect(loadedSession.pausedAt, isNull);
       expect(loadedSession.shownMotivationMilestones, {10, 20});
@@ -81,18 +96,18 @@ void main() {
   );
 
   test(
-    'Active meal timer session store saves and loads a paused session',
+    'Active activity timer session store saves and loads a paused session',
     () async {
       SharedPreferences.setMockInitialValues({});
-      final store = ActiveMealTimerSessionStore();
+      final store = ActiveActivityTimerSessionStore();
       final pausedAt = DateTime.utc(2026, 6, 10, 1, 40);
 
       await store.save(
-        ActiveMealTimerSession(
+        ActiveActivityTimerSession(
           sessionId: 'session-2',
           startedAt: DateTime.utc(2026, 6, 10, 1, 30),
           config: ActivityTimerConfig.defaults(),
-          state: ActiveMealTimerSessionState.paused,
+          state: ActiveActivityTimerSessionState.paused,
           totalPausedDuration: const Duration(minutes: 1),
           pausedAt: pausedAt,
         ),
@@ -101,52 +116,80 @@ void main() {
       final loadedSession = await store.load();
 
       expect(loadedSession, isNotNull);
-      expect(loadedSession!.state, ActiveMealTimerSessionState.paused);
+      expect(loadedSession!.state, ActiveActivityTimerSessionState.paused);
       expect(loadedSession.pausedAt, pausedAt);
       expect(loadedSession.totalPausedDuration, const Duration(minutes: 1));
     },
   );
 
-  test('Active meal timer session copyWith can clear nullable fields', () {
-    final session = ActiveMealTimerSession(
+  test('Active activity timer session copyWith can clear nullable fields', () {
+    final session = ActiveActivityTimerSession(
       sessionId: 'session-3',
       startedAt: DateTime.utc(2026, 6, 10, 1, 30),
       config: ActivityTimerConfig.defaults(),
-      state: ActiveMealTimerSessionState.paused,
+      state: ActiveActivityTimerSessionState.paused,
       pausedAt: DateTime.utc(2026, 6, 10, 1, 35),
       lastMotivationVideoShownAt: const Duration(minutes: 3),
     );
 
     final resumedSession = session.copyWith(
-      state: ActiveMealTimerSessionState.running,
+      state: ActiveActivityTimerSessionState.running,
       pausedAt: null,
       lastMotivationVideoShownAt: null,
     );
 
-    expect(resumedSession.state, ActiveMealTimerSessionState.running);
+    expect(resumedSession.state, ActiveActivityTimerSessionState.running);
     expect(resumedSession.pausedAt, isNull);
     expect(resumedSession.lastMotivationVideoShownAt, isNull);
   });
 
-  test('Active meal timer session store ignores malformed data', () async {
+  test('Active activity timer session store ignores malformed data', () async {
     SharedPreferences.setMockInitialValues({
-      'activeMealTimerSession': '{not-json',
+      'activeActivityTimerSession': '{not-json',
     });
 
-    final loadedSession = await ActiveMealTimerSessionStore().load();
+    final loadedSession = await ActiveActivityTimerSessionStore().load();
 
     expect(loadedSession, isNull);
   });
 
-  test('Active meal timer session store clears saved data', () async {
+  test(
+    'Active activity timer session store reads legacy meal session key',
+    () async {
+      final session = ActiveActivityTimerSession(
+        sessionId: 'legacy-session',
+        startedAt: DateTime.utc(2026, 6, 10, 1, 30),
+        config: ActivityTimerConfig.defaults().copyWith(
+          markerMode: ActivityMarkerMode.manual,
+          markerIds: const ['legacy-a', 'legacy-b'],
+          selectedMarkerIds: const ['legacy-a'],
+        ),
+        state: ActiveActivityTimerSessionState.running,
+      );
+      SharedPreferences.setMockInitialValues({
+        'activeMealTimerSession': jsonEncode(session.toJson()),
+      });
+
+      final loadedSession = await const ActiveActivityTimerSessionStore()
+          .load();
+
+      expect(loadedSession, isNotNull);
+      expect(loadedSession!.sessionId, 'legacy-session');
+      expect(loadedSession.config.markerMode, ActivityMarkerMode.manual);
+      expect(loadedSession.config.markerIds, ['legacy-a', 'legacy-b']);
+      expect(loadedSession.config.selectedMarkerIds, ['legacy-a']);
+    },
+  );
+
+  test('Active activity timer session store clears saved data', () async {
     SharedPreferences.setMockInitialValues({});
-    final store = ActiveMealTimerSessionStore();
+    final store = ActiveActivityTimerSessionStore();
     await store.save(
-      ActiveMealTimerSession(
+      ActiveActivityTimerSession(
         sessionId: 'session-4',
         startedAt: DateTime.utc(2026, 6, 10, 1, 30),
         config: ActivityTimerConfig.defaults(),
-        state: ActiveMealTimerSessionState.running,
+        state: ActiveActivityTimerSessionState.running,
       ),
     );
 

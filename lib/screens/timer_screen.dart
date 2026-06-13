@@ -9,13 +9,13 @@ import '../catalogs/vehicle_catalog.dart';
 import '../controllers/activity_timer_controller.dart';
 import '../l10n/app_texts.dart';
 import '../l10n/text_sets.dart';
-import '../models/active_meal_timer_session.dart';
+import '../models/active_activity_timer_session.dart';
 import '../models/activity_completion_status.dart';
 import '../models/meal_ingredient.dart';
 import '../models/activity_session_result.dart';
 import '../models/activity_timer_config.dart';
 import '../models/vehicle_avatar_presentation.dart';
-import '../services/active_meal_timer_session_store.dart';
+import '../services/active_activity_timer_session_store.dart';
 import '../services/local_meal_progress_service.dart';
 import '../services/motivation_audio_service.dart';
 import '../services/orientation_service.dart';
@@ -160,7 +160,7 @@ class TimerScreen extends StatefulWidget {
     required this.onConfigChanged,
     this.screenAwakeService = const WakelockScreenAwakeService(),
     this.orientationService = const SystemOrientationService(),
-    this.activeSessionStore = const ActiveMealTimerSessionStore(),
+    this.activeSessionStore = const ActiveActivityTimerSessionStore(),
     this.motivationAudioService,
     this.restoredSession,
     this.now,
@@ -171,9 +171,9 @@ class TimerScreen extends StatefulWidget {
   final ValueChanged<ActivityTimerConfig> onConfigChanged;
   final ScreenAwakeService screenAwakeService;
   final OrientationService orientationService;
-  final ActiveMealTimerSessionStore activeSessionStore;
+  final ActiveActivityTimerSessionStore activeSessionStore;
   final MotivationAudioService? motivationAudioService;
-  final ActiveMealTimerSession? restoredSession;
+  final ActiveActivityTimerSession? restoredSession;
   final DateTime Function()? now;
 
   @override
@@ -708,21 +708,21 @@ class _TimerScreenState extends State<TimerScreen>
     return result.copyWith(selectedMarkerIds: _timerConfig.selectedMarkerIds);
   }
 
-  ActiveMealTimerSession? _activeSessionSnapshot() {
+  ActiveActivityTimerSession? _activeSessionSnapshot() {
     final startedAt = _controller.startedAt;
     if (startedAt == null ||
         _controller.state == ActivityTimerState.completed) {
       return null;
     }
 
-    return ActiveMealTimerSession(
+    return ActiveActivityTimerSession(
       sessionId: _activeSessionId,
       startedAt: startedAt,
       config: _timerConfig,
       state: switch (_controller.state) {
-        ActivityTimerState.paused => ActiveMealTimerSessionState.paused,
-        ActivityTimerState.arrived => ActiveMealTimerSessionState.arrived,
-        _ => ActiveMealTimerSessionState.running,
+        ActivityTimerState.paused => ActiveActivityTimerSessionState.paused,
+        ActivityTimerState.arrived => ActiveActivityTimerSessionState.arrived,
+        _ => ActiveActivityTimerSessionState.running,
       },
       totalPausedDuration: _controller.totalPausedDuration,
       pausedAt: _controller.pausedAt,
@@ -741,7 +741,7 @@ class _TimerScreenState extends State<TimerScreen>
     try {
       await widget.activeSessionStore.save(session);
     } catch (error, stackTrace) {
-      debugPrint('Unable to save active meal timer session: $error');
+      debugPrint('Unable to save active activity timer session: $error');
       debugPrintStack(stackTrace: stackTrace);
     }
   }
@@ -750,7 +750,7 @@ class _TimerScreenState extends State<TimerScreen>
     try {
       await widget.activeSessionStore.clear();
     } catch (error, stackTrace) {
-      debugPrint('Unable to clear active meal timer session: $error');
+      debugPrint('Unable to clear active activity timer session: $error');
       debugPrintStack(stackTrace: stackTrace);
     }
   }
