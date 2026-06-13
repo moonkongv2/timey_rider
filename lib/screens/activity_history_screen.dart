@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../catalogs/activity_catalog.dart';
 import '../catalogs/activity_marker_catalog.dart';
 import '../l10n/app_texts.dart';
 import '../models/activity_marker.dart';
@@ -48,8 +49,8 @@ class _ActivityHistoryScreenState extends State<ActivityHistoryScreen> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: Text(texts.mealHistory.deleteRecordDialogTitle),
-          content: Text(texts.mealHistory.deleteRecordDialogBody),
+          title: Text(texts.activityHistory.deleteRecordDialogTitle),
+          content: Text(texts.activityHistory.deleteRecordDialogBody),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(false),
@@ -57,7 +58,7 @@ class _ActivityHistoryScreenState extends State<ActivityHistoryScreen> {
             ),
             FilledButton(
               onPressed: () => Navigator.of(context).pop(true),
-              child: Text(texts.mealHistory.deleteRecordConfirmLabel),
+              child: Text(texts.activityHistory.deleteRecordConfirmLabel),
             ),
           ],
         );
@@ -75,7 +76,9 @@ class _ActivityHistoryScreenState extends State<ActivityHistoryScreen> {
     if (deleted) {
       _reloadSnapshot();
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(texts.mealHistory.deleteRecordSuccessMessage)),
+        SnackBar(
+          content: Text(texts.activityHistory.deleteRecordSuccessMessage),
+        ),
       );
     }
   }
@@ -85,7 +88,7 @@ class _ActivityHistoryScreenState extends State<ActivityHistoryScreen> {
     final texts = AppTexts.of(context);
 
     return Scaffold(
-      appBar: AppBar(title: Text(texts.mealHistory.title)),
+      appBar: AppBar(title: Text(texts.activityHistory.title)),
       body: SafeArea(
         child: FutureBuilder<ActivityProgressSnapshot>(
           future: _snapshotFuture,
@@ -95,7 +98,7 @@ class _ActivityHistoryScreenState extends State<ActivityHistoryScreen> {
               return const Center(child: CircularProgressIndicator());
             }
             if (history.isEmpty) {
-              return const _MealHistoryEmptyState();
+              return const _ActivityHistoryEmptyState();
             }
 
             return ListView.separated(
@@ -109,10 +112,10 @@ class _ActivityHistoryScreenState extends State<ActivityHistoryScreen> {
               separatorBuilder: (_, _) => const SizedBox(height: AppSpacing.md),
               itemBuilder: (context, index) {
                 if (index == 0) {
-                  return const _MealHistoryHelpCard();
+                  return const _ActivityHistoryHelpCard();
                 }
                 final entry = history[index - 1];
-                return _MealHistoryCard(
+                return _ActivityHistoryCard(
                   entry: entry,
                   onDelete: () => _confirmDeleteActivityHistoryEntry(entry),
                 );
@@ -125,13 +128,13 @@ class _ActivityHistoryScreenState extends State<ActivityHistoryScreen> {
   }
 }
 
-class _MealHistoryEmptyState extends StatelessWidget {
-  const _MealHistoryEmptyState();
+class _ActivityHistoryEmptyState extends StatelessWidget {
+  const _ActivityHistoryEmptyState();
 
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
-    final texts = AppTexts.of(context).mealHistory;
+    final texts = AppTexts.of(context).activityHistory;
 
     return Center(
       child: Padding(
@@ -140,7 +143,7 @@ class _MealHistoryEmptyState extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             const Icon(
-              Icons.restaurant_menu_rounded,
+              Icons.flag_rounded,
               size: 56,
               color: AppColors.textSecondary,
             ),
@@ -169,16 +172,16 @@ class _MealHistoryEmptyState extends StatelessWidget {
   }
 }
 
-class _MealHistoryHelpCard extends StatelessWidget {
-  const _MealHistoryHelpCard();
+class _ActivityHistoryHelpCard extends StatelessWidget {
+  const _ActivityHistoryHelpCard();
 
   @override
   Widget build(BuildContext context) {
-    final texts = AppTexts.of(context).mealHistory;
+    final texts = AppTexts.of(context).activityHistory;
     final textTheme = Theme.of(context).textTheme;
 
     return Card(
-      key: const ValueKey('mealHistoryHelpCard'),
+      key: const ValueKey('activityHistoryHelpCard'),
       color: AppColors.surfaceWarm,
       shape: RoundedRectangleBorder(borderRadius: AppRadius.card),
       child: Padding(
@@ -206,7 +209,7 @@ class _MealHistoryHelpCard extends StatelessWidget {
             ),
             const SizedBox(height: AppSpacing.md),
             for (final item in texts.helpBulletItems)
-              _MealHistoryHelpBullet(text: item),
+              _ActivityHistoryHelpBullet(text: item),
           ],
         ),
       ),
@@ -214,8 +217,8 @@ class _MealHistoryHelpCard extends StatelessWidget {
   }
 }
 
-class _MealHistoryHelpBullet extends StatelessWidget {
-  const _MealHistoryHelpBullet({required this.text});
+class _ActivityHistoryHelpBullet extends StatelessWidget {
+  const _ActivityHistoryHelpBullet({required this.text});
 
   final String text;
 
@@ -251,8 +254,8 @@ class _MealHistoryHelpBullet extends StatelessWidget {
   }
 }
 
-class _MealHistoryCard extends StatelessWidget {
-  const _MealHistoryCard({required this.entry, required this.onDelete});
+class _ActivityHistoryCard extends StatelessWidget {
+  const _ActivityHistoryCard({required this.entry, required this.onDelete});
 
   final ActivityHistoryEntry entry;
   final VoidCallback onDelete;
@@ -261,7 +264,11 @@ class _MealHistoryCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
     final texts = AppTexts.of(context);
-    final historyTexts = texts.mealHistory;
+    final historyTexts = texts.activityHistory;
+    final activity = ActivityCatalog.findById(entry.activityId);
+    final activityLabel = activity.labelForLanguage(
+      Localizations.localeOf(context).languageCode,
+    );
     final cappedActualDuration = capDuration(
       entry.actualDuration,
       entry.targetDuration,
@@ -284,8 +291,8 @@ class _MealHistoryCard extends StatelessWidget {
               children: [
                 Expanded(
                   child: Text(
-                    historyTexts.dateLabel(entry.endedAt),
-                    style: textTheme.titleMedium?.copyWith(
+                    activityLabel,
+                    style: textTheme.titleLarge?.copyWith(
                       color: AppColors.textStrong,
                       fontWeight: FontWeight.w900,
                     ),
@@ -303,6 +310,25 @@ class _MealHistoryCard extends StatelessWidget {
                   onPressed: onDelete,
                   icon: const Icon(Icons.delete_outline_rounded),
                   color: AppColors.textSecondary,
+                ),
+              ],
+            ),
+            const SizedBox(height: AppSpacing.xs),
+            Row(
+              children: [
+                Text(
+                  activity.emoji,
+                  style: const TextStyle(fontSize: 22, height: 1),
+                ),
+                const SizedBox(width: AppSpacing.sm),
+                Expanded(
+                  child: Text(
+                    historyTexts.dateLabel(entry.endedAt),
+                    style: textTheme.bodyMedium?.copyWith(
+                      color: AppColors.textSecondary,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
                 ),
               ],
             ),
@@ -333,7 +359,7 @@ class _MealHistoryCard extends StatelessWidget {
             if (selectedMarkers.isNotEmpty) ...[
               const SizedBox(height: AppSpacing.md),
               Text(
-                historyTexts.selectedIngredientLabel,
+                historyTexts.selectedMarkerLabel,
                 style: textTheme.labelLarge?.copyWith(
                   color: AppColors.textSecondary,
                   fontWeight: FontWeight.w800,
@@ -586,7 +612,7 @@ class _RewardRow extends StatelessWidget {
 
     if (rewards.isEmpty) {
       return Text(
-        texts.mealHistory.noRewardLabel,
+        texts.activityHistory.noRewardLabel,
         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
           color: AppColors.textSecondary,
           fontWeight: FontWeight.w700,

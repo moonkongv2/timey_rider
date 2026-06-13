@@ -20,7 +20,7 @@ class EnHomeTexts implements HomeTextSet {
   String get customStartButton => 'Start Custom Ride';
   String get customSheetTitle => 'Custom time';
   String get customTimerTitle => 'Custom Timer';
-  String get activitySummaryLabel => 'Activities';
+  String get activitySummaryLabel => 'Missions';
   String get stickerKindSummaryLabel => 'Kinds';
   String get stickerSummaryLabel => 'Stickers';
   String get noActivityHistory => 'No activity history yet.';
@@ -66,11 +66,14 @@ class EnHomeTexts implements HomeTextSet {
     String actualDuration,
     ActivityCompletionStatus completionStatus,
   ) {
-    final status =
-        completionStatus == ActivityCompletionStatus.needsMoreTime ||
-            completionStatus == ActivityCompletionStatus.canceled
-        ? 'incomplete'
-        : 'complete';
+    final status = switch (completionStatus) {
+      ActivityCompletionStatus.completedBeforeEnd => 'Done early',
+      ActivityCompletionStatus.completedAtEnd => 'Done on time',
+      ActivityCompletionStatus.completedAfterEnd => 'Done after time',
+      ActivityCompletionStatus.timeEnded => 'Time ended',
+      ActivityCompletionStatus.needsMoreTime => 'Needs more time',
+      ActivityCompletionStatus.canceled => 'Canceled',
+    };
     return 'Recent activity $actualDuration · $status';
   }
 }

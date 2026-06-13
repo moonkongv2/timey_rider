@@ -104,7 +104,7 @@ abstract interface class AvatarSetupTextSet {
   String get privacyNote;
 }
 
-abstract interface class MealHistoryTextSet {
+abstract interface class ActivityHistoryTextSet {
   String get title;
   String get emptyTitle;
   String get emptyBody;
@@ -115,7 +115,7 @@ abstract interface class MealHistoryTextSet {
   String get overrunTimeLabel;
   String get rewardLabel;
   String get noRewardLabel;
-  String get selectedIngredientLabel;
+  String get selectedMarkerLabel;
   String get deleteRecordLabel;
   String get deleteRecordDialogTitle;
   String get deleteRecordDialogBody;

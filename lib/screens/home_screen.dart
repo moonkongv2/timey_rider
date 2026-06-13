@@ -1500,10 +1500,10 @@ class _ProgressSummary extends StatelessWidget {
                     recent.completionStatus,
                   ),
                   if (!recent.activityCompleted)
-                    texts.mealHistory.noRewardLabel,
+                    texts.activityHistory.noRewardLabel,
                   if (!recent.activityCompleted &&
                       recentOverrun > Duration.zero)
-                    texts.mealHistory.overrunTime(
+                    texts.activityHistory.overrunTime(
                       formatDuration(recentOverrun),
                     ),
                 ].join(' · '),

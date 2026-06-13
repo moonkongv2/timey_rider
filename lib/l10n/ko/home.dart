@@ -19,7 +19,7 @@ class HomeTexts implements HomeTextSet {
   String get customStartButton => '직접 설정으로 출발';
   String get customSheetTitle => '직접 설정';
   String get customTimerTitle => '직접 설정';
-  String get activitySummaryLabel => '활동';
+  String get activitySummaryLabel => '미션';
   String get stickerKindSummaryLabel => '종류';
   String get stickerSummaryLabel => '스티커';
   String get noActivityHistory => '아직 저장된 활동 기록이 없어.';
@@ -64,12 +64,15 @@ class HomeTexts implements HomeTextSet {
     String actualDuration,
     ActivityCompletionStatus completionStatus,
   ) {
-    final status =
-        completionStatus == ActivityCompletionStatus.needsMoreTime ||
-            completionStatus == ActivityCompletionStatus.canceled
-        ? '미완료'
-        : '완료';
-    return '최근 활동 $actualDuration · $status';
+    final status = switch (completionStatus) {
+      ActivityCompletionStatus.completedBeforeEnd => '시간 전에 완료',
+      ActivityCompletionStatus.completedAtEnd => '시간에 맞춰 완료',
+      ActivityCompletionStatus.completedAfterEnd => '조금 더 하고 완료',
+      ActivityCompletionStatus.timeEnded => '시간 종료',
+      ActivityCompletionStatus.needsMoreTime => '조금 더 필요',
+      ActivityCompletionStatus.canceled => '취소됨',
+    };
+    return '최근 기록 $actualDuration · $status';
   }
 }
 

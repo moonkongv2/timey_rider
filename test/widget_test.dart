@@ -6678,7 +6678,7 @@ void main() {
     expect(historyJson.containsKey('selectedIngredientIds'), isFalse);
   });
 
-  test('Deleting meal history removes only the saved record', () async {
+  test('Deleting activity history removes only the saved record', () async {
     SharedPreferences.setMockInitialValues({});
 
     final service = LocalActivityProgressService();
@@ -6719,7 +6719,7 @@ void main() {
   });
 
   test(
-    'Deleting missing meal history entry leaves records unchanged',
+    'Deleting missing activity history entry leaves records unchanged',
     () async {
       SharedPreferences.setMockInitialValues({});
 
@@ -7077,13 +7077,16 @@ void main() {
     await tester.drag(find.byType(ListView), const Offset(0, -700));
     await tester.pumpAndSettle();
 
-    expect(find.text('Recent activity 20:00 · complete'), findsOneWidget);
+    expect(
+      find.text('Recent activity 20:00 · Done after time'),
+      findsOneWidget,
+    );
 
     await tester.tap(find.text("Jiyul's activity history"));
     await tester.pumpAndSettle();
 
     expect(find.byType(ActivityHistoryScreen), findsOneWidget);
-    expect(find.text('Meal Records'), findsOneWidget);
+    expect(find.text('Activity Records'), findsOneWidget);
   });
 
   testWidgets('Home activity history summary shows incomplete status', (
@@ -7116,7 +7119,10 @@ void main() {
     await tester.drag(find.byType(ListView), const Offset(0, -700));
     await tester.pumpAndSettle();
 
-    expect(find.text('최근 활동 20:00 · 미완료 · 스티커 없음 · 초과 +05:00'), findsOneWidget);
+    expect(
+      find.text('최근 기록 20:00 · 조금 더 필요 · 스티커 없음 · 초과 +05:00'),
+      findsOneWidget,
+    );
   });
 
   testWidgets('Reward goal creation form saves a goal', (tester) async {
@@ -7186,7 +7192,7 @@ void main() {
     expect(snapshot.usedRewardGoals, hasLength(1));
   });
 
-  testWidgets('Meal history screen shows empty state', (tester) async {
+  testWidgets('Activity history screen shows empty state', (tester) async {
     SharedPreferences.setMockInitialValues({});
 
     await tester.pumpWidget(
@@ -7201,12 +7207,14 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    expect(find.text('식사 기록'), findsOneWidget);
-    expect(find.text('아직 식사 기록이 없어요'), findsOneWidget);
-    expect(find.text('타이머를 완료하면 기록이 여기에 쌓여요.'), findsOneWidget);
+    expect(find.text('활동 기록'), findsOneWidget);
+    expect(find.text('아직 저장된 활동 기록이 없어.'), findsOneWidget);
+    expect(find.text('미션 타이머를 마치면 기록이 여기에 쌓여요.'), findsOneWidget);
   });
 
-  testWidgets('Meal history screen lists saved meal records', (tester) async {
+  testWidgets('Activity history screen lists saved activity records', (
+    tester,
+  ) async {
     SharedPreferences.setMockInitialValues({});
     final service = LocalActivityProgressService();
     await service.recordActivityResult(
@@ -7228,18 +7236,20 @@ void main() {
     );
     await tester.pumpAndSettle();
 
+    expect(find.text('양치'), findsOneWidget);
+    expect(find.text('🪥'), findsOneWidget);
     expect(find.textContaining('12:25'), findsOneWidget);
     expect(find.text('목표'), findsOneWidget);
     expect(find.text('20:00'), findsNWidgets(2));
     expect(find.text('실제'), findsOneWidget);
     expect(find.text('25:00'), findsNothing);
     expect(find.text('초과 +05:00'), findsNothing);
-    expect(find.text('완료'), findsOneWidget);
+    expect(find.text('조금 더 하고 완료'), findsOneWidget);
     expect(find.text('받은 스티커'), findsOneWidget);
-    expect(find.text('고른 식재료'), findsNothing);
+    expect(find.text('고른 마커'), findsNothing);
   });
 
-  testWidgets('Meal history screen deletes a record after confirmation', (
+  testWidgets('Activity history screen deletes a record after confirmation', (
     tester,
   ) async {
     SharedPreferences.setMockInitialValues({});
@@ -7271,19 +7281,19 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    expect(find.text('이 식사 기록을 삭제할까요?'), findsOneWidget);
+    expect(find.text('이 활동 기록을 삭제할까요?'), findsOneWidget);
     expect(find.text('기록만 삭제되고 받은 스티커는 유지돼요.'), findsOneWidget);
 
     await tester.tap(find.text('삭제'));
     await tester.pumpAndSettle();
 
-    expect(find.text('식사 기록을 삭제했어요.'), findsOneWidget);
+    expect(find.text('활동 기록을 삭제했어요.'), findsOneWidget);
     expect(find.textContaining('12:25'), findsNothing);
-    expect(find.text('아직 식사 기록이 없어요'), findsOneWidget);
+    expect(find.text('아직 저장된 활동 기록이 없어.'), findsOneWidget);
     expect((await service.loadSnapshot()).history, isEmpty);
   });
 
-  testWidgets('Meal history delete dialog can be canceled', (tester) async {
+  testWidgets('Activity history delete dialog can be canceled', (tester) async {
     SharedPreferences.setMockInitialValues({});
     final service = LocalActivityProgressService();
     final recordedSession = await service.recordActivityResult(
@@ -7317,7 +7327,7 @@ void main() {
     expect((await service.loadSnapshot()).history, hasLength(1));
   });
 
-  testWidgets('Meal history screen shows directly selected markers', (
+  testWidgets('Activity history screen shows directly selected markers', (
     tester,
   ) async {
     SharedPreferences.setMockInitialValues({});
@@ -7341,14 +7351,17 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    expect(find.byKey(const ValueKey('mealHistoryHelpCard')), findsOneWidget);
-    expect(find.text('식사 기록 안내'), findsOneWidget);
-    expect(find.text('고른 식재료'), findsOneWidget);
+    expect(
+      find.byKey(const ValueKey('activityHistoryHelpCard')),
+      findsOneWidget,
+    );
+    expect(find.text('활동 기록 안내'), findsOneWidget);
+    expect(find.text('고른 마커'), findsOneWidget);
     expect(find.text('윗니'), findsOneWidget);
     expect(find.text('아랫니'), findsOneWidget);
   });
 
-  testWidgets('Meal history screen shows incomplete meal records', (
+  testWidgets('Activity history screen shows needs-more-time records', (
     tester,
   ) async {
     SharedPreferences.setMockInitialValues({});
@@ -7373,7 +7386,7 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    expect(find.text('미완료'), findsOneWidget);
+    expect(find.text('조금 더 필요'), findsOneWidget);
     expect(find.text('스티커 없음'), findsOneWidget);
     expect(find.text('초과 +05:00'), findsOneWidget);
   });

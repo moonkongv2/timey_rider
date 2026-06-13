@@ -4,7 +4,7 @@ import 'en/common.dart';
 import 'en/avatar_setup.dart';
 import 'en/home.dart';
 import 'en/meal_ingredient.dart';
-import 'en/meal_history.dart';
+import 'en/activity_history.dart';
 import 'en/result.dart';
 import 'en/rewards.dart';
 import 'en/settings.dart';
@@ -14,7 +14,7 @@ import 'ko/common.dart';
 import 'ko/avatar_setup.dart';
 import 'ko/home.dart';
 import 'ko/meal_ingredient.dart';
-import 'ko/meal_history.dart';
+import 'ko/activity_history.dart';
 import 'ko/result.dart';
 import 'ko/rewards.dart';
 import 'ko/settings.dart';
@@ -28,7 +28,7 @@ class AppTextBundle {
     required this.common,
     required this.home,
     required this.mealIngredient,
-    required this.mealHistory,
+    required this.activityHistory,
     required this.result,
     required this.rewards,
     required this.settings,
@@ -40,7 +40,7 @@ class AppTextBundle {
   final CommonTextSet common;
   final HomeTextSet home;
   final MealIngredientTextSet mealIngredient;
-  final MealHistoryTextSet mealHistory;
+  final ActivityHistoryTextSet activityHistory;
   final ResultTextSet result;
   final RewardTextSet rewards;
   final SettingsTextSet settings;
@@ -56,7 +56,7 @@ abstract final class AppTexts {
     common: CommonTexts(),
     home: HomeTexts(),
     mealIngredient: MealIngredientTexts(),
-    mealHistory: MealHistoryTexts(),
+    activityHistory: ActivityHistoryTexts(),
     result: ResultTexts(),
     rewards: RewardTexts(),
     settings: SettingsTexts(),
@@ -69,7 +69,7 @@ abstract final class AppTexts {
     common: EnCommonTexts(),
     home: EnHomeTexts(),
     mealIngredient: EnMealIngredientTexts(),
-    mealHistory: EnMealHistoryTexts(),
+    activityHistory: EnActivityHistoryTexts(),
     result: EnResultTexts(),
     rewards: EnRewardTexts(),
     settings: EnSettingsTexts(),
