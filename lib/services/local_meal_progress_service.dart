@@ -199,6 +199,25 @@ class LocalMealProgressService {
     await preferences.remove(_activeRewardGoalsKey);
   }
 
+  Future<bool> deleteMealHistoryEntry(String entryId) async {
+    final preferences = await SharedPreferences.getInstance();
+    final history = _decodeList(
+      preferences.getStringList(_historyKey),
+      MealHistoryEntry.fromJson,
+    ).toList();
+    final index = history.indexWhere((entry) => entry.id == entryId);
+    if (index == -1) {
+      return false;
+    }
+
+    history.removeAt(index);
+    await preferences.setStringList(
+      _historyKey,
+      history.map((entry) => jsonEncode(entry.toJson())).toList(),
+    );
+    return true;
+  }
+
   Future<RecordedMealSession> recordMealResult(MealSessionResult result) async {
     final preferences = await SharedPreferences.getInstance();
     final history = _decodeList(

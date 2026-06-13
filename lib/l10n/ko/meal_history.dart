@@ -22,6 +22,11 @@ class MealHistoryTexts implements MealHistoryTextSet {
   String get rewardLabel => '받은 스티커';
   String get noRewardLabel => '스티커 없음';
   String get selectedIngredientLabel => '고른 식재료';
+  String get deleteRecordLabel => '식사 기록 삭제';
+  String get deleteRecordDialogTitle => '이 식사 기록을 삭제할까요?';
+  String get deleteRecordDialogBody => '기록만 삭제되고 받은 스티커는 유지돼요.';
+  String get deleteRecordConfirmLabel => '삭제';
+  String get deleteRecordSuccessMessage => '식사 기록을 삭제했어요.';
 
   String completedStatus(MealCompletionStatus completionStatus) {
     return completionStatus == MealCompletionStatus.notCompleted ? '미완료' : '완료';

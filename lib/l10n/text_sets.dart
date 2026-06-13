@@ -114,6 +114,11 @@ abstract interface class MealHistoryTextSet {
   String get rewardLabel;
   String get noRewardLabel;
   String get selectedIngredientLabel;
+  String get deleteRecordLabel;
+  String get deleteRecordDialogTitle;
+  String get deleteRecordDialogBody;
+  String get deleteRecordConfirmLabel;
+  String get deleteRecordSuccessMessage;
 
   String completedStatus(MealCompletionStatus completionStatus);
   String dateLabel(DateTime dateTime);

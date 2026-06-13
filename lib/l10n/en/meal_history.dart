@@ -22,6 +22,12 @@ class EnMealHistoryTexts implements MealHistoryTextSet {
   String get rewardLabel => 'Stickers earned';
   String get noRewardLabel => 'No stickers';
   String get selectedIngredientLabel => 'Chosen ingredients';
+  String get deleteRecordLabel => 'Delete meal record';
+  String get deleteRecordDialogTitle => 'Delete this meal record?';
+  String get deleteRecordDialogBody =>
+      'Only the record will be removed. Earned stickers will stay.';
+  String get deleteRecordConfirmLabel => 'Delete';
+  String get deleteRecordSuccessMessage => 'Meal record deleted.';
 
   String completedStatus(MealCompletionStatus completionStatus) {
     return completionStatus == MealCompletionStatus.notCompleted

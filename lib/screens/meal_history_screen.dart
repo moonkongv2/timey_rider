@@ -13,10 +13,68 @@ import '../theme/app_spacing.dart';
 import '../utils/duration_format.dart';
 import '../widgets/reward_sticker_image.dart';
 
-class MealHistoryScreen extends StatelessWidget {
+class MealHistoryScreen extends StatefulWidget {
   const MealHistoryScreen({super.key, required this.mealProgressService});
 
   final LocalMealProgressService mealProgressService;
+
+  @override
+  State<MealHistoryScreen> createState() => _MealHistoryScreenState();
+}
+
+class _MealHistoryScreenState extends State<MealHistoryScreen> {
+  late Future<MealProgressSnapshot> _snapshotFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    _snapshotFuture = widget.mealProgressService.loadSnapshot();
+  }
+
+  void _reloadSnapshot() {
+    setState(() {
+      _snapshotFuture = widget.mealProgressService.loadSnapshot();
+    });
+  }
+
+  Future<void> _confirmDeleteMealHistoryEntry(MealHistoryEntry entry) async {
+    final texts = AppTexts.of(context);
+    final shouldDelete = await showDialog<bool>(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text(texts.mealHistory.deleteRecordDialogTitle),
+          content: Text(texts.mealHistory.deleteRecordDialogBody),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: Text(texts.common.cancel),
+            ),
+            FilledButton(
+              onPressed: () => Navigator.of(context).pop(true),
+              child: Text(texts.mealHistory.deleteRecordConfirmLabel),
+            ),
+          ],
+        );
+      },
+    );
+    if (shouldDelete != true) {
+      return;
+    }
+
+    final deleted = await widget.mealProgressService.deleteMealHistoryEntry(
+      entry.id,
+    );
+    if (!mounted) {
+      return;
+    }
+    if (deleted) {
+      _reloadSnapshot();
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(texts.mealHistory.deleteRecordSuccessMessage)),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -26,7 +84,7 @@ class MealHistoryScreen extends StatelessWidget {
       appBar: AppBar(title: Text(texts.mealHistory.title)),
       body: SafeArea(
         child: FutureBuilder<MealProgressSnapshot>(
-          future: mealProgressService.loadSnapshot(),
+          future: _snapshotFuture,
           builder: (context, snapshot) {
             final history = snapshot.data?.history ?? const [];
             if (!snapshot.hasData) {
@@ -49,7 +107,11 @@ class MealHistoryScreen extends StatelessWidget {
                 if (index == 0) {
                   return const _MealHistoryHelpCard();
                 }
-                return _MealHistoryCard(entry: history[index - 1]);
+                final entry = history[index - 1];
+                return _MealHistoryCard(
+                  entry: entry,
+                  onDelete: () => _confirmDeleteMealHistoryEntry(entry),
+                );
               },
             );
           },
@@ -186,9 +248,10 @@ class _MealHistoryHelpBullet extends StatelessWidget {
 }
 
 class _MealHistoryCard extends StatelessWidget {
-  const _MealHistoryCard({required this.entry});
+  const _MealHistoryCard({required this.entry, required this.onDelete});
 
   final MealHistoryEntry entry;
+  final VoidCallback onDelete;
 
   @override
   Widget build(BuildContext context) {
@@ -228,6 +291,14 @@ class _MealHistoryCard extends StatelessWidget {
                 _StatusChip(
                   label: historyTexts.completedStatus(entry.completionStatus),
                   isIncomplete: !entry.mealCompleted,
+                ),
+                const SizedBox(width: AppSpacing.xs),
+                IconButton(
+                  key: ValueKey('deleteMealHistoryEntry-${entry.id}'),
+                  tooltip: historyTexts.deleteRecordLabel,
+                  onPressed: onDelete,
+                  icon: const Icon(Icons.delete_outline_rounded),
+                  color: AppColors.textSecondary,
                 ),
               ],
             ),

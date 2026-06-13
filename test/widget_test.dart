@@ -6477,6 +6477,60 @@ void main() {
     expect(snapshot.history.single.selectedIngredientIds, ['carrot', 'egg']);
   });
 
+  test('Deleting meal history removes only the saved record', () async {
+    SharedPreferences.setMockInitialValues({});
+
+    final service = LocalMealProgressService();
+    await service.createRewardGoal(
+      requiredStickerCount: 2,
+      rewardText: '아이스크림',
+    );
+    final recordedSession = await service.recordMealResult(_mealResult());
+    final beforeDelete = await service.loadSnapshot();
+
+    expect(beforeDelete.history, hasLength(1));
+    expect(beforeDelete.inventory, isNotEmpty);
+    expect(beforeDelete.activeRewardGoals.single.filledCount, 1);
+
+    final deleted = await service.deleteMealHistoryEntry(
+      recordedSession.entry.id,
+    );
+    final afterDelete = await service.loadSnapshot();
+
+    expect(deleted, isTrue);
+    expect(afterDelete.history, isEmpty);
+    expect(afterDelete.inventory, hasLength(beforeDelete.inventory.length));
+    expect(
+      afterDelete.inventory.single.rewardId,
+      beforeDelete.inventory.single.rewardId,
+    );
+    expect(
+      afterDelete.inventory.single.count,
+      beforeDelete.inventory.single.count,
+    );
+    expect(afterDelete.activeRewardGoals.single.filledCount, 1);
+    expect(
+      afterDelete.activeRewardGoals.single.filledSlots.single.mealSessionId,
+      recordedSession.entry.id,
+    );
+  });
+
+  test(
+    'Deleting missing meal history entry leaves records unchanged',
+    () async {
+      SharedPreferences.setMockInitialValues({});
+
+      final service = LocalMealProgressService();
+      await service.recordMealResult(_mealResult());
+
+      final deleted = await service.deleteMealHistoryEntry('missing-meal');
+      final snapshot = await service.loadSnapshot();
+
+      expect(deleted, isFalse);
+      expect(snapshot.history, hasLength(1));
+    },
+  );
+
   test('Completed meal fills exactly one active reward goal slot', () async {
     SharedPreferences.setMockInitialValues({});
 
@@ -6970,6 +7024,84 @@ void main() {
     expect(find.text('완료'), findsOneWidget);
     expect(find.text('받은 스티커'), findsOneWidget);
     expect(find.text('고른 식재료'), findsNothing);
+  });
+
+  testWidgets('Meal history screen deletes a record after confirmation', (
+    tester,
+  ) async {
+    SharedPreferences.setMockInitialValues({});
+    final service = LocalMealProgressService();
+    final recordedSession = await service.recordMealResult(
+      _mealResult(
+        startedAt: DateTime(2026, 5, 4, 12),
+        targetDuration: const Duration(minutes: 20),
+        actualDuration: const Duration(minutes: 25),
+      ),
+    );
+
+    await tester.pumpWidget(
+      MaterialApp(
+        locale: const Locale('ko'),
+        localizationsDelegates: GlobalMaterialLocalizations.delegates,
+        supportedLocales: AppTexts.supportedLocales,
+        home: MealHistoryScreen(mealProgressService: service),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.textContaining('12:25'), findsOneWidget);
+
+    await tester.tap(
+      find.byKey(
+        ValueKey('deleteMealHistoryEntry-${recordedSession.entry.id}'),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('이 식사 기록을 삭제할까요?'), findsOneWidget);
+    expect(find.text('기록만 삭제되고 받은 스티커는 유지돼요.'), findsOneWidget);
+
+    await tester.tap(find.text('삭제'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('식사 기록을 삭제했어요.'), findsOneWidget);
+    expect(find.textContaining('12:25'), findsNothing);
+    expect(find.text('아직 식사 기록이 없어요'), findsOneWidget);
+    expect((await service.loadSnapshot()).history, isEmpty);
+  });
+
+  testWidgets('Meal history delete dialog can be canceled', (tester) async {
+    SharedPreferences.setMockInitialValues({});
+    final service = LocalMealProgressService();
+    final recordedSession = await service.recordMealResult(
+      _mealResult(
+        startedAt: DateTime(2026, 5, 4, 12),
+        targetDuration: const Duration(minutes: 20),
+        actualDuration: const Duration(minutes: 25),
+      ),
+    );
+
+    await tester.pumpWidget(
+      MaterialApp(
+        locale: const Locale('ko'),
+        localizationsDelegates: GlobalMaterialLocalizations.delegates,
+        supportedLocales: AppTexts.supportedLocales,
+        home: MealHistoryScreen(mealProgressService: service),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(
+      find.byKey(
+        ValueKey('deleteMealHistoryEntry-${recordedSession.entry.id}'),
+      ),
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('취소'));
+    await tester.pumpAndSettle();
+
+    expect(find.textContaining('12:25'), findsOneWidget);
+    expect((await service.loadSnapshot()).history, hasLength(1));
   });
 
   testWidgets('Meal history screen shows directly selected ingredients', (
