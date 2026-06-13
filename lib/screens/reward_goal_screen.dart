@@ -1,26 +1,26 @@
 import 'package:flutter/material.dart';
 
 import '../l10n/app_texts.dart';
-import '../models/meal_progress_snapshot.dart';
+import '../models/activity_progress_snapshot.dart';
 import '../models/reward_goal.dart';
 import '../models/reward_item.dart';
-import '../services/local_meal_progress_service.dart';
+import '../services/local_activity_progress_service.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_radius.dart';
 import '../theme/app_spacing.dart';
 import '../widgets/reward_sticker_image.dart';
 
 class RewardGoalScreen extends StatefulWidget {
-  const RewardGoalScreen({super.key, required this.mealProgressService});
+  const RewardGoalScreen({super.key, required this.activityProgressService});
 
-  final LocalMealProgressService mealProgressService;
+  final LocalActivityProgressService activityProgressService;
 
   @override
   State<RewardGoalScreen> createState() => _RewardGoalScreenState();
 }
 
 class _RewardGoalScreenState extends State<RewardGoalScreen> {
-  late Future<MealProgressSnapshot> _snapshotFuture;
+  late Future<ActivityProgressSnapshot> _snapshotFuture;
   final TextEditingController _rewardTextController = TextEditingController();
   int _requiredStickerCount = 5;
   bool _isSaving = false;
@@ -29,7 +29,7 @@ class _RewardGoalScreenState extends State<RewardGoalScreen> {
   @override
   void initState() {
     super.initState();
-    _snapshotFuture = widget.mealProgressService.loadSnapshot();
+    _snapshotFuture = widget.activityProgressService.loadSnapshot();
     _rewardTextController.addListener(_handleRewardTextChanged);
   }
 
@@ -46,7 +46,7 @@ class _RewardGoalScreenState extends State<RewardGoalScreen> {
 
   void _refresh() {
     setState(() {
-      _snapshotFuture = widget.mealProgressService.loadSnapshot();
+      _snapshotFuture = widget.activityProgressService.loadSnapshot();
     });
   }
 
@@ -89,7 +89,7 @@ class _RewardGoalScreenState extends State<RewardGoalScreen> {
     final texts = AppTexts.of(context);
     setState(() => _isSaving = true);
     try {
-      await widget.mealProgressService.createRewardGoal(
+      await widget.activityProgressService.createRewardGoal(
         requiredStickerCount: _requiredStickerCount,
         rewardText: rewardText,
       );
@@ -118,7 +118,7 @@ class _RewardGoalScreenState extends State<RewardGoalScreen> {
     final texts = AppTexts.of(context);
     setState(() => _isSaving = true);
     try {
-      await widget.mealProgressService.updateActiveRewardGoal(
+      await widget.activityProgressService.updateActiveRewardGoal(
         goalId: editingGoal.id,
         requiredStickerCount: _requiredStickerCount,
         rewardText: rewardText,
@@ -157,7 +157,7 @@ class _RewardGoalScreenState extends State<RewardGoalScreen> {
     final texts = AppTexts.of(context);
     setState(() => _isSaving = true);
     try {
-      final usedGoal = await widget.mealProgressService.useEarnedRewardGoal(
+      final usedGoal = await widget.activityProgressService.useEarnedRewardGoal(
         goalId: goal.id,
       );
       if (mounted && usedGoal != null) {
@@ -195,7 +195,7 @@ class _RewardGoalScreenState extends State<RewardGoalScreen> {
 
     setState(() => _isSaving = true);
     try {
-      final canceledGoal = await widget.mealProgressService
+      final canceledGoal = await widget.activityProgressService
           .cancelActiveRewardGoal(goalId: goal.id);
       if (mounted && canceledGoal != null) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -253,7 +253,7 @@ class _RewardGoalScreenState extends State<RewardGoalScreen> {
     return Scaffold(
       appBar: AppBar(title: Text(texts.rewards.rewardGoalTitle)),
       body: SafeArea(
-        child: FutureBuilder<MealProgressSnapshot>(
+        child: FutureBuilder<ActivityProgressSnapshot>(
           future: _snapshotFuture,
           builder: (context, snapshot) {
             final activeGoals =
@@ -265,7 +265,7 @@ class _RewardGoalScreenState extends State<RewardGoalScreen> {
             final editingGoal = _editingGoal;
             final canCreate =
                 activeGoals.length <
-                    LocalMealProgressService.maxActiveRewardGoals &&
+                    LocalActivityProgressService.maxActiveRewardGoals &&
                 editingGoal == null;
 
             return ListView(

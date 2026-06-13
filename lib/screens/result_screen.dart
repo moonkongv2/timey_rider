@@ -5,12 +5,12 @@ import 'package:video_player/video_player.dart';
 
 import '../l10n/app_texts.dart';
 import '../l10n/text_sets.dart';
-import '../models/meal_progress_snapshot.dart';
+import '../models/activity_progress_snapshot.dart';
 import '../models/activity_session_result.dart';
 import '../models/activity_timer_config.dart';
 import '../models/reward_goal.dart';
 import '../models/reward_item.dart';
-import '../services/local_meal_progress_service.dart';
+import '../services/local_activity_progress_service.dart';
 import '../services/orientation_service.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_radius.dart';
@@ -101,7 +101,7 @@ class ResultScreen extends StatefulWidget {
     super.key,
     required this.result,
     required this.config,
-    required this.mealProgressService,
+    required this.activityProgressService,
     required this.onConfigChanged,
     this.introControllerFactory,
     this.orientationService = const SystemOrientationService(),
@@ -109,7 +109,7 @@ class ResultScreen extends StatefulWidget {
 
   final ActivitySessionResult result;
   final ActivityTimerConfig config;
-  final LocalMealProgressService mealProgressService;
+  final LocalActivityProgressService activityProgressService;
   final ValueChanged<ActivityTimerConfig> onConfigChanged;
   final ResultIntroControllerFactory? introControllerFactory;
   final OrientationService orientationService;
@@ -122,7 +122,7 @@ class _ResultScreenState extends State<ResultScreen> {
   static const _successImagePath = 'assets/images/result_success.png';
 
   VideoPlayerController? _introController;
-  late final Future<RecordedMealSession> _recordedSession;
+  late final Future<RecordedActivitySession> _recordedSession;
   bool _introFinished = false;
   bool _introFallback = false;
   bool _handoffOrientation = false;
@@ -131,7 +131,7 @@ class _ResultScreenState extends State<ResultScreen> {
   void initState() {
     super.initState();
     unawaited(widget.orientationService.allowMealFlowOrientations());
-    _recordedSession = widget.mealProgressService.recordMealResult(
+    _recordedSession = widget.activityProgressService.recordActivityResult(
       widget.result,
     );
     if (!widget.result.activityCompleted) {
@@ -210,7 +210,7 @@ class _ResultScreenState extends State<ResultScreen> {
       MaterialPageRoute(
         builder: (_) => TimerScreen(
           config: widget.config,
-          mealProgressService: widget.mealProgressService,
+          activityProgressService: widget.activityProgressService,
           onConfigChanged: widget.onConfigChanged,
           orientationService: widget.orientationService,
         ),
@@ -262,7 +262,7 @@ class _ResultScreenState extends State<ResultScreen> {
                     return _CompactLandscapeResultLayout(
                       mealCompleted: mealCompleted,
                       recordedSession: _recordedSession,
-                      mealProgressService: widget.mealProgressService,
+                      activityProgressService: widget.activityProgressService,
                       orientationService: widget.orientationService,
                       failureRiderAssetPath: failureRiderAssetPath,
                       vehicleId: widget.config.vehicleId,
@@ -314,7 +314,7 @@ class _ResultScreenState extends State<ResultScreen> {
                                             ? AppSpacing.lg
                                             : AppSpacing.xl,
                                       ),
-                                      FutureBuilder<RecordedMealSession>(
+                                      FutureBuilder<RecordedActivitySession>(
                                         future: _recordedSession,
                                         builder: (context, snapshot) {
                                           final recordedSession = snapshot.data;
@@ -341,8 +341,8 @@ class _ResultScreenState extends State<ResultScreen> {
                                                       .updatedRewardGoals,
                                                   earnedGoals: recordedSession
                                                       .earnedRewardGoals,
-                                                  mealProgressService: widget
-                                                      .mealProgressService,
+                                                  activityProgressService: widget
+                                                      .activityProgressService,
                                                   orientationService:
                                                       widget.orientationService,
                                                 ),
@@ -631,7 +631,7 @@ class _CompactLandscapeResultLayout extends StatelessWidget {
   const _CompactLandscapeResultLayout({
     required this.mealCompleted,
     required this.recordedSession,
-    required this.mealProgressService,
+    required this.activityProgressService,
     required this.orientationService,
     required this.failureRiderAssetPath,
     required this.vehicleId,
@@ -640,8 +640,8 @@ class _CompactLandscapeResultLayout extends StatelessWidget {
   });
 
   final bool mealCompleted;
-  final Future<RecordedMealSession> recordedSession;
-  final LocalMealProgressService mealProgressService;
+  final Future<RecordedActivitySession> recordedSession;
+  final LocalActivityProgressService activityProgressService;
   final OrientationService orientationService;
   final String failureRiderAssetPath;
   final String vehicleId;
@@ -667,7 +667,7 @@ class _CompactLandscapeResultLayout extends StatelessWidget {
               Expanded(
                 flex: 5,
                 child: mealCompleted
-                    ? FutureBuilder<RecordedMealSession>(
+                    ? FutureBuilder<RecordedActivitySession>(
                         future: recordedSession,
                         builder: (context, snapshot) {
                           final recordedSession = snapshot.data;
@@ -694,7 +694,8 @@ class _CompactLandscapeResultLayout extends StatelessWidget {
                                           recordedSession.updatedRewardGoals,
                                       earnedGoals:
                                           recordedSession.earnedRewardGoals,
-                                      mealProgressService: mealProgressService,
+                                      activityProgressService:
+                                          activityProgressService,
                                       orientationService: orientationService,
                                       isCompact: true,
                                     ),
@@ -845,14 +846,14 @@ class _RewardGoalResultBox extends StatelessWidget {
   const _RewardGoalResultBox({
     required this.updatedGoals,
     required this.earnedGoals,
-    required this.mealProgressService,
+    required this.activityProgressService,
     required this.orientationService,
     this.isCompact = false,
   });
 
   final List<RewardGoal> updatedGoals;
   final List<RewardGoal> earnedGoals;
-  final LocalMealProgressService mealProgressService;
+  final LocalActivityProgressService activityProgressService;
   final OrientationService orientationService;
   final bool isCompact;
 
@@ -898,7 +899,7 @@ class _RewardGoalResultBox extends StatelessWidget {
                   await Navigator.of(context).push(
                     MaterialPageRoute(
                       builder: (_) => RewardGoalScreen(
-                        mealProgressService: mealProgressService,
+                        activityProgressService: activityProgressService,
                       ),
                     ),
                   );

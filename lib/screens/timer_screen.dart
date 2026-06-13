@@ -16,7 +16,7 @@ import '../models/activity_session_result.dart';
 import '../models/activity_timer_config.dart';
 import '../models/vehicle_avatar_presentation.dart';
 import '../services/active_activity_timer_session_store.dart';
-import '../services/local_meal_progress_service.dart';
+import '../services/local_activity_progress_service.dart';
 import '../services/motivation_audio_service.dart';
 import '../services/orientation_service.dart';
 import '../services/screen_awake_service.dart';
@@ -156,7 +156,7 @@ class TimerScreen extends StatefulWidget {
   const TimerScreen({
     super.key,
     required this.config,
-    required this.mealProgressService,
+    required this.activityProgressService,
     required this.onConfigChanged,
     this.screenAwakeService = const WakelockScreenAwakeService(),
     this.orientationService = const SystemOrientationService(),
@@ -167,7 +167,7 @@ class TimerScreen extends StatefulWidget {
   });
 
   final ActivityTimerConfig config;
-  final LocalMealProgressService mealProgressService;
+  final LocalActivityProgressService activityProgressService;
   final ValueChanged<ActivityTimerConfig> onConfigChanged;
   final ScreenAwakeService screenAwakeService;
   final OrientationService orientationService;
@@ -690,7 +690,7 @@ class _TimerScreenState extends State<TimerScreen>
         builder: (_) => ResultScreen(
           result: recordableResult,
           config: _timerConfig,
-          mealProgressService: widget.mealProgressService,
+          activityProgressService: widget.activityProgressService,
           onConfigChanged: widget.onConfigChanged,
           orientationService: widget.orientationService,
         ),

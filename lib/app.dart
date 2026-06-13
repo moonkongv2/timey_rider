@@ -8,7 +8,7 @@ import 'screens/child_name_setup_screen.dart';
 import 'screens/home_screen.dart';
 import 'screens/splash_screen.dart';
 import 'services/active_activity_timer_session_store.dart';
-import 'services/local_meal_progress_service.dart';
+import 'services/local_activity_progress_service.dart';
 import 'services/local_settings_service.dart';
 import 'theme/app_theme.dart';
 
@@ -16,13 +16,13 @@ class TickyRiderApp extends StatefulWidget {
   const TickyRiderApp({
     super.key,
     required this.settingsService,
-    required this.mealProgressService,
+    required this.activityProgressService,
     required this.initialConfig,
     this.activeSessionStore = const ActiveActivityTimerSessionStore(),
   });
 
   final LocalSettingsService settingsService;
-  final LocalMealProgressService mealProgressService;
+  final LocalActivityProgressService activityProgressService;
   final ActivityTimerConfig initialConfig;
   final ActiveActivityTimerSessionStore activeSessionStore;
 
@@ -70,7 +70,7 @@ class _TickyRiderAppState extends State<TickyRiderApp> {
           : _hasChildName
           ? HomeScreen(
               config: _config,
-              mealProgressService: widget.mealProgressService,
+              activityProgressService: widget.activityProgressService,
               activeSessionStore: widget.activeSessionStore,
               onConfigChanged: _saveConfig,
             )

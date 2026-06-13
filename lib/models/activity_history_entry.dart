@@ -1,80 +1,79 @@
+import '../catalogs/activity_catalog.dart';
 import 'activity_completion_status.dart';
 
-class MealHistoryEntry {
-  const MealHistoryEntry({
+class ActivityHistoryEntry {
+  const ActivityHistoryEntry({
     required this.id,
+    required this.activityId,
     required this.startedAt,
     required this.endedAt,
     required this.targetDuration,
     required this.actualDuration,
-    required this.completedBeforeArrival,
+    required this.completedBeforeEnd,
+    required this.completionStatus,
     required this.rewardIds,
-    this.mealCompleted = true,
-    this.selectedIngredientIds = const [],
-    ActivityCompletionStatus? completionStatus,
-  }) : completionStatus =
-           completionStatus ??
-           (mealCompleted
-               ? (completedBeforeArrival
-                     ? ActivityCompletionStatus.completedBeforeEnd
-                     : ActivityCompletionStatus.completedAfterEnd)
-               : ActivityCompletionStatus.needsMoreTime);
+    this.selectedMarkerIds = const [],
+  });
 
-  factory MealHistoryEntry.fromJson(Map<String, Object?> json) {
+  factory ActivityHistoryEntry.fromJson(Map<String, Object?> json) {
     final rewardIds = json['rewardIds'];
-    final selectedIngredientIds = json['selectedIngredientIds'];
-    final completedBeforeArrival =
-        json['completedBeforeArrival'] as bool? ?? false;
+    final selectedMarkerIds =
+        json['selectedMarkerIds'] ?? json['selectedIngredientIds'];
+    final completedBeforeEnd =
+        json['completedBeforeEnd'] as bool? ??
+        json['completedBeforeArrival'] as bool? ??
+        false;
     final completionStatus = activityCompletionStatusFromJson(
       json['completionStatus'],
-      completedBeforeEnd: completedBeforeArrival,
+      completedBeforeEnd: completedBeforeEnd,
       activityCompleted: json['mealCompleted'] as bool?,
     );
-    final mealCompleted =
-        json['mealCompleted'] as bool? ??
-        _activityCompletionStatusIsCompleted(completionStatus);
 
-    return MealHistoryEntry(
+    return ActivityHistoryEntry(
       id: json['id'] as String,
+      activityId:
+          json['activityId'] as String? ?? ActivityCatalog.defaultActivity.id,
       startedAt: DateTime.parse(json['startedAt'] as String),
       endedAt: DateTime.parse(json['endedAt'] as String),
       targetDuration: Duration(milliseconds: json['targetMs'] as int),
       actualDuration: Duration(milliseconds: json['actualMs'] as int),
-      completedBeforeArrival: completedBeforeArrival,
-      mealCompleted: mealCompleted,
+      completedBeforeEnd: completedBeforeEnd,
       completionStatus: completionStatus,
       rewardIds: rewardIds is List
           ? rewardIds.whereType<String>().toList(growable: false)
           : const [],
-      selectedIngredientIds: selectedIngredientIds is List
-          ? selectedIngredientIds.whereType<String>().toList(growable: false)
+      selectedMarkerIds: selectedMarkerIds is List
+          ? selectedMarkerIds.whereType<String>().toList(growable: false)
           : const [],
     );
   }
 
   final String id;
+  final String activityId;
   final DateTime startedAt;
   final DateTime endedAt;
   final Duration targetDuration;
   final Duration actualDuration;
-  final bool completedBeforeArrival;
-  final bool mealCompleted;
+  final bool completedBeforeEnd;
   final ActivityCompletionStatus completionStatus;
   final List<String> rewardIds;
-  final List<String> selectedIngredientIds;
+  final List<String> selectedMarkerIds;
+
+  bool get activityCompleted =>
+      _activityCompletionStatusIsCompleted(completionStatus);
 
   Map<String, Object?> toJson() {
     return {
       'id': id,
+      'activityId': activityId,
       'startedAt': startedAt.toIso8601String(),
       'endedAt': endedAt.toIso8601String(),
       'targetMs': targetDuration.inMilliseconds,
       'actualMs': actualDuration.inMilliseconds,
-      'completedBeforeArrival': completedBeforeArrival,
-      'mealCompleted': mealCompleted,
+      'completedBeforeEnd': completedBeforeEnd,
       'completionStatus': completionStatus.name,
       'rewardIds': rewardIds,
-      'selectedIngredientIds': selectedIngredientIds,
+      'selectedMarkerIds': selectedMarkerIds,
     };
   }
 }

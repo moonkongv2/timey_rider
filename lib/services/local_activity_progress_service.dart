@@ -3,36 +3,45 @@ import 'dart:math';
 
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../models/meal_history_entry.dart';
-import '../models/meal_progress_snapshot.dart';
+import '../catalogs/activity_catalog.dart';
+import '../models/activity_history_entry.dart';
+import '../models/activity_progress_snapshot.dart';
+import '../models/activity_completion_status.dart';
 import '../models/activity_session_result.dart';
 import '../models/reward_goal.dart';
 import '../models/reward_item.dart';
 
-class LocalMealProgressService {
-  LocalMealProgressService({Random? random}) : _random = random ?? Random();
+class LocalActivityProgressService {
+  LocalActivityProgressService({Random? random}) : _random = random ?? Random();
 
-  static const _historyKey = 'mealHistory';
-  static const _inventoryKey = 'rewardInventory';
+  static const _historyKey = 'activityHistory';
+  static const _legacyHistoryKey = 'mealHistory';
+  static const _inventoryKey = 'activityRewardInventory';
+  static const _legacyInventoryKey = 'rewardInventory';
   static const _legacyActiveRewardGoalKey = 'activeRewardGoal';
   static const _legacyRedeemedRewardGoalsKey = 'redeemedRewardGoals';
-  static const _activeRewardGoalsKey = 'activeRewardGoals';
-  static const _earnedRewardGoalsKey = 'earnedRewardGoals';
-  static const _usedRewardGoalsKey = 'usedRewardGoals';
+  static const _activeRewardGoalsKey = 'activityActiveRewardGoals';
+  static const _legacyActiveRewardGoalsKey = 'activeRewardGoals';
+  static const _earnedRewardGoalsKey = 'activityEarnedRewardGoals';
+  static const _legacyEarnedRewardGoalsKey = 'earnedRewardGoals';
+  static const _usedRewardGoalsKey = 'activityUsedRewardGoals';
+  static const _legacyUsedRewardGoalsKey = 'usedRewardGoals';
   static const maxActiveRewardGoals = 2;
 
   final Random _random;
 
-  Future<MealProgressSnapshot> loadSnapshot() async {
+  Future<ActivityProgressSnapshot> loadSnapshot() async {
     final preferences = await SharedPreferences.getInstance();
 
-    return MealProgressSnapshot(
+    return ActivityProgressSnapshot(
       history: _decodeList(
-        preferences.getStringList(_historyKey),
-        MealHistoryEntry.fromJson,
+        preferences.getStringList(_historyKey) ??
+            preferences.getStringList(_legacyHistoryKey),
+        ActivityHistoryEntry.fromJson,
       ),
       inventory: _decodeList(
-        preferences.getStringList(_inventoryKey),
+        preferences.getStringList(_inventoryKey) ??
+            preferences.getStringList(_legacyInventoryKey),
         RewardInventoryItem.fromJson,
       ),
       activeRewardGoals: _loadActiveRewardGoals(preferences),
@@ -79,6 +88,7 @@ class LocalMealProgressService {
     activeGoals.add(goal);
     await _saveRewardGoalList(preferences, _activeRewardGoalsKey, activeGoals);
     await preferences.remove(_legacyActiveRewardGoalKey);
+    await preferences.remove(_legacyActiveRewardGoalsKey);
     return goal;
   }
 
@@ -129,6 +139,7 @@ class LocalMealProgressService {
         _earnedRewardGoalsKey,
         earnedGoals,
       );
+      await preferences.remove(_legacyEarnedRewardGoalsKey);
     } else {
       activeGoals[targetIndex] = updatedGoal;
       await _saveRewardGoalList(
@@ -138,6 +149,7 @@ class LocalMealProgressService {
       );
     }
     await preferences.remove(_legacyActiveRewardGoalKey);
+    await preferences.remove(_legacyActiveRewardGoalsKey);
     return updatedGoal;
   }
 
@@ -158,6 +170,7 @@ class LocalMealProgressService {
     final canceledGoal = activeGoals.removeAt(targetIndex);
     await _saveRewardGoalList(preferences, _activeRewardGoalsKey, activeGoals);
     await preferences.remove(_legacyActiveRewardGoalKey);
+    await preferences.remove(_legacyActiveRewardGoalsKey);
     return canceledGoal;
   }
 
@@ -190,6 +203,9 @@ class LocalMealProgressService {
 
     await _saveRewardGoalList(preferences, _earnedRewardGoalsKey, earnedGoals);
     await _saveRewardGoalList(preferences, _usedRewardGoalsKey, usedGoals);
+    await preferences.remove(_legacyEarnedRewardGoalsKey);
+    await preferences.remove(_legacyUsedRewardGoalsKey);
+    await preferences.remove(_legacyRedeemedRewardGoalsKey);
     return usedGoal;
   }
 
@@ -197,13 +213,15 @@ class LocalMealProgressService {
     final preferences = await SharedPreferences.getInstance();
     await preferences.remove(_legacyActiveRewardGoalKey);
     await preferences.remove(_activeRewardGoalsKey);
+    await preferences.remove(_legacyActiveRewardGoalsKey);
   }
 
-  Future<bool> deleteMealHistoryEntry(String entryId) async {
+  Future<bool> deleteActivityHistoryEntry(String entryId) async {
     final preferences = await SharedPreferences.getInstance();
     final history = _decodeList(
-      preferences.getStringList(_historyKey),
-      MealHistoryEntry.fromJson,
+      preferences.getStringList(_historyKey) ??
+          preferences.getStringList(_legacyHistoryKey),
+      ActivityHistoryEntry.fromJson,
     ).toList();
     final index = history.indexWhere((entry) => entry.id == entryId);
     if (index == -1) {
@@ -215,36 +233,39 @@ class LocalMealProgressService {
       _historyKey,
       history.map((entry) => jsonEncode(entry.toJson())).toList(),
     );
+    await preferences.remove(_legacyHistoryKey);
     return true;
   }
 
-  Future<RecordedMealSession> recordMealResult(
+  Future<RecordedActivitySession> recordActivityResult(
     ActivitySessionResult result,
   ) async {
     final preferences = await SharedPreferences.getInstance();
     final history = _decodeList(
-      preferences.getStringList(_historyKey),
-      MealHistoryEntry.fromJson,
+      preferences.getStringList(_historyKey) ??
+          preferences.getStringList(_legacyHistoryKey),
+      ActivityHistoryEntry.fromJson,
     ).toList();
     final inventory = _decodeList(
-      preferences.getStringList(_inventoryKey),
+      preferences.getStringList(_inventoryKey) ??
+          preferences.getStringList(_legacyInventoryKey),
       RewardInventoryItem.fromJson,
     ).toList();
     final activeRewardGoals = _loadActiveRewardGoals(preferences).toList();
     final earnedRewardGoals = _loadEarnedRewardGoals(preferences).toList();
 
     final awardedRewards = _selectRewards(result);
-    final entry = MealHistoryEntry(
+    final entry = ActivityHistoryEntry(
       id: result.endedAt.microsecondsSinceEpoch.toString(),
+      activityId: result.activityId,
       startedAt: result.startedAt,
       endedAt: result.endedAt,
       targetDuration: result.targetDuration,
       actualDuration: result.actualDuration,
-      completedBeforeArrival: result.completedBeforeEnd,
-      mealCompleted: result.activityCompleted,
+      completedBeforeEnd: result.completedBeforeEnd,
       completionStatus: result.completionStatus,
       rewardIds: awardedRewards.map((reward) => reward.id).toList(),
-      selectedIngredientIds: result.selectedMarkerIds,
+      selectedMarkerIds: result.selectedMarkerIds,
     );
 
     history.insert(0, entry);
@@ -260,10 +281,12 @@ class LocalMealProgressService {
       _historyKey,
       history.map((entry) => jsonEncode(entry.toJson())).toList(),
     );
+    await preferences.remove(_legacyHistoryKey);
     await preferences.setStringList(
       _inventoryKey,
       inventory.map((item) => jsonEncode(item.toJson())).toList(),
     );
+    await preferences.remove(_legacyInventoryKey);
     if (goalUpdate.changed) {
       earnedRewardGoals.insertAll(0, goalUpdate.earnedGoals);
       await _saveRewardGoalList(
@@ -277,9 +300,11 @@ class LocalMealProgressService {
         earnedRewardGoals,
       );
       await preferences.remove(_legacyActiveRewardGoalKey);
+      await preferences.remove(_legacyActiveRewardGoalsKey);
+      await preferences.remove(_legacyEarnedRewardGoalsKey);
     }
 
-    return RecordedMealSession(
+    return RecordedActivitySession(
       entry: entry,
       awardedRewards: awardedRewards,
       updatedRewardGoals: goalUpdate.updatedGoals,
@@ -288,11 +313,24 @@ class LocalMealProgressService {
   }
 
   List<RewardDefinition> _selectRewards(ActivitySessionResult result) {
-    if (!result.activityCompleted) {
+    final activity = ActivityCatalog.findById(result.activityId);
+    if (!activity.rewardEnabledByDefault ||
+        !_completionStatusAwardsSticker(result.completionStatus)) {
       return const [];
     }
 
     return [_randomSuccessSticker()];
+  }
+
+  bool _completionStatusAwardsSticker(ActivityCompletionStatus status) {
+    return switch (status) {
+      ActivityCompletionStatus.completedBeforeEnd ||
+      ActivityCompletionStatus.completedAtEnd ||
+      ActivityCompletionStatus.completedAfterEnd => true,
+      ActivityCompletionStatus.timeEnded ||
+      ActivityCompletionStatus.needsMoreTime ||
+      ActivityCompletionStatus.canceled => false,
+    };
   }
 
   RewardDefinition _randomSuccessSticker() {
@@ -329,7 +367,8 @@ class LocalMealProgressService {
     required ActivitySessionResult result,
     required String mealSessionId,
   }) {
-    if (goals.isEmpty || !result.activityCompleted) {
+    if (goals.isEmpty ||
+        !_completionStatusAwardsSticker(result.completionStatus)) {
       return _RewardGoalUpdate(activeGoals: goals);
     }
 
@@ -393,7 +432,9 @@ class LocalMealProgressService {
   }
 
   List<RewardGoal> _loadActiveRewardGoals(SharedPreferences preferences) {
-    final rawGoals = preferences.getStringList(_activeRewardGoalsKey);
+    final rawGoals =
+        preferences.getStringList(_activeRewardGoalsKey) ??
+        preferences.getStringList(_legacyActiveRewardGoalsKey);
     if (rawGoals != null) {
       return _decodeRewardGoalList(rawGoals)
           .where((goal) => goal.status == RewardGoalStatus.active)
@@ -412,7 +453,9 @@ class LocalMealProgressService {
   }
 
   List<RewardGoal> _loadEarnedRewardGoals(SharedPreferences preferences) {
-    final rawGoals = preferences.getStringList(_earnedRewardGoalsKey);
+    final rawGoals =
+        preferences.getStringList(_earnedRewardGoalsKey) ??
+        preferences.getStringList(_legacyEarnedRewardGoalsKey);
     if (rawGoals != null) {
       return _decodeRewardGoalList(
         rawGoals,
@@ -435,7 +478,9 @@ class LocalMealProgressService {
   }
 
   List<RewardGoal> _loadUsedRewardGoals(SharedPreferences preferences) {
-    final rawGoals = preferences.getStringList(_usedRewardGoalsKey);
+    final rawGoals =
+        preferences.getStringList(_usedRewardGoalsKey) ??
+        preferences.getStringList(_legacyUsedRewardGoalsKey);
     if (rawGoals != null) {
       return _decodeRewardGoalList(
         rawGoals,

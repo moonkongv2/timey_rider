@@ -1,18 +1,21 @@
 import 'package:flutter/material.dart';
 
 import '../l10n/app_texts.dart';
-import '../models/meal_progress_snapshot.dart';
+import '../models/activity_progress_snapshot.dart';
 import '../models/reward_item.dart';
-import '../services/local_meal_progress_service.dart';
+import '../services/local_activity_progress_service.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_radius.dart';
 import '../theme/app_spacing.dart';
 import '../widgets/reward_sticker_image.dart';
 
 class StickerCollectionScreen extends StatelessWidget {
-  const StickerCollectionScreen({super.key, required this.mealProgressService});
+  const StickerCollectionScreen({
+    super.key,
+    required this.activityProgressService,
+  });
 
-  final LocalMealProgressService mealProgressService;
+  final LocalActivityProgressService activityProgressService;
 
   @override
   Widget build(BuildContext context) {
@@ -21,8 +24,8 @@ class StickerCollectionScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(title: Text(texts.rewards.collectionTitle)),
       body: SafeArea(
-        child: FutureBuilder<MealProgressSnapshot>(
-          future: mealProgressService.loadSnapshot(),
+        child: FutureBuilder<ActivityProgressSnapshot>(
+          future: activityProgressService.loadSnapshot(),
           builder: (context, snapshot) {
             final inventory = snapshot.data?.inventory ?? const [];
 

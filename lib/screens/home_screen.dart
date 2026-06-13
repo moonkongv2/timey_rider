@@ -9,7 +9,7 @@ import '../catalogs/meal_course_catalog.dart';
 import '../catalogs/vehicle_catalog.dart';
 import '../l10n/app_texts.dart';
 import '../models/active_activity_timer_session.dart';
-import '../models/meal_progress_snapshot.dart';
+import '../models/activity_progress_snapshot.dart';
 import '../models/activity_timer_config.dart';
 import '../models/vehicle_avatar_presentation.dart';
 import '../navigation/app_route_observer.dart';
@@ -17,7 +17,7 @@ import '../models/reward_goal.dart';
 import '../models/reward_item.dart';
 import '../models/vehicle.dart';
 import '../services/active_activity_timer_session_store.dart';
-import '../services/local_meal_progress_service.dart';
+import '../services/local_activity_progress_service.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_radius.dart';
 import '../theme/app_shadows.dart';
@@ -30,7 +30,7 @@ import '../widgets/meal_ingredient_picker_sheet.dart';
 import '../widgets/reward_sticker_image.dart';
 import '../widgets/vehicle_selection_card.dart';
 import 'avatar_setup_screen.dart';
-import 'meal_history_screen.dart';
+import 'activity_history_screen.dart';
 import 'reward_goal_screen.dart';
 import 'settings_screen.dart';
 import 'sticker_collection_screen.dart';
@@ -44,7 +44,7 @@ class HomeScreen extends StatefulWidget {
   const HomeScreen({
     super.key,
     required this.config,
-    required this.mealProgressService,
+    required this.activityProgressService,
     required this.onConfigChanged,
     this.activeSessionStore = const ActiveActivityTimerSessionStore(),
     this.avatarImageBuilder,
@@ -52,7 +52,7 @@ class HomeScreen extends StatefulWidget {
   });
 
   final ActivityTimerConfig config;
-  final LocalMealProgressService mealProgressService;
+  final LocalActivityProgressService activityProgressService;
   final ValueChanged<ActivityTimerConfig> onConfigChanged;
   final ActiveActivityTimerSessionStore activeSessionStore;
   final Widget Function(BuildContext context, String imagePath)?
@@ -215,7 +215,7 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
       MaterialPageRoute(
         builder: (_) => TimerScreen(
           config: config,
-          mealProgressService: widget.mealProgressService,
+          activityProgressService: widget.activityProgressService,
           activeSessionStore: widget.activeSessionStore,
           onConfigChanged: _updateTimerRuntimeConfig,
         ),
@@ -284,7 +284,7 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
         builder: (_) => TimerScreen(
           config: session.config,
           restoredSession: session,
-          mealProgressService: widget.mealProgressService,
+          activityProgressService: widget.activityProgressService,
           activeSessionStore: widget.activeSessionStore,
           onConfigChanged: _updateTimerRuntimeConfig,
         ),
@@ -713,8 +713,8 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
               },
             ),
             const SizedBox(height: AppSpacing.xxl),
-            FutureBuilder<MealProgressSnapshot>(
-              future: widget.mealProgressService.loadSnapshot(),
+            FutureBuilder<ActivityProgressSnapshot>(
+              future: widget.activityProgressService.loadSnapshot(),
               builder: (context, snapshot) {
                 return _ProgressSummary(
                   childName: childName,
@@ -722,8 +722,9 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
                   onOpenMealHistory: () {
                     Navigator.of(context).push(
                       MaterialPageRoute(
-                        builder: (_) => MealHistoryScreen(
-                          mealProgressService: widget.mealProgressService,
+                        builder: (_) => ActivityHistoryScreen(
+                          activityProgressService:
+                              widget.activityProgressService,
                         ),
                       ),
                     );
@@ -732,7 +733,8 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
                     await Navigator.of(context).push(
                       MaterialPageRoute(
                         builder: (_) => RewardGoalScreen(
-                          mealProgressService: widget.mealProgressService,
+                          activityProgressService:
+                              widget.activityProgressService,
                         ),
                       ),
                     );
@@ -744,7 +746,8 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
                     Navigator.of(context).push(
                       MaterialPageRoute(
                         builder: (_) => StickerCollectionScreen(
-                          mealProgressService: widget.mealProgressService,
+                          activityProgressService:
+                              widget.activityProgressService,
                         ),
                       ),
                     );
@@ -1575,7 +1578,7 @@ class _ProgressSummary extends StatelessWidget {
   });
 
   final String childName;
-  final MealProgressSnapshot? snapshot;
+  final ActivityProgressSnapshot? snapshot;
   final VoidCallback onOpenMealHistory;
   final VoidCallback onOpenRewardGoal;
   final VoidCallback onOpenStickers;
@@ -1619,8 +1622,10 @@ class _ProgressSummary extends StatelessWidget {
                     formatDuration(recentDisplayDuration),
                     recent.completionStatus,
                   ),
-                  if (!recent.mealCompleted) texts.mealHistory.noRewardLabel,
-                  if (!recent.mealCompleted && recentOverrun > Duration.zero)
+                  if (!recent.activityCompleted)
+                    texts.mealHistory.noRewardLabel,
+                  if (!recent.activityCompleted &&
+                      recentOverrun > Duration.zero)
                     texts.mealHistory.overrunTime(
                       formatDuration(recentOverrun),
                     ),

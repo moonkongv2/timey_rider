@@ -1,9 +1,9 @@
-import 'meal_history_entry.dart';
+import 'activity_history_entry.dart';
 import 'reward_goal.dart';
 import 'reward_item.dart';
 
-class MealProgressSnapshot {
-  const MealProgressSnapshot({
+class ActivityProgressSnapshot {
+  const ActivityProgressSnapshot({
     required this.history,
     required this.inventory,
     required this.activeRewardGoals,
@@ -11,7 +11,7 @@ class MealProgressSnapshot {
     required this.usedRewardGoals,
   });
 
-  final List<MealHistoryEntry> history;
+  final List<ActivityHistoryEntry> history;
   final List<RewardInventoryItem> inventory;
   final List<RewardGoal> activeRewardGoals;
   final List<RewardGoal> earnedRewardGoals;
@@ -22,15 +22,15 @@ class MealProgressSnapshot {
   List<RewardGoal> get redeemedRewardGoals => usedRewardGoals;
 }
 
-class RecordedMealSession {
-  const RecordedMealSession({
+class RecordedActivitySession {
+  const RecordedActivitySession({
     required this.entry,
     required this.awardedRewards,
     required this.updatedRewardGoals,
     required this.earnedRewardGoals,
   });
 
-  final MealHistoryEntry entry;
+  final ActivityHistoryEntry entry;
   final List<RewardDefinition> awardedRewards;
   final List<RewardGoal> updatedRewardGoals;
   final List<RewardGoal> earnedRewardGoals;

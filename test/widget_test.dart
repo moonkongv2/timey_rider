@@ -26,7 +26,7 @@ import 'package:ticky_rider/models/vehicle.dart';
 import 'package:ticky_rider/models/vehicle_avatar_presentation.dart';
 import 'package:ticky_rider/screens/avatar_setup_screen.dart';
 import 'package:ticky_rider/screens/home_screen.dart';
-import 'package:ticky_rider/screens/meal_history_screen.dart';
+import 'package:ticky_rider/screens/activity_history_screen.dart';
 import 'package:ticky_rider/screens/reward_goal_screen.dart';
 import 'package:ticky_rider/screens/result_screen.dart';
 import 'package:ticky_rider/screens/settings_screen.dart';
@@ -35,7 +35,7 @@ import 'package:ticky_rider/screens/user_guide_screen.dart';
 import 'package:ticky_rider/services/active_activity_timer_session_store.dart';
 import 'package:ticky_rider/services/avatar_image_picker.dart';
 import 'package:ticky_rider/services/local_avatar_image_service.dart';
-import 'package:ticky_rider/services/local_meal_progress_service.dart';
+import 'package:ticky_rider/services/local_activity_progress_service.dart';
 import 'package:ticky_rider/services/local_settings_service.dart';
 import 'package:ticky_rider/services/motivation_audio_service.dart';
 import 'package:ticky_rider/services/orientation_service.dart';
@@ -566,9 +566,9 @@ void main() {
           GlobalWidgetsLocalizations.delegate,
         ],
         home: ResultScreen(
-          result: _mealResult(completedBeforeArrival: true),
+          result: _activityResult(completedBeforeEnd: true),
           config: ActivityTimerConfig.defaults(),
-          mealProgressService: LocalMealProgressService(),
+          activityProgressService: LocalActivityProgressService(),
           onConfigChanged: (_) {},
           introControllerFactory: (assetPath) {
             introVideoPaths.add(assetPath);
@@ -603,9 +603,9 @@ void main() {
           GlobalWidgetsLocalizations.delegate,
         ],
         home: ResultScreen(
-          result: _mealResult(completedBeforeArrival: false),
+          result: _activityResult(completedBeforeEnd: false),
           config: ActivityTimerConfig.defaults(),
-          mealProgressService: LocalMealProgressService(),
+          activityProgressService: LocalActivityProgressService(),
           onConfigChanged: (_) {},
           introControllerFactory: (assetPath) {
             introVideoPaths.add(assetPath);
@@ -633,7 +633,7 @@ void main() {
       tester.view.resetDevicePixelRatio();
     });
 
-    final service = LocalMealProgressService();
+    final service = LocalActivityProgressService();
     final introVideoPaths = <String>[];
 
     await tester.pumpWidget(
@@ -646,9 +646,9 @@ void main() {
           GlobalWidgetsLocalizations.delegate,
         ],
         home: ResultScreen(
-          result: _mealResult(mealCompleted: false),
+          result: _activityResult(activityCompleted: false),
           config: ActivityTimerConfig.defaults(),
-          mealProgressService: service,
+          activityProgressService: service,
           onConfigChanged: (_) {},
           introControllerFactory: (assetPath) {
             introVideoPaths.add(assetPath);
@@ -677,7 +677,7 @@ void main() {
 
     final snapshot = await service.loadSnapshot();
     expect(snapshot.history, hasLength(1));
-    expect(snapshot.history.single.mealCompleted, isFalse);
+    expect(snapshot.history.single.activityCompleted, isFalse);
     expect(
       snapshot.history.single.completionStatus,
       ActivityCompletionStatus.needsMoreTime,
@@ -705,9 +705,9 @@ void main() {
           GlobalWidgetsLocalizations.delegate,
         ],
         home: ResultScreen(
-          result: _mealResult(completedBeforeArrival: true),
+          result: _activityResult(completedBeforeEnd: true),
           config: ActivityTimerConfig.defaults(),
-          mealProgressService: LocalMealProgressService(),
+          activityProgressService: LocalActivityProgressService(),
           onConfigChanged: (_) {},
           introControllerFactory: (_) {
             return VideoPlayerController.asset(
@@ -746,9 +746,9 @@ void main() {
           GlobalWidgetsLocalizations.delegate,
         ],
         home: ResultScreen(
-          result: _mealResult(completedBeforeArrival: true),
+          result: _activityResult(completedBeforeEnd: true),
           config: ActivityTimerConfig.defaults(),
-          mealProgressService: LocalMealProgressService(),
+          activityProgressService: LocalActivityProgressService(),
           onConfigChanged: (_) {},
           introControllerFactory: (_) {
             return VideoPlayerController.asset(
@@ -800,9 +800,9 @@ void main() {
           GlobalWidgetsLocalizations.delegate,
         ],
         home: ResultScreen(
-          result: _mealResult(mealCompleted: false),
+          result: _activityResult(activityCompleted: false),
           config: ActivityTimerConfig.defaults(),
-          mealProgressService: LocalMealProgressService(),
+          activityProgressService: LocalActivityProgressService(),
           onConfigChanged: (_) {},
         ),
       ),
@@ -849,9 +849,9 @@ void main() {
           GlobalWidgetsLocalizations.delegate,
         ],
         home: ResultScreen(
-          result: _mealResult(completedBeforeArrival: true),
+          result: _activityResult(completedBeforeEnd: true),
           config: ActivityTimerConfig.defaults(),
-          mealProgressService: LocalMealProgressService(),
+          activityProgressService: LocalActivityProgressService(),
           onConfigChanged: (_) {},
           introControllerFactory: (_) {
             return VideoPlayerController.asset(
@@ -901,9 +901,9 @@ void main() {
           GlobalWidgetsLocalizations.delegate,
         ],
         home: ResultScreen(
-          result: _mealResult(mealCompleted: false),
+          result: _activityResult(activityCompleted: false),
           config: ActivityTimerConfig.defaults(),
-          mealProgressService: LocalMealProgressService(),
+          activityProgressService: LocalActivityProgressService(),
           onConfigChanged: (_) {},
         ),
       ),
@@ -942,9 +942,9 @@ void main() {
           GlobalWidgetsLocalizations.delegate,
         ],
         home: ResultScreen(
-          result: _mealResult(mealCompleted: false),
+          result: _activityResult(activityCompleted: false),
           config: ActivityTimerConfig.defaults().copyWith(vehicleId: 'bus'),
-          mealProgressService: LocalMealProgressService(),
+          activityProgressService: LocalActivityProgressService(),
           onConfigChanged: (_) {},
         ),
       ),
@@ -991,9 +991,9 @@ void main() {
           GlobalWidgetsLocalizations.delegate,
         ],
         home: ResultScreen(
-          result: _mealResult(completedBeforeArrival: true),
+          result: _activityResult(completedBeforeEnd: true),
           config: ActivityTimerConfig.defaults(),
-          mealProgressService: LocalMealProgressService(),
+          activityProgressService: LocalActivityProgressService(),
           onConfigChanged: (_) {},
           introControllerFactory: (_) {
             return VideoPlayerController.asset(
@@ -1048,9 +1048,9 @@ void main() {
           GlobalWidgetsLocalizations.delegate,
         ],
         home: ResultScreen(
-          result: _mealResult(mealCompleted: false),
+          result: _activityResult(activityCompleted: false),
           config: ActivityTimerConfig.defaults(),
-          mealProgressService: LocalMealProgressService(),
+          activityProgressService: LocalActivityProgressService(),
           onConfigChanged: (_) {},
           orientationService: orientationService,
         ),
@@ -1615,7 +1615,7 @@ void main() {
             childName: '지율',
             duration: const Duration(minutes: 25),
           ),
-          mealProgressService: LocalMealProgressService(),
+          activityProgressService: LocalActivityProgressService(),
           onConfigChanged: (_) {},
           now: () => now,
         ),
@@ -1663,7 +1663,7 @@ void main() {
         ],
         home: HomeScreen(
           config: ActivityTimerConfig.defaults().copyWith(childName: '지율'),
-          mealProgressService: LocalMealProgressService(),
+          activityProgressService: LocalActivityProgressService(),
           onConfigChanged: (_) {},
           now: () => now,
         ),
@@ -1717,7 +1717,7 @@ void main() {
         ],
         home: HomeScreen(
           config: ActivityTimerConfig.defaults().copyWith(childName: '지율'),
-          mealProgressService: LocalMealProgressService(),
+          activityProgressService: LocalActivityProgressService(),
           onConfigChanged: (_) {},
           now: () => now,
         ),
@@ -1777,7 +1777,7 @@ void main() {
         ],
         home: HomeScreen(
           config: ActivityTimerConfig.defaults().copyWith(childName: '지율'),
-          mealProgressService: LocalMealProgressService(),
+          activityProgressService: LocalActivityProgressService(),
           onConfigChanged: (_) {},
           now: () => now,
         ),
@@ -1816,7 +1816,7 @@ void main() {
         ],
         home: HomeScreen(
           config: ActivityTimerConfig.defaults().copyWith(childName: '지율'),
-          mealProgressService: LocalMealProgressService(),
+          activityProgressService: LocalActivityProgressService(),
           onConfigChanged: (_) {},
           now: () => now,
         ),
@@ -1859,7 +1859,7 @@ void main() {
         ],
         home: HomeScreen(
           config: ActivityTimerConfig.defaults().copyWith(childName: '지율'),
-          mealProgressService: LocalMealProgressService(),
+          activityProgressService: LocalActivityProgressService(),
           onConfigChanged: (_) {},
           now: () => now,
         ),
@@ -1909,7 +1909,7 @@ void main() {
             duration: const Duration(minutes: 25),
             markerMode: ActivityMarkerMode.off,
           ),
-          mealProgressService: LocalMealProgressService(),
+          activityProgressService: LocalActivityProgressService(),
           onConfigChanged: (_) {},
           now: () => now,
         ),
@@ -1958,7 +1958,7 @@ void main() {
             childName: '지율',
             duration: const Duration(minutes: 35),
           ),
-          mealProgressService: LocalMealProgressService(),
+          activityProgressService: LocalActivityProgressService(),
           onConfigChanged: (_) {},
         ),
       ),
@@ -2020,7 +2020,7 @@ void main() {
             childName: '지율',
             duration: const Duration(minutes: 25),
           ),
-          mealProgressService: LocalMealProgressService(),
+          activityProgressService: LocalActivityProgressService(),
           onConfigChanged: (_) {},
         ),
       ),
@@ -2076,7 +2076,7 @@ void main() {
             duration: const Duration(minutes: 35),
             markerMode: ActivityMarkerMode.off,
           ),
-          mealProgressService: LocalMealProgressService(),
+          activityProgressService: LocalActivityProgressService(),
           onConfigChanged: (_) {},
         ),
       ),
@@ -2128,7 +2128,7 @@ void main() {
             duration: const Duration(minutes: 35),
             markerMode: ActivityMarkerMode.random,
           ),
-          mealProgressService: LocalMealProgressService(),
+          activityProgressService: LocalActivityProgressService(),
           onConfigChanged: (_) {},
         ),
       ),
@@ -2177,7 +2177,7 @@ void main() {
             childName: '지율',
             duration: const Duration(minutes: 35),
           ),
-          mealProgressService: LocalMealProgressService(),
+          activityProgressService: LocalActivityProgressService(),
           onConfigChanged: (_) {},
         ),
       ),
@@ -2234,7 +2234,7 @@ void main() {
               childName: '지율',
               duration: const Duration(minutes: 25),
             ),
-            mealProgressService: LocalMealProgressService(),
+            activityProgressService: LocalActivityProgressService(),
             onConfigChanged: (_) {},
           ),
         ),
@@ -2302,7 +2302,7 @@ void main() {
             childName: '지율',
             duration: const Duration(minutes: 25),
           ),
-          mealProgressService: LocalMealProgressService(),
+          activityProgressService: LocalActivityProgressService(),
           onConfigChanged: (_) {},
         ),
       ),
@@ -2347,7 +2347,7 @@ void main() {
             childName: '지율',
             duration: const Duration(minutes: 15),
           ),
-          mealProgressService: LocalMealProgressService(),
+          activityProgressService: LocalActivityProgressService(),
           onConfigChanged: (_) {},
         ),
       ),
@@ -2383,7 +2383,7 @@ void main() {
             childName: '지율',
             duration: const Duration(minutes: 35),
           ),
-          mealProgressService: LocalMealProgressService(),
+          activityProgressService: LocalActivityProgressService(),
           onConfigChanged: (config) => changedConfig = config,
         ),
       ),
@@ -2443,7 +2443,7 @@ void main() {
               childName: '지율',
               duration: const Duration(minutes: 35),
             ),
-            mealProgressService: LocalMealProgressService(),
+            activityProgressService: LocalActivityProgressService(),
             onConfigChanged: (config) => changedConfig = config,
           ),
         ),
@@ -2523,7 +2523,7 @@ void main() {
               ),
             },
           ),
-          mealProgressService: LocalMealProgressService(),
+          activityProgressService: LocalActivityProgressService(),
           onConfigChanged: (_) {},
           avatarImageBuilder: (context, imagePath) {
             return const ColoredBox(
@@ -2579,7 +2579,7 @@ void main() {
             customAvatarImagePath: avatarFile.path,
             customAvatarVehicleId: 'police_car',
           ),
-          mealProgressService: LocalMealProgressService(),
+          activityProgressService: LocalActivityProgressService(),
           onConfigChanged: (_) {},
           avatarImageBuilder: (context, imagePath) {
             return const ColoredBox(
@@ -3505,7 +3505,7 @@ void main() {
             childName: '지율',
             duration: const Duration(minutes: 25),
           ),
-          mealProgressService: LocalMealProgressService(),
+          activityProgressService: LocalActivityProgressService(),
           onConfigChanged: (config) => changedConfig = config,
         ),
       ),
@@ -3804,7 +3804,7 @@ void main() {
             childName: '지율',
             vehicleId: 'fire_truck',
           ),
-          mealProgressService: LocalMealProgressService(),
+          activityProgressService: LocalActivityProgressService(),
           onConfigChanged: (config) => changedConfig = config,
         ),
       ),
@@ -4870,7 +4870,7 @@ void main() {
             customAvatarImagePath: avatarFile.path,
             customAvatarVehicleId: 'police_car',
           ),
-          mealProgressService: LocalMealProgressService(),
+          activityProgressService: LocalActivityProgressService(),
           onConfigChanged: (_) {},
         ),
       ),
@@ -4909,7 +4909,7 @@ void main() {
               ),
             },
           ),
-          mealProgressService: LocalMealProgressService(),
+          activityProgressService: LocalActivityProgressService(),
           onConfigChanged: (_) {},
         ),
       ),
@@ -4935,7 +4935,7 @@ void main() {
           config: ActivityTimerConfig.defaults().copyWith(
             markerIds: const ['carrot', 'egg'],
           ),
-          mealProgressService: LocalMealProgressService(),
+          activityProgressService: LocalActivityProgressService(),
           onConfigChanged: (_) {},
         ),
       ),
@@ -4969,7 +4969,7 @@ void main() {
             markerMode: ActivityMarkerMode.off,
             markerIds: const [],
           ),
-          mealProgressService: LocalMealProgressService(),
+          activityProgressService: LocalActivityProgressService(),
           onConfigChanged: (_) {},
         ),
       ),
@@ -4991,7 +4991,7 @@ void main() {
           config: ActivityTimerConfig.defaults().copyWith(
             duration: const Duration(minutes: 60),
           ),
-          mealProgressService: LocalMealProgressService(),
+          activityProgressService: LocalActivityProgressService(),
           onConfigChanged: (_) {},
         ),
       ),
@@ -5019,7 +5019,7 @@ void main() {
             childName: '지율',
             vehicleId: 'bus',
           ),
-          mealProgressService: LocalMealProgressService(),
+          activityProgressService: LocalActivityProgressService(),
           now: () => startedAt,
           onConfigChanged: (_) {},
         ),
@@ -5055,7 +5055,7 @@ void main() {
           config: ActivityTimerConfig.defaults().copyWith(
             duration: const Duration(minutes: 35),
           ),
-          mealProgressService: LocalMealProgressService(),
+          activityProgressService: LocalActivityProgressService(),
           now: () => now,
           onConfigChanged: (_) {},
         ),
@@ -5105,7 +5105,7 @@ void main() {
           config: ActivityTimerConfig.defaults().copyWith(
             duration: const Duration(minutes: 10),
           ),
-          mealProgressService: LocalMealProgressService(),
+          activityProgressService: LocalActivityProgressService(),
           onConfigChanged: (_) {},
         ),
       ),
@@ -5149,7 +5149,7 @@ void main() {
         home: TimerScreen(
           config: ActivityTimerConfig.defaults(),
           restoredSession: session,
-          mealProgressService: LocalMealProgressService(),
+          activityProgressService: LocalActivityProgressService(),
           now: () => now,
           onConfigChanged: (_) {},
         ),
@@ -5194,7 +5194,7 @@ void main() {
         home: TimerScreen(
           config: ActivityTimerConfig.defaults(),
           restoredSession: session,
-          mealProgressService: LocalMealProgressService(),
+          activityProgressService: LocalActivityProgressService(),
           now: () => now,
           onConfigChanged: (_) {},
         ),
@@ -5240,7 +5240,7 @@ void main() {
           config: ActivityTimerConfig.defaults().copyWith(
             duration: const Duration(minutes: 25),
           ),
-          mealProgressService: LocalMealProgressService(),
+          activityProgressService: LocalActivityProgressService(),
           now: () => now,
           onConfigChanged: (_) {},
         ),
@@ -5273,7 +5273,7 @@ void main() {
           config: ActivityTimerConfig.defaults().copyWith(
             duration: const Duration(minutes: 10),
           ),
-          mealProgressService: LocalMealProgressService(),
+          activityProgressService: LocalActivityProgressService(),
           onConfigChanged: (_) {},
         ),
       ),
@@ -5308,7 +5308,7 @@ void main() {
           config: ActivityTimerConfig.defaults().copyWith(
             duration: const Duration(seconds: 100),
           ),
-          mealProgressService: LocalMealProgressService(),
+          activityProgressService: LocalActivityProgressService(),
           now: () => now,
           onConfigChanged: (_) {},
         ),
@@ -5349,7 +5349,7 @@ void main() {
           config: ActivityTimerConfig.defaults().copyWith(
             duration: const Duration(minutes: 10),
           ),
-          mealProgressService: LocalMealProgressService(),
+          activityProgressService: LocalActivityProgressService(),
           onConfigChanged: (_) {},
         ),
       ),
@@ -5383,7 +5383,7 @@ void main() {
           config: ActivityTimerConfig.defaults().copyWith(
             duration: const Duration(seconds: 1),
           ),
-          mealProgressService: LocalMealProgressService(),
+          activityProgressService: LocalActivityProgressService(),
           now: () => now,
           onConfigChanged: (_) {},
         ),
@@ -5411,7 +5411,7 @@ void main() {
     SharedPreferences.setMockInitialValues({});
 
     var now = DateTime(2026);
-    final service = LocalMealProgressService();
+    final service = LocalActivityProgressService();
 
     await tester.pumpWidget(
       MaterialApp(
@@ -5423,7 +5423,7 @@ void main() {
             markerIds: const ['carrot', 'egg'],
             selectedMarkerIds: const ['carrot', 'egg'],
           ),
-          mealProgressService: service,
+          activityProgressService: service,
           now: () => now,
           onConfigChanged: (_) {},
         ),
@@ -5440,7 +5440,7 @@ void main() {
     await tester.pump();
 
     final snapshot = await service.loadSnapshot();
-    expect(snapshot.history.single.selectedIngredientIds, ['carrot', 'egg']);
+    expect(snapshot.history.single.selectedMarkerIds, ['carrot', 'egg']);
 
     await tester.pumpWidget(const SizedBox.shrink());
     await tester.pump();
@@ -5459,7 +5459,7 @@ void main() {
           config: ActivityTimerConfig.defaults().copyWith(
             duration: const Duration(seconds: 1),
           ),
-          mealProgressService: LocalMealProgressService(),
+          activityProgressService: LocalActivityProgressService(),
           now: () => now,
           onConfigChanged: (_) {},
           orientationService: orientationService,
@@ -5512,7 +5512,7 @@ void main() {
             duration: const Duration(seconds: 100),
             soundEnabled: true,
           ),
-          mealProgressService: LocalMealProgressService(),
+          activityProgressService: LocalActivityProgressService(),
           motivationAudioService: motivationAudioService,
           now: () => now,
           onConfigChanged: (_) {},
@@ -5560,7 +5560,7 @@ void main() {
               duration: const Duration(minutes: 60),
               soundEnabled: false,
             ),
-            mealProgressService: LocalMealProgressService(),
+            activityProgressService: LocalActivityProgressService(),
             now: () => now,
             onConfigChanged: (_) {},
           ),
@@ -5618,7 +5618,7 @@ void main() {
               motivationVideoUseCustomInterval: true,
               motivationVideoInterval: const Duration(minutes: 5),
             ),
-            mealProgressService: LocalMealProgressService(),
+            activityProgressService: LocalActivityProgressService(),
             now: () => now,
             onConfigChanged: (_) {},
           ),
@@ -5675,7 +5675,7 @@ void main() {
             duration: const Duration(minutes: 60),
             soundEnabled: false,
           ),
-          mealProgressService: LocalMealProgressService(),
+          activityProgressService: LocalActivityProgressService(),
           now: () => now,
           onConfigChanged: (config) => changedConfig = config,
         ),
@@ -5739,7 +5739,7 @@ void main() {
               duration: const Duration(minutes: 60),
               soundEnabled: false,
             ),
-            mealProgressService: LocalMealProgressService(),
+            activityProgressService: LocalActivityProgressService(),
             now: () => now,
             onConfigChanged: (config) => changedConfig = config,
           ),
@@ -5802,7 +5802,7 @@ void main() {
               duration: const Duration(minutes: 60),
               soundEnabled: false,
             ),
-            mealProgressService: LocalMealProgressService(),
+            activityProgressService: LocalActivityProgressService(),
             now: () => now,
             onConfigChanged: (_) {},
           ),
@@ -5871,7 +5871,7 @@ void main() {
             soundEnabled: false,
             motivationVideoEnabled: false,
           ),
-          mealProgressService: LocalMealProgressService(),
+          activityProgressService: LocalActivityProgressService(),
           now: () => now,
           onConfigChanged: (_) {},
         ),
@@ -5908,7 +5908,7 @@ void main() {
           config: ActivityTimerConfig.defaults().copyWith(
             duration: const Duration(minutes: 60),
           ),
-          mealProgressService: LocalMealProgressService(),
+          activityProgressService: LocalActivityProgressService(),
           now: () => now,
           onConfigChanged: (_) {},
         ),
@@ -5959,7 +5959,7 @@ void main() {
           config: ActivityTimerConfig.defaults().copyWith(
             duration: const Duration(minutes: 5),
           ),
-          mealProgressService: LocalMealProgressService(),
+          activityProgressService: LocalActivityProgressService(),
           onConfigChanged: (_) {},
         ),
       ),
@@ -6064,7 +6064,7 @@ void main() {
           config: ActivityTimerConfig.defaults().copyWith(
             duration: const Duration(minutes: 60),
           ),
-          mealProgressService: LocalMealProgressService(),
+          activityProgressService: LocalActivityProgressService(),
           onConfigChanged: (_) {},
         ),
       ),
@@ -6105,7 +6105,7 @@ void main() {
           locale: const Locale('en'),
           home: TimerScreen(
             config: ActivityTimerConfig.defaults(),
-            mealProgressService: LocalMealProgressService(),
+            activityProgressService: LocalActivityProgressService(),
             onConfigChanged: (_) {},
           ),
         ),
@@ -6164,7 +6164,7 @@ void main() {
           config: ActivityTimerConfig.defaults().copyWith(
             motivationVideoUseCustomInterval: true,
           ),
-          mealProgressService: LocalMealProgressService(),
+          activityProgressService: LocalActivityProgressService(),
           onConfigChanged: (_) {},
         ),
       ),
@@ -6195,7 +6195,7 @@ void main() {
       MaterialApp(
         home: TimerScreen(
           config: ActivityTimerConfig.defaults(),
-          mealProgressService: LocalMealProgressService(),
+          activityProgressService: LocalActivityProgressService(),
           onConfigChanged: (_) {},
           orientationService: orientationService,
         ),
@@ -6225,7 +6225,7 @@ void main() {
           config: ActivityTimerConfig.defaults().copyWith(
             keepScreenAwake: true,
           ),
-          mealProgressService: LocalMealProgressService(),
+          activityProgressService: LocalActivityProgressService(),
           onConfigChanged: (_) {},
           screenAwakeService: screenAwakeService,
         ),
@@ -6252,7 +6252,7 @@ void main() {
             config: ActivityTimerConfig.defaults().copyWith(
               keepScreenAwake: false,
             ),
-            mealProgressService: LocalMealProgressService(),
+            activityProgressService: LocalActivityProgressService(),
             onConfigChanged: (_) {},
             screenAwakeService: screenAwakeService,
           ),
@@ -6298,7 +6298,7 @@ void main() {
       MaterialPageRoute(
         builder: (_) => TimerScreen(
           config: ActivityTimerConfig.defaults(),
-          mealProgressService: LocalMealProgressService(),
+          activityProgressService: LocalActivityProgressService(),
           onConfigChanged: (_) {},
         ),
       ),
@@ -6371,7 +6371,7 @@ void main() {
         locale: const Locale('en'),
         home: TimerScreen(
           config: ActivityTimerConfig.defaults(),
-          mealProgressService: LocalMealProgressService(),
+          activityProgressService: LocalActivityProgressService(),
           onConfigChanged: (_) {},
         ),
       ),
@@ -6392,7 +6392,7 @@ void main() {
         locale: const Locale('en'),
         home: TimerScreen(
           config: ActivityTimerConfig.defaults(),
-          mealProgressService: LocalMealProgressService(),
+          activityProgressService: LocalActivityProgressService(),
           onConfigChanged: (_) {},
         ),
       ),
@@ -6422,14 +6422,14 @@ void main() {
   test('Fast meal awards only one random sticker', () async {
     SharedPreferences.setMockInitialValues({});
 
-    final service = LocalMealProgressService();
-    final recordedSession = await service.recordMealResult(
-      _mealResult(
+    final service = LocalActivityProgressService();
+    final recordedSession = await service.recordActivityResult(
+      _activityResult(
         startedAt: DateTime(2026, 5, 4, 12),
         endedAt: DateTime(2026, 5, 4, 12, 10),
         targetDuration: const Duration(minutes: 20),
         actualDuration: const Duration(minutes: 13),
-        completedBeforeArrival: true,
+        completedBeforeEnd: true,
       ),
     );
 
@@ -6439,37 +6439,61 @@ void main() {
   test('Completed overtime meal awards a random sticker', () async {
     SharedPreferences.setMockInitialValues({});
 
-    final service = LocalMealProgressService();
-    final recordedSession = await service.recordMealResult(
-      _mealResult(
+    final service = LocalActivityProgressService();
+    final recordedSession = await service.recordActivityResult(
+      _activityResult(
         startedAt: DateTime(2026, 5, 4, 12),
         endedAt: DateTime(2026, 5, 4, 12, 25),
         targetDuration: const Duration(minutes: 20),
         actualDuration: const Duration(minutes: 25),
-        completedBeforeArrival: false,
+        completedBeforeEnd: false,
       ),
     );
 
     expect(recordedSession.awardedRewards, hasLength(1));
   });
 
+  test('Activity with disabled rewards does not award stickers', () async {
+    SharedPreferences.setMockInitialValues({});
+
+    final service = LocalActivityProgressService();
+    final recordedSession = await service.recordActivityResult(
+      _activityResult(activityId: 'play'),
+    );
+
+    expect(recordedSession.awardedRewards, isEmpty);
+    expect(recordedSession.entry.activityId, 'play');
+  });
+
+  test('Time-ended activity does not award stickers', () async {
+    SharedPreferences.setMockInitialValues({});
+
+    final service = LocalActivityProgressService();
+    final recordedSession = await service.recordActivityResult(
+      _activityResult(completionStatus: ActivityCompletionStatus.timeEnded),
+    );
+
+    expect(recordedSession.awardedRewards, isEmpty);
+    expect(recordedSession.entry.activityCompleted, isTrue);
+  });
+
   test('Incomplete meal does not award stickers', () async {
     SharedPreferences.setMockInitialValues({});
 
-    final service = LocalMealProgressService();
-    final recordedSession = await service.recordMealResult(
-      _mealResult(
+    final service = LocalActivityProgressService();
+    final recordedSession = await service.recordActivityResult(
+      _activityResult(
         startedAt: DateTime(2026, 5, 4, 12),
         endedAt: DateTime(2026, 5, 4, 12, 25),
         targetDuration: const Duration(minutes: 20),
         actualDuration: const Duration(minutes: 25),
-        completedBeforeArrival: false,
-        mealCompleted: false,
+        completedBeforeEnd: false,
+        activityCompleted: false,
       ),
     );
 
     expect(recordedSession.awardedRewards, isEmpty);
-    expect(recordedSession.entry.mealCompleted, isFalse);
+    expect(recordedSession.entry.activityCompleted, isFalse);
     expect(
       recordedSession.entry.completionStatus,
       ActivityCompletionStatus.needsMoreTime,
@@ -6480,11 +6504,11 @@ void main() {
   test('Arrival-completed meal records at-arrival status', () async {
     SharedPreferences.setMockInitialValues({});
 
-    final service = LocalMealProgressService();
-    final recordedSession = await service.recordMealResult(
-      _mealResult(
+    final service = LocalActivityProgressService();
+    final recordedSession = await service.recordActivityResult(
+      _activityResult(
         actualDuration: const Duration(minutes: 20),
-        completedBeforeArrival: false,
+        completedBeforeEnd: false,
         completionStatus: ActivityCompletionStatus.completedAtEnd,
       ),
     );
@@ -6503,32 +6527,51 @@ void main() {
   test('Meal history stores directly selected ingredient ids', () async {
     SharedPreferences.setMockInitialValues({});
 
-    final service = LocalMealProgressService();
-    final recordedSession = await service.recordMealResult(
-      _mealResult(selectedIngredientIds: const ['carrot', 'egg']),
+    final service = LocalActivityProgressService();
+    final recordedSession = await service.recordActivityResult(
+      _activityResult(selectedMarkerIds: const ['carrot', 'egg']),
     );
     final snapshot = await service.loadSnapshot();
 
-    expect(recordedSession.entry.selectedIngredientIds, ['carrot', 'egg']);
-    expect(snapshot.history.single.selectedIngredientIds, ['carrot', 'egg']);
+    expect(recordedSession.entry.selectedMarkerIds, ['carrot', 'egg']);
+    expect(snapshot.history.single.selectedMarkerIds, ['carrot', 'egg']);
+
+    final preferences = await SharedPreferences.getInstance();
+    final rawHistory = preferences.getStringList('activityHistory');
+    final rawInventory = preferences.getStringList('activityRewardInventory');
+    expect(rawHistory, isNotNull);
+    expect(rawInventory, isNotNull);
+    expect(preferences.getStringList('mealHistory'), isNull);
+    expect(preferences.getStringList('rewardInventory'), isNull);
+    final historyJson = Map<String, Object?>.from(
+      jsonDecode(rawHistory!.single) as Map,
+    );
+    expect(historyJson['activityId'], ActivityCatalog.defaultActivity.id);
+    expect(historyJson['completedBeforeEnd'], isFalse);
+    expect(historyJson['selectedMarkerIds'], ['carrot', 'egg']);
+    expect(historyJson.containsKey('completedBeforeArrival'), isFalse);
+    expect(historyJson.containsKey('mealCompleted'), isFalse);
+    expect(historyJson.containsKey('selectedIngredientIds'), isFalse);
   });
 
   test('Deleting meal history removes only the saved record', () async {
     SharedPreferences.setMockInitialValues({});
 
-    final service = LocalMealProgressService();
+    final service = LocalActivityProgressService();
     await service.createRewardGoal(
       requiredStickerCount: 2,
       rewardText: '아이스크림',
     );
-    final recordedSession = await service.recordMealResult(_mealResult());
+    final recordedSession = await service.recordActivityResult(
+      _activityResult(),
+    );
     final beforeDelete = await service.loadSnapshot();
 
     expect(beforeDelete.history, hasLength(1));
     expect(beforeDelete.inventory, isNotEmpty);
     expect(beforeDelete.activeRewardGoals.single.filledCount, 1);
 
-    final deleted = await service.deleteMealHistoryEntry(
+    final deleted = await service.deleteActivityHistoryEntry(
       recordedSession.entry.id,
     );
     final afterDelete = await service.loadSnapshot();
@@ -6556,10 +6599,10 @@ void main() {
     () async {
       SharedPreferences.setMockInitialValues({});
 
-      final service = LocalMealProgressService();
-      await service.recordMealResult(_mealResult());
+      final service = LocalActivityProgressService();
+      await service.recordActivityResult(_activityResult());
 
-      final deleted = await service.deleteMealHistoryEntry('missing-meal');
+      final deleted = await service.deleteActivityHistoryEntry('missing-meal');
       final snapshot = await service.loadSnapshot();
 
       expect(deleted, isFalse);
@@ -6570,13 +6613,15 @@ void main() {
   test('Completed meal fills exactly one active reward goal slot', () async {
     SharedPreferences.setMockInitialValues({});
 
-    final service = LocalMealProgressService();
+    final service = LocalActivityProgressService();
     await service.createRewardGoal(
       requiredStickerCount: 5,
       rewardText: '아이스크림',
     );
 
-    final recordedSession = await service.recordMealResult(_mealResult());
+    final recordedSession = await service.recordActivityResult(
+      _activityResult(),
+    );
     final snapshot = await service.loadSnapshot();
 
     expect(recordedSession.updatedRewardGoal?.filledCount, 1);
@@ -6587,14 +6632,16 @@ void main() {
   test('Completed meal fills all active reward goals', () async {
     SharedPreferences.setMockInitialValues({});
 
-    final service = LocalMealProgressService();
+    final service = LocalActivityProgressService();
     await service.createRewardGoal(
       requiredStickerCount: 5,
       rewardText: '아이스크림',
     );
     await service.createRewardGoal(requiredStickerCount: 7, rewardText: '딸기');
 
-    final recordedSession = await service.recordMealResult(_mealResult());
+    final recordedSession = await service.recordActivityResult(
+      _activityResult(),
+    );
     final snapshot = await service.loadSnapshot();
 
     expect(recordedSession.updatedRewardGoals, hasLength(2));
@@ -6605,7 +6652,7 @@ void main() {
   test('Only two active reward goals can be created', () async {
     SharedPreferences.setMockInitialValues({});
 
-    final service = LocalMealProgressService();
+    final service = LocalActivityProgressService();
     await service.createRewardGoal(
       requiredStickerCount: 5,
       rewardText: '아이스크림',
@@ -6650,7 +6697,7 @@ void main() {
         'redeemedRewardGoals': [jsonEncode(legacyUsedGoal.toJson())],
       });
 
-      final snapshot = await LocalMealProgressService().loadSnapshot();
+      final snapshot = await LocalActivityProgressService().loadSnapshot();
 
       expect(snapshot.activeRewardGoals, hasLength(1));
       expect(snapshot.activeRewardGoals.first.rewardText, '아이스크림');
@@ -6674,27 +6721,31 @@ void main() {
       ],
     });
 
-    final snapshot = await LocalMealProgressService().loadSnapshot();
+    final snapshot = await LocalActivityProgressService().loadSnapshot();
 
-    expect(snapshot.history.single.mealCompleted, isTrue);
+    expect(snapshot.history.single.activityCompleted, isTrue);
+    expect(
+      snapshot.history.single.activityId,
+      ActivityCatalog.defaultActivity.id,
+    );
     expect(
       snapshot.history.single.completionStatus,
       ActivityCompletionStatus.completedAfterEnd,
     );
-    expect(snapshot.history.single.selectedIngredientIds, isEmpty);
+    expect(snapshot.history.single.selectedMarkerIds, isEmpty);
   });
 
   test('Fast meal fills only one reward goal slot', () async {
     SharedPreferences.setMockInitialValues({});
 
-    final service = LocalMealProgressService();
+    final service = LocalActivityProgressService();
     await service.createRewardGoal(
       requiredStickerCount: 5,
       rewardText: '아이스크림',
     );
 
-    final recordedSession = await service.recordMealResult(
-      _mealResult(
+    final recordedSession = await service.recordActivityResult(
+      _activityResult(
         targetDuration: const Duration(minutes: 20),
         actualDuration: const Duration(minutes: 13),
       ),
@@ -6708,14 +6759,14 @@ void main() {
   test('Incomplete meal does not fill a reward goal slot', () async {
     SharedPreferences.setMockInitialValues({});
 
-    final service = LocalMealProgressService();
+    final service = LocalActivityProgressService();
     await service.createRewardGoal(
       requiredStickerCount: 5,
       rewardText: '아이스크림',
     );
 
-    final recordedSession = await service.recordMealResult(
-      _mealResult(mealCompleted: false),
+    final recordedSession = await service.recordActivityResult(
+      _activityResult(activityCompleted: false),
     );
     final snapshot = await service.loadSnapshot();
 
@@ -6726,17 +6777,17 @@ void main() {
   test('Reward goal becomes earned when required count is reached', () async {
     SharedPreferences.setMockInitialValues({});
 
-    final service = LocalMealProgressService();
+    final service = LocalActivityProgressService();
     await service.createRewardGoal(
       requiredStickerCount: 2,
       rewardText: '아이스크림',
     );
 
-    await service.recordMealResult(
-      _mealResult(endedAt: DateTime(2026, 5, 4, 12)),
+    await service.recordActivityResult(
+      _activityResult(endedAt: DateTime(2026, 5, 4, 12)),
     );
-    final recordedSession = await service.recordMealResult(
-      _mealResult(endedAt: DateTime(2026, 5, 4, 13)),
+    final recordedSession = await service.recordActivityResult(
+      _activityResult(endedAt: DateTime(2026, 5, 4, 13)),
     );
     final snapshot = await service.loadSnapshot();
 
@@ -6749,12 +6800,12 @@ void main() {
   test('Using an earned goal moves it to used history', () async {
     SharedPreferences.setMockInitialValues({});
 
-    final service = LocalMealProgressService();
+    final service = LocalActivityProgressService();
     await service.createRewardGoal(
       requiredStickerCount: 1,
       rewardText: '아이스크림',
     );
-    await service.recordMealResult(_mealResult());
+    await service.recordActivityResult(_activityResult());
 
     final usedGoal = await service.useEarnedRewardGoal();
     final snapshot = await service.loadSnapshot();
@@ -6770,7 +6821,7 @@ void main() {
   test('Active reward goal can be updated', () async {
     SharedPreferences.setMockInitialValues({});
 
-    final service = LocalMealProgressService();
+    final service = LocalActivityProgressService();
     await service.createRewardGoal(
       requiredStickerCount: 5,
       rewardText: '아이스크림',
@@ -6793,14 +6844,14 @@ void main() {
     () async {
       SharedPreferences.setMockInitialValues({});
 
-      final service = LocalMealProgressService();
+      final service = LocalActivityProgressService();
       await service.createRewardGoal(
         requiredStickerCount: 5,
         rewardText: '아이스크림',
       );
-      await service.recordMealResult(_mealResult());
-      await service.recordMealResult(
-        _mealResult(endedAt: DateTime(2026, 5, 4, 13)),
+      await service.recordActivityResult(_activityResult());
+      await service.recordActivityResult(
+        _activityResult(endedAt: DateTime(2026, 5, 4, 13)),
       );
 
       final updatedGoal = await service.updateActiveRewardGoal(
@@ -6820,7 +6871,7 @@ void main() {
   test('Active reward goal can be canceled', () async {
     SharedPreferences.setMockInitialValues({});
 
-    final service = LocalMealProgressService();
+    final service = LocalActivityProgressService();
     await service.createRewardGoal(
       requiredStickerCount: 5,
       rewardText: '아이스크림',
@@ -6837,13 +6888,15 @@ void main() {
   test('Existing sticker inventory counts still increase', () async {
     SharedPreferences.setMockInitialValues({});
 
-    final service = LocalMealProgressService();
+    final service = LocalActivityProgressService();
     await service.createRewardGoal(
       requiredStickerCount: 5,
       rewardText: '아이스크림',
     );
 
-    final recordedSession = await service.recordMealResult(_mealResult());
+    final recordedSession = await service.recordActivityResult(
+      _activityResult(),
+    );
     final snapshot = await service.loadSnapshot();
     final inventoryCount = snapshot.inventory.fold<int>(
       0,
@@ -6862,7 +6915,7 @@ void main() {
         locale: const Locale('en'),
         home: HomeScreen(
           config: ActivityTimerConfig.defaults().copyWith(childName: 'Jiyul'),
-          mealProgressService: LocalMealProgressService(),
+          activityProgressService: LocalActivityProgressService(),
           onConfigChanged: (_) {},
         ),
       ),
@@ -6878,9 +6931,9 @@ void main() {
     tester,
   ) async {
     SharedPreferences.setMockInitialValues({});
-    final service = LocalMealProgressService();
-    await service.recordMealResult(
-      _mealResult(
+    final service = LocalActivityProgressService();
+    await service.recordActivityResult(
+      _activityResult(
         targetDuration: const Duration(minutes: 20),
         actualDuration: const Duration(minutes: 25),
       ),
@@ -6891,7 +6944,7 @@ void main() {
         locale: const Locale('en'),
         home: HomeScreen(
           config: ActivityTimerConfig.defaults().copyWith(childName: 'Jiyul'),
-          mealProgressService: service,
+          activityProgressService: service,
           onConfigChanged: (_) {},
         ),
       ),
@@ -6905,7 +6958,7 @@ void main() {
     await tester.tap(find.text("Jiyul's meal records"));
     await tester.pumpAndSettle();
 
-    expect(find.byType(MealHistoryScreen), findsOneWidget);
+    expect(find.byType(ActivityHistoryScreen), findsOneWidget);
     expect(find.text('Meal Records'), findsOneWidget);
   });
 
@@ -6913,12 +6966,12 @@ void main() {
     tester,
   ) async {
     SharedPreferences.setMockInitialValues({});
-    final service = LocalMealProgressService();
-    await service.recordMealResult(
-      _mealResult(
+    final service = LocalActivityProgressService();
+    await service.recordActivityResult(
+      _activityResult(
         targetDuration: const Duration(minutes: 20),
         actualDuration: const Duration(minutes: 25),
-        mealCompleted: false,
+        activityCompleted: false,
         completionStatus: ActivityCompletionStatus.needsMoreTime,
       ),
     );
@@ -6930,7 +6983,7 @@ void main() {
         supportedLocales: AppTexts.supportedLocales,
         home: HomeScreen(
           config: ActivityTimerConfig.defaults().copyWith(childName: '강우'),
-          mealProgressService: service,
+          activityProgressService: service,
           onConfigChanged: (_) {},
         ),
       ),
@@ -6944,12 +6997,12 @@ void main() {
 
   testWidgets('Reward goal creation form saves a goal', (tester) async {
     SharedPreferences.setMockInitialValues({});
-    final service = LocalMealProgressService();
+    final service = LocalActivityProgressService();
 
     await tester.pumpWidget(
       MaterialApp(
         locale: const Locale('en'),
-        home: RewardGoalScreen(mealProgressService: service),
+        home: RewardGoalScreen(activityProgressService: service),
       ),
     );
     await tester.pump();
@@ -6968,17 +7021,17 @@ void main() {
 
   testWidgets('Earned reward use flow asks for confirmation', (tester) async {
     SharedPreferences.setMockInitialValues({});
-    final service = LocalMealProgressService();
+    final service = LocalActivityProgressService();
     await service.createRewardGoal(
       requiredStickerCount: 1,
       rewardText: 'ice cream',
     );
-    await service.recordMealResult(_mealResult());
+    await service.recordActivityResult(_activityResult());
 
     await tester.pumpWidget(
       MaterialApp(
         locale: const Locale('en'),
-        home: RewardGoalScreen(mealProgressService: service),
+        home: RewardGoalScreen(activityProgressService: service),
       ),
     );
     await tester.pumpAndSettle();
@@ -7017,8 +7070,8 @@ void main() {
         locale: const Locale('ko'),
         localizationsDelegates: GlobalMaterialLocalizations.delegates,
         supportedLocales: AppTexts.supportedLocales,
-        home: MealHistoryScreen(
-          mealProgressService: LocalMealProgressService(),
+        home: ActivityHistoryScreen(
+          activityProgressService: LocalActivityProgressService(),
         ),
       ),
     );
@@ -7031,13 +7084,13 @@ void main() {
 
   testWidgets('Meal history screen lists saved meal records', (tester) async {
     SharedPreferences.setMockInitialValues({});
-    final service = LocalMealProgressService();
-    await service.recordMealResult(
-      _mealResult(
+    final service = LocalActivityProgressService();
+    await service.recordActivityResult(
+      _activityResult(
         startedAt: DateTime(2026, 5, 4, 12),
         targetDuration: const Duration(minutes: 20),
         actualDuration: const Duration(minutes: 25),
-        completedBeforeArrival: false,
+        completedBeforeEnd: false,
       ),
     );
 
@@ -7046,7 +7099,7 @@ void main() {
         locale: const Locale('ko'),
         localizationsDelegates: GlobalMaterialLocalizations.delegates,
         supportedLocales: AppTexts.supportedLocales,
-        home: MealHistoryScreen(mealProgressService: service),
+        home: ActivityHistoryScreen(activityProgressService: service),
       ),
     );
     await tester.pumpAndSettle();
@@ -7066,9 +7119,9 @@ void main() {
     tester,
   ) async {
     SharedPreferences.setMockInitialValues({});
-    final service = LocalMealProgressService();
-    final recordedSession = await service.recordMealResult(
-      _mealResult(
+    final service = LocalActivityProgressService();
+    final recordedSession = await service.recordActivityResult(
+      _activityResult(
         startedAt: DateTime(2026, 5, 4, 12),
         targetDuration: const Duration(minutes: 20),
         actualDuration: const Duration(minutes: 25),
@@ -7080,7 +7133,7 @@ void main() {
         locale: const Locale('ko'),
         localizationsDelegates: GlobalMaterialLocalizations.delegates,
         supportedLocales: AppTexts.supportedLocales,
-        home: MealHistoryScreen(mealProgressService: service),
+        home: ActivityHistoryScreen(activityProgressService: service),
       ),
     );
     await tester.pumpAndSettle();
@@ -7089,7 +7142,7 @@ void main() {
 
     await tester.tap(
       find.byKey(
-        ValueKey('deleteMealHistoryEntry-${recordedSession.entry.id}'),
+        ValueKey('deleteActivityHistoryEntry-${recordedSession.entry.id}'),
       ),
     );
     await tester.pumpAndSettle();
@@ -7108,9 +7161,9 @@ void main() {
 
   testWidgets('Meal history delete dialog can be canceled', (tester) async {
     SharedPreferences.setMockInitialValues({});
-    final service = LocalMealProgressService();
-    final recordedSession = await service.recordMealResult(
-      _mealResult(
+    final service = LocalActivityProgressService();
+    final recordedSession = await service.recordActivityResult(
+      _activityResult(
         startedAt: DateTime(2026, 5, 4, 12),
         targetDuration: const Duration(minutes: 20),
         actualDuration: const Duration(minutes: 25),
@@ -7122,14 +7175,14 @@ void main() {
         locale: const Locale('ko'),
         localizationsDelegates: GlobalMaterialLocalizations.delegates,
         supportedLocales: AppTexts.supportedLocales,
-        home: MealHistoryScreen(mealProgressService: service),
+        home: ActivityHistoryScreen(activityProgressService: service),
       ),
     );
     await tester.pumpAndSettle();
 
     await tester.tap(
       find.byKey(
-        ValueKey('deleteMealHistoryEntry-${recordedSession.entry.id}'),
+        ValueKey('deleteActivityHistoryEntry-${recordedSession.entry.id}'),
       ),
     );
     await tester.pumpAndSettle();
@@ -7144,13 +7197,13 @@ void main() {
     tester,
   ) async {
     SharedPreferences.setMockInitialValues({});
-    final service = LocalMealProgressService();
-    await service.recordMealResult(
-      _mealResult(
+    final service = LocalActivityProgressService();
+    await service.recordActivityResult(
+      _activityResult(
         startedAt: DateTime(2026, 5, 4, 12),
         targetDuration: const Duration(minutes: 20),
         actualDuration: const Duration(minutes: 20),
-        selectedIngredientIds: const ['carrot', 'egg'],
+        selectedMarkerIds: const ['carrot', 'egg'],
       ),
     );
 
@@ -7159,7 +7212,7 @@ void main() {
         locale: const Locale('ko'),
         localizationsDelegates: GlobalMaterialLocalizations.delegates,
         supportedLocales: AppTexts.supportedLocales,
-        home: MealHistoryScreen(mealProgressService: service),
+        home: ActivityHistoryScreen(activityProgressService: service),
       ),
     );
     await tester.pumpAndSettle();
@@ -7175,13 +7228,13 @@ void main() {
     tester,
   ) async {
     SharedPreferences.setMockInitialValues({});
-    final service = LocalMealProgressService();
-    await service.recordMealResult(
-      _mealResult(
+    final service = LocalActivityProgressService();
+    await service.recordActivityResult(
+      _activityResult(
         startedAt: DateTime(2026, 5, 4, 12),
         targetDuration: const Duration(minutes: 20),
         actualDuration: const Duration(minutes: 25),
-        mealCompleted: false,
+        activityCompleted: false,
         completionStatus: ActivityCompletionStatus.needsMoreTime,
       ),
     );
@@ -7191,7 +7244,7 @@ void main() {
         locale: const Locale('ko'),
         localizationsDelegates: GlobalMaterialLocalizations.delegates,
         supportedLocales: AppTexts.supportedLocales,
-        home: MealHistoryScreen(mealProgressService: service),
+        home: ActivityHistoryScreen(activityProgressService: service),
       ),
     );
     await tester.pumpAndSettle();
@@ -7202,34 +7255,35 @@ void main() {
   });
 }
 
-ActivitySessionResult _mealResult({
+ActivitySessionResult _activityResult({
+  String activityId = 'brushing',
   DateTime? startedAt,
   DateTime? endedAt,
   Duration targetDuration = const Duration(minutes: 20),
   Duration actualDuration = const Duration(minutes: 25),
-  bool completedBeforeArrival = false,
-  bool mealCompleted = true,
+  bool completedBeforeEnd = false,
+  bool activityCompleted = true,
   ActivityCompletionStatus? completionStatus,
-  List<String> selectedIngredientIds = const [],
+  List<String> selectedMarkerIds = const [],
 }) {
   final resolvedStartedAt = startedAt ?? DateTime(2026, 5, 4, 12);
   final resolvedEndedAt = endedAt ?? resolvedStartedAt.add(actualDuration);
 
   return ActivitySessionResult(
-    activityId: ActivityCatalog.defaultActivity.id,
+    activityId: activityId,
     startedAt: resolvedStartedAt,
     endedAt: resolvedEndedAt,
     targetDuration: targetDuration,
     actualDuration: actualDuration,
-    completedBeforeEnd: completedBeforeArrival,
+    completedBeforeEnd: completedBeforeEnd,
     completionStatus:
         completionStatus ??
-        (mealCompleted
-            ? (completedBeforeArrival
+        (activityCompleted
+            ? (completedBeforeEnd
                   ? ActivityCompletionStatus.completedBeforeEnd
                   : ActivityCompletionStatus.completedAfterEnd)
             : ActivityCompletionStatus.needsMoreTime),
-    selectedMarkerIds: selectedIngredientIds,
+    selectedMarkerIds: selectedMarkerIds,
   );
 }
 

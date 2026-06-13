@@ -3,41 +3,46 @@ import 'package:flutter/material.dart';
 import '../catalogs/meal_ingredient_catalog.dart';
 import '../l10n/app_texts.dart';
 import '../models/meal_ingredient.dart';
-import '../models/meal_history_entry.dart';
-import '../models/meal_progress_snapshot.dart';
+import '../models/activity_history_entry.dart';
+import '../models/activity_progress_snapshot.dart';
 import '../models/reward_item.dart';
-import '../services/local_meal_progress_service.dart';
+import '../services/local_activity_progress_service.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_radius.dart';
 import '../theme/app_spacing.dart';
 import '../utils/duration_format.dart';
 import '../widgets/reward_sticker_image.dart';
 
-class MealHistoryScreen extends StatefulWidget {
-  const MealHistoryScreen({super.key, required this.mealProgressService});
+class ActivityHistoryScreen extends StatefulWidget {
+  const ActivityHistoryScreen({
+    super.key,
+    required this.activityProgressService,
+  });
 
-  final LocalMealProgressService mealProgressService;
+  final LocalActivityProgressService activityProgressService;
 
   @override
-  State<MealHistoryScreen> createState() => _MealHistoryScreenState();
+  State<ActivityHistoryScreen> createState() => _ActivityHistoryScreenState();
 }
 
-class _MealHistoryScreenState extends State<MealHistoryScreen> {
-  late Future<MealProgressSnapshot> _snapshotFuture;
+class _ActivityHistoryScreenState extends State<ActivityHistoryScreen> {
+  late Future<ActivityProgressSnapshot> _snapshotFuture;
 
   @override
   void initState() {
     super.initState();
-    _snapshotFuture = widget.mealProgressService.loadSnapshot();
+    _snapshotFuture = widget.activityProgressService.loadSnapshot();
   }
 
   void _reloadSnapshot() {
     setState(() {
-      _snapshotFuture = widget.mealProgressService.loadSnapshot();
+      _snapshotFuture = widget.activityProgressService.loadSnapshot();
     });
   }
 
-  Future<void> _confirmDeleteMealHistoryEntry(MealHistoryEntry entry) async {
+  Future<void> _confirmDeleteActivityHistoryEntry(
+    ActivityHistoryEntry entry,
+  ) async {
     final texts = AppTexts.of(context);
     final shouldDelete = await showDialog<bool>(
       context: context,
@@ -62,9 +67,8 @@ class _MealHistoryScreenState extends State<MealHistoryScreen> {
       return;
     }
 
-    final deleted = await widget.mealProgressService.deleteMealHistoryEntry(
-      entry.id,
-    );
+    final deleted = await widget.activityProgressService
+        .deleteActivityHistoryEntry(entry.id);
     if (!mounted) {
       return;
     }
@@ -83,7 +87,7 @@ class _MealHistoryScreenState extends State<MealHistoryScreen> {
     return Scaffold(
       appBar: AppBar(title: Text(texts.mealHistory.title)),
       body: SafeArea(
-        child: FutureBuilder<MealProgressSnapshot>(
+        child: FutureBuilder<ActivityProgressSnapshot>(
           future: _snapshotFuture,
           builder: (context, snapshot) {
             final history = snapshot.data?.history ?? const [];
@@ -110,7 +114,7 @@ class _MealHistoryScreenState extends State<MealHistoryScreen> {
                 final entry = history[index - 1];
                 return _MealHistoryCard(
                   entry: entry,
-                  onDelete: () => _confirmDeleteMealHistoryEntry(entry),
+                  onDelete: () => _confirmDeleteActivityHistoryEntry(entry),
                 );
               },
             );
@@ -250,7 +254,7 @@ class _MealHistoryHelpBullet extends StatelessWidget {
 class _MealHistoryCard extends StatelessWidget {
   const _MealHistoryCard({required this.entry, required this.onDelete});
 
-  final MealHistoryEntry entry;
+  final ActivityHistoryEntry entry;
   final VoidCallback onDelete;
 
   @override
@@ -263,7 +267,7 @@ class _MealHistoryCard extends StatelessWidget {
       entry.targetDuration,
     );
     final overrun = overrunDuration(entry.actualDuration, entry.targetDuration);
-    final selectedIngredients = entry.selectedIngredientIds
+    final selectedIngredients = entry.selectedMarkerIds
         .map(MealIngredientCatalog.findById)
         .whereType<MealIngredientDefinition>()
         .toList(growable: false);
@@ -290,11 +294,11 @@ class _MealHistoryCard extends StatelessWidget {
                 const SizedBox(width: AppSpacing.sm),
                 _StatusChip(
                   label: historyTexts.completedStatus(entry.completionStatus),
-                  isIncomplete: !entry.mealCompleted,
+                  isIncomplete: !entry.activityCompleted,
                 ),
                 const SizedBox(width: AppSpacing.xs),
                 IconButton(
-                  key: ValueKey('deleteMealHistoryEntry-${entry.id}'),
+                  key: ValueKey('deleteActivityHistoryEntry-${entry.id}'),
                   tooltip: historyTexts.deleteRecordLabel,
                   onPressed: onDelete,
                   icon: const Icon(Icons.delete_outline_rounded),
@@ -320,7 +324,7 @@ class _MealHistoryCard extends StatelessWidget {
                 ),
               ],
             ),
-            if (!entry.mealCompleted && overrun > Duration.zero) ...[
+            if (!entry.activityCompleted && overrun > Duration.zero) ...[
               const SizedBox(height: AppSpacing.sm),
               _OverrunChip(
                 label: historyTexts.overrunTime(formatDuration(overrun)),
