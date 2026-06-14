@@ -1415,11 +1415,22 @@ class _TimerBuilderSheetState extends State<_TimerBuilderSheet> {
                     ),
                     const SizedBox(height: AppSpacing.lg),
                     if (savedPresetCards.isNotEmpty) ...[
-                      for (final card in savedPresetCards) ...[
-                        card,
-                        const SizedBox(height: AppSpacing.sm),
-                      ],
+                      _TimerBuilderStepTitle(
+                        title: homeTexts.timerBuilderSavedPresetTitle,
+                      ),
                       const SizedBox(height: AppSpacing.sm),
+                      SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: Row(
+                          children: [
+                            for (final card in savedPresetCards) ...[
+                              SizedBox(width: 252, child: card),
+                              const SizedBox(width: AppSpacing.sm),
+                            ],
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: AppSpacing.lg),
                     ],
                     if (recentPreset != null && recentActivity != null) ...[
                       _TimerBuilderPresetCard(
@@ -1678,66 +1689,83 @@ class _TimerBuilderPresetCard extends StatelessWidget {
         border: Border.all(color: AppColors.borderWarm),
       ),
       child: Padding(
-        padding: const EdgeInsets.all(AppSpacing.md),
-        child: Row(
+        padding: const EdgeInsets.all(AppSpacing.sm),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            DecoratedBox(
-              decoration: BoxDecoration(
-                color: AppColors.surfaceYellow,
-                borderRadius: AppRadius.pill,
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(AppSpacing.sm),
-                child: Text(
-                  activityEmoji,
-                  textScaler: TextScaler.noScaling,
-                  style: textTheme.titleLarge,
-                ),
-              ),
-            ),
-            const SizedBox(width: AppSpacing.md),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: textTheme.labelLarge?.copyWith(
-                      color: AppColors.textSecondary,
-                      fontWeight: FontWeight.w800,
+            Row(
+              children: [
+                DecoratedBox(
+                  decoration: BoxDecoration(
+                    color: AppColors.surfaceYellow,
+                    borderRadius: AppRadius.pill,
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(AppSpacing.sm),
+                    child: Text(
+                      activityEmoji,
+                      textScaler: TextScaler.noScaling,
+                      style: textTheme.titleLarge,
                     ),
                   ),
-                  const SizedBox(height: AppSpacing.xs),
-                  Text(
-                    '$activityLabel · $durationLabel · $markerModeLabel',
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    style: textTheme.titleSmall?.copyWith(
-                      color: AppColors.textStrong,
-                      fontWeight: FontWeight.w900,
+                ),
+                const SizedBox(width: AppSpacing.sm),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        title,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: textTheme.labelLarge?.copyWith(
+                          color: AppColors.textSecondary,
+                          fontWeight: FontWeight.w800,
+                        ),
+                      ),
+                      const SizedBox(height: AppSpacing.xs),
+                      Text(
+                        '$activityLabel · $durationLabel · $markerModeLabel',
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: textTheme.titleSmall?.copyWith(
+                          color: AppColors.textStrong,
+                          fontWeight: FontWeight.w900,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                if (onDelete != null) ...[
+                  const SizedBox(width: AppSpacing.xs),
+                  IconButton(
+                    key: deleteButtonKey,
+                    onPressed: onDelete,
+                    tooltip: deleteTooltip,
+                    icon: const Icon(Icons.close_rounded),
+                    color: AppColors.textSecondary,
+                    style: IconButton.styleFrom(
+                      fixedSize: const Size(36, 36),
+                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                     ),
                   ),
                 ],
+              ],
+            ),
+            const SizedBox(height: AppSpacing.sm),
+            Align(
+              alignment: Alignment.centerRight,
+              child: TextButton(
+                key: applyButtonKey,
+                onPressed: onApply,
+                style: TextButton.styleFrom(
+                  minimumSize: const Size(72, 36),
+                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                ),
+                child: Text(applyLabel),
               ),
             ),
-            const SizedBox(width: AppSpacing.sm),
-            TextButton(
-              key: applyButtonKey,
-              onPressed: onApply,
-              child: Text(applyLabel),
-            ),
-            if (onDelete != null) ...[
-              const SizedBox(width: AppSpacing.xs),
-              IconButton(
-                key: deleteButtonKey,
-                onPressed: onDelete,
-                tooltip: deleteTooltip,
-                icon: const Icon(Icons.close_rounded),
-                color: AppColors.textSecondary,
-              ),
-            ],
           ],
         ),
       ),
