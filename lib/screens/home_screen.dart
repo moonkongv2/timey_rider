@@ -1429,7 +1429,6 @@ class _TimerBuilderSheetState extends State<_TimerBuilderSheet> {
             deleteButtonKey: ValueKey(
               'timerBuilderSavedPresetDeleteButton_$index',
             ),
-            title: homeTexts.timerBuilderSavedPresetTitle,
             applyLabel: homeTexts.timerBuilderRecentPresetApplyButton,
             deleteTooltip: homeTexts.timerBuilderDeletePresetTooltip,
             activityEmoji: activity.emoji,
@@ -1770,20 +1769,20 @@ class _TimerBuilderPresetCard extends StatelessWidget {
   const _TimerBuilderPresetCard({
     super.key,
     required this.applyButtonKey,
-    required this.title,
     required this.applyLabel,
     required this.activityEmoji,
     required this.activityLabel,
     required this.durationLabel,
     required this.markerModeLabel,
     required this.onApply,
+    this.title,
     this.deleteButtonKey,
     this.deleteTooltip,
     this.onDelete,
   });
 
   final Key applyButtonKey;
-  final String title;
+  final String? title;
   final String applyLabel;
   final String activityEmoji;
   final String activityLabel;
@@ -1831,16 +1830,18 @@ class _TimerBuilderPresetCard extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        title,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: textTheme.labelLarge?.copyWith(
-                          color: AppColors.textSecondary,
-                          fontWeight: FontWeight.w800,
+                      if (title != null) ...[
+                        Text(
+                          title!,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: textTheme.labelLarge?.copyWith(
+                            color: AppColors.textSecondary,
+                            fontWeight: FontWeight.w800,
+                          ),
                         ),
-                      ),
-                      const SizedBox(height: AppSpacing.xs),
+                        const SizedBox(height: AppSpacing.xs),
+                      ],
                       Text(
                         '$activityLabel · $durationLabel · $markerModeLabel',
                         maxLines: 2,

@@ -2513,6 +2513,7 @@ void main() {
       findsOneWidget,
     );
     expect(find.text('1/5개'), findsOneWidget);
+    expect(find.text('저장한 타이머'), findsOneWidget);
     expect(find.text('저장했어요.'), findsOneWidget);
   });
 
