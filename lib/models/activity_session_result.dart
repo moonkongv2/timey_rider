@@ -21,16 +21,8 @@ class ActivitySessionResult {
   final ActivityCompletionStatus completionStatus;
   final List<String> selectedMarkerIds;
 
-  bool get activityCompleted {
-    return switch (completionStatus) {
-      ActivityCompletionStatus.completedBeforeEnd ||
-      ActivityCompletionStatus.completedAtEnd ||
-      ActivityCompletionStatus.completedAfterEnd ||
-      ActivityCompletionStatus.timeEnded => true,
-      ActivityCompletionStatus.needsMoreTime ||
-      ActivityCompletionStatus.canceled => false,
-    };
-  }
+  bool get activityCompleted =>
+      activityCompletionStatusIsCompleted(completionStatus);
 
   ActivitySessionResult copyWith({List<String>? selectedMarkerIds}) {
     return ActivitySessionResult(

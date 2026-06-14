@@ -7,6 +7,30 @@ enum ActivityCompletionStatus {
   canceled,
 }
 
+bool activityCompletionStatusIsCompleted(ActivityCompletionStatus status) {
+  return switch (status) {
+    ActivityCompletionStatus.completedBeforeEnd ||
+    ActivityCompletionStatus.completedAtEnd ||
+    ActivityCompletionStatus.completedAfterEnd ||
+    ActivityCompletionStatus.timeEnded => true,
+    ActivityCompletionStatus.needsMoreTime ||
+    ActivityCompletionStatus.canceled => false,
+  };
+}
+
+bool activityCompletionStatusCanReceiveSticker(
+  ActivityCompletionStatus status,
+) {
+  return switch (status) {
+    ActivityCompletionStatus.completedBeforeEnd ||
+    ActivityCompletionStatus.completedAtEnd ||
+    ActivityCompletionStatus.completedAfterEnd => true,
+    ActivityCompletionStatus.timeEnded ||
+    ActivityCompletionStatus.needsMoreTime ||
+    ActivityCompletionStatus.canceled => false,
+  };
+}
+
 ActivityCompletionStatus activityCompletionStatusFromJson(
   Object? value, {
   required bool completedBeforeEnd,

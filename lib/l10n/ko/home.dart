@@ -95,9 +95,9 @@ class HomeTexts implements HomeTextSet {
     ActivityCompletionStatus completionStatus,
   ) {
     final status = switch (completionStatus) {
-      ActivityCompletionStatus.completedBeforeEnd => '시간 전에 완료',
-      ActivityCompletionStatus.completedAtEnd => '시간에 맞춰 완료',
-      ActivityCompletionStatus.completedAfterEnd => '조금 더 하고 완료',
+      ActivityCompletionStatus.completedBeforeEnd ||
+      ActivityCompletionStatus.completedAtEnd ||
+      ActivityCompletionStatus.completedAfterEnd => '완료',
       ActivityCompletionStatus.timeEnded => '시간 종료',
       ActivityCompletionStatus.needsMoreTime => '조금 더 필요',
       ActivityCompletionStatus.canceled => '취소됨',

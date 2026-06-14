@@ -119,6 +119,47 @@ void main() {
     expect(incomplete.activityCompleted, isFalse);
   });
 
+  test(
+    'Activity completion status helpers separate completion and stickers',
+    () {
+      expect(
+        activityCompletionStatusIsCompleted(
+          ActivityCompletionStatus.completedBeforeEnd,
+        ),
+        isTrue,
+      );
+      expect(
+        activityCompletionStatusIsCompleted(ActivityCompletionStatus.timeEnded),
+        isTrue,
+      );
+      expect(
+        activityCompletionStatusIsCompleted(
+          ActivityCompletionStatus.needsMoreTime,
+        ),
+        isFalse,
+      );
+
+      expect(
+        activityCompletionStatusCanReceiveSticker(
+          ActivityCompletionStatus.completedAtEnd,
+        ),
+        isTrue,
+      );
+      expect(
+        activityCompletionStatusCanReceiveSticker(
+          ActivityCompletionStatus.timeEnded,
+        ),
+        isFalse,
+      );
+      expect(
+        activityCompletionStatusCanReceiveSticker(
+          ActivityCompletionStatus.canceled,
+        ),
+        isFalse,
+      );
+    },
+  );
+
   test('ActivitySessionResult copyWith updates selected marker ids', () {
     final startedAt = DateTime.utc(2026, 6, 13, 1);
     final result = ActivitySessionResult(

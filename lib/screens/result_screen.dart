@@ -47,25 +47,11 @@ const _resultVideoPathsByVehicle = {
 };
 
 bool isPositiveResult(ActivityCompletionStatus status) {
-  return switch (status) {
-    ActivityCompletionStatus.completedBeforeEnd ||
-    ActivityCompletionStatus.completedAtEnd ||
-    ActivityCompletionStatus.completedAfterEnd ||
-    ActivityCompletionStatus.timeEnded => true,
-    ActivityCompletionStatus.needsMoreTime ||
-    ActivityCompletionStatus.canceled => false,
-  };
+  return activityCompletionStatusIsCompleted(status);
 }
 
 bool isRewardableResult(ActivityCompletionStatus status) {
-  return switch (status) {
-    ActivityCompletionStatus.completedBeforeEnd ||
-    ActivityCompletionStatus.completedAtEnd ||
-    ActivityCompletionStatus.completedAfterEnd => true,
-    ActivityCompletionStatus.timeEnded ||
-    ActivityCompletionStatus.needsMoreTime ||
-    ActivityCompletionStatus.canceled => false,
-  };
+  return activityCompletionStatusCanReceiveSticker(status);
 }
 
 List<AppHelpSection> _resultHelpSections(

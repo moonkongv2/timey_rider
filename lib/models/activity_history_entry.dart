@@ -59,7 +59,7 @@ class ActivityHistoryEntry {
   final List<String> selectedMarkerIds;
 
   bool get activityCompleted =>
-      _activityCompletionStatusIsCompleted(completionStatus);
+      activityCompletionStatusIsCompleted(completionStatus);
 
   Map<String, Object?> toJson() {
     return {
@@ -75,15 +75,4 @@ class ActivityHistoryEntry {
       'selectedMarkerIds': selectedMarkerIds,
     };
   }
-}
-
-bool _activityCompletionStatusIsCompleted(ActivityCompletionStatus status) {
-  return switch (status) {
-    ActivityCompletionStatus.completedBeforeEnd ||
-    ActivityCompletionStatus.completedAtEnd ||
-    ActivityCompletionStatus.completedAfterEnd ||
-    ActivityCompletionStatus.timeEnded => true,
-    ActivityCompletionStatus.needsMoreTime ||
-    ActivityCompletionStatus.canceled => false,
-  };
 }

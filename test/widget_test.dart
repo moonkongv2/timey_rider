@@ -7756,10 +7756,7 @@ void main() {
     await tester.drag(find.byType(ListView), const Offset(0, -700));
     await tester.pumpAndSettle();
 
-    expect(
-      find.text('Recent activity 20:00 · Done after time'),
-      findsOneWidget,
-    );
+    expect(find.text('Recent activity 20:00 · Completed'), findsOneWidget);
 
     await tester.tap(find.text("Jiyul's activity history"));
     await tester.pumpAndSettle();
@@ -7923,7 +7920,7 @@ void main() {
     expect(find.text('실제'), findsOneWidget);
     expect(find.text('25:00'), findsNothing);
     expect(find.text('초과 +05:00'), findsNothing);
-    expect(find.text('조금 더 하고 완료'), findsOneWidget);
+    expect(find.text('완료'), findsOneWidget);
     expect(find.text('받은 스티커'), findsOneWidget);
     expect(find.text('고른 마커'), findsNothing);
   });

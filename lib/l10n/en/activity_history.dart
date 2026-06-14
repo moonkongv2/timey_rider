@@ -31,9 +31,9 @@ class EnActivityHistoryTexts implements ActivityHistoryTextSet {
 
   String completedStatus(ActivityCompletionStatus completionStatus) {
     return switch (completionStatus) {
-      ActivityCompletionStatus.completedBeforeEnd => 'Done early',
-      ActivityCompletionStatus.completedAtEnd => 'Done on time',
-      ActivityCompletionStatus.completedAfterEnd => 'Done after time',
+      ActivityCompletionStatus.completedBeforeEnd ||
+      ActivityCompletionStatus.completedAtEnd ||
+      ActivityCompletionStatus.completedAfterEnd => 'Completed',
       ActivityCompletionStatus.timeEnded => 'Time ended',
       ActivityCompletionStatus.needsMoreTime => 'Needs more time',
       ActivityCompletionStatus.canceled => 'Canceled',

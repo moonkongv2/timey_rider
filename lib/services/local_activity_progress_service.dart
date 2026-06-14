@@ -317,22 +317,11 @@ class LocalActivityProgressService {
   List<RewardDefinition> _selectRewards(ActivitySessionResult result) {
     final activity = ActivityCatalog.findById(result.activityId);
     if (!activity.rewardEnabledByDefault ||
-        !_completionStatusAwardsSticker(result.completionStatus)) {
+        !activityCompletionStatusCanReceiveSticker(result.completionStatus)) {
       return const [];
     }
 
     return [_randomSuccessSticker()];
-  }
-
-  bool _completionStatusAwardsSticker(ActivityCompletionStatus status) {
-    return switch (status) {
-      ActivityCompletionStatus.completedBeforeEnd ||
-      ActivityCompletionStatus.completedAtEnd ||
-      ActivityCompletionStatus.completedAfterEnd => true,
-      ActivityCompletionStatus.timeEnded ||
-      ActivityCompletionStatus.needsMoreTime ||
-      ActivityCompletionStatus.canceled => false,
-    };
   }
 
   RewardDefinition _randomSuccessSticker() {
@@ -370,7 +359,7 @@ class LocalActivityProgressService {
     required String activitySessionId,
   }) {
     if (goals.isEmpty ||
-        !_completionStatusAwardsSticker(result.completionStatus)) {
+        !activityCompletionStatusCanReceiveSticker(result.completionStatus)) {
       return _RewardGoalUpdate(activeGoals: goals);
     }
 
