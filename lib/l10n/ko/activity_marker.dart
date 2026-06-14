@@ -14,12 +14,11 @@ class ActivityMarkerTexts implements ActivityMarkerTextSet {
     '완료 여부나 스티커 판정을 직접 결정하지 않아요.',
   ];
   List<String> get helpBulletItems => const [
-    '활동에 맞게: 선택한 활동에 어울리는 마커를 사용해요.',
-    '직접 선택: 시작 전 최대 5개까지 골라요. 직접 고른 마커는 활동 기록에 남아요.',
-    '자동 선택: 활동에 맞는 마커를 무작위로 골라요.',
-    '활동 기록에는 직접 고른 마커만 남아요.',
+    '자동: 선택한 활동에 어울리는 그림 마커를 미리 보여주고 사용해요.',
+    '직접 선택: 시작 전 그림 마커를 최대 5개까지 골라요.',
+    '활동 기록에는 직접 고른 그림 마커만 남아요.',
   ];
-  String get randomStartButton => '자동 선택으로 출발';
+  String get automaticStartButton => '자동으로 출발';
   String get selectedStartButton => '선택한 마커로 출발';
 
   String selectedCount(int selectedCount, int maxCount) {

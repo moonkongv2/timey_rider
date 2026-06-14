@@ -13,8 +13,8 @@ sealed class ActivityMarkerPickerResult {
   const ActivityMarkerPickerResult();
 }
 
-class RandomActivityMarkers extends ActivityMarkerPickerResult {
-  const RandomActivityMarkers();
+class AutomaticActivityMarkers extends ActivityMarkerPickerResult {
+  const AutomaticActivityMarkers();
 }
 
 class SelectedActivityMarkers extends ActivityMarkerPickerResult {
@@ -43,19 +43,7 @@ class _ActivityMarkerPickerSheetState extends State<ActivityMarkerPickerSheet> {
   late final Set<String> _selectedIds = _validInitialSelectedIds();
 
   late final List<ActivityMarkerDefinition> _availableMarkers =
-      _markersForActivity();
-
-  List<ActivityMarkerDefinition> _markersForActivity() {
-    final activityMarkerIds = ActivityMarkerCatalog.markerIdsForActivity(
-      widget.activityId,
-    );
-    final candidateIds = activityMarkerIds.isEmpty
-        ? ActivityMarkerCatalog.defaultSelectionIds
-        : activityMarkerIds;
-    return List.unmodifiable(
-      candidateIds.map(ActivityMarkerCatalog.findById).nonNulls,
-    );
-  }
+      ActivityMarkerCatalog.all;
 
   Set<String> _validInitialSelectedIds() {
     final selectedIds = <String>{};
@@ -85,8 +73,8 @@ class _ActivityMarkerPickerSheetState extends State<ActivityMarkerPickerSheet> {
     });
   }
 
-  void _startRandom() {
-    Navigator.of(context).pop(const RandomActivityMarkers());
+  void _startAutomatic() {
+    Navigator.of(context).pop(const AutomaticActivityMarkers());
   }
 
   void _startSelected() {
@@ -249,11 +237,11 @@ class _ActivityMarkerPickerSheetState extends State<ActivityMarkerPickerSheet> {
                         Expanded(
                           child: OutlinedButton.icon(
                             key: const ValueKey(
-                              'randomStartActivityMarkersButton',
+                              'automaticStartActivityMarkersButton',
                             ),
-                            onPressed: _startRandom,
+                            onPressed: _startAutomatic,
                             icon: const Icon(Icons.shuffle_rounded),
-                            label: Text(texts.randomStartButton),
+                            label: Text(texts.automaticStartButton),
                           ),
                         ),
                         const SizedBox(width: AppSpacing.sm),
@@ -301,29 +289,31 @@ class _MarkerChoiceChip extends StatelessWidget {
       Localizations.localeOf(context).languageCode,
     );
 
-    return ChoiceChip(
-      key: ValueKey('activityMarkerChip_${marker.id}'),
+    return Semantics(
+      label: label,
       selected: isSelected,
-      onSelected: isEnabled ? (_) => onSelected() : null,
-      avatar: _MarkerChipAvatar(marker: marker),
-      label: Text(label),
-      labelStyle: Theme.of(context).textTheme.labelLarge?.copyWith(
-        color: isSelected ? AppColors.textStrong : AppColors.textPrimary,
-        fontWeight: FontWeight.w800,
+      button: true,
+      child: ChoiceChip(
+        key: ValueKey('activityMarkerChip_${marker.id}'),
+        selected: isSelected,
+        onSelected: isEnabled ? (_) => onSelected() : null,
+        label: _MarkerEmoji(marker: marker),
+        labelPadding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+        selectedColor: AppColors.surfaceYellow,
+        backgroundColor: AppColors.white.withValues(alpha: 0.82),
+        disabledColor: AppColors.white.withValues(alpha: 0.44),
+        side: BorderSide(
+          color: isSelected ? AppColors.primarySoft : AppColors.borderSoft,
+          width: isSelected ? 1.6 : 1,
+        ),
+        showCheckmark: false,
       ),
-      selectedColor: AppColors.surfaceYellow,
-      backgroundColor: AppColors.white.withValues(alpha: 0.82),
-      disabledColor: AppColors.white.withValues(alpha: 0.44),
-      side: BorderSide(
-        color: isSelected ? AppColors.primarySoft : AppColors.borderSoft,
-      ),
-      showCheckmark: false,
     );
   }
 }
 
-class _MarkerChipAvatar extends StatelessWidget {
-  const _MarkerChipAvatar({required this.marker});
+class _MarkerEmoji extends StatelessWidget {
+  const _MarkerEmoji({required this.marker});
 
   final ActivityMarkerDefinition marker;
 
@@ -331,18 +321,28 @@ class _MarkerChipAvatar extends StatelessWidget {
   Widget build(BuildContext context) {
     final assetPath = marker.assetPath;
     if (assetPath == null) {
-      return Text(marker.emoji);
+      return Text(
+        marker.emoji,
+        textScaler: TextScaler.noScaling,
+        style: const TextStyle(fontSize: 26, height: 1),
+      );
     }
 
     return SizedBox(
-      width: 22,
-      height: 22,
+      width: 30,
+      height: 30,
       child: Image.asset(
         assetPath,
         key: ValueKey('activityMarkerChipImage_${marker.id}'),
         fit: BoxFit.contain,
         errorBuilder: (context, error, stackTrace) {
-          return Center(child: Text(marker.emoji));
+          return Center(
+            child: Text(
+              marker.emoji,
+              textScaler: TextScaler.noScaling,
+              style: const TextStyle(fontSize: 26, height: 1),
+            ),
+          );
         },
       ),
     );

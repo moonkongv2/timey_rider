@@ -26,10 +26,15 @@ String _markerModeLabel(SettingsTextSet texts, ActivityMarkerMode mode) {
   return switch (mode) {
     ActivityMarkerMode.off => texts.markerModeOff,
     ActivityMarkerMode.manual => texts.markerModeManual,
-    ActivityMarkerMode.random => texts.markerModeRandom,
     ActivityMarkerMode.activityDefault => texts.markerModeActivityDefault,
   };
 }
+
+const _markerModes = [
+  ActivityMarkerMode.off,
+  ActivityMarkerMode.manual,
+  ActivityMarkerMode.activityDefault,
+];
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({
@@ -258,7 +263,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             ),
                           ),
                           segments: [
-                            for (final mode in ActivityMarkerMode.values)
+                            for (final mode in _markerModes)
                               ButtonSegment(
                                 value: mode,
                                 label: FittedBox(

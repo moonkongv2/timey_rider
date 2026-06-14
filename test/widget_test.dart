@@ -87,11 +87,11 @@ void main() {
     expect(ids.toSet(), hasLength(ids.length));
   });
 
-  test('Activity marker random selection returns valid ids', () {
-    final ids = ActivityMarkerCatalog.randomSelectionIds();
+  test('Activity marker automatic selection returns valid ids', () {
+    final ids = ActivityMarkerCatalog.automaticSelectionIds();
 
     expect(ids, isNotEmpty);
-    expect(ids, hasLength(5));
+    expect(ids, hasLength(2));
     for (final id in ids) {
       expect(ActivityMarkerCatalog.findById(id), isNotNull);
     }
@@ -146,13 +146,13 @@ void main() {
   });
 
   test('Activity marker course slots only uses selected ids', () {
-    const selectedIds = ['top_teeth', 'bottom_teeth', 'front_teeth'];
+    const selectedIds = ['top_teeth', 'bottom_teeth', 'molars'];
     final slots = ActivityMarkerCatalog.courseSlotsFor(selectedIds);
 
     expect(slots.map((marker) => marker.id).toSet(), {
       'top_teeth',
       'bottom_teeth',
-      'front_teeth',
+      'molars',
     });
   });
 
@@ -258,12 +258,12 @@ void main() {
 
   test('ActivityTimerConfig copyWith updates marker mode', () {
     final config = ActivityTimerConfig.defaults().copyWith(
-      markerMode: ActivityMarkerMode.random,
+      markerMode: ActivityMarkerMode.activityDefault,
     );
     final preservedConfig = config.copyWith(vehicleId: 'bus');
     final updatedConfig = config.copyWith(markerMode: ActivityMarkerMode.off);
 
-    expect(preservedConfig.markerMode, ActivityMarkerMode.random);
+    expect(preservedConfig.markerMode, ActivityMarkerMode.activityDefault);
     expect(updatedConfig.markerMode, ActivityMarkerMode.off);
   });
 
@@ -339,23 +339,14 @@ void main() {
     final service = LocalSettingsService();
     await service.saveConfig(
       ActivityTimerConfig.defaults().copyWith(
-        markerMode: ActivityMarkerMode.random,
+        markerMode: ActivityMarkerMode.activityDefault,
       ),
     );
 
     final loadedConfig = await service.loadConfig();
     final preferences = await SharedPreferences.getInstance();
-    expect(loadedConfig.markerMode, ActivityMarkerMode.random);
-    expect(preferences.getString('markerMode'), 'random');
-    expect(preferences.getString('courseIngredientMode'), isNull);
-  });
-
-  test('Local settings reads legacy marker mode key', () async {
-    SharedPreferences.setMockInitialValues({'courseIngredientMode': 'manual'});
-
-    final loadedConfig = await LocalSettingsService().loadConfig();
-
-    expect(loadedConfig.markerMode, ActivityMarkerMode.manual);
+    expect(loadedConfig.markerMode, ActivityMarkerMode.activityDefault);
+    expect(preferences.getString('markerMode'), 'activityDefault');
   });
 
   test('Local settings falls back for invalid marker mode', () async {
@@ -2097,9 +2088,7 @@ void main() {
     expect(timerScreen.config.duration, const Duration(minutes: 2));
   });
 
-  testWidgets('Timer builder shows manual marker choices for an activity', (
-    tester,
-  ) async {
+  testWidgets('Timer builder shows all manual marker choices', (tester) async {
     SharedPreferences.setMockInitialValues({});
     addTearDown(() async {
       await const ActiveActivityTimerSessionStore().clear();
@@ -2133,6 +2122,12 @@ void main() {
 
     expect(find.byKey(const ValueKey('timerBuilderSheet')), findsOneWidget);
     expect(
+      find.byKey(const ValueKey('timerBuilderSelectedMarkerCount')),
+      findsOneWidget,
+    );
+    expect(find.text('0/5개 선택'), findsOneWidget);
+    expect(find.text('마커를 1~5개 선택해요.'), findsOneWidget);
+    expect(
       find.byKey(const ValueKey('timerBuilderMarker_top_teeth')),
       findsOneWidget,
     );
@@ -2141,11 +2136,44 @@ void main() {
       findsOneWidget,
     );
     expect(
-      find.byKey(const ValueKey('timerBuilderMarker_front_teeth')),
+      find.byKey(const ValueKey('timerBuilderMarker_cover')),
       findsOneWidget,
     );
-    expect(find.text('어금니'), findsOneWidget);
-    expect(find.text('혀'), findsOneWidget);
+    expect(
+      find.byKey(const ValueKey('timerBuilderMarker_blocks')),
+      findsOneWidget,
+    );
+    expect(
+      find.byKey(const ValueKey('timerBuilderMarker_star')),
+      findsOneWidget,
+    );
+    expect(find.text('안쪽 꼼꼼'), findsNothing);
+    expect(find.text('마무리 헹굼'), findsNothing);
+
+    for (final markerId in [
+      'top_teeth',
+      'bottom_teeth',
+      'molars',
+      'tongue',
+      'star',
+    ]) {
+      tester
+          .widget<ChoiceChip>(
+            find.byKey(ValueKey('timerBuilderMarker_$markerId')),
+          )
+          .onSelected!(true);
+      await tester.pump();
+    }
+
+    expect(find.text('5/5개 선택'), findsOneWidget);
+    expect(
+      tester
+          .widget<ChoiceChip>(
+            find.byKey(const ValueKey('timerBuilderMarker_cover')),
+          )
+          .onSelected,
+      isNull,
+    );
     expect(find.byType(TimerScreen), findsNothing);
   });
 
@@ -2216,13 +2244,36 @@ void main() {
     await tester.pump();
 
     await _openTimerBuilder(tester);
+
+    expect(
+      find.byKey(const ValueKey('timerBuilderAutoMarkerPreview')),
+      findsOneWidget,
+    );
+    expect(
+      find.byKey(const ValueKey('timerBuilderAutoMarkerPreview_top_teeth')),
+      findsOneWidget,
+    );
+    expect(
+      find.byKey(const ValueKey('timerBuilderAutoMarkerPreview_bottom_teeth')),
+      findsOneWidget,
+    );
+    expect(
+      find.byKey(const ValueKey('timerBuilderAutoMarkerPreview_star')),
+      findsOneWidget,
+    );
+    expect(
+      find.byKey(const ValueKey('timerBuilderAutoMarkerPreview_flag')),
+      findsOneWidget,
+    );
     await _startTimerBuilder(tester);
 
     expect(find.byKey(const ValueKey('timerBuilderSheet')), findsNothing);
     expect(find.byType(TimerScreen), findsOneWidget);
     expect(
       tester.widget<TimerScreen>(find.byType(TimerScreen)).config.markerIds,
-      hasLength(ActivityMarkerCatalog.maxSelectableMarkerCount),
+      hasLength(
+        ActivityMarkerCatalog.autoSelectionIdsForActivity('brushing').length,
+      ),
     );
     expect(
       tester
@@ -2233,7 +2284,7 @@ void main() {
     );
   });
 
-  testWidgets('Timer builder random marker starts timer', (tester) async {
+  testWidgets('Timer builder automatic marker starts timer', (tester) async {
     SharedPreferences.setMockInitialValues({});
     addTearDown(() async {
       await const ActiveActivityTimerSessionStore().clear();
@@ -2252,7 +2303,7 @@ void main() {
           config: ActivityTimerConfig.defaults().copyWith(
             childName: '지율',
             duration: const Duration(minutes: 35),
-            markerMode: ActivityMarkerMode.random,
+            markerMode: ActivityMarkerMode.activityDefault,
           ),
           activityProgressService: LocalActivityProgressService(),
           onConfigChanged: (_) {},
@@ -2268,7 +2319,9 @@ void main() {
     expect(find.byType(TimerScreen), findsOneWidget);
     expect(
       tester.widget<TimerScreen>(find.byType(TimerScreen)).config.markerIds,
-      hasLength(ActivityMarkerCatalog.maxSelectableMarkerCount),
+      hasLength(
+        ActivityMarkerCatalog.autoSelectionIdsForActivity('brushing').length,
+      ),
     );
     expect(
       tester
@@ -2426,7 +2479,7 @@ void main() {
     });
     await const LocalRecentTimerService().save(
       ActivityTimerPreset(
-        activityId: 'reading',
+        activityId: 'brushing',
         duration: Duration(minutes: 18),
         markerMode: ActivityMarkerMode.manual,
         markerIds: ['cover', 'bookmark'],
@@ -2460,7 +2513,7 @@ void main() {
       findsOneWidget,
     );
     expect(find.text('최근 설정'), findsOneWidget);
-    expect(find.textContaining('책 읽기 · 18분'), findsOneWidget);
+    expect(find.textContaining('양치 · 18분'), findsOneWidget);
 
     await tester.tap(
       find.byKey(const ValueKey('timerBuilderRecentPresetApplyButton')),
@@ -2469,7 +2522,7 @@ void main() {
     await _startTimerBuilder(tester);
 
     final timerScreen = tester.widget<TimerScreen>(find.byType(TimerScreen));
-    expect(timerScreen.config.activityId, 'reading');
+    expect(timerScreen.config.activityId, 'brushing');
     expect(timerScreen.config.duration, const Duration(minutes: 18));
     expect(timerScreen.config.markerMode, ActivityMarkerMode.manual);
     expect(timerScreen.config.markerIds, ['cover', 'bookmark']);
@@ -2547,7 +2600,7 @@ void main() {
         ActivityTimerPreset(
           activityId: 'custom',
           duration: Duration(minutes: 10 + index),
-          markerMode: ActivityMarkerMode.random,
+          markerMode: ActivityMarkerMode.activityDefault,
           markerIds: const ['star'],
           selectedMarkerIds: const [],
           updatedAt: DateTime(2026, 6, 14, index),
@@ -2608,7 +2661,7 @@ void main() {
       ActivityTimerPreset(
         activityId: 'reading',
         duration: const Duration(minutes: 15),
-        markerMode: ActivityMarkerMode.random,
+        markerMode: ActivityMarkerMode.activityDefault,
         updatedAt: DateTime(2026, 6, 14, 8),
       ),
     );
@@ -2675,7 +2728,7 @@ void main() {
         ActivityTimerPreset(
           activityId: 'custom',
           duration: Duration(minutes: 10 + index),
-          markerMode: ActivityMarkerMode.random,
+          markerMode: ActivityMarkerMode.activityDefault,
           updatedAt: DateTime(2026, 6, 14, index),
           customName: '홈 타이머 $index',
         ),
@@ -2789,6 +2842,19 @@ void main() {
         .getTopLeft(find.byKey(const ValueKey('createTimerCard')))
         .dy;
     expect(favoriteTop, lessThan(createTimerTop));
+    final favoriteActionCenter = tester.getCenter(
+      find.descendant(
+        of: find.byKey(const ValueKey('homeFavoriteTimerCard_0')),
+        matching: find.byIcon(Icons.play_arrow_rounded),
+      ),
+    );
+    final createActionCenter = tester.getCenter(
+      find.descendant(
+        of: find.byKey(const ValueKey('createTimerCard')),
+        matching: find.byIcon(Icons.add_rounded),
+      ),
+    );
+    expect(createActionCenter.dx, closeTo(favoriteActionCenter.dx, 0.1));
 
     await tester.tap(find.byKey(const ValueKey('homeFavoriteTimerCard_0')));
     await tester.pump();
@@ -3913,7 +3979,10 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('Course markers'), findsOneWidget);
-    expect(find.textContaining('Chosen markers are saved'), findsOneWidget);
+    expect(
+      find.textContaining('Only manually chosen picture markers'),
+      findsOneWidget,
+    );
   });
 
   testWidgets('User guide shows key Korean guide copy', (tester) async {
@@ -3940,13 +4009,13 @@ void main() {
     expect(find.text('코스 마커'), findsOneWidget);
 
     await tester.scrollUntilVisible(
-      find.textContaining('직접 고른 마커').first,
+      find.textContaining('직접 고른 그림 마커').first,
       200,
       scrollable: find.byType(Scrollable).first,
     );
     await tester.pumpAndSettle();
 
-    expect(find.textContaining('직접 고른 마커'), findsWidgets);
+    expect(find.textContaining('직접 고른 그림 마커'), findsWidgets);
 
     await tester.scrollUntilVisible(
       find.text('동기부여 영상'),
@@ -3998,7 +4067,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.byKey(const ValueKey('appHelpSheet')), findsOneWidget);
-    expect(find.textContaining('직접 고른 마커'), findsWidgets);
+    expect(find.textContaining('직접 고른 그림 마커'), findsWidgets);
   });
 
   testWidgets('Settings screen updates course marker mode', (tester) async {
@@ -4043,17 +4112,17 @@ void main() {
     expect(segmentedButtonRect.right, lessThanOrEqualTo(cardRect.right));
     expect(find.text('사용 안 함'), findsOneWidget);
     expect(find.text('직접 선택'), findsOneWidget);
-    expect(find.text('자동 선택'), findsOneWidget);
-    expect(find.text('활동에 맞게'), findsOneWidget);
+    expect(find.text('자동'), findsOneWidget);
+    expect(find.text('활동에 맞게'), findsNothing);
     expect(
-      find.text('직접 선택한 마커만 활동 기록에 남아요. 자동 선택은 도로에만 표시돼요.'),
+      find.text('자동은 활동에 맞는 그림 마커를 미리 보여주고 사용해요. 직접 고른 그림 마커만 활동 기록에 남아요.'),
       findsOneWidget,
     );
 
-    segmentedButton.onSelectionChanged!({ActivityMarkerMode.random});
+    segmentedButton.onSelectionChanged!({ActivityMarkerMode.manual});
     await tester.pump();
 
-    expect(latestConfig.markerMode, ActivityMarkerMode.random);
+    expect(latestConfig.markerMode, ActivityMarkerMode.manual);
   });
 
   testWidgets('Settings screen updates motivation video settings', (
@@ -7283,7 +7352,6 @@ void main() {
     expect(historyJson['selectedMarkerIds'], ['top_teeth', 'bottom_teeth']);
     expect(historyJson.containsKey('completedBeforeArrival'), isFalse);
     expect(historyJson.containsKey('mealCompleted'), isFalse);
-    expect(historyJson.containsKey('selectedIngredientIds'), isFalse);
   });
 
   test('Deleting activity history removes only the saved record', () async {
@@ -7968,8 +8036,10 @@ void main() {
     );
     expect(find.text('활동 기록 안내'), findsOneWidget);
     expect(find.text('고른 마커'), findsOneWidget);
-    expect(find.text('윗니'), findsOneWidget);
-    expect(find.text('아랫니'), findsOneWidget);
+    expect(find.text('위쪽 반짝'), findsNothing);
+    expect(find.text('아래쪽 반짝'), findsNothing);
+    expect(find.text('😁'), findsOneWidget);
+    expect(find.text('🫧'), findsOneWidget);
   });
 
   testWidgets('Activity history screen shows needs-more-time records', (

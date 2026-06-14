@@ -514,54 +514,39 @@ class _SelectedMarkerRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final languageCode = Localizations.localeOf(context).languageCode;
-
     return Wrap(
       spacing: AppSpacing.sm,
       runSpacing: AppSpacing.sm,
       children: [
-        for (final marker in markers)
-          _SelectedMarkerPill(
-            marker: marker,
-            label: marker.labelForLanguage(languageCode),
-          ),
+        for (final marker in markers) _SelectedMarkerPill(marker: marker),
       ],
     );
   }
 }
 
 class _SelectedMarkerPill extends StatelessWidget {
-  const _SelectedMarkerPill({required this.marker, required this.label});
+  const _SelectedMarkerPill({required this.marker});
 
   final ActivityMarkerDefinition marker;
-  final String label;
 
   @override
   Widget build(BuildContext context) {
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        color: AppColors.surfaceSoft,
-        borderRadius: AppRadius.pill,
-        border: Border.all(color: AppColors.borderSoft),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(
-          horizontal: AppSpacing.sm,
-          vertical: AppSpacing.xs,
+    final label = marker.labelForLanguage(
+      Localizations.localeOf(context).languageCode,
+    );
+
+    return Semantics(
+      label: label,
+      image: true,
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          color: AppColors.surfaceSoft,
+          borderRadius: AppRadius.pill,
+          border: Border.all(color: AppColors.borderSoft),
         ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            _SelectedMarkerAvatar(marker: marker, semanticLabel: label),
-            const SizedBox(width: AppSpacing.xs),
-            Text(
-              label,
-              style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                color: AppColors.textStrong,
-                fontWeight: FontWeight.w900,
-              ),
-            ),
-          ],
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          child: _SelectedMarkerAvatar(marker: marker, semanticLabel: label),
         ),
       ),
     );
@@ -581,17 +566,25 @@ class _SelectedMarkerAvatar extends StatelessWidget {
   Widget build(BuildContext context) {
     final assetPath = marker.assetPath;
     if (assetPath == null) {
-      return Text(marker.emoji);
+      return Text(
+        marker.emoji,
+        textScaler: TextScaler.noScaling,
+        style: const TextStyle(fontSize: 24, height: 1),
+      );
     }
 
     return Image.asset(
       assetPath,
       semanticLabel: semanticLabel,
-      width: 28,
-      height: 28,
+      width: 30,
+      height: 30,
       fit: BoxFit.contain,
       errorBuilder: (context, error, stackTrace) {
-        return Text(marker.emoji);
+        return Text(
+          marker.emoji,
+          textScaler: TextScaler.noScaling,
+          style: const TextStyle(fontSize: 24, height: 1),
+        );
       },
     );
   }

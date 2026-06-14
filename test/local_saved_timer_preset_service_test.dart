@@ -41,7 +41,7 @@ void main() {
         ActivityTimerPreset(
           activityId: 'brushing',
           duration: const Duration(minutes: 2),
-          markerMode: ActivityMarkerMode.random,
+          markerMode: ActivityMarkerMode.activityDefault,
           updatedAt: DateTime.utc(2026, 6, 14, 1),
         ),
       );
@@ -49,7 +49,7 @@ void main() {
         ActivityTimerPreset(
           activityId: 'reading',
           duration: const Duration(minutes: 15),
-          markerMode: ActivityMarkerMode.random,
+          markerMode: ActivityMarkerMode.activityDefault,
           updatedAt: DateTime.utc(2026, 6, 14, 2),
         ),
       );
@@ -57,7 +57,7 @@ void main() {
         ActivityTimerPreset(
           activityId: 'brushing',
           duration: const Duration(minutes: 2),
-          markerMode: ActivityMarkerMode.random,
+          markerMode: ActivityMarkerMode.activityDefault,
           updatedAt: DateTime.utc(2026, 6, 14, 3),
         ),
       );
@@ -81,7 +81,7 @@ void main() {
         ActivityTimerPreset(
           activityId: 'custom',
           duration: const Duration(minutes: 12),
-          markerMode: ActivityMarkerMode.random,
+          markerMode: ActivityMarkerMode.activityDefault,
           updatedAt: DateTime.utc(2026, 6, 14, 1),
           customName: 'Piano',
         ),
@@ -90,7 +90,7 @@ void main() {
         ActivityTimerPreset(
           activityId: 'custom',
           duration: const Duration(minutes: 12),
-          markerMode: ActivityMarkerMode.random,
+          markerMode: ActivityMarkerMode.activityDefault,
           updatedAt: DateTime.utc(2026, 6, 14, 2),
           customName: 'Blocks',
         ),
@@ -117,7 +117,7 @@ void main() {
         ActivityTimerPreset(
           activityId: 'custom',
           duration: Duration(minutes: index + 1),
-          markerMode: ActivityMarkerMode.random,
+          markerMode: ActivityMarkerMode.activityDefault,
           updatedAt: DateTime.utc(2026, 6, 14, index),
         ),
       );
@@ -138,7 +138,7 @@ void main() {
       ActivityTimerPreset(
         activityId: 'reading',
         duration: const Duration(minutes: 15),
-        markerMode: ActivityMarkerMode.random,
+        markerMode: ActivityMarkerMode.activityDefault,
         updatedAt: DateTime.utc(2026, 6, 14, 1),
       ),
     );
@@ -146,7 +146,7 @@ void main() {
       ActivityTimerPreset(
         activityId: 'cleanup',
         duration: const Duration(minutes: 5),
-        markerMode: ActivityMarkerMode.random,
+        markerMode: ActivityMarkerMode.activityDefault,
         updatedAt: DateTime.utc(2026, 6, 14, 2),
       ),
     );
@@ -165,7 +165,7 @@ void main() {
       ActivityTimerPreset(
         activityId: 'reading',
         duration: const Duration(minutes: 15),
-        markerMode: ActivityMarkerMode.random,
+        markerMode: ActivityMarkerMode.activityDefault,
         updatedAt: DateTime.utc(2026, 6, 14, 1),
       ),
     );
@@ -194,7 +194,7 @@ void main() {
         ActivityTimerPreset(
           activityId: 'custom',
           duration: Duration(minutes: 10 + index),
-          markerMode: ActivityMarkerMode.random,
+          markerMode: ActivityMarkerMode.activityDefault,
           updatedAt: DateTime.utc(2026, 6, 14, index),
           customName: 'Timer $index',
         ),
@@ -233,7 +233,7 @@ void main() {
         ActivityTimerPreset(
           activityId: 'brushing',
           duration: const Duration(minutes: 2),
-          markerMode: ActivityMarkerMode.random,
+          markerMode: ActivityMarkerMode.activityDefault,
           updatedAt: DateTime.utc(2026, 6, 14, 1),
         ),
       );
@@ -243,7 +243,7 @@ void main() {
         ActivityTimerPreset(
           activityId: 'brushing',
           duration: const Duration(minutes: 2),
-          markerMode: ActivityMarkerMode.random,
+          markerMode: ActivityMarkerMode.activityDefault,
           updatedAt: DateTime.utc(2026, 6, 14, 2),
         ),
       );
@@ -260,7 +260,7 @@ void main() {
         {
           'activityId': 'reading',
           'durationMs': const Duration(minutes: 15).inMilliseconds,
-          'markerMode': 'random',
+          'markerMode': 'activityDefault',
           'updatedAt': DateTime.utc(2026, 6, 14, 1).toIso8601String(),
         },
         {'activityId': '', 'durationMs': 0},

@@ -1276,7 +1276,12 @@ class _TimerBuilderSection extends StatelessWidget {
                     border: Border.all(color: AppColors.borderSoft),
                   ),
                   child: Padding(
-                    padding: const EdgeInsets.all(AppSpacing.md),
+                    padding: const EdgeInsetsDirectional.fromSTEB(
+                      AppSpacing.md,
+                      AppSpacing.md,
+                      AppSpacing.sm,
+                      AppSpacing.md,
+                    ),
                     child: Row(
                       children: [
                         DecoratedBox(
@@ -1433,8 +1438,8 @@ class _HomeFavoriteTimerCard extends StatelessWidget {
                     borderRadius: AppRadius.pill,
                   ),
                   child: const SizedBox(
-                    width: 36,
-                    height: 36,
+                    width: 40,
+                    height: 40,
                     child: Icon(
                       Icons.play_arrow_rounded,
                       color: AppColors.brown700,
@@ -1471,7 +1476,7 @@ class _TimerBuilderSheet extends StatefulWidget {
 class _TimerBuilderSheetState extends State<_TimerBuilderSheet> {
   late ActivityDefinition _selectedActivity = ActivityCatalog.defaultActivity;
   late double _minutes = _selectedActivity.defaultDuration.inMinutes.toDouble();
-  ActivityMarkerMode _markerMode = ActivityMarkerMode.random;
+  ActivityMarkerMode _markerMode = ActivityMarkerMode.activityDefault;
   final Set<String> _selectedMarkerIds = {};
   late List<ActivityTimerPreset> _savedPresets;
   String? _favoritePresetLimitMessage;
@@ -1483,12 +1488,7 @@ class _TimerBuilderSheetState extends State<_TimerBuilderSheet> {
   }
 
   List<ActivityMarkerDefinition> get _availableMarkers {
-    final candidateIds = ActivityMarkerCatalog.defaultSelectionIdsForActivity(
-      _selectedActivity.id,
-    );
-    return List.unmodifiable(
-      candidateIds.map(ActivityMarkerCatalog.findById).nonNulls,
-    );
+    return ActivityMarkerCatalog.all;
   }
 
   void _selectActivity(ActivityDefinition activity) {
@@ -1651,9 +1651,7 @@ class _TimerBuilderSheetState extends State<_TimerBuilderSheet> {
         selectedMarkerIds: _selectedMarkerIds.toList(growable: false),
       ),
       _ => _ActivityMarkerSelection(
-        markerIds: ActivityMarkerCatalog.randomSelectionIds(
-          activityId: _selectedActivity.id,
-        ),
+        markerIds: _autoMarkerSelectionIds(_selectedActivity.id),
         selectedMarkerIds: const [],
       ),
     };
@@ -1676,6 +1674,11 @@ class _TimerBuilderSheetState extends State<_TimerBuilderSheet> {
     final mediaQuery = MediaQuery.of(context);
     final languageCode = Localizations.localeOf(context).languageCode;
     final selectedMinuteLabel = homeTexts.minuteLabel(_minutes.round());
+    final maxMarkerCount = ActivityMarkerCatalog.maxSelectableMarkerCount;
+    final autoPreviewMarkers =
+        ActivityMarkerCatalog.autoSelectionIdsForActivity(
+          _selectedActivity.id,
+        ).map(ActivityMarkerCatalog.findById).nonNulls.toList(growable: false);
     final recentPreset = widget.recentPreset;
     final recentActivity = recentPreset == null
         ? null
@@ -1872,13 +1875,15 @@ class _TimerBuilderSheetState extends State<_TimerBuilderSheet> {
                       children: [
                         Expanded(
                           child: _TimerBuilderModeButton(
-                            key: const ValueKey('timerBuilderMarkerRandom'),
-                            label: homeTexts.timerBuilderRandomMarkerOption,
+                            key: const ValueKey('timerBuilderMarkerAutomatic'),
+                            label: homeTexts.timerBuilderAutomaticMarkerOption,
                             icon: Icons.shuffle_rounded,
                             isSelected:
-                                _markerMode == ActivityMarkerMode.random,
-                            onPressed: () =>
-                                _selectMarkerMode(ActivityMarkerMode.random),
+                                _markerMode ==
+                                ActivityMarkerMode.activityDefault,
+                            onPressed: () => _selectMarkerMode(
+                              ActivityMarkerMode.activityDefault,
+                            ),
                           ),
                         ),
                         const SizedBox(width: AppSpacing.sm),
@@ -1895,8 +1900,33 @@ class _TimerBuilderSheetState extends State<_TimerBuilderSheet> {
                         ),
                       ],
                     ),
+                    if (_markerMode != ActivityMarkerMode.manual &&
+                        autoPreviewMarkers.isNotEmpty) ...[
+                      const SizedBox(height: AppSpacing.sm),
+                      Wrap(
+                        key: const ValueKey('timerBuilderAutoMarkerPreview'),
+                        spacing: AppSpacing.sm,
+                        runSpacing: AppSpacing.sm,
+                        children: [
+                          for (final marker in autoPreviewMarkers)
+                            _TimerBuilderMarkerPreview(marker: marker),
+                        ],
+                      ),
+                    ],
                     if (_markerMode == ActivityMarkerMode.manual) ...[
                       const SizedBox(height: AppSpacing.sm),
+                      Text(
+                        texts.activityMarker.selectedCount(
+                          _selectedMarkerIds.length,
+                          maxMarkerCount,
+                        ),
+                        key: const ValueKey('timerBuilderSelectedMarkerCount'),
+                        style: textTheme.labelLarge?.copyWith(
+                          color: AppColors.textPrimary,
+                          fontWeight: FontWeight.w900,
+                        ),
+                      ),
+                      const SizedBox(height: AppSpacing.xs),
                       Text(
                         homeTexts.timerBuilderSelectedMarkerEmpty,
                         style: textTheme.labelMedium?.copyWith(
@@ -1917,9 +1947,7 @@ class _TimerBuilderSheetState extends State<_TimerBuilderSheet> {
                               ),
                               isEnabled:
                                   _selectedMarkerIds.contains(marker.id) ||
-                                  _selectedMarkerIds.length <
-                                      ActivityMarkerCatalog
-                                          .maxSelectableMarkerCount,
+                                  _selectedMarkerIds.length < maxMarkerCount,
                               onSelected: () => _toggleMarker(marker),
                             ),
                         ],
@@ -2207,17 +2235,18 @@ String _presetActivityLabel(
   return preset.customName ?? activity.labelForLanguage(languageCode);
 }
 
+List<String> _autoMarkerSelectionIds(String activityId) {
+  return ActivityMarkerCatalog.automaticSelectionIds(
+    activityId: activityId,
+    count: ActivityMarkerCatalog.autoSelectionIdsForActivity(activityId).length,
+  );
+}
+
 _PresetStartSettings _startSettingsForPreset(ActivityTimerPreset preset) {
-  final candidateMarkerIds =
-      ActivityMarkerCatalog.defaultSelectionIdsForActivity(
-        preset.activityId,
-      ).toSet();
-  final savedMarkerIds =
-      preset.selectedMarkerIds.isEmpty &&
-          preset.markerMode == ActivityMarkerMode.manual
-      ? preset.markerIds
-      : preset.selectedMarkerIds;
-  final selectedMarkerIds = savedMarkerIds
+  final candidateMarkerIds = ActivityMarkerCatalog.all
+      .map((marker) => marker.id)
+      .toSet();
+  final selectedMarkerIds = preset.selectedMarkerIds
       .where(candidateMarkerIds.contains)
       .take(ActivityMarkerCatalog.maxSelectableMarkerCount)
       .toList(growable: false);
@@ -2225,7 +2254,7 @@ _PresetStartSettings _startSettingsForPreset(ActivityTimerPreset preset) {
       preset.markerMode == ActivityMarkerMode.manual &&
           selectedMarkerIds.isNotEmpty
       ? ActivityMarkerMode.manual
-      : ActivityMarkerMode.random;
+      : ActivityMarkerMode.activityDefault;
 
   return switch (markerMode) {
     ActivityMarkerMode.manual => _PresetStartSettings(
@@ -2238,9 +2267,7 @@ _PresetStartSettings _startSettingsForPreset(ActivityTimerPreset preset) {
     _ => _PresetStartSettings(
       markerMode: markerMode,
       markerSelection: _ActivityMarkerSelection(
-        markerIds: ActivityMarkerCatalog.randomSelectionIds(
-          activityId: preset.activityId,
-        ),
+        markerIds: _autoMarkerSelectionIds(preset.activityId),
         selectedMarkerIds: const [],
       ),
     ),
@@ -2460,23 +2487,63 @@ class _TimerBuilderMarkerChip extends StatelessWidget {
       Localizations.localeOf(context).languageCode,
     );
 
-    return ChoiceChip(
-      key: ValueKey('timerBuilderMarker_${marker.id}'),
+    return Semantics(
+      label: label,
       selected: isSelected,
-      onSelected: isEnabled ? (_) => onSelected() : null,
-      avatar: Text(marker.emoji, textScaler: TextScaler.noScaling),
-      label: Text(label),
-      labelStyle: Theme.of(context).textTheme.labelLarge?.copyWith(
-        color: isSelected ? AppColors.textStrong : AppColors.textPrimary,
-        fontWeight: FontWeight.w800,
+      button: true,
+      child: ChoiceChip(
+        key: ValueKey('timerBuilderMarker_${marker.id}'),
+        selected: isSelected,
+        onSelected: isEnabled ? (_) => onSelected() : null,
+        label: Text(
+          marker.emoji,
+          textScaler: TextScaler.noScaling,
+          style: const TextStyle(fontSize: 26, height: 1),
+        ),
+        labelPadding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+        selectedColor: AppColors.surfaceYellow,
+        backgroundColor: AppColors.white.withValues(alpha: 0.82),
+        disabledColor: AppColors.white.withValues(alpha: 0.44),
+        side: BorderSide(
+          color: isSelected ? AppColors.primarySoft : AppColors.borderSoft,
+          width: isSelected ? 1.6 : 1,
+        ),
+        showCheckmark: false,
       ),
-      selectedColor: AppColors.surfaceYellow,
-      backgroundColor: AppColors.white.withValues(alpha: 0.82),
-      disabledColor: AppColors.white.withValues(alpha: 0.44),
-      side: BorderSide(
-        color: isSelected ? AppColors.primarySoft : AppColors.borderSoft,
+    );
+  }
+}
+
+class _TimerBuilderMarkerPreview extends StatelessWidget {
+  const _TimerBuilderMarkerPreview({required this.marker});
+
+  final ActivityMarkerDefinition marker;
+
+  @override
+  Widget build(BuildContext context) {
+    final label = marker.labelForLanguage(
+      Localizations.localeOf(context).languageCode,
+    );
+
+    return Semantics(
+      label: label,
+      image: true,
+      child: DecoratedBox(
+        key: ValueKey('timerBuilderAutoMarkerPreview_${marker.id}'),
+        decoration: BoxDecoration(
+          color: AppColors.white.withValues(alpha: 0.74),
+          borderRadius: AppRadius.pill,
+          border: Border.all(color: AppColors.borderSoft),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          child: Text(
+            marker.emoji,
+            textScaler: TextScaler.noScaling,
+            style: const TextStyle(fontSize: 28, height: 1),
+          ),
+        ),
       ),
-      showCheckmark: false,
     );
   }
 }

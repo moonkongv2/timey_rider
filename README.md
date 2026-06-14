@@ -16,7 +16,7 @@ The app is designed around one simple goal: make daily routines feel like cozy j
 - Child name setup and local settings persistence
 - Activity quick starts for brushing teeth, reading, cleanup, play time, and custom timers
 - Custom timer duration from 1 to 60 minutes
-- Course marker setup with activity defaults, random, or selected markers
+- Course marker setup with automatic previews or selected picture markers
 - Home course suggestions that adapt to the saved default duration
 - 12 selectable rider vehicles: motorcycle, fire truck, police car, excavator, airplane, bus, supercar, train, T-rex, shark, brachio, and pteranodon
 - Vehicle-specific custom avatar storage and preview
@@ -40,7 +40,7 @@ The app is designed around one simple goal: make daily routines feel like cozy j
 2. Enter the child's name on first setup.
 3. Pick an activity mission such as brushing teeth, reading, cleanup, play time, or custom timer.
 4. Pick a rider vehicle on the home screen.
-5. Start the activity timer with matching, random, or selected course markers.
+5. Start the activity timer with automatic or selected picture markers.
 6. Watch the selected rider move along the course as the timer progresses.
 7. See short motivation videos and optional cheer audio during the timer.
 8. Complete the activity, let time end, or record that more time is needed.
@@ -173,7 +173,7 @@ lib/
     app/                             # Reusable UI primitives
     app/app_help_sheet.dart          # Reusable contextual help bottom sheet
     avatar/                          # Avatar composite preview
-    activity_marker_picker_sheet.dart # Random/selected marker picker
+    activity_marker_picker_sheet.dart # Automatic/selected marker picker
     road_view.dart                   # Road scene, vehicle placement, video bubble/layers
     road_painter.dart                # Road path drawing and progress highlight
     timer_control_bar.dart           # Pause/resume and complete controls
@@ -237,7 +237,7 @@ dart run flutter_launcher_icons
 - Timer UI copy is state-aware: running uses progress-based messages, paused shows break copy, and arrived/completed shows arrival copy.
 - The selected vehicle is shared across home, vehicle selector, timer road view, result media, and avatar rendering through `VehicleDefinition`.
 - Vehicle course visuals are selected through `VehicleCourseKind`, so airplanes and pteranodons use sky styling, sharks use water styling, trains use rail styling, and other vehicles use road styling.
-- Activity markers are selected before a ride and expanded into repeated course slots by `ActivityMarkerCatalog`.
+- Activity markers are previewed or selected before a ride and expanded into repeated course slots by `ActivityMarkerCatalog`.
 - Custom avatar images are stored per vehicle, so multiple vehicle tiles can keep their own custom avatar previews.
 - User-facing guide and help copy should stay synchronized with actual timer, marker, motivation, and reward rules.
 - Settings, activity progress, sticker inventory, reward goals, and avatar config are stored locally with `SharedPreferences`.

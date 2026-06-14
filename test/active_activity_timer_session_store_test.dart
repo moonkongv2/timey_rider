@@ -56,9 +56,6 @@ void main() {
       expect(configJson['markerMode'], 'manual');
       expect(configJson['markerIds'], ['egg', 'tofu']);
       expect(configJson['selectedMarkerIds'], ['egg', 'tofu']);
-      expect(configJson.containsKey('courseIngredientMode'), isFalse);
-      expect(configJson.containsKey('courseIngredientIds'), isFalse);
-      expect(configJson.containsKey('selectedCourseIngredientIds'), isFalse);
 
       final loadedSession = await store.load();
 

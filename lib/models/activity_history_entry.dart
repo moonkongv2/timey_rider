@@ -17,10 +17,7 @@ class ActivityHistoryEntry {
 
   factory ActivityHistoryEntry.fromJson(Map<String, Object?> json) {
     final rewardIds = json['rewardIds'];
-    // Migration fallback: read pre-activity history fields, but save only the
-    // activity/marker field names from toJson().
-    final selectedMarkerIds =
-        json['selectedMarkerIds'] ?? json['selectedIngredientIds'];
+    final selectedMarkerIds = json['selectedMarkerIds'];
     final completedBeforeEnd =
         json['completedBeforeEnd'] as bool? ??
         json['completedBeforeArrival'] as bool? ??

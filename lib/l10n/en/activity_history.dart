@@ -12,7 +12,7 @@ class EnActivityHistoryTexts implements ActivityHistoryTextSet {
   String get helpTitle => 'Activity history guide';
   List<String> get helpBulletItems => const [
     'Activity history shows the mission, target time, actual time, completion status, and earned stickers.',
-    'Manually chosen markers appear when they were saved with the activity.',
+    'Manually chosen picture markers appear when they were saved with the activity.',
     'Auto-selected markers appear on the road only and are not saved in history.',
     'Incomplete records may show no stickers.',
   ];

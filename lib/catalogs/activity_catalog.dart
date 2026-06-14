@@ -14,7 +14,7 @@ abstract final class ActivityCatalog {
     ],
     completionMode: ActivityCompletionMode.confirmDone,
     rewardEnabledByDefault: true,
-    markerIds: ['top_teeth', 'bottom_teeth', 'front_teeth', 'molars', 'tongue'],
+    markerIds: ['top_teeth', 'bottom_teeth', 'molars', 'tongue'],
   );
 
   static const reading = ActivityDefinition(
@@ -62,7 +62,7 @@ abstract final class ActivityCatalog {
     ],
     completionMode: ActivityCompletionMode.timeEndsAutomatically,
     rewardEnabledByDefault: false,
-    markerIds: [],
+    markerIds: ['balloon', 'ball', 'music', 'cars', 'dolls'],
   );
 
   static const meal = ActivityDefinition(
@@ -78,7 +78,7 @@ abstract final class ActivityCatalog {
     ],
     completionMode: ActivityCompletionMode.parentCheck,
     rewardEnabledByDefault: false,
-    markerIds: [],
+    markerIds: ['spoon', 'sip_water', 'rice', 'plate', 'all_done'],
   );
 
   static const custom = ActivityDefinition(

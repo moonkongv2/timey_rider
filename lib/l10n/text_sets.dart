@@ -57,7 +57,7 @@ abstract interface class HomeTextSet {
   String get timerBuilderSheetTitle;
   String get timerBuilderActivityStepTitle;
   String get timerBuilderMarkerStepTitle;
-  String get timerBuilderRandomMarkerOption;
+  String get timerBuilderAutomaticMarkerOption;
   String get timerBuilderManualMarkerOption;
   String get timerBuilderRecentPresetTitle;
   String get timerBuilderRecentPresetApplyButton;
@@ -184,7 +184,7 @@ abstract interface class ActivityMarkerTextSet {
   String get helpTitle;
   List<String> get helpBodyParagraphs;
   List<String> get helpBulletItems;
-  String get randomStartButton;
+  String get automaticStartButton;
   String get selectedStartButton;
 
   String selectedCount(int selectedCount, int maxCount);
@@ -207,7 +207,6 @@ abstract interface class SettingsTextSet {
   String get markerModeTitle;
   String get markerModeOff;
   String get markerModeManual;
-  String get markerModeRandom;
   String get markerModeActivityDefault;
   String get markerModeDescription;
   String get defaultTimerDuration;
