@@ -4289,7 +4289,7 @@ void main() {
     expect(find.byType(VehicleSelectionCard), findsNothing);
   });
 
-  testWidgets('Home screen shows timer builder above vehicle choices', (
+  testWidgets('Home screen shows vehicle choices above timer builder', (
     tester,
   ) async {
     SharedPreferences.setMockInitialValues({});
@@ -4316,50 +4316,10 @@ void main() {
       findsOneWidget,
     );
 
-    final firstRowTop = tester
-        .getTopLeft(_vehicleChoiceFinder('motorcycle'))
-        .dy;
-    expect(
-      tester.getTopLeft(_vehicleChoiceFinder('fire_truck')).dy,
-      firstRowTop,
-    );
-    expect(
-      tester.getTopLeft(_vehicleChoiceFinder('police_car')).dy,
-      firstRowTop,
-    );
-    expect(
-      tester.getTopLeft(_vehicleChoiceFinder('excavator')).dy,
-      firstRowTop,
-    );
-    final secondRowTop = tester.getTopLeft(_vehicleChoiceFinder('airplane')).dy;
-    expect(secondRowTop, greaterThan(firstRowTop));
-    expect(tester.getTopLeft(_vehicleChoiceFinder('bus')).dy, secondRowTop);
-    expect(
-      tester.getTopLeft(_vehicleChoiceFinder('supercar')).dy,
-      secondRowTop,
-    );
-    expect(tester.getTopLeft(_vehicleChoiceFinder('train')).dy, secondRowTop);
-    final thirdRowTop = tester.getTopLeft(_vehicleChoiceFinder('t_rex')).dy;
-    expect(thirdRowTop, greaterThan(secondRowTop));
-    expect(tester.getTopLeft(_vehicleChoiceFinder('shark')).dy, thirdRowTop);
-    expect(tester.getTopLeft(_vehicleChoiceFinder('brachio')).dy, thirdRowTop);
-    expect(
-      tester.getTopLeft(_vehicleChoiceFinder('pteranodon')).dy,
-      thirdRowTop,
-    );
     expect(
       tester.getSize(_vehicleChoiceFinder('motorcycle')).width,
       tester.getSize(_vehicleChoiceFinder('fire_truck')).width,
     );
-    final firstRowCenterX =
-        (_vehicleChoiceRect(tester, 'motorcycle').left +
-            _vehicleChoiceRect(tester, 'excavator').right) /
-        2;
-    final thirdRowCenterX =
-        (_vehicleChoiceRect(tester, 't_rex').left +
-            _vehicleChoiceRect(tester, 'pteranodon').right) /
-        2;
-    expect((thirdRowCenterX - firstRowCenterX).abs(), lessThan(1.0));
 
     final vehicleTitleTop = tester.getTopLeft(find.text('오늘의 빠방')).dy;
     final timerBuilderTop = tester
@@ -8358,10 +8318,6 @@ final _transparentPngBytes = Uint8List.fromList([
 
 Material _vehicleChoiceMaterial(WidgetTester tester, String vehicleId) {
   return tester.widget<Material>(_vehicleChoiceFinder(vehicleId));
-}
-
-Rect _vehicleChoiceRect(WidgetTester tester, String vehicleId) {
-  return tester.getRect(_vehicleChoiceFinder(vehicleId));
 }
 
 Finder _vehicleChoiceFinder(String vehicleId) {

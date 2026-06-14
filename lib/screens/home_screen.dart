@@ -493,9 +493,34 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
               ],
             ),
             const SizedBox(height: AppSpacing.lg),
-            LayoutBuilder(
-              builder: (context, constraints) {
-                final vehicleCard = VehicleSelectionCard(
+            Column(
+              children: [
+                FutureBuilder<ActiveActivityTimerSession?>(
+                  future: _activeSessionFuture,
+                  builder: (context, snapshot) {
+                    final activeSession = snapshot.data;
+                    if (activeSession == null) {
+                      return const SizedBox.shrink();
+                    }
+
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: AppSpacing.xl),
+                      child: _ActiveTimerResumeCard(
+                        remaining: _remainingForActiveSession(
+                          activeSession,
+                          now: _now(),
+                        ),
+                        hasArrived: _hasActiveSessionArrived(
+                          activeSession,
+                          now: _now(),
+                        ),
+                        onPressed: () => _resumeActiveTimer(activeSession),
+                        onCancel: _cancelActiveTimer,
+                      ),
+                    );
+                  },
+                ),
+                VehicleSelectionCard(
                   title: texts.home.todayVehicleTitle,
                   selectedVehicleId: _config.vehicleId,
                   onVehicleSelected: (vehicleId) {
@@ -516,8 +541,9 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
                         : texts.home.avatarCtaCreateSemantics,
                     onPressed: _openAvatarSetup,
                   ),
-                );
-                final timerBuilder = FutureBuilder<List<ActivityTimerPreset>>(
+                ),
+                const SizedBox(height: AppSpacing.xl),
+                FutureBuilder<List<ActivityTimerPreset>>(
                   future: _favoriteTimerPresetsFuture,
                   builder: (context, snapshot) {
                     return _TimerBuilderSection(
@@ -530,58 +556,8 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
                       onFavoritePressed: _startFavoriteTimerPreset,
                     );
                   },
-                );
-                final activeSessionCard =
-                    FutureBuilder<ActiveActivityTimerSession?>(
-                      future: _activeSessionFuture,
-                      builder: (context, snapshot) {
-                        final activeSession = snapshot.data;
-                        if (activeSession == null) {
-                          return const SizedBox.shrink();
-                        }
-
-                        return Padding(
-                          padding: const EdgeInsets.only(bottom: AppSpacing.xl),
-                          child: _ActiveTimerResumeCard(
-                            remaining: _remainingForActiveSession(
-                              activeSession,
-                              now: _now(),
-                            ),
-                            hasArrived: _hasActiveSessionArrived(
-                              activeSession,
-                              now: _now(),
-                            ),
-                            onPressed: () => _resumeActiveTimer(activeSession),
-                            onCancel: _cancelActiveTimer,
-                          ),
-                        );
-                      },
-                    );
-
-                if (constraints.maxWidth >= 700) {
-                  return Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Expanded(
-                        child: Column(
-                          children: [activeSessionCard, timerBuilder],
-                        ),
-                      ),
-                      const SizedBox(width: AppSpacing.xl),
-                      Expanded(child: Column(children: [vehicleCard])),
-                    ],
-                  );
-                }
-
-                return Column(
-                  children: [
-                    activeSessionCard,
-                    timerBuilder,
-                    const SizedBox(height: AppSpacing.xl),
-                    vehicleCard,
-                  ],
-                );
-              },
+                ),
+              ],
             ),
             const SizedBox(height: AppSpacing.xxl),
             FutureBuilder<ActivityProgressSnapshot>(
