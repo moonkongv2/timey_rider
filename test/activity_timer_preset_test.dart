@@ -52,21 +52,36 @@ void main() {
       duration: const Duration(minutes: 12),
       markerMode: ActivityMarkerMode.random,
       updatedAt: updatedAt,
-      customName: '  Piano practice  ',
+      customName: '  Piano  ',
     );
 
-    expect(preset.customName, 'Piano practice');
-    expect(preset.toJson()['customName'], 'Piano practice');
+    expect(preset.customName, 'Piano');
+    expect(preset.toJson()['customName'], 'Piano');
 
     final parsed = ActivityTimerPreset.fromJson({
       'activityId': 'custom',
       'durationMs': const Duration(minutes: 12).inMilliseconds,
       'markerMode': 'random',
       'updatedAt': updatedAt.toIso8601String(),
-      'customName': 'Piano practice',
+      'customName': 'Piano',
     });
 
-    expect(parsed.customName, 'Piano practice');
+    expect(parsed.customName, 'Piano');
+  });
+
+  test('ActivityTimerPreset limits custom name length', () {
+    final updatedAt = DateTime.utc(2026, 6, 14, 1, 30);
+
+    final preset = ActivityTimerPreset(
+      activityId: 'custom',
+      duration: const Duration(minutes: 12),
+      markerMode: ActivityMarkerMode.random,
+      updatedAt: updatedAt,
+      customName: '123456789012345',
+    );
+
+    expect(preset.customName, '123456789012');
+    expect(preset.toJson()['customName'], '123456789012');
   });
 
   test('ActivityTimerPreset stores optional home favorite state', () {

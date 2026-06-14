@@ -2823,9 +2823,20 @@ void main() {
     await _saveTimerBuilderPreset(tester);
 
     expect(find.text('타이머 이름'), findsOneWidget);
+    const longCustomName = '피아노연습타이머이름길게입력';
+    const limitedCustomName = '피아노연습타이머이름길게';
     await tester.enterText(
       find.byKey(const ValueKey('timerBuilderCustomNameField')),
-      '피아노 연습',
+      longCustomName,
+    );
+    expect(
+      tester
+          .widget<TextField>(
+            find.byKey(const ValueKey('timerBuilderCustomNameField')),
+          )
+          .controller
+          ?.text,
+      limitedCustomName,
     );
     tester
         .widget<FilledButton>(
@@ -2837,8 +2848,8 @@ void main() {
     final presets = await const LocalSavedTimerPresetService().load();
     expect(presets, hasLength(1));
     expect(presets.first.activityId, 'custom');
-    expect(presets.first.customName, '피아노 연습');
-    expect(find.textContaining('피아노 연습 · 12분'), findsOneWidget);
+    expect(presets.first.customName, limitedCustomName);
+    expect(find.textContaining('$limitedCustomName · 12분'), findsOneWidget);
   });
 
   testWidgets('Timer builder can save a custom timer as Other without a name', (

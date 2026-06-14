@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart' show ScrollCacheExtent;
+import 'package:flutter/services.dart';
 
 import '../catalogs/activity_catalog.dart';
 import '../catalogs/activity_marker_catalog.dart';
@@ -714,6 +715,12 @@ class _CustomPresetNameDialogState extends State<_CustomPresetNameDialog> {
         controller: _controller,
         autofocus: true,
         textInputAction: TextInputAction.done,
+        maxLength: ActivityTimerPreset.maxCustomNameLength,
+        inputFormatters: [
+          LengthLimitingTextInputFormatter(
+            ActivityTimerPreset.maxCustomNameLength,
+          ),
+        ],
         decoration: InputDecoration(labelText: widget.fieldLabel),
         onSubmitted: _submit,
       ),

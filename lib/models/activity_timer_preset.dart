@@ -1,6 +1,8 @@
 import 'activity.dart';
 
 class ActivityTimerPreset {
+  static const int maxCustomNameLength = 12;
+
   const ActivityTimerPreset({
     required this.activityId,
     required this.duration,
@@ -49,7 +51,7 @@ class ActivityTimerPreset {
   final String? _customName;
   final bool isFavorite;
   String? get customName {
-    final value = _customName?.trim();
+    final value = _normalizeCustomName(_customName);
     if (value == null || value.isEmpty) {
       return null;
     }
@@ -132,4 +134,15 @@ List<String> _stringListFromJson(Object? value) {
 
 String? _stringFromJson(Object? value) {
   return value is String ? value : null;
+}
+
+String? _normalizeCustomName(String? value) {
+  final trimmedValue = value?.trim();
+  if (trimmedValue == null || trimmedValue.isEmpty) {
+    return null;
+  }
+  if (trimmedValue.length <= ActivityTimerPreset.maxCustomNameLength) {
+    return trimmedValue;
+  }
+  return trimmedValue.substring(0, ActivityTimerPreset.maxCustomNameLength);
 }
