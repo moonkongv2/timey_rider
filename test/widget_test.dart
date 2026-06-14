@@ -2449,11 +2449,9 @@ void main() {
     expect(find.text('최근 설정'), findsOneWidget);
     expect(find.textContaining('책 읽기 · 18분 · 선택'), findsOneWidget);
 
-    tester
-        .widget<TextButton>(
-          find.byKey(const ValueKey('timerBuilderRecentPresetApplyButton')),
-        )
-        .onPressed!();
+    await tester.tap(
+      find.byKey(const ValueKey('timerBuilderRecentPresetApplyButton')),
+    );
     await tester.pump();
     await _startTimerBuilder(tester);
 
@@ -2725,6 +2723,65 @@ void main() {
     expect(find.text('홈에는 최대 3개까지 표시할 수 있어요.'), findsOneWidget);
   });
 
+  testWidgets('Home shows favorite saved timer presets for quick start', (
+    tester,
+  ) async {
+    SharedPreferences.setMockInitialValues({});
+    addTearDown(() async {
+      await const ActiveActivityTimerSessionStore().clear();
+      await const LocalSavedTimerPresetService().clear();
+      await const LocalRecentTimerService().clear();
+    });
+    await const LocalSavedTimerPresetService().save(
+      ActivityTimerPreset(
+        activityId: 'reading',
+        duration: Duration(minutes: 18),
+        markerMode: ActivityMarkerMode.manual,
+        markerIds: ['cover', 'bookmark'],
+        selectedMarkerIds: ['cover', 'bookmark'],
+        updatedAt: DateTime(2026, 6, 14, 8),
+        isFavorite: true,
+      ),
+    );
+
+    await tester.pumpWidget(
+      MaterialApp(
+        locale: const Locale('ko'),
+        supportedLocales: const [Locale('ko'), Locale('en')],
+        localizationsDelegates: const [
+          GlobalMaterialLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+        ],
+        home: HomeScreen(
+          config: ActivityTimerConfig.defaults().copyWith(childName: '지율'),
+          activityProgressService: LocalActivityProgressService(),
+          onConfigChanged: (_) {},
+        ),
+      ),
+    );
+    await tester.pump();
+    await tester.pump();
+
+    expect(
+      find.byKey(const ValueKey('homeFavoriteTimerCard_0')),
+      findsOneWidget,
+    );
+    expect(find.text('책 읽기'), findsOneWidget);
+    expect(find.text('18분 · 선택'), findsOneWidget);
+
+    await tester.tap(find.byKey(const ValueKey('homeFavoriteTimerCard_0')));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 400));
+
+    final timerScreen = tester.widget<TimerScreen>(find.byType(TimerScreen));
+    expect(timerScreen.config.activityId, 'reading');
+    expect(timerScreen.config.duration, const Duration(minutes: 18));
+    expect(timerScreen.config.markerMode, ActivityMarkerMode.manual);
+    expect(timerScreen.config.markerIds, ['cover', 'bookmark']);
+    expect(timerScreen.config.selectedMarkerIds, ['cover', 'bookmark']);
+  });
+
   testWidgets('Timer builder saves a named custom timer preset', (
     tester,
   ) async {
@@ -2869,11 +2926,9 @@ void main() {
     );
     expect(find.textContaining('책 읽기 · 18분 · 선택'), findsOneWidget);
 
-    tester
-        .widget<TextButton>(
-          find.byKey(const ValueKey('timerBuilderSavedPresetApplyButton_0')),
-        )
-        .onPressed!();
+    await tester.tap(
+      find.byKey(const ValueKey('timerBuilderSavedPresetApplyButton_0')),
+    );
     await tester.pump();
     await _startTimerBuilder(tester);
 
@@ -2884,7 +2939,7 @@ void main() {
 
     Navigator.of(tester.element(find.byType(TimerScreen))).pop();
     await tester.pump();
-    await tester.pump(const Duration(milliseconds: 400));
+    await tester.pump(const Duration(seconds: 1));
     await _openTimerBuilder(tester);
 
     tester
@@ -8014,9 +8069,7 @@ Future<void> _startApp(
 }
 
 Future<void> _openTimerBuilder(WidgetTester tester) async {
-  tester
-      .widget<AppBouncyButton>(find.byKey(const ValueKey('createTimerButton')))
-      .onPressed!();
+  await tester.tap(find.byKey(const ValueKey('createTimerButton')));
   await tester.pump();
   await tester.pump(const Duration(milliseconds: 400));
 }
