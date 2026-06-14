@@ -2160,8 +2160,8 @@ void main() {
       find.byKey(const ValueKey('timerBuilderMarker_star')),
       findsOneWidget,
     );
-    expect(find.text('어금니'), findsNothing);
-    expect(find.text('혀'), findsNothing);
+    expect(find.text('안쪽 꼼꼼'), findsNothing);
+    expect(find.text('마무리 헹굼'), findsNothing);
 
     for (final markerId in [
       'top_teeth',
@@ -8059,8 +8059,8 @@ void main() {
     );
     expect(find.text('활동 기록 안내'), findsOneWidget);
     expect(find.text('고른 마커'), findsOneWidget);
-    expect(find.text('윗니'), findsOneWidget);
-    expect(find.text('아랫니'), findsOneWidget);
+    expect(find.text('위쪽 반짝'), findsOneWidget);
+    expect(find.text('아래쪽 반짝'), findsOneWidget);
   });
 
   testWidgets('Activity history screen shows needs-more-time records', (

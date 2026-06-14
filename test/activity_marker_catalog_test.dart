@@ -39,6 +39,14 @@ void main() {
     ]);
   });
 
+  test('brushing markers use process labels and friendly emoji', () {
+    expect(ActivityMarkerCatalog.findById('top_teeth')?.labelKo, '위쪽 반짝');
+    expect(ActivityMarkerCatalog.findById('bottom_teeth')?.emoji, '🫧');
+    expect(ActivityMarkerCatalog.findById('molars')?.labelEn, 'Back brush');
+    expect(ActivityMarkerCatalog.findById('tongue')?.labelKo, '마무리 헹굼');
+    expect(ActivityMarkerCatalog.findById('front_teeth')?.labelKo, '앞쪽 스마일');
+  });
+
   test('autoSelectionIdsForActivity falls back to common markers', () {
     expect(ActivityMarkerCatalog.autoSelectionIdsForActivity('play'), [
       'star',

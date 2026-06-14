@@ -10,41 +10,41 @@ abstract final class ActivityMarkerCatalog {
 
   static const topTeeth = ActivityMarkerDefinition(
     id: 'top_teeth',
-    labelKo: '윗니',
-    labelEn: 'Top teeth',
+    labelKo: '위쪽 반짝',
+    labelEn: 'Top sparkle',
     emoji: '😁',
     activityIds: ['brushing'],
   );
 
   static const bottomTeeth = ActivityMarkerDefinition(
     id: 'bottom_teeth',
-    labelKo: '아랫니',
-    labelEn: 'Bottom teeth',
-    emoji: '😄',
+    labelKo: '아래쪽 반짝',
+    labelEn: 'Bottom sparkle',
+    emoji: '🫧',
     activityIds: ['brushing'],
   );
 
   static const frontTeeth = ActivityMarkerDefinition(
     id: 'front_teeth',
-    labelKo: '앞니',
-    labelEn: 'Front teeth',
+    labelKo: '앞쪽 스마일',
+    labelEn: 'Front smile',
     emoji: '😁',
     activityIds: ['brushing'],
   );
 
   static const molars = ActivityMarkerDefinition(
     id: 'molars',
-    labelKo: '어금니',
-    labelEn: 'Molars',
+    labelKo: '안쪽 꼼꼼',
+    labelEn: 'Back brush',
     emoji: '✨',
     activityIds: ['brushing'],
   );
 
   static const tongue = ActivityMarkerDefinition(
     id: 'tongue',
-    labelKo: '혀',
-    labelEn: 'Tongue',
-    emoji: '😋',
+    labelKo: '마무리 헹굼',
+    labelEn: 'Final rinse',
+    emoji: '💧',
     activityIds: ['brushing'],
   );
 
