@@ -1524,12 +1524,6 @@ class _TimerBuilderSheetState extends State<_TimerBuilderSheet> {
                         title: homeTexts.timerBuilderSavedPresetTitle,
                         countLabel: savedPresetCountLabel,
                       ),
-                      if (isSavedPresetListFull) ...[
-                        const SizedBox(height: AppSpacing.xs),
-                        _TimerBuilderSavedPresetLimitHint(
-                          text: homeTexts.timerBuilderSavedPresetLimitHint,
-                        ),
-                      ],
                       const SizedBox(height: AppSpacing.sm),
                       SingleChildScrollView(
                         scrollDirection: Axis.horizontal,
@@ -1719,6 +1713,14 @@ class _TimerBuilderSheetState extends State<_TimerBuilderSheet> {
                       ],
                     ),
                     const SizedBox(height: AppSpacing.lg),
+                    if (isSavedPresetListFull) ...[
+                      _TimerBuilderSavedPresetLimitHint(
+                        title:
+                            '${homeTexts.timerBuilderSavedPresetTitle} $savedPresetCountLabel',
+                        text: homeTexts.timerBuilderSavedPresetLimitHint,
+                      ),
+                      const SizedBox(height: AppSpacing.sm),
+                    ],
                     Row(
                       children: [
                         Expanded(
@@ -1956,18 +1958,63 @@ class _TimerBuilderSavedPresetHeader extends StatelessWidget {
 }
 
 class _TimerBuilderSavedPresetLimitHint extends StatelessWidget {
-  const _TimerBuilderSavedPresetLimitHint({required this.text});
+  const _TimerBuilderSavedPresetLimitHint({
+    required this.title,
+    required this.text,
+  });
 
+  final String title;
   final String text;
 
   @override
   Widget build(BuildContext context) {
-    return Text(
-      text,
+    final textTheme = Theme.of(context).textTheme;
+
+    return DecoratedBox(
       key: const ValueKey('timerBuilderSavedPresetLimitHint'),
-      style: Theme.of(context).textTheme.labelMedium?.copyWith(
-        color: AppColors.textSecondary,
-        fontWeight: FontWeight.w700,
+      decoration: BoxDecoration(
+        color: AppColors.surfaceYellow.withValues(alpha: 0.76),
+        borderRadius: AppRadius.card,
+        border: Border.all(color: AppColors.borderWarm),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(AppSpacing.sm),
+        child: Row(
+          children: [
+            Icon(
+              Icons.info_outline_rounded,
+              color: AppColors.brown700,
+              size: 20,
+            ),
+            const SizedBox(width: AppSpacing.sm),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: textTheme.labelLarge?.copyWith(
+                      color: AppColors.textStrong,
+                      fontWeight: FontWeight.w900,
+                    ),
+                  ),
+                  const SizedBox(height: AppSpacing.xs),
+                  Text(
+                    text,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: textTheme.labelMedium?.copyWith(
+                      color: AppColors.textSecondary,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

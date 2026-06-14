@@ -36,7 +36,7 @@ class EnHomeTexts implements HomeTextSet {
   String get timerBuilderSavedPresetFullMessage =>
       'Saved. Older timers are cleaned up automatically.';
   String get timerBuilderSavedPresetLimitHint =>
-      'Up to 5 timers can be saved. New saves clean up older timers.';
+      'New saves replace the oldest timer.';
   String get timerBuilderDeletePresetTooltip => 'Delete';
   String get timerBuilderCustomNameDialogTitle => 'Timer name';
   String get timerBuilderCustomNameFieldLabel => 'Name';

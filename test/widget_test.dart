@@ -2566,7 +2566,12 @@ void main() {
     await _openTimerBuilder(tester);
 
     expect(find.text('5/5개'), findsOneWidget);
-    expect(find.text('최대 5개까지 저장돼요. 새로 저장하면 오래된 타이머가 정리돼요.'), findsOneWidget);
+    expect(
+      find.byKey(const ValueKey('timerBuilderSavedPresetLimitHint')),
+      findsOneWidget,
+    );
+    expect(find.text('저장한 타이머 5/5개'), findsOneWidget);
+    expect(find.text('새로 저장하면 가장 오래된 타이머가 정리돼요.'), findsOneWidget);
 
     await _selectTimerBuilderActivity(tester, 'reading');
     await _setTimerBuilderMinutes(tester, 18);
@@ -2575,10 +2580,6 @@ void main() {
     final presets = await savedTimerPresetService.load();
     expect(presets, hasLength(LocalSavedTimerPresetService.maxSavedPresets));
     expect(find.text('5/5개'), findsOneWidget);
-    expect(
-      find.byKey(const ValueKey('timerBuilderSavedPresetLimitHint')),
-      findsOneWidget,
-    );
     expect(find.text('저장했어요. 오래된 타이머는 자동으로 정리돼요.'), findsOneWidget);
   });
 
