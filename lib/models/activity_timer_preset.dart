@@ -1,7 +1,7 @@
 import 'activity.dart';
 
 class ActivityTimerPreset {
-  static const int maxCustomNameLength = 12;
+  static const int maxCustomNameLength = 18;
 
   const ActivityTimerPreset({
     required this.activityId,

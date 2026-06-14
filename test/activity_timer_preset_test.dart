@@ -77,11 +77,11 @@ void main() {
       duration: const Duration(minutes: 12),
       markerMode: ActivityMarkerMode.random,
       updatedAt: updatedAt,
-      customName: '123456789012345',
+      customName: '12345678901234567890',
     );
 
-    expect(preset.customName, '123456789012');
-    expect(preset.toJson()['customName'], '123456789012');
+    expect(preset.customName, '123456789012345678');
+    expect(preset.toJson()['customName'], '123456789012345678');
   });
 
   test('ActivityTimerPreset stores optional home favorite state', () {

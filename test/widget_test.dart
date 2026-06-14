@@ -2823,8 +2823,8 @@ void main() {
     await _saveTimerBuilderPreset(tester);
 
     expect(find.text('타이머 이름'), findsOneWidget);
-    const longCustomName = '피아노연습타이머이름길게입력';
-    const limitedCustomName = '피아노연습타이머이름길게';
+    const longCustomName = '피아노연습타이머이름길게입력테스트초과';
+    const limitedCustomName = '피아노연습타이머이름길게입력테스트초';
     await tester.enterText(
       find.byKey(const ValueKey('timerBuilderCustomNameField')),
       longCustomName,
