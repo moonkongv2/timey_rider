@@ -620,6 +620,73 @@ class _CustomPresetNameResult {
   final String? customName;
 }
 
+class _CustomPresetNameDialog extends StatefulWidget {
+  const _CustomPresetNameDialog({
+    required this.title,
+    required this.fieldLabel,
+    required this.cancelLabel,
+    required this.useOtherLabel,
+    required this.saveLabel,
+  });
+
+  final String title;
+  final String fieldLabel;
+  final String cancelLabel;
+  final String useOtherLabel;
+  final String saveLabel;
+
+  @override
+  State<_CustomPresetNameDialog> createState() =>
+      _CustomPresetNameDialogState();
+}
+
+class _CustomPresetNameDialogState extends State<_CustomPresetNameDialog> {
+  final TextEditingController _controller = TextEditingController();
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  void _submit(String value) {
+    Navigator.of(context).pop(_CustomPresetNameResult(value));
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: Text(widget.title),
+      content: TextField(
+        key: const ValueKey('timerBuilderCustomNameField'),
+        controller: _controller,
+        autofocus: true,
+        textInputAction: TextInputAction.done,
+        decoration: InputDecoration(labelText: widget.fieldLabel),
+        onSubmitted: _submit,
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: Text(widget.cancelLabel),
+        ),
+        TextButton(
+          key: const ValueKey('timerBuilderUseOtherNameButton'),
+          onPressed: () {
+            Navigator.of(context).pop(const _CustomPresetNameResult(null));
+          },
+          child: Text(widget.useOtherLabel),
+        ),
+        FilledButton(
+          key: const ValueKey('timerBuilderSaveCustomNameButton'),
+          onPressed: () => _submit(_controller.text),
+          child: Text(widget.saveLabel),
+        ),
+      ],
+    );
+  }
+}
+
 enum _ActiveTimerStartChoice { cancel, startNew }
 
 bool _isStaleActiveSession(
@@ -1268,55 +1335,18 @@ class _TimerBuilderSheetState extends State<_TimerBuilderSheet> {
 
   Future<_CustomPresetNameResult?> _requestCustomPresetName() async {
     final texts = AppTexts.of(context);
-    final controller = TextEditingController();
-    try {
-      return await showDialog<_CustomPresetNameResult>(
-        context: context,
-        builder: (context) {
-          return AlertDialog(
-            title: Text(texts.home.timerBuilderCustomNameDialogTitle),
-            content: TextField(
-              key: const ValueKey('timerBuilderCustomNameField'),
-              controller: controller,
-              autofocus: true,
-              textInputAction: TextInputAction.done,
-              decoration: InputDecoration(
-                labelText: texts.home.timerBuilderCustomNameFieldLabel,
-              ),
-              onSubmitted: (value) {
-                Navigator.of(context).pop(_CustomPresetNameResult(value));
-              },
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.of(context).pop(),
-                child: Text(texts.common.cancel),
-              ),
-              TextButton(
-                key: const ValueKey('timerBuilderUseOtherNameButton'),
-                onPressed: () {
-                  Navigator.of(
-                    context,
-                  ).pop(const _CustomPresetNameResult(null));
-                },
-                child: Text(texts.home.timerBuilderUseOtherNameButton),
-              ),
-              FilledButton(
-                key: const ValueKey('timerBuilderSaveCustomNameButton'),
-                onPressed: () {
-                  Navigator.of(
-                    context,
-                  ).pop(_CustomPresetNameResult(controller.text));
-                },
-                child: Text(texts.home.timerBuilderSavePresetButton),
-              ),
-            ],
-          );
-        },
-      );
-    } finally {
-      controller.dispose();
-    }
+    return showDialog<_CustomPresetNameResult>(
+      context: context,
+      builder: (context) {
+        return _CustomPresetNameDialog(
+          title: texts.home.timerBuilderCustomNameDialogTitle,
+          fieldLabel: texts.home.timerBuilderCustomNameFieldLabel,
+          cancelLabel: texts.common.cancel,
+          useOtherLabel: texts.home.timerBuilderUseOtherNameButton,
+          saveLabel: texts.home.timerBuilderSavePresetButton,
+        );
+      },
+    );
   }
 
   Future<void> _deleteSavedPreset(int index) async {

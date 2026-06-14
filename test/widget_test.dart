@@ -2594,13 +2594,15 @@ void main() {
     await _openTimerBuilder(tester);
     await _selectTimerBuilderActivity(tester, 'custom');
     await _saveTimerBuilderPreset(tester);
+    await tester.pumpAndSettle();
 
-    tester
-        .widget<TextButton>(
-          find.byKey(const ValueKey('timerBuilderUseOtherNameButton')),
-        )
-        .onPressed!();
+    await tester.tap(
+      find.byKey(const ValueKey('timerBuilderUseOtherNameButton')),
+    );
     await tester.pump();
+    expect(tester.takeException(), isNull);
+    await tester.pumpAndSettle();
+    expect(tester.takeException(), isNull);
 
     final presets = await const LocalSavedTimerPresetService().load();
     expect(presets, hasLength(1));
