@@ -146,13 +146,13 @@ void main() {
   });
 
   test('Activity marker course slots only uses selected ids', () {
-    const selectedIds = ['top_teeth', 'bottom_teeth', 'front_teeth'];
+    const selectedIds = ['top_teeth', 'bottom_teeth', 'molars'];
     final slots = ActivityMarkerCatalog.courseSlotsFor(selectedIds);
 
     expect(slots.map((marker) => marker.id).toSet(), {
       'top_teeth',
       'bottom_teeth',
-      'front_teeth',
+      'molars',
     });
   });
 
@@ -2143,10 +2143,6 @@ void main() {
     expect(
       find.byKey(const ValueKey('timerBuilderMarker_bottom_teeth')),
       findsOneWidget,
-    );
-    expect(
-      find.byKey(const ValueKey('timerBuilderMarker_front_teeth')),
-      findsNothing,
     );
     expect(
       find.byKey(const ValueKey('timerBuilderMarker_cover')),

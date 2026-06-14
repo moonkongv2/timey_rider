@@ -24,14 +24,6 @@ abstract final class ActivityMarkerCatalog {
     activityIds: ['brushing'],
   );
 
-  static const frontTeeth = ActivityMarkerDefinition(
-    id: 'front_teeth',
-    labelKo: '앞쪽 스마일',
-    labelEn: 'Front smile',
-    emoji: '😁',
-    activityIds: ['brushing'],
-  );
-
   static const molars = ActivityMarkerDefinition(
     id: 'molars',
     labelKo: '안쪽 꼼꼼',
@@ -259,8 +251,6 @@ abstract final class ActivityMarkerCatalog {
     rocket,
   ];
 
-  static const legacyMarkers = [frontTeeth];
-
   static const defaultSelectionIds = [
     'star',
     'flag',
@@ -272,7 +262,7 @@ abstract final class ActivityMarkerCatalog {
   static const commonAutoSelectionIds = ['star', 'flag'];
 
   static ActivityMarkerDefinition? findById(String id) {
-    for (final marker in [...all, ...legacyMarkers]) {
+    for (final marker in all) {
       if (marker.id == id) {
         return marker;
       }

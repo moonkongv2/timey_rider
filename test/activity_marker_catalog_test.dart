@@ -45,7 +45,6 @@ void main() {
     expect(ActivityMarkerCatalog.findById('bottom_teeth')?.emoji, '🫧');
     expect(ActivityMarkerCatalog.findById('molars')?.labelEn, 'Back brush');
     expect(ActivityMarkerCatalog.findById('tongue')?.labelKo, '마무리 헹굼');
-    expect(ActivityMarkerCatalog.findById('front_teeth')?.labelKo, '앞쪽 스마일');
   });
 
   test('reading finish marker does not duplicate the common flag emoji', () {
