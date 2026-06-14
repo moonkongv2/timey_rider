@@ -32,6 +32,9 @@ class HomeTexts implements HomeTextSet {
   String get timerBuilderSavePresetButton => '저장';
   String get timerBuilderSavedPresetMessage => '저장했어요.';
   String get timerBuilderDeletePresetTooltip => '삭제';
+  String get timerBuilderCustomNameDialogTitle => '타이머 이름';
+  String get timerBuilderCustomNameFieldLabel => '이름';
+  String get timerBuilderUseOtherNameButton => '기타로 저장';
   String get timerBuilderTimeStepTitle => '3. 시간';
   String get timerBuilderStartButton => '출발';
   String get timerBuilderSelectedMarkerEmpty => '마커를 하나 이상 선택해요.';

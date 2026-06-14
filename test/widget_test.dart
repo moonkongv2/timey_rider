@@ -2511,6 +2511,103 @@ void main() {
     expect(find.text('저장했어요.'), findsOneWidget);
   });
 
+  testWidgets('Timer builder saves a named custom timer preset', (
+    tester,
+  ) async {
+    SharedPreferences.setMockInitialValues({});
+    addTearDown(() async {
+      await const ActiveActivityTimerSessionStore().clear();
+      await const LocalSavedTimerPresetService().clear();
+    });
+
+    await tester.pumpWidget(
+      MaterialApp(
+        locale: const Locale('ko'),
+        supportedLocales: const [Locale('ko'), Locale('en')],
+        localizationsDelegates: const [
+          GlobalMaterialLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+        ],
+        home: HomeScreen(
+          config: ActivityTimerConfig.defaults().copyWith(childName: '지율'),
+          activityProgressService: LocalActivityProgressService(),
+          onConfigChanged: (_) {},
+          now: () => DateTime(2026, 6, 14, 11),
+        ),
+      ),
+    );
+    await tester.pump();
+
+    await _openTimerBuilder(tester);
+    await _selectTimerBuilderActivity(tester, 'custom');
+    await _setTimerBuilderMinutes(tester, 12);
+    await _saveTimerBuilderPreset(tester);
+
+    expect(find.text('타이머 이름'), findsOneWidget);
+    await tester.enterText(
+      find.byKey(const ValueKey('timerBuilderCustomNameField')),
+      '피아노 연습',
+    );
+    tester
+        .widget<FilledButton>(
+          find.byKey(const ValueKey('timerBuilderSaveCustomNameButton')),
+        )
+        .onPressed!();
+    await tester.pump();
+
+    final presets = await const LocalSavedTimerPresetService().load();
+    expect(presets, hasLength(1));
+    expect(presets.first.activityId, 'custom');
+    expect(presets.first.customName, '피아노 연습');
+    expect(find.textContaining('피아노 연습 · 12분 · 자동'), findsOneWidget);
+  });
+
+  testWidgets('Timer builder can save a custom timer as Other without a name', (
+    tester,
+  ) async {
+    SharedPreferences.setMockInitialValues({});
+    addTearDown(() async {
+      await const ActiveActivityTimerSessionStore().clear();
+      await const LocalSavedTimerPresetService().clear();
+    });
+
+    await tester.pumpWidget(
+      MaterialApp(
+        locale: const Locale('ko'),
+        supportedLocales: const [Locale('ko'), Locale('en')],
+        localizationsDelegates: const [
+          GlobalMaterialLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+        ],
+        home: HomeScreen(
+          config: ActivityTimerConfig.defaults().copyWith(childName: '지율'),
+          activityProgressService: LocalActivityProgressService(),
+          onConfigChanged: (_) {},
+          now: () => DateTime(2026, 6, 14, 11),
+        ),
+      ),
+    );
+    await tester.pump();
+
+    await _openTimerBuilder(tester);
+    await _selectTimerBuilderActivity(tester, 'custom');
+    await _saveTimerBuilderPreset(tester);
+
+    tester
+        .widget<TextButton>(
+          find.byKey(const ValueKey('timerBuilderUseOtherNameButton')),
+        )
+        .onPressed!();
+    await tester.pump();
+
+    final presets = await const LocalSavedTimerPresetService().load();
+    expect(presets, hasLength(1));
+    expect(presets.first.customName, isNull);
+    expect(find.textContaining('기타 · 10분 · 자동'), findsOneWidget);
+  });
+
   testWidgets('Timer builder applies and deletes a saved timer preset', (
     tester,
   ) async {

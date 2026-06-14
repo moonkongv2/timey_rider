@@ -83,7 +83,8 @@ class LocalSavedTimerPresetService {
 bool _matchesTimerSettings(ActivityTimerPreset a, ActivityTimerPreset b) {
   if (a.activityId != b.activityId ||
       a.duration != b.duration ||
-      a.markerMode != b.markerMode) {
+      a.markerMode != b.markerMode ||
+      a.customName != b.customName) {
     return false;
   }
 

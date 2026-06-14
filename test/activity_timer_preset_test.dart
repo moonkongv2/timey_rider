@@ -44,6 +44,31 @@ void main() {
     expect(preset.updatedAt, updatedAt);
   });
 
+  test('ActivityTimerPreset stores an optional custom name', () {
+    final updatedAt = DateTime.utc(2026, 6, 14, 1, 30);
+
+    final preset = ActivityTimerPreset(
+      activityId: 'custom',
+      duration: const Duration(minutes: 12),
+      markerMode: ActivityMarkerMode.random,
+      updatedAt: updatedAt,
+      customName: '  Piano practice  ',
+    );
+
+    expect(preset.customName, 'Piano practice');
+    expect(preset.toJson()['customName'], 'Piano practice');
+
+    final parsed = ActivityTimerPreset.fromJson({
+      'activityId': 'custom',
+      'durationMs': const Duration(minutes: 12).inMilliseconds,
+      'markerMode': 'random',
+      'updatedAt': updatedAt.toIso8601String(),
+      'customName': 'Piano practice',
+    });
+
+    expect(parsed.customName, 'Piano practice');
+  });
+
   test('ActivityTimerPreset copyWith updates settings immutably', () {
     final updatedAt = DateTime.utc(2026, 6, 14, 1, 30);
     final preset = ActivityTimerPreset(

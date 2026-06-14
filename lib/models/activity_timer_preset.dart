@@ -8,7 +8,9 @@ class ActivityTimerPreset {
     required this.updatedAt,
     this.markerIds = const [],
     List<String> selectedMarkerIds = const [],
-  }) : _selectedMarkerIds = selectedMarkerIds;
+    String? customName,
+  }) : _selectedMarkerIds = selectedMarkerIds,
+       _customName = customName;
 
   factory ActivityTimerPreset.fromJson(Map<String, Object?> json) {
     final activityId = _stringFromJson(json['activityId']);
@@ -31,6 +33,7 @@ class ActivityTimerPreset {
       markerIds: _stringListFromJson(json['markerIds']),
       selectedMarkerIds: _stringListFromJson(json['selectedMarkerIds']),
       updatedAt: updatedAt,
+      customName: _stringFromJson(json['customName']),
     );
   }
 
@@ -41,6 +44,14 @@ class ActivityTimerPreset {
   final List<String>? _selectedMarkerIds;
   List<String> get selectedMarkerIds => _selectedMarkerIds ?? const [];
   final DateTime updatedAt;
+  final String? _customName;
+  String? get customName {
+    final value = _customName?.trim();
+    if (value == null || value.isEmpty) {
+      return null;
+    }
+    return value;
+  }
 
   ActivityTimerPreset copyWith({
     String? activityId,
@@ -49,6 +60,7 @@ class ActivityTimerPreset {
     List<String>? markerIds,
     List<String>? selectedMarkerIds,
     DateTime? updatedAt,
+    String? customName,
   }) {
     return ActivityTimerPreset(
       activityId: activityId ?? this.activityId,
@@ -59,10 +71,12 @@ class ActivityTimerPreset {
         selectedMarkerIds ?? this.selectedMarkerIds,
       ),
       updatedAt: updatedAt ?? this.updatedAt,
+      customName: customName ?? this.customName,
     );
   }
 
   Map<String, Object?> toJson() {
+    final customName = this.customName;
     return {
       'activityId': activityId,
       'durationMs': duration.inMilliseconds,
@@ -70,6 +84,7 @@ class ActivityTimerPreset {
       'markerIds': markerIds,
       'selectedMarkerIds': selectedMarkerIds,
       'updatedAt': updatedAt.toIso8601String(),
+      if (customName != null) 'customName': customName,
     };
   }
 }

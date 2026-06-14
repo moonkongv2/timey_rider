@@ -71,6 +71,39 @@ void main() {
     },
   );
 
+  test(
+    'LocalSavedTimerPresetService keeps custom presets with different names',
+    () async {
+      SharedPreferences.setMockInitialValues({});
+      const service = LocalSavedTimerPresetService();
+
+      await service.save(
+        ActivityTimerPreset(
+          activityId: 'custom',
+          duration: const Duration(minutes: 12),
+          markerMode: ActivityMarkerMode.random,
+          updatedAt: DateTime.utc(2026, 6, 14, 1),
+          customName: 'Piano',
+        ),
+      );
+      await service.save(
+        ActivityTimerPreset(
+          activityId: 'custom',
+          duration: const Duration(minutes: 12),
+          markerMode: ActivityMarkerMode.random,
+          updatedAt: DateTime.utc(2026, 6, 14, 2),
+          customName: 'Blocks',
+        ),
+      );
+
+      final presets = await service.load();
+
+      expect(presets, hasLength(2));
+      expect(presets.first.customName, 'Blocks');
+      expect(presets.last.customName, 'Piano');
+    },
+  );
+
   test('LocalSavedTimerPresetService caps saved presets', () async {
     SharedPreferences.setMockInitialValues({});
     const service = LocalSavedTimerPresetService();

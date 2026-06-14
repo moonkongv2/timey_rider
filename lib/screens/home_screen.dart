@@ -614,6 +614,12 @@ class _TimerBuilderResult {
   final _ActivityMarkerSelection activityMarkerSelection;
 }
 
+class _CustomPresetNameResult {
+  const _CustomPresetNameResult(this.customName);
+
+  final String? customName;
+}
+
 enum _ActiveTimerStartChoice { cancel, startNew }
 
 bool _isStaleActiveSession(
@@ -1215,7 +1221,7 @@ class _TimerBuilderSheetState extends State<_TimerBuilderSheet> {
     _updateMinutes((_minutes.round() + delta).toDouble());
   }
 
-  ActivityTimerPreset _currentPreset() {
+  ActivityTimerPreset _currentPreset({String? customName}) {
     final markerIds = _markerMode == ActivityMarkerMode.manual
         ? _selectedMarkerIds.toList(growable: false)
         : const <String>[];
@@ -1226,6 +1232,7 @@ class _TimerBuilderSheetState extends State<_TimerBuilderSheet> {
       markerIds: markerIds,
       selectedMarkerIds: markerIds,
       updatedAt: widget.now(),
+      customName: customName,
     );
   }
 
@@ -1235,8 +1242,15 @@ class _TimerBuilderSheetState extends State<_TimerBuilderSheet> {
       return;
     }
 
+    final customNameResult = _selectedActivity.id == ActivityCatalog.custom.id
+        ? await _requestCustomPresetName()
+        : const _CustomPresetNameResult(null);
+    if (!mounted || customNameResult == null) {
+      return;
+    }
+
     final savedPresets = await widget.savedTimerPresetService.save(
-      _currentPreset(),
+      _currentPreset(customName: customNameResult.customName),
     );
     if (!mounted) {
       return;
@@ -1250,6 +1264,59 @@ class _TimerBuilderSheetState extends State<_TimerBuilderSheet> {
         content: Text(AppTexts.of(context).home.timerBuilderSavedPresetMessage),
       ),
     );
+  }
+
+  Future<_CustomPresetNameResult?> _requestCustomPresetName() async {
+    final texts = AppTexts.of(context);
+    final controller = TextEditingController();
+    try {
+      return await showDialog<_CustomPresetNameResult>(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: Text(texts.home.timerBuilderCustomNameDialogTitle),
+            content: TextField(
+              key: const ValueKey('timerBuilderCustomNameField'),
+              controller: controller,
+              autofocus: true,
+              textInputAction: TextInputAction.done,
+              decoration: InputDecoration(
+                labelText: texts.home.timerBuilderCustomNameFieldLabel,
+              ),
+              onSubmitted: (value) {
+                Navigator.of(context).pop(_CustomPresetNameResult(value));
+              },
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: Text(texts.common.cancel),
+              ),
+              TextButton(
+                key: const ValueKey('timerBuilderUseOtherNameButton'),
+                onPressed: () {
+                  Navigator.of(
+                    context,
+                  ).pop(const _CustomPresetNameResult(null));
+                },
+                child: Text(texts.home.timerBuilderUseOtherNameButton),
+              ),
+              FilledButton(
+                key: const ValueKey('timerBuilderSaveCustomNameButton'),
+                onPressed: () {
+                  Navigator.of(
+                    context,
+                  ).pop(_CustomPresetNameResult(controller.text));
+                },
+                child: Text(texts.home.timerBuilderSavePresetButton),
+              ),
+            ],
+          );
+        },
+      );
+    } finally {
+      controller.dispose();
+    }
   }
 
   Future<void> _deleteSavedPreset(int index) async {
@@ -1328,7 +1395,7 @@ class _TimerBuilderSheetState extends State<_TimerBuilderSheet> {
             applyLabel: homeTexts.timerBuilderRecentPresetApplyButton,
             deleteTooltip: homeTexts.timerBuilderDeletePresetTooltip,
             activityEmoji: activity.emoji,
-            activityLabel: activity.labelForLanguage(languageCode),
+            activityLabel: _presetActivityLabel(preset, activity, languageCode),
             durationLabel: homeTexts.minuteLabel(preset.duration.inMinutes),
             markerModeLabel: markerModeLabel,
             onApply: () => _applyPreset(preset),
@@ -1442,7 +1509,9 @@ class _TimerBuilderSheetState extends State<_TimerBuilderSheet> {
                         applyLabel:
                             homeTexts.timerBuilderRecentPresetApplyButton,
                         activityEmoji: recentActivity.emoji,
-                        activityLabel: recentActivity.labelForLanguage(
+                        activityLabel: _presetActivityLabel(
+                          recentPreset,
+                          recentActivity,
                           languageCode,
                         ),
                         durationLabel: homeTexts.minuteLabel(
@@ -1771,6 +1840,14 @@ class _TimerBuilderPresetCard extends StatelessWidget {
       ),
     );
   }
+}
+
+String _presetActivityLabel(
+  ActivityTimerPreset preset,
+  ActivityDefinition activity,
+  String languageCode,
+) {
+  return preset.customName ?? activity.labelForLanguage(languageCode);
 }
 
 class _TimerBuilderStepTitle extends StatelessWidget {
