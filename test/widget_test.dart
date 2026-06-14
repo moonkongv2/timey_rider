@@ -347,15 +347,6 @@ void main() {
     final preferences = await SharedPreferences.getInstance();
     expect(loadedConfig.markerMode, ActivityMarkerMode.activityDefault);
     expect(preferences.getString('markerMode'), 'activityDefault');
-    expect(preferences.getString('courseIngredientMode'), isNull);
-  });
-
-  test('Local settings reads legacy marker mode key', () async {
-    SharedPreferences.setMockInitialValues({'courseIngredientMode': 'manual'});
-
-    final loadedConfig = await LocalSettingsService().loadConfig();
-
-    expect(loadedConfig.markerMode, ActivityMarkerMode.manual);
   });
 
   test('Local settings falls back for invalid marker mode', () async {
@@ -7388,7 +7379,6 @@ void main() {
     expect(historyJson['selectedMarkerIds'], ['top_teeth', 'bottom_teeth']);
     expect(historyJson.containsKey('completedBeforeArrival'), isFalse);
     expect(historyJson.containsKey('mealCompleted'), isFalse);
-    expect(historyJson.containsKey('selectedIngredientIds'), isFalse);
   });
 
   test('Deleting activity history removes only the saved record', () async {

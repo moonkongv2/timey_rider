@@ -2172,12 +2172,7 @@ _PresetStartSettings _startSettingsForPreset(ActivityTimerPreset preset) {
   final candidateMarkerIds = ActivityMarkerCatalog.all
       .map((marker) => marker.id)
       .toSet();
-  final savedMarkerIds =
-      preset.selectedMarkerIds.isEmpty &&
-          preset.markerMode == ActivityMarkerMode.manual
-      ? preset.markerIds
-      : preset.selectedMarkerIds;
-  final selectedMarkerIds = savedMarkerIds
+  final selectedMarkerIds = preset.selectedMarkerIds
       .where(candidateMarkerIds.contains)
       .take(ActivityMarkerCatalog.maxSelectableMarkerCount)
       .toList(growable: false);

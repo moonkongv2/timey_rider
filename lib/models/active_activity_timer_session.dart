@@ -178,19 +178,13 @@ ActivityTimerConfig _configFromJson(Map<String, Object?> json) {
       defaults.avatarRotationDegrees,
     ),
     customAvatarsByVehicle: _avatarMapFromJson(json['customAvatarsByVehicle']),
-    // Migration fallback: read pre-activity marker fields, but save only
-    // markerMode/markerIds/selectedMarkerIds from _configToJson().
     markerMode: _markerModeFromJson(
-      json['markerMode'] ?? json['courseIngredientMode'],
+      json['markerMode'],
       fallback: defaults.markerMode,
     ),
     activityId: _stringFromJson(json['activityId']) ?? defaults.activityId,
-    markerIds: _stringListFromJson(
-      json['markerIds'] ?? json['courseIngredientIds'],
-    ),
-    selectedMarkerIds: _stringListFromJson(
-      json['selectedMarkerIds'] ?? json['selectedCourseIngredientIds'],
-    ),
+    markerIds: _stringListFromJson(json['markerIds']),
+    selectedMarkerIds: _stringListFromJson(json['selectedMarkerIds']),
   );
 }
 

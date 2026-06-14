@@ -27,8 +27,6 @@ class LocalSettingsService {
   static const _avatarRotationDegreesKey = 'avatarRotationDegrees';
   static const _customAvatarsByVehicleKey = 'customAvatarsByVehicle';
   static const _markerModeKey = 'markerMode';
-  // Migration fallback: read old marker mode key, but save only markerMode.
-  static const _legacyMarkerModeKey = 'courseIngredientMode';
 
   Future<ActivityTimerConfig> loadConfig() async {
     final preferences = await SharedPreferences.getInstance();
@@ -111,8 +109,7 @@ class LocalSettingsService {
           activeAvatarConfig?.rotationDegrees ?? avatarRotationDegrees,
       customAvatarsByVehicle: customAvatarsByVehicle,
       markerMode: _markerModeFromString(
-        preferences.getString(_markerModeKey) ??
-            preferences.getString(_legacyMarkerModeKey),
+        preferences.getString(_markerModeKey),
         fallback: defaults.markerMode,
       ),
     );
@@ -189,7 +186,6 @@ class LocalSettingsService {
       _markerModeKey,
       _markerModeToString(config.markerMode),
     );
-    await preferences.remove(_legacyMarkerModeKey);
   }
 
   Future<bool> loadHasSeenOnboarding({String? childName}) async {

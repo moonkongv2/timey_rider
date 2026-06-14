@@ -154,8 +154,7 @@ bool _matchesTimerSettings(ActivityTimerPreset a, ActivityTimerPreset b) {
     return true;
   }
 
-  return _sameStringList(a.selectedMarkerIds, b.selectedMarkerIds) &&
-      _sameStringList(a.markerIds, b.markerIds);
+  return _sameStringList(a.selectedMarkerIds, b.selectedMarkerIds);
 }
 
 bool _sameStringList(List<String> a, List<String> b) {
