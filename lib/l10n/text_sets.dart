@@ -40,6 +40,7 @@ abstract interface class HomeTextSet {
   String get timerBuilderSavePresetButton;
   String get timerBuilderSavedPresetMessage;
   String get timerBuilderSavedPresetFullMessage;
+  String get timerBuilderSavedPresetLimitHint;
   String get timerBuilderDeletePresetTooltip;
   String get timerBuilderCustomNameDialogTitle;
   String get timerBuilderCustomNameFieldLabel;

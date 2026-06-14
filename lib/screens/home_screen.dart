@@ -1330,9 +1330,9 @@ class _TimerBuilderSheetState extends State<_TimerBuilderSheet> {
         savedPresets.length >= LocalSavedTimerPresetService.maxSavedPresets
         ? AppTexts.of(context).home.timerBuilderSavedPresetFullMessage
         : AppTexts.of(context).home.timerBuilderSavedPresetMessage;
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(SnackBar(content: Text(savedPresetMessage)));
+    final scaffoldMessenger = ScaffoldMessenger.of(context);
+    scaffoldMessenger.hideCurrentSnackBar();
+    scaffoldMessenger.showSnackBar(SnackBar(content: Text(savedPresetMessage)));
   }
 
   Future<_CustomPresetNameResult?> _requestCustomPresetName() async {
@@ -1411,6 +1411,8 @@ class _TimerBuilderSheetState extends State<_TimerBuilderSheet> {
       _savedPresets.length,
       LocalSavedTimerPresetService.maxSavedPresets,
     );
+    final isSavedPresetListFull =
+        _savedPresets.length >= LocalSavedTimerPresetService.maxSavedPresets;
     final savedPresetCards = _savedPresets.indexed
         .map((entry) {
           final index = entry.$1;
@@ -1522,6 +1524,12 @@ class _TimerBuilderSheetState extends State<_TimerBuilderSheet> {
                         title: homeTexts.timerBuilderSavedPresetTitle,
                         countLabel: savedPresetCountLabel,
                       ),
+                      if (isSavedPresetListFull) ...[
+                        const SizedBox(height: AppSpacing.xs),
+                        _TimerBuilderSavedPresetLimitHint(
+                          text: homeTexts.timerBuilderSavedPresetLimitHint,
+                        ),
+                      ],
                       const SizedBox(height: AppSpacing.sm),
                       SingleChildScrollView(
                         scrollDirection: Axis.horizontal,
@@ -1943,6 +1951,24 @@ class _TimerBuilderSavedPresetHeader extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+}
+
+class _TimerBuilderSavedPresetLimitHint extends StatelessWidget {
+  const _TimerBuilderSavedPresetLimitHint({required this.text});
+
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      text,
+      key: const ValueKey('timerBuilderSavedPresetLimitHint'),
+      style: Theme.of(context).textTheme.labelMedium?.copyWith(
+        color: AppColors.textSecondary,
+        fontWeight: FontWeight.w700,
+      ),
     );
   }
 }
