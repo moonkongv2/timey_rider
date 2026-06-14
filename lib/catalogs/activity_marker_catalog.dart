@@ -109,7 +109,7 @@ abstract final class ActivityMarkerCatalog {
     labelKo: '자동차 자리',
     labelEn: 'Car spot',
     emoji: '🚗',
-    activityIds: ['cleanup'],
+    activityIds: ['cleanup', 'play'],
   );
 
   static const dolls = ActivityMarkerDefinition(
@@ -117,7 +117,7 @@ abstract final class ActivityMarkerCatalog {
     labelKo: '인형 자리',
     labelEn: 'Doll spot',
     emoji: '🧸',
-    activityIds: ['cleanup'],
+    activityIds: ['cleanup', 'play'],
   );
 
   static const box = ActivityMarkerDefinition(
@@ -126,6 +126,70 @@ abstract final class ActivityMarkerCatalog {
     labelEn: 'Cleanup box',
     emoji: '📦',
     activityIds: ['cleanup'],
+  );
+
+  static const balloon = ActivityMarkerDefinition(
+    id: 'balloon',
+    labelKo: '풍선',
+    labelEn: 'Balloon',
+    emoji: '🎈',
+    activityIds: ['play'],
+  );
+
+  static const ball = ActivityMarkerDefinition(
+    id: 'ball',
+    labelKo: '공',
+    labelEn: 'Ball',
+    emoji: '⚽',
+    activityIds: ['play'],
+  );
+
+  static const music = ActivityMarkerDefinition(
+    id: 'music',
+    labelKo: '음악',
+    labelEn: 'Music',
+    emoji: '🎵',
+    activityIds: ['play'],
+  );
+
+  static const spoon = ActivityMarkerDefinition(
+    id: 'spoon',
+    labelKo: '숟가락',
+    labelEn: 'Spoon',
+    emoji: '🥄',
+    activityIds: ['meal'],
+  );
+
+  static const sipWater = ActivityMarkerDefinition(
+    id: 'sip_water',
+    labelKo: '물 한 모금',
+    labelEn: 'Sip of water',
+    emoji: '🥤',
+    activityIds: ['meal'],
+  );
+
+  static const rice = ActivityMarkerDefinition(
+    id: 'rice',
+    labelKo: '밥',
+    labelEn: 'Rice',
+    emoji: '🍚',
+    activityIds: ['meal'],
+  );
+
+  static const plate = ActivityMarkerDefinition(
+    id: 'plate',
+    labelKo: '접시',
+    labelEn: 'Plate',
+    emoji: '🍽️',
+    activityIds: ['meal'],
+  );
+
+  static const allDone = ActivityMarkerDefinition(
+    id: 'all_done',
+    labelKo: '잘 먹었어요',
+    labelEn: 'All done',
+    emoji: '✅',
+    activityIds: ['meal'],
   );
 
   static const star = ActivityMarkerDefinition(
@@ -180,6 +244,14 @@ abstract final class ActivityMarkerCatalog {
     cars,
     dolls,
     box,
+    balloon,
+    ball,
+    music,
+    spoon,
+    sipWater,
+    rice,
+    plate,
+    allDone,
     star,
     flag,
     heart,

@@ -60,8 +60,39 @@ void main() {
     expect(ActivityMarkerCatalog.findById('box')?.labelKo, '정리 상자');
   });
 
-  test('autoSelectionIdsForActivity falls back to common markers', () {
+  test('play markers include toy choices and shared markers', () {
+    expect(ActivityMarkerCatalog.markerIdsForActivity('play'), [
+      'cars',
+      'dolls',
+      'balloon',
+      'ball',
+      'music',
+    ]);
     expect(ActivityMarkerCatalog.autoSelectionIdsForActivity('play'), [
+      'cars',
+      'dolls',
+      'balloon',
+      'ball',
+      'music',
+      'star',
+      'flag',
+    ]);
+  });
+
+  test('meal markers avoid napkin-like emoji', () {
+    final mealIds = ActivityMarkerCatalog.markerIdsForActivity('meal');
+    final mealEmoji = mealIds
+        .map(ActivityMarkerCatalog.findById)
+        .nonNulls
+        .map((marker) => marker.emoji)
+        .toList();
+
+    expect(mealIds, ['spoon', 'sip_water', 'rice', 'plate', 'all_done']);
+    expect(mealEmoji, isNot(contains('🧻')));
+  });
+
+  test('autoSelectionIdsForActivity falls back to common markers', () {
+    expect(ActivityMarkerCatalog.autoSelectionIdsForActivity('custom'), [
       'star',
       'flag',
     ]);

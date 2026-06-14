@@ -27,6 +27,23 @@ void main() {
     expect(activity.labelForLanguage('ja'), 'Cleanup');
   });
 
+  test('play and meal activities define default marker ids', () {
+    expect(ActivityCatalog.play.markerIds, [
+      'balloon',
+      'ball',
+      'music',
+      'cars',
+      'dolls',
+    ]);
+    expect(ActivityCatalog.meal.markerIds, [
+      'spoon',
+      'sip_water',
+      'rice',
+      'plate',
+      'all_done',
+    ]);
+  });
+
   test('activityCompletionStatusFromJson returns known status values', () {
     final status = activityCompletionStatusFromJson(
       'completedAtEnd',
