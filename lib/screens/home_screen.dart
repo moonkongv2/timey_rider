@@ -1362,6 +1362,29 @@ class _TimerBuilderSheetState extends State<_TimerBuilderSheet> {
     });
   }
 
+  Future<void> _toggleSavedPresetFavorite(int index) async {
+    final result = await widget.savedTimerPresetService.toggleFavoriteAt(index);
+    if (!mounted) {
+      return;
+    }
+
+    setState(() {
+      _savedPresets = result.presets;
+    });
+
+    if (result.isLimitReached) {
+      final scaffoldMessenger = ScaffoldMessenger.of(context);
+      scaffoldMessenger.hideCurrentSnackBar();
+      scaffoldMessenger.showSnackBar(
+        SnackBar(
+          content: Text(
+            AppTexts.of(context).home.timerBuilderFavoritePresetLimitMessage,
+          ),
+        ),
+      );
+    }
+  }
+
   void _start() {
     if (_markerMode == ActivityMarkerMode.manual &&
         _selectedMarkerIds.isEmpty) {
@@ -1429,14 +1452,22 @@ class _TimerBuilderSheetState extends State<_TimerBuilderSheet> {
             deleteButtonKey: ValueKey(
               'timerBuilderSavedPresetDeleteButton_$index',
             ),
+            favoriteButtonKey: ValueKey(
+              'timerBuilderSavedPresetFavoriteButton_$index',
+            ),
             applyLabel: homeTexts.timerBuilderRecentPresetApplyButton,
             deleteTooltip: homeTexts.timerBuilderDeletePresetTooltip,
+            favoriteTooltip: preset.isFavorite
+                ? homeTexts.timerBuilderUnfavoritePresetTooltip
+                : homeTexts.timerBuilderFavoritePresetTooltip,
+            isFavorite: preset.isFavorite,
             activityEmoji: activity.emoji,
             activityLabel: _presetActivityLabel(preset, activity, languageCode),
             durationLabel: homeTexts.minuteLabel(preset.duration.inMinutes),
             markerModeLabel: markerModeLabel,
             onApply: () => _applyPreset(preset),
             onDelete: () => _deleteSavedPreset(index),
+            onFavoriteToggle: () => _toggleSavedPresetFavorite(index),
           );
         })
         .toList(growable: false);
@@ -1779,6 +1810,10 @@ class _TimerBuilderPresetCard extends StatelessWidget {
     this.deleteButtonKey,
     this.deleteTooltip,
     this.onDelete,
+    this.favoriteButtonKey,
+    this.favoriteTooltip,
+    this.isFavorite = false,
+    this.onFavoriteToggle,
   });
 
   final Key applyButtonKey;
@@ -1792,6 +1827,10 @@ class _TimerBuilderPresetCard extends StatelessWidget {
   final Key? deleteButtonKey;
   final String? deleteTooltip;
   final VoidCallback? onDelete;
+  final Key? favoriteButtonKey;
+  final String? favoriteTooltip;
+  final bool isFavorite;
+  final VoidCallback? onFavoriteToggle;
 
   @override
   Widget build(BuildContext context) {
@@ -1854,6 +1893,26 @@ class _TimerBuilderPresetCard extends StatelessWidget {
                     ],
                   ),
                 ),
+                if (onFavoriteToggle != null) ...[
+                  const SizedBox(width: AppSpacing.xs),
+                  IconButton(
+                    key: favoriteButtonKey,
+                    onPressed: onFavoriteToggle,
+                    tooltip: favoriteTooltip,
+                    icon: Icon(
+                      isFavorite
+                          ? Icons.star_rounded
+                          : Icons.star_border_rounded,
+                    ),
+                    color: isFavorite
+                        ? AppColors.primary
+                        : AppColors.textSecondary,
+                    style: IconButton.styleFrom(
+                      fixedSize: const Size(36, 36),
+                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    ),
+                  ),
+                ],
                 if (onDelete != null) ...[
                   const SizedBox(width: AppSpacing.xs),
                   IconButton(

@@ -2584,6 +2584,147 @@ void main() {
     expect(find.text('저장했어요. 오래된 타이머는 자동으로 정리돼요.'), findsOneWidget);
   });
 
+  testWidgets('Timer builder toggles saved timer home favorites', (
+    tester,
+  ) async {
+    SharedPreferences.setMockInitialValues({});
+    addTearDown(() async {
+      await const ActiveActivityTimerSessionStore().clear();
+      await const LocalSavedTimerPresetService().clear();
+    });
+    const savedTimerPresetService = LocalSavedTimerPresetService();
+    await savedTimerPresetService.save(
+      ActivityTimerPreset(
+        activityId: 'reading',
+        duration: const Duration(minutes: 15),
+        markerMode: ActivityMarkerMode.random,
+        updatedAt: DateTime(2026, 6, 14, 8),
+      ),
+    );
+
+    await tester.pumpWidget(
+      MaterialApp(
+        locale: const Locale('ko'),
+        supportedLocales: const [Locale('ko'), Locale('en')],
+        localizationsDelegates: const [
+          GlobalMaterialLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+        ],
+        home: HomeScreen(
+          config: ActivityTimerConfig.defaults().copyWith(childName: '지율'),
+          activityProgressService: LocalActivityProgressService(),
+          onConfigChanged: (_) {},
+        ),
+      ),
+    );
+    await tester.pump();
+
+    await _openTimerBuilder(tester);
+
+    expect(find.byTooltip('홈에 표시'), findsOneWidget);
+    tester
+        .widget<IconButton>(
+          find.byKey(const ValueKey('timerBuilderSavedPresetFavoriteButton_0')),
+        )
+        .onPressed!();
+    await tester.pump();
+
+    var presets = await savedTimerPresetService.load();
+    expect(presets.first.isFavorite, isTrue);
+    expect(find.byTooltip('홈에서 숨기기'), findsOneWidget);
+
+    tester
+        .widget<IconButton>(
+          find.byKey(const ValueKey('timerBuilderSavedPresetFavoriteButton_0')),
+        )
+        .onPressed!();
+    await tester.pump();
+
+    presets = await savedTimerPresetService.load();
+    expect(presets.first.isFavorite, isFalse);
+    expect(find.byTooltip('홈에 표시'), findsOneWidget);
+  });
+
+  testWidgets('Timer builder shows the home favorite limit message', (
+    tester,
+  ) async {
+    SharedPreferences.setMockInitialValues({});
+    addTearDown(() async {
+      await const ActiveActivityTimerSessionStore().clear();
+      await const LocalSavedTimerPresetService().clear();
+    });
+    const savedTimerPresetService = LocalSavedTimerPresetService();
+    for (
+      var index = 0;
+      index < LocalSavedTimerPresetService.maxFavoritePresets + 1;
+      index += 1
+    ) {
+      await savedTimerPresetService.save(
+        ActivityTimerPreset(
+          activityId: 'custom',
+          duration: Duration(minutes: 10 + index),
+          markerMode: ActivityMarkerMode.random,
+          updatedAt: DateTime(2026, 6, 14, index),
+          customName: '홈 타이머 $index',
+        ),
+      );
+    }
+
+    await tester.pumpWidget(
+      MaterialApp(
+        locale: const Locale('ko'),
+        supportedLocales: const [Locale('ko'), Locale('en')],
+        localizationsDelegates: const [
+          GlobalMaterialLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+        ],
+        home: HomeScreen(
+          config: ActivityTimerConfig.defaults().copyWith(childName: '지율'),
+          activityProgressService: LocalActivityProgressService(),
+          onConfigChanged: (_) {},
+        ),
+      ),
+    );
+    await tester.pump();
+
+    await _openTimerBuilder(tester);
+
+    for (
+      var index = 0;
+      index < LocalSavedTimerPresetService.maxFavoritePresets;
+      index += 1
+    ) {
+      tester
+          .widget<IconButton>(
+            find.byKey(
+              ValueKey('timerBuilderSavedPresetFavoriteButton_$index'),
+            ),
+          )
+          .onPressed!();
+      await tester.pump();
+    }
+
+    tester
+        .widget<IconButton>(
+          find.byKey(
+            ValueKey(
+              'timerBuilderSavedPresetFavoriteButton_${LocalSavedTimerPresetService.maxFavoritePresets}',
+            ),
+          ),
+        )
+        .onPressed!();
+    await tester.pump();
+
+    final presets = await savedTimerPresetService.load();
+    expect(
+      presets.where((preset) => preset.isFavorite),
+      hasLength(LocalSavedTimerPresetService.maxFavoritePresets),
+    );
+    expect(find.text('홈에는 최대 3개까지 표시할 수 있어요.'), findsOneWidget);
+  });
+
   testWidgets('Timer builder saves a named custom timer preset', (
     tester,
   ) async {

@@ -34,6 +34,9 @@ class HomeTexts implements HomeTextSet {
   String get timerBuilderSavedPresetFullMessage => '저장했어요. 오래된 타이머는 자동으로 정리돼요.';
   String get timerBuilderSavedPresetLimitHint => '새로 저장하면 가장 오래된 타이머가 정리돼요.';
   String get timerBuilderDeletePresetTooltip => '삭제';
+  String get timerBuilderFavoritePresetTooltip => '홈에 표시';
+  String get timerBuilderUnfavoritePresetTooltip => '홈에서 숨기기';
+  String get timerBuilderFavoritePresetLimitMessage => '홈에는 최대 3개까지 표시할 수 있어요.';
   String get timerBuilderCustomNameDialogTitle => '타이머 이름';
   String get timerBuilderCustomNameFieldLabel => '이름';
   String get timerBuilderUseOtherNameButton => '기타로 저장';

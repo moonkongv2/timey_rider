@@ -38,6 +38,10 @@ class EnHomeTexts implements HomeTextSet {
   String get timerBuilderSavedPresetLimitHint =>
       'New saves replace the oldest timer.';
   String get timerBuilderDeletePresetTooltip => 'Delete';
+  String get timerBuilderFavoritePresetTooltip => 'Show on Home';
+  String get timerBuilderUnfavoritePresetTooltip => 'Hide from Home';
+  String get timerBuilderFavoritePresetLimitMessage =>
+      'Up to 3 timers can be shown on Home.';
   String get timerBuilderCustomNameDialogTitle => 'Timer name';
   String get timerBuilderCustomNameFieldLabel => 'Name';
   String get timerBuilderUseOtherNameButton => 'Save as Other';
