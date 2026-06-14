@@ -121,9 +121,11 @@ class VehicleSelectionCard extends StatelessWidget {
               LayoutBuilder(
                 builder: (context, constraints) {
                   const spacing = AppSpacing.sm;
-                  final fourAcrossWidth =
-                      (constraints.maxWidth - (spacing * 3)) / 4;
-                  final itemSize = fourAcrossWidth.clamp(72.0, 84.0).toDouble();
+                  final threeAcrossWidth =
+                      (constraints.maxWidth - (spacing * 2)) / 3;
+                  final itemSize = threeAcrossWidth
+                      .clamp(72.0, 96.0)
+                      .toDouble();
 
                   return Wrap(
                     alignment: WrapAlignment.center,
