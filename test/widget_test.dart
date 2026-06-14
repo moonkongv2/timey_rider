@@ -2447,7 +2447,7 @@ void main() {
       findsOneWidget,
     );
     expect(find.text('최근 설정'), findsOneWidget);
-    expect(find.textContaining('책 읽기 · 18분 · 선택'), findsOneWidget);
+    expect(find.textContaining('책 읽기 · 18분'), findsOneWidget);
 
     await tester.tap(
       find.byKey(const ValueKey('timerBuilderRecentPresetApplyButton')),
@@ -2768,7 +2768,14 @@ void main() {
       findsOneWidget,
     );
     expect(find.text('책 읽기'), findsOneWidget);
-    expect(find.text('18분 · 선택'), findsOneWidget);
+    expect(find.text('18분'), findsOneWidget);
+    final favoriteTop = tester
+        .getTopLeft(find.byKey(const ValueKey('homeFavoriteTimerCard_0')))
+        .dy;
+    final createTimerTop = tester
+        .getTopLeft(find.byKey(const ValueKey('createTimerCard')))
+        .dy;
+    expect(favoriteTop, lessThan(createTimerTop));
 
     await tester.tap(find.byKey(const ValueKey('homeFavoriteTimerCard_0')));
     await tester.pump();
@@ -2831,7 +2838,7 @@ void main() {
     expect(presets, hasLength(1));
     expect(presets.first.activityId, 'custom');
     expect(presets.first.customName, '피아노 연습');
-    expect(find.textContaining('피아노 연습 · 12분 · 자동'), findsOneWidget);
+    expect(find.textContaining('피아노 연습 · 12분'), findsOneWidget);
   });
 
   testWidgets('Timer builder can save a custom timer as Other without a name', (
@@ -2878,7 +2885,7 @@ void main() {
     final presets = await const LocalSavedTimerPresetService().load();
     expect(presets, hasLength(1));
     expect(presets.first.customName, isNull);
-    expect(find.textContaining('기타 · 10분 · 자동'), findsOneWidget);
+    expect(find.textContaining('기타 · 10분'), findsOneWidget);
   });
 
   testWidgets('Timer builder applies and deletes a saved timer preset', (
@@ -2924,7 +2931,7 @@ void main() {
       find.byKey(const ValueKey('timerBuilderSavedPresetCard_0')),
       findsOneWidget,
     );
-    expect(find.textContaining('책 읽기 · 18분 · 선택'), findsOneWidget);
+    expect(find.textContaining('책 읽기 · 18분'), findsOneWidget);
 
     await tester.tap(
       find.byKey(const ValueKey('timerBuilderSavedPresetApplyButton_0')),

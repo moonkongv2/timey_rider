@@ -1144,6 +1144,41 @@ class _TimerBuilderSection extends StatelessWidget {
                 fontWeight: FontWeight.w800,
               ),
             ),
+            if (favoritePresets.isNotEmpty) ...[
+              const SizedBox(height: AppSpacing.md),
+              Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      favoriteTitle,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: textTheme.titleSmall?.copyWith(
+                        color: AppColors.textStrong,
+                        fontWeight: FontWeight.w900,
+                      ),
+                    ),
+                  ),
+                  Text(
+                    '${favoritePresets.length}/${LocalSavedTimerPresetService.maxFavoritePresets}',
+                    style: textTheme.labelMedium?.copyWith(
+                      color: AppColors.textSecondary,
+                      fontWeight: FontWeight.w900,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: AppSpacing.sm),
+              for (final entry in favoritePresets.indexed) ...[
+                _HomeFavoriteTimerCard(
+                  key: ValueKey('homeFavoriteTimerCard_${entry.$1}'),
+                  preset: entry.$2,
+                  onPressed: () => onFavoritePressed(entry.$2),
+                ),
+                if (entry.$1 != favoritePresets.length - 1)
+                  const SizedBox(height: AppSpacing.sm),
+              ],
+            ],
             const SizedBox(height: AppSpacing.md),
             Material(
               key: const ValueKey('createTimerCard'),
@@ -1229,41 +1264,6 @@ class _TimerBuilderSection extends StatelessWidget {
                 ),
               ),
             ),
-            if (favoritePresets.isNotEmpty) ...[
-              const SizedBox(height: AppSpacing.md),
-              Row(
-                children: [
-                  Expanded(
-                    child: Text(
-                      favoriteTitle,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: textTheme.titleSmall?.copyWith(
-                        color: AppColors.textStrong,
-                        fontWeight: FontWeight.w900,
-                      ),
-                    ),
-                  ),
-                  Text(
-                    '${favoritePresets.length}/${LocalSavedTimerPresetService.maxFavoritePresets}',
-                    style: textTheme.labelMedium?.copyWith(
-                      color: AppColors.textSecondary,
-                      fontWeight: FontWeight.w900,
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: AppSpacing.sm),
-              for (final entry in favoritePresets.indexed) ...[
-                _HomeFavoriteTimerCard(
-                  key: ValueKey('homeFavoriteTimerCard_${entry.$1}'),
-                  preset: entry.$2,
-                  onPressed: () => onFavoritePressed(entry.$2),
-                ),
-                if (entry.$1 != favoritePresets.length - 1)
-                  const SizedBox(height: AppSpacing.sm),
-              ],
-            ],
           ],
         ),
       ),
@@ -1287,9 +1287,6 @@ class _HomeFavoriteTimerCard extends StatelessWidget {
     final textTheme = Theme.of(context).textTheme;
     final languageCode = Localizations.localeOf(context).languageCode;
     final activity = ActivityCatalog.findById(preset.activityId);
-    final markerModeLabel = preset.markerMode == ActivityMarkerMode.manual
-        ? texts.home.timerBuilderManualMarkerOption
-        : texts.home.timerBuilderRandomMarkerOption;
 
     return Material(
       color: AppColors.white.withValues(alpha: 0.82),
@@ -1337,7 +1334,7 @@ class _HomeFavoriteTimerCard extends StatelessWidget {
                       ),
                       const SizedBox(height: AppSpacing.xs),
                       Text(
-                        '${texts.home.minuteLabel(preset.duration.inMinutes)} · $markerModeLabel',
+                        texts.home.minuteLabel(preset.duration.inMinutes),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: textTheme.labelMedium?.copyWith(
@@ -1602,10 +1599,6 @@ class _TimerBuilderSheetState extends State<_TimerBuilderSheet> {
     final recentActivity = recentPreset == null
         ? null
         : ActivityCatalog.findById(recentPreset.activityId);
-    final recentMarkerModeLabel =
-        recentPreset?.markerMode == ActivityMarkerMode.manual
-        ? homeTexts.timerBuilderManualMarkerOption
-        : homeTexts.timerBuilderRandomMarkerOption;
     final savedPresetCountLabel = homeTexts.timerBuilderSavedPresetCount(
       _savedPresets.length,
       LocalSavedTimerPresetService.maxSavedPresets,
@@ -1617,9 +1610,6 @@ class _TimerBuilderSheetState extends State<_TimerBuilderSheet> {
           final index = entry.$1;
           final preset = entry.$2;
           final activity = ActivityCatalog.findById(preset.activityId);
-          final markerModeLabel = preset.markerMode == ActivityMarkerMode.manual
-              ? homeTexts.timerBuilderManualMarkerOption
-              : homeTexts.timerBuilderRandomMarkerOption;
           return _TimerBuilderPresetCard(
             key: ValueKey('timerBuilderSavedPresetCard_$index'),
             applyButtonKey: ValueKey(
@@ -1639,7 +1629,6 @@ class _TimerBuilderSheetState extends State<_TimerBuilderSheet> {
             activityEmoji: activity.emoji,
             activityLabel: _presetActivityLabel(preset, activity, languageCode),
             durationLabel: homeTexts.minuteLabel(preset.duration.inMinutes),
-            markerModeLabel: markerModeLabel,
             onApply: () => _applyPreset(preset),
             onDelete: () => _deleteSavedPreset(index),
             onFavoriteToggle: () => _toggleSavedPresetFavorite(index),
@@ -1772,7 +1761,6 @@ class _TimerBuilderSheetState extends State<_TimerBuilderSheet> {
                         durationLabel: homeTexts.minuteLabel(
                           recentPreset.duration.inMinutes,
                         ),
-                        markerModeLabel: recentMarkerModeLabel,
                         onApply: () => _applyPreset(recentPreset),
                       ),
                       const SizedBox(height: AppSpacing.lg),
@@ -1989,7 +1977,6 @@ class _TimerBuilderPresetCard extends StatelessWidget {
     required this.activityEmoji,
     required this.activityLabel,
     required this.durationLabel,
-    required this.markerModeLabel,
     required this.onApply,
     this.title,
     this.deleteButtonKey,
@@ -2006,7 +1993,6 @@ class _TimerBuilderPresetCard extends StatelessWidget {
   final String activityEmoji;
   final String activityLabel;
   final String durationLabel;
-  final String markerModeLabel;
   final VoidCallback onApply;
   final Key? deleteButtonKey;
   final String? deleteTooltip;
@@ -2073,7 +2059,7 @@ class _TimerBuilderPresetCard extends StatelessWidget {
                             const SizedBox(height: AppSpacing.xs),
                           ],
                           Text(
-                            '$activityLabel · $durationLabel · $markerModeLabel',
+                            '$activityLabel · $durationLabel',
                             maxLines: 2,
                             overflow: TextOverflow.ellipsis,
                             style: textTheme.titleSmall?.copyWith(
