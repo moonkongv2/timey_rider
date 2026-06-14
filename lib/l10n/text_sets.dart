@@ -39,6 +39,7 @@ abstract interface class HomeTextSet {
   String get timerBuilderSavedPresetTitle;
   String get timerBuilderSavePresetButton;
   String get timerBuilderSavedPresetMessage;
+  String get timerBuilderSavedPresetFullMessage;
   String get timerBuilderDeletePresetTooltip;
   String get timerBuilderCustomNameDialogTitle;
   String get timerBuilderCustomNameFieldLabel;
@@ -70,6 +71,7 @@ abstract interface class HomeTextSet {
 
   String recentCustomMinutes(int minutes);
   String minuteLabel(int minutes);
+  String timerBuilderSavedPresetCount(int count, int maxCount);
   String activeTimerSubtitle(String remainingTime);
   String normalCourse(int minutes);
   String alternateCourse(int minutes);

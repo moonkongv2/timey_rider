@@ -1326,11 +1326,13 @@ class _TimerBuilderSheetState extends State<_TimerBuilderSheet> {
     setState(() {
       _savedPresets = savedPresets;
     });
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(AppTexts.of(context).home.timerBuilderSavedPresetMessage),
-      ),
-    );
+    final savedPresetMessage =
+        savedPresets.length >= LocalSavedTimerPresetService.maxSavedPresets
+        ? AppTexts.of(context).home.timerBuilderSavedPresetFullMessage
+        : AppTexts.of(context).home.timerBuilderSavedPresetMessage;
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(savedPresetMessage)));
   }
 
   Future<_CustomPresetNameResult?> _requestCustomPresetName() async {
@@ -1405,6 +1407,10 @@ class _TimerBuilderSheetState extends State<_TimerBuilderSheet> {
         recentPreset?.markerMode == ActivityMarkerMode.manual
         ? homeTexts.timerBuilderManualMarkerOption
         : homeTexts.timerBuilderRandomMarkerOption;
+    final savedPresetCountLabel = homeTexts.timerBuilderSavedPresetCount(
+      _savedPresets.length,
+      LocalSavedTimerPresetService.maxSavedPresets,
+    );
     final savedPresetCards = _savedPresets.indexed
         .map((entry) {
           final index = entry.$1;
@@ -1512,8 +1518,9 @@ class _TimerBuilderSheetState extends State<_TimerBuilderSheet> {
                     ),
                     const SizedBox(height: AppSpacing.lg),
                     if (savedPresetCards.isNotEmpty) ...[
-                      _TimerBuilderStepTitle(
+                      _TimerBuilderSavedPresetHeader(
                         title: homeTexts.timerBuilderSavedPresetTitle,
+                        countLabel: savedPresetCountLabel,
                       ),
                       const SizedBox(height: AppSpacing.sm),
                       SingleChildScrollView(
@@ -1893,6 +1900,49 @@ class _TimerBuilderStepTitle extends StatelessWidget {
         color: AppColors.textStrong,
         fontWeight: FontWeight.w900,
       ),
+    );
+  }
+}
+
+class _TimerBuilderSavedPresetHeader extends StatelessWidget {
+  const _TimerBuilderSavedPresetHeader({
+    required this.title,
+    required this.countLabel,
+  });
+
+  final String title;
+  final String countLabel;
+
+  @override
+  Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
+
+    return Row(
+      children: [
+        Expanded(child: _TimerBuilderStepTitle(title: title)),
+        const SizedBox(width: AppSpacing.sm),
+        DecoratedBox(
+          decoration: BoxDecoration(
+            color: AppColors.white.withValues(alpha: 0.74),
+            borderRadius: AppRadius.pill,
+            border: Border.all(color: AppColors.borderWarm),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppSpacing.sm,
+              vertical: AppSpacing.xs,
+            ),
+            child: Text(
+              countLabel,
+              key: const ValueKey('timerBuilderSavedPresetCount'),
+              style: textTheme.labelMedium?.copyWith(
+                color: AppColors.textSecondary,
+                fontWeight: FontWeight.w900,
+              ),
+            ),
+          ),
+        ),
+      ],
     );
   }
 }

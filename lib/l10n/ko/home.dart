@@ -31,6 +31,7 @@ class HomeTexts implements HomeTextSet {
   String get timerBuilderSavedPresetTitle => '저장한 타이머';
   String get timerBuilderSavePresetButton => '저장';
   String get timerBuilderSavedPresetMessage => '저장했어요.';
+  String get timerBuilderSavedPresetFullMessage => '저장했어요. 오래된 타이머는 자동으로 정리돼요.';
   String get timerBuilderDeletePresetTooltip => '삭제';
   String get timerBuilderCustomNameDialogTitle => '타이머 이름';
   String get timerBuilderCustomNameFieldLabel => '이름';
@@ -62,6 +63,10 @@ class HomeTexts implements HomeTextSet {
 
   String recentCustomMinutes(int minutes) => '최근 $minutes분';
   String minuteLabel(int minutes) => '$minutes분';
+  String timerBuilderSavedPresetCount(int count, int maxCount) {
+    return '$count/$maxCount개';
+  }
+
   String activeTimerSubtitle(String remainingTime) => '남은 시간 $remainingTime';
   String normalCourse(int minutes) => '$minutes분 보통 코스';
   String alternateCourse(int minutes) => '$minutes분 코스';

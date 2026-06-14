@@ -33,6 +33,8 @@ class EnHomeTexts implements HomeTextSet {
   String get timerBuilderSavedPresetTitle => 'Saved timers';
   String get timerBuilderSavePresetButton => 'Save';
   String get timerBuilderSavedPresetMessage => 'Saved.';
+  String get timerBuilderSavedPresetFullMessage =>
+      'Saved. Older timers are cleaned up automatically.';
   String get timerBuilderDeletePresetTooltip => 'Delete';
   String get timerBuilderCustomNameDialogTitle => 'Timer name';
   String get timerBuilderCustomNameFieldLabel => 'Name';
@@ -66,6 +68,10 @@ class EnHomeTexts implements HomeTextSet {
 
   String recentCustomMinutes(int minutes) => 'Recent $minutes min';
   String minuteLabel(int minutes) => '$minutes min';
+  String timerBuilderSavedPresetCount(int count, int maxCount) {
+    return '$count/$maxCount';
+  }
+
   String activeTimerSubtitle(String remainingTime) => '$remainingTime left';
   String normalCourse(int minutes) => '$minutes-min Regular Ride';
   String alternateCourse(int minutes) => '$minutes-min Ride';

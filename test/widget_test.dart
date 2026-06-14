@@ -2508,7 +2508,73 @@ void main() {
       find.byKey(const ValueKey('timerBuilderSavedPresetCard_0')),
       findsOneWidget,
     );
+    expect(
+      find.byKey(const ValueKey('timerBuilderSavedPresetCount')),
+      findsOneWidget,
+    );
+    expect(find.text('1/5개'), findsOneWidget);
     expect(find.text('저장했어요.'), findsOneWidget);
+  });
+
+  testWidgets('Timer builder shows the saved timer preset limit', (
+    tester,
+  ) async {
+    SharedPreferences.setMockInitialValues({});
+    addTearDown(() async {
+      await const ActiveActivityTimerSessionStore().clear();
+      await const LocalSavedTimerPresetService().clear();
+    });
+
+    final savedTimerPresetService = const LocalSavedTimerPresetService();
+    for (
+      var index = 0;
+      index < LocalSavedTimerPresetService.maxSavedPresets;
+      index += 1
+    ) {
+      await savedTimerPresetService.save(
+        ActivityTimerPreset(
+          activityId: 'custom',
+          duration: Duration(minutes: 10 + index),
+          markerMode: ActivityMarkerMode.random,
+          markerIds: const ['star'],
+          selectedMarkerIds: const [],
+          updatedAt: DateTime(2026, 6, 14, index),
+          customName: '저장 $index',
+        ),
+      );
+    }
+
+    await tester.pumpWidget(
+      MaterialApp(
+        locale: const Locale('ko'),
+        supportedLocales: const [Locale('ko'), Locale('en')],
+        localizationsDelegates: const [
+          GlobalMaterialLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+        ],
+        home: HomeScreen(
+          config: ActivityTimerConfig.defaults().copyWith(childName: '지율'),
+          activityProgressService: LocalActivityProgressService(),
+          onConfigChanged: (_) {},
+          now: () => DateTime(2026, 6, 14, 12),
+        ),
+      ),
+    );
+    await tester.pump();
+
+    await _openTimerBuilder(tester);
+
+    expect(find.text('5/5개'), findsOneWidget);
+
+    await _selectTimerBuilderActivity(tester, 'reading');
+    await _setTimerBuilderMinutes(tester, 18);
+    await _saveTimerBuilderPreset(tester);
+
+    final presets = await savedTimerPresetService.load();
+    expect(presets, hasLength(LocalSavedTimerPresetService.maxSavedPresets));
+    expect(find.text('5/5개'), findsOneWidget);
+    expect(find.text('저장했어요. 오래된 타이머는 자동으로 정리돼요.'), findsOneWidget);
   });
 
   testWidgets('Timer builder saves a named custom timer preset', (
