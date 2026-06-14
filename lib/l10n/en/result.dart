@@ -115,7 +115,7 @@ class EnResultTexts implements ResultTextSet {
         'When you confirm the activity is finished, it is recorded as complete.',
       ],
       ActivityCompletionStatus.timeEnded => const [
-        'This activity finished because the timer reached the end.',
+        'After the timer ends, check the mission together and save the record.',
       ],
       ActivityCompletionStatus.needsMoreTime ||
       ActivityCompletionStatus.canceled => const [
@@ -129,16 +129,16 @@ class EnResultTexts implements ResultTextSet {
       ActivityCompletionStatus.completedBeforeEnd ||
       ActivityCompletionStatus.completedAtEnd ||
       ActivityCompletionStatus.completedAfterEnd => const [
-        'A completed mission can earn one random success sticker.',
-        'If a reward goal is active, the sticker can fill one goal slot.',
+        'Choose Get Sticker to receive one random success sticker.',
+        'If a reward goal is active, the received sticker can fill one goal slot.',
       ],
       ActivityCompletionStatus.timeEnded => const [
         'A time-ended activity is still recorded as part of the routine.',
-        'Move to the next activity without adding sticker pressure.',
+        'Check together, then choose whether to get a sticker.',
       ],
       ActivityCompletionStatus.needsMoreTime ||
       ActivityCompletionStatus.canceled => const [
-        'Incomplete activity records do not award stickers.',
+        'Choose No Sticker This Time to save the record without a sticker.',
         'An incomplete result is a planning clue, not a punishment.',
       ],
     };
@@ -153,18 +153,18 @@ class EnResultTexts implements ResultTextSet {
       ActivityCompletionStatus.completedAtEnd ||
       ActivityCompletionStatus.completedAfterEnd => const [
         'The activity was confirmed finished and recorded as complete.',
-        'A completed mission can earn one random success sticker.',
-        'If a reward goal is active, the sticker can fill one goal slot.',
+        'Choose Get Sticker to receive one random success sticker.',
+        'If a reward goal is active, the received sticker can fill one goal slot.',
       ],
       ActivityCompletionStatus.timeEnded => const [
         'The timer reached the end and the activity was recorded.',
         'This is a routine transition, not a pass-or-fail result.',
-        'No sticker is added for this outcome.',
+        'Check together, then choose whether to get a sticker.',
       ],
       ActivityCompletionStatus.needsMoreTime ||
       ActivityCompletionStatus.canceled => const [
         'The activity needed a little more time.',
-        'Incomplete activity records do not award stickers.',
+        'Choose No Sticker This Time to save the record without a sticker.',
         'Use the record to adjust the next try.',
       ],
     };

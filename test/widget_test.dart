@@ -4068,7 +4068,7 @@ void main() {
     expect(find.textContaining('일부 구간을 건너뛸 수 있어요'), findsOneWidget);
 
     await tester.scrollUntilVisible(
-      find.textContaining('완료한 미션은 랜덤 성공 스티커'),
+      find.textContaining('스티커 받기를 선택하면 랜덤 성공 스티커'),
       200,
       scrollable: find.byType(Scrollable).first,
     );
@@ -7864,7 +7864,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(
-      find.text('최근 기록 20:00 · 조금 더 필요 · 스티커 없음 · 초과 +05:00'),
+      find.text('최근 기록 20:00 · 조금 더 필요 · 스티커 받지 않음 · 초과 +05:00'),
       findsOneWidget,
     );
   });
@@ -8133,7 +8133,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('조금 더 필요'), findsOneWidget);
-    expect(find.text('스티커 없음'), findsOneWidget);
+    expect(find.text('스티커 받지 않음'), findsOneWidget);
     expect(find.text('초과 +05:00'), findsOneWidget);
   });
 }

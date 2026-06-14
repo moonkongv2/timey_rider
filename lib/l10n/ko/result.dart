@@ -103,7 +103,9 @@ class ResultTexts implements ResultTextSet {
       ActivityCompletionStatus.completedAfterEnd => const [
         '활동을 마쳤다고 확인하면 완료로 기록돼요.',
       ],
-      ActivityCompletionStatus.timeEnded => const ['시간이 끝나 자동으로 마무리된 활동이에요.'],
+      ActivityCompletionStatus.timeEnded => const [
+        '시간이 끝난 뒤 아이와 함께 확인하고 기록돼요.',
+      ],
       ActivityCompletionStatus.needsMoreTime ||
       ActivityCompletionStatus.canceled => const [
         '활동을 마치지 못했으면 다음 시도를 위한 기록으로 남겨요.',
@@ -116,16 +118,16 @@ class ResultTexts implements ResultTextSet {
       ActivityCompletionStatus.completedBeforeEnd ||
       ActivityCompletionStatus.completedAtEnd ||
       ActivityCompletionStatus.completedAfterEnd => const [
-        '완료한 미션은 랜덤 성공 스티커 1개를 받을 수 있어요.',
-        '보상 목표가 있으면 성공 스티커가 목표 칸을 채울 수 있어요.',
+        '스티커 받기를 선택하면 랜덤 성공 스티커 1개를 받아요.',
+        '보상 목표가 있으면 받은 스티커가 목표 칸을 채울 수 있어요.',
       ],
       ActivityCompletionStatus.timeEnded => const [
         '시간 종료 활동은 완료된 흐름으로 기록돼요.',
-        '보상 스티커 없이 다음 활동으로 부드럽게 넘어가요.',
+        '아이와 함께 확인한 뒤 스티커를 받을지 선택해요.',
       ],
       ActivityCompletionStatus.needsMoreTime ||
       ActivityCompletionStatus.canceled => const [
-        '미완료 기록에는 스티커가 지급되지 않아요.',
+        '이번엔 스티커 받지 않기를 선택하면 기록만 남아요.',
         '미완료는 벌이 아니라 다음 조절을 위한 기록이에요.',
       ],
     };
@@ -140,18 +142,18 @@ class ResultTexts implements ResultTextSet {
       ActivityCompletionStatus.completedAtEnd ||
       ActivityCompletionStatus.completedAfterEnd => const [
         '활동을 마쳤다고 확인되어 완료로 기록돼요.',
-        '완료한 미션은 랜덤 성공 스티커 1개를 받을 수 있어요.',
-        '보상 목표가 있으면 성공 스티커가 목표 칸을 채울 수 있어요.',
+        '스티커 받기를 선택하면 랜덤 성공 스티커 1개를 받아요.',
+        '보상 목표가 있으면 받은 스티커가 목표 칸을 채울 수 있어요.',
       ],
       ActivityCompletionStatus.timeEnded => const [
         '정해둔 시간이 끝나 활동이 마무리된 기록이에요.',
         '성공이나 실패를 가르는 결과가 아니라 루틴 흐름을 지키는 기록이에요.',
-        '보상 스티커 없이 다음 미션으로 넘어갈 수 있어요.',
+        '아이와 함께 확인한 뒤 스티커를 받을지 선택해요.',
       ],
       ActivityCompletionStatus.needsMoreTime ||
       ActivityCompletionStatus.canceled => const [
         '활동을 마치기에는 시간이 조금 부족했던 기록이에요.',
-        '미완료 기록에는 스티커가 지급되지 않아요.',
+        '이번엔 스티커 받지 않기를 선택하면 기록만 남아요.',
         '미완료는 벌이 아니라 다음 조절을 위한 기록이에요.',
       ],
     };

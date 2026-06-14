@@ -55,9 +55,9 @@ class EnUserGuideTexts implements UserGuideTextSet {
   String get completionTitle => 'Completion and stickers';
   List<String> get completionItems => const [
     'When you confirm the activity is done, it is recorded as complete.',
-    'Some activities, like Play Time, can finish when the timer ends.',
-    'Completed missions may earn a random success sticker.',
-    'Needs-more-time or canceled records are saved without stickers and can guide the next timer choice.',
+    'After the timer ends, check together and choose whether to get a sticker.',
+    'Choose Get Sticker to receive a random success sticker.',
+    'Choose No Sticker This Time to save the record and guide the next timer choice.',
     'The child-facing result keeps a next-try tone instead of harsh failure wording.',
   ];
 
@@ -66,7 +66,7 @@ class EnUserGuideTexts implements UserGuideTextSet {
     'Activity history shows activity name, target time, actual time, and completion status.',
     'Earned stickers and manually chosen picture markers can appear with the record.',
     'Earned stickers collect in the sticker collection screen.',
-    'If reward goals are active, success stickers can fill goal slots.',
+    'If reward goals are active, received stickers can fill goal slots.',
   ];
 
   String get exitResumeTitle => 'Leaving and resuming during a timer';

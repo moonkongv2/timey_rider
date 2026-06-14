@@ -14,13 +14,13 @@ class EnActivityHistoryTexts implements ActivityHistoryTextSet {
     'Activity history shows the mission, target time, actual time, completion status, and earned stickers.',
     'Manually chosen picture markers appear when they were saved with the activity.',
     'Auto-selected markers appear on the road only and are not saved in history.',
-    'Incomplete records may show no stickers.',
+    'Records without a sticker show No sticker this time.',
   ];
   String get targetTimeLabel => 'Target';
   String get actualTimeLabel => 'Actual';
   String get overrunTimeLabel => 'Over';
   String get rewardLabel => 'Stickers earned';
-  String get noRewardLabel => 'No stickers';
+  String get noRewardLabel => 'No sticker this time';
   String get selectedMarkerLabel => 'Chosen markers';
   String get deleteRecordLabel => 'Delete activity record';
   String get deleteRecordDialogTitle => 'Delete this activity record?';
