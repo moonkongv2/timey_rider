@@ -289,29 +289,31 @@ class _MarkerChoiceChip extends StatelessWidget {
       Localizations.localeOf(context).languageCode,
     );
 
-    return ChoiceChip(
-      key: ValueKey('activityMarkerChip_${marker.id}'),
+    return Semantics(
+      label: label,
       selected: isSelected,
-      onSelected: isEnabled ? (_) => onSelected() : null,
-      avatar: _MarkerChipAvatar(marker: marker),
-      label: Text(label),
-      labelStyle: Theme.of(context).textTheme.labelLarge?.copyWith(
-        color: isSelected ? AppColors.textStrong : AppColors.textPrimary,
-        fontWeight: FontWeight.w800,
+      button: true,
+      child: ChoiceChip(
+        key: ValueKey('activityMarkerChip_${marker.id}'),
+        selected: isSelected,
+        onSelected: isEnabled ? (_) => onSelected() : null,
+        label: _MarkerEmoji(marker: marker),
+        labelPadding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+        selectedColor: AppColors.surfaceYellow,
+        backgroundColor: AppColors.white.withValues(alpha: 0.82),
+        disabledColor: AppColors.white.withValues(alpha: 0.44),
+        side: BorderSide(
+          color: isSelected ? AppColors.primarySoft : AppColors.borderSoft,
+          width: isSelected ? 1.6 : 1,
+        ),
+        showCheckmark: false,
       ),
-      selectedColor: AppColors.surfaceYellow,
-      backgroundColor: AppColors.white.withValues(alpha: 0.82),
-      disabledColor: AppColors.white.withValues(alpha: 0.44),
-      side: BorderSide(
-        color: isSelected ? AppColors.primarySoft : AppColors.borderSoft,
-      ),
-      showCheckmark: false,
     );
   }
 }
 
-class _MarkerChipAvatar extends StatelessWidget {
-  const _MarkerChipAvatar({required this.marker});
+class _MarkerEmoji extends StatelessWidget {
+  const _MarkerEmoji({required this.marker});
 
   final ActivityMarkerDefinition marker;
 
@@ -319,18 +321,28 @@ class _MarkerChipAvatar extends StatelessWidget {
   Widget build(BuildContext context) {
     final assetPath = marker.assetPath;
     if (assetPath == null) {
-      return Text(marker.emoji);
+      return Text(
+        marker.emoji,
+        textScaler: TextScaler.noScaling,
+        style: const TextStyle(fontSize: 26, height: 1),
+      );
     }
 
     return SizedBox(
-      width: 22,
-      height: 22,
+      width: 30,
+      height: 30,
       child: Image.asset(
         assetPath,
         key: ValueKey('activityMarkerChipImage_${marker.id}'),
         fit: BoxFit.contain,
         errorBuilder: (context, error, stackTrace) {
-          return Center(child: Text(marker.emoji));
+          return Center(
+            child: Text(
+              marker.emoji,
+              textScaler: TextScaler.noScaling,
+              style: const TextStyle(fontSize: 26, height: 1),
+            ),
+          );
         },
       ),
     );

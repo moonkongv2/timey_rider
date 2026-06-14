@@ -2146,7 +2146,7 @@ void main() {
     );
     expect(
       find.byKey(const ValueKey('timerBuilderMarker_front_teeth')),
-      findsOneWidget,
+      findsNothing,
     );
     expect(
       find.byKey(const ValueKey('timerBuilderMarker_cover')),
@@ -2160,15 +2160,15 @@ void main() {
       find.byKey(const ValueKey('timerBuilderMarker_star')),
       findsOneWidget,
     );
-    expect(find.text('어금니'), findsOneWidget);
-    expect(find.text('혀'), findsOneWidget);
+    expect(find.text('어금니'), findsNothing);
+    expect(find.text('혀'), findsNothing);
 
     for (final markerId in [
       'top_teeth',
       'bottom_teeth',
-      'front_teeth',
       'molars',
       'tongue',
+      'star',
     ]) {
       tester
           .widget<ChoiceChip>(
@@ -2257,13 +2257,28 @@ void main() {
     await tester.pump();
 
     await _openTimerBuilder(tester);
+
+    expect(
+      find.byKey(const ValueKey('timerBuilderAutoMarkerPreview')),
+      findsOneWidget,
+    );
+    expect(
+      find.byKey(const ValueKey('timerBuilderAutoMarkerPreview_top_teeth')),
+      findsOneWidget,
+    );
+    expect(
+      find.byKey(const ValueKey('timerBuilderAutoMarkerPreview_bottom_teeth')),
+      findsOneWidget,
+    );
     await _startTimerBuilder(tester);
 
     expect(find.byKey(const ValueKey('timerBuilderSheet')), findsNothing);
     expect(find.byType(TimerScreen), findsOneWidget);
     expect(
       tester.widget<TimerScreen>(find.byType(TimerScreen)).config.markerIds,
-      hasLength(ActivityMarkerCatalog.maxSelectableMarkerCount),
+      hasLength(
+        ActivityMarkerCatalog.defaultSelectionIdsForActivity('brushing').length,
+      ),
     );
     expect(
       tester

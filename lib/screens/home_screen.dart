@@ -1598,6 +1598,10 @@ class _TimerBuilderSheetState extends State<_TimerBuilderSheet> {
     final languageCode = Localizations.localeOf(context).languageCode;
     final selectedMinuteLabel = homeTexts.minuteLabel(_minutes.round());
     final maxMarkerCount = ActivityMarkerCatalog.maxSelectableMarkerCount;
+    final autoPreviewMarkers =
+        ActivityMarkerCatalog.defaultSelectionIdsForActivity(
+          _selectedActivity.id,
+        ).map(ActivityMarkerCatalog.findById).nonNulls.toList(growable: false);
     final recentPreset = widget.recentPreset;
     final recentActivity = recentPreset == null
         ? null
@@ -1817,6 +1821,19 @@ class _TimerBuilderSheetState extends State<_TimerBuilderSheet> {
                         ),
                       ],
                     ),
+                    if (_markerMode != ActivityMarkerMode.manual &&
+                        autoPreviewMarkers.isNotEmpty) ...[
+                      const SizedBox(height: AppSpacing.sm),
+                      Wrap(
+                        key: const ValueKey('timerBuilderAutoMarkerPreview'),
+                        spacing: AppSpacing.sm,
+                        runSpacing: AppSpacing.sm,
+                        children: [
+                          for (final marker in autoPreviewMarkers)
+                            _TimerBuilderMarkerPreview(marker: marker),
+                        ],
+                      ),
+                    ],
                     if (_markerMode == ActivityMarkerMode.manual) ...[
                       const SizedBox(height: AppSpacing.sm),
                       Text(
@@ -2391,23 +2408,63 @@ class _TimerBuilderMarkerChip extends StatelessWidget {
       Localizations.localeOf(context).languageCode,
     );
 
-    return ChoiceChip(
-      key: ValueKey('timerBuilderMarker_${marker.id}'),
+    return Semantics(
+      label: label,
       selected: isSelected,
-      onSelected: isEnabled ? (_) => onSelected() : null,
-      avatar: Text(marker.emoji, textScaler: TextScaler.noScaling),
-      label: Text(label),
-      labelStyle: Theme.of(context).textTheme.labelLarge?.copyWith(
-        color: isSelected ? AppColors.textStrong : AppColors.textPrimary,
-        fontWeight: FontWeight.w800,
+      button: true,
+      child: ChoiceChip(
+        key: ValueKey('timerBuilderMarker_${marker.id}'),
+        selected: isSelected,
+        onSelected: isEnabled ? (_) => onSelected() : null,
+        label: Text(
+          marker.emoji,
+          textScaler: TextScaler.noScaling,
+          style: const TextStyle(fontSize: 26, height: 1),
+        ),
+        labelPadding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+        selectedColor: AppColors.surfaceYellow,
+        backgroundColor: AppColors.white.withValues(alpha: 0.82),
+        disabledColor: AppColors.white.withValues(alpha: 0.44),
+        side: BorderSide(
+          color: isSelected ? AppColors.primarySoft : AppColors.borderSoft,
+          width: isSelected ? 1.6 : 1,
+        ),
+        showCheckmark: false,
       ),
-      selectedColor: AppColors.surfaceYellow,
-      backgroundColor: AppColors.white.withValues(alpha: 0.82),
-      disabledColor: AppColors.white.withValues(alpha: 0.44),
-      side: BorderSide(
-        color: isSelected ? AppColors.primarySoft : AppColors.borderSoft,
+    );
+  }
+}
+
+class _TimerBuilderMarkerPreview extends StatelessWidget {
+  const _TimerBuilderMarkerPreview({required this.marker});
+
+  final ActivityMarkerDefinition marker;
+
+  @override
+  Widget build(BuildContext context) {
+    final label = marker.labelForLanguage(
+      Localizations.localeOf(context).languageCode,
+    );
+
+    return Semantics(
+      label: label,
+      image: true,
+      child: DecoratedBox(
+        key: ValueKey('timerBuilderAutoMarkerPreview_${marker.id}'),
+        decoration: BoxDecoration(
+          color: AppColors.white.withValues(alpha: 0.74),
+          borderRadius: AppRadius.pill,
+          border: Border.all(color: AppColors.borderSoft),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          child: Text(
+            marker.emoji,
+            textScaler: TextScaler.noScaling,
+            style: const TextStyle(fontSize: 28, height: 1),
+          ),
+        ),
       ),
-      showCheckmark: false,
     );
   }
 }

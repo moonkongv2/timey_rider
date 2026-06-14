@@ -168,7 +168,6 @@ abstract final class ActivityMarkerCatalog {
   static const all = [
     topTeeth,
     bottomTeeth,
-    frontTeeth,
     molars,
     tongue,
     cover,
@@ -188,6 +187,8 @@ abstract final class ActivityMarkerCatalog {
     rocket,
   ];
 
+  static const legacyMarkers = [frontTeeth];
+
   static const defaultSelectionIds = [
     'star',
     'flag',
@@ -197,7 +198,7 @@ abstract final class ActivityMarkerCatalog {
   ];
 
   static ActivityMarkerDefinition? findById(String id) {
-    for (final marker in all) {
+    for (final marker in [...all, ...legacyMarkers]) {
       if (marker.id == id) {
         return marker;
       }

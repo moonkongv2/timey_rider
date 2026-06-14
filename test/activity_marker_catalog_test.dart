@@ -7,13 +7,7 @@ void main() {
   test('markerIdsForActivity returns brushing markers', () {
     final markerIds = ActivityMarkerCatalog.markerIdsForActivity('brushing');
 
-    expect(markerIds, [
-      'top_teeth',
-      'bottom_teeth',
-      'front_teeth',
-      'molars',
-      'tongue',
-    ]);
+    expect(markerIds, ['top_teeth', 'bottom_teeth', 'molars', 'tongue']);
   });
 
   test('randomSelectionIds for reading returns only reading markers', () {

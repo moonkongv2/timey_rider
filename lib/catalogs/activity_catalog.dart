@@ -14,7 +14,7 @@ abstract final class ActivityCatalog {
     ],
     completionMode: ActivityCompletionMode.confirmDone,
     rewardEnabledByDefault: true,
-    markerIds: ['top_teeth', 'bottom_teeth', 'front_teeth', 'molars', 'tongue'],
+    markerIds: ['top_teeth', 'bottom_teeth', 'molars', 'tongue'],
   );
 
   static const reading = ActivityDefinition(
