@@ -9,6 +9,7 @@ class LocalSavedTimerPresetService {
   const LocalSavedTimerPresetService();
 
   static const maxSavedPresets = 5;
+  static const maxFavoritePresets = 3;
   static const _savedTimerPresetsKey = 'savedActivityTimerPresets';
 
   Future<List<ActivityTimerPreset>> load() async {
@@ -45,14 +46,51 @@ class LocalSavedTimerPresetService {
 
   Future<List<ActivityTimerPreset>> save(ActivityTimerPreset preset) async {
     final existingPresets = await load();
+    final matchingPreset = _matchingTimerPreset(existingPresets, preset);
+    final favoriteAwarePreset =
+        !preset.isFavorite && matchingPreset?.isFavorite == true
+        ? preset.copyWith(isFavorite: true)
+        : preset;
     final updatedPresets = [
-      preset,
+      favoriteAwarePreset,
       for (final existingPreset in existingPresets)
-        if (!_matchesTimerSettings(existingPreset, preset)) existingPreset,
+        if (!_matchesTimerSettings(existingPreset, favoriteAwarePreset))
+          existingPreset,
     ].take(maxSavedPresets).toList(growable: false);
 
     await _write(updatedPresets);
     return List.unmodifiable(updatedPresets);
+  }
+
+  Future<SavedTimerPresetFavoriteResult> toggleFavoriteAt(int index) async {
+    final existingPresets = await load();
+    if (index < 0 || index >= existingPresets.length) {
+      return SavedTimerPresetFavoriteResult(presets: existingPresets);
+    }
+
+    final preset = existingPresets[index];
+    final shouldFavorite = !preset.isFavorite;
+    if (shouldFavorite &&
+        existingPresets.where((preset) => preset.isFavorite).length >=
+            maxFavoritePresets) {
+      return SavedTimerPresetFavoriteResult(
+        presets: existingPresets,
+        isLimitReached: true,
+      );
+    }
+
+    final updatedPresets = [
+      for (final entry in existingPresets.indexed)
+        if (entry.$1 == index)
+          entry.$2.copyWith(isFavorite: shouldFavorite)
+        else
+          entry.$2,
+    ];
+    await _write(updatedPresets);
+    return SavedTimerPresetFavoriteResult(
+      presets: List.unmodifiable(updatedPresets),
+      didUpdate: true,
+    );
   }
 
   Future<List<ActivityTimerPreset>> removeAt(int index) async {
@@ -78,6 +116,30 @@ class LocalSavedTimerPresetService {
       jsonEncode([for (final preset in presets) preset.toJson()]),
     );
   }
+}
+
+class SavedTimerPresetFavoriteResult {
+  const SavedTimerPresetFavoriteResult({
+    required this.presets,
+    this.didUpdate = false,
+    this.isLimitReached = false,
+  });
+
+  final List<ActivityTimerPreset> presets;
+  final bool didUpdate;
+  final bool isLimitReached;
+}
+
+ActivityTimerPreset? _matchingTimerPreset(
+  List<ActivityTimerPreset> presets,
+  ActivityTimerPreset preset,
+) {
+  for (final existingPreset in presets) {
+    if (_matchesTimerSettings(existingPreset, preset)) {
+      return existingPreset;
+    }
+  }
+  return null;
 }
 
 bool _matchesTimerSettings(ActivityTimerPreset a, ActivityTimerPreset b) {

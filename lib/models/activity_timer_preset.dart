@@ -9,6 +9,7 @@ class ActivityTimerPreset {
     this.markerIds = const [],
     List<String> selectedMarkerIds = const [],
     String? customName,
+    this.isFavorite = false,
   }) : _selectedMarkerIds = selectedMarkerIds,
        _customName = customName;
 
@@ -34,6 +35,7 @@ class ActivityTimerPreset {
       selectedMarkerIds: _stringListFromJson(json['selectedMarkerIds']),
       updatedAt: updatedAt,
       customName: _stringFromJson(json['customName']),
+      isFavorite: json['isFavorite'] == true,
     );
   }
 
@@ -45,6 +47,7 @@ class ActivityTimerPreset {
   List<String> get selectedMarkerIds => _selectedMarkerIds ?? const [];
   final DateTime updatedAt;
   final String? _customName;
+  final bool isFavorite;
   String? get customName {
     final value = _customName?.trim();
     if (value == null || value.isEmpty) {
@@ -61,6 +64,7 @@ class ActivityTimerPreset {
     List<String>? selectedMarkerIds,
     DateTime? updatedAt,
     String? customName,
+    bool? isFavorite,
   }) {
     return ActivityTimerPreset(
       activityId: activityId ?? this.activityId,
@@ -72,6 +76,7 @@ class ActivityTimerPreset {
       ),
       updatedAt: updatedAt ?? this.updatedAt,
       customName: customName ?? this.customName,
+      isFavorite: isFavorite ?? this.isFavorite,
     );
   }
 
@@ -85,6 +90,7 @@ class ActivityTimerPreset {
       'selectedMarkerIds': selectedMarkerIds,
       'updatedAt': updatedAt.toIso8601String(),
       if (customName != null) 'customName': customName,
+      if (isFavorite) 'isFavorite': true,
     };
   }
 }

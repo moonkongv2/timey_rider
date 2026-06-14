@@ -157,6 +157,103 @@ void main() {
     expect(presets.first.activityId, 'reading');
   });
 
+  test('LocalSavedTimerPresetService toggles favorite presets', () async {
+    SharedPreferences.setMockInitialValues({});
+    const service = LocalSavedTimerPresetService();
+
+    await service.save(
+      ActivityTimerPreset(
+        activityId: 'reading',
+        duration: const Duration(minutes: 15),
+        markerMode: ActivityMarkerMode.random,
+        updatedAt: DateTime.utc(2026, 6, 14, 1),
+      ),
+    );
+
+    final favorited = await service.toggleFavoriteAt(0);
+    final unfavorited = await service.toggleFavoriteAt(0);
+
+    expect(favorited.didUpdate, isTrue);
+    expect(favorited.isLimitReached, isFalse);
+    expect(favorited.presets.first.isFavorite, isTrue);
+    expect(unfavorited.didUpdate, isTrue);
+    expect(unfavorited.presets.first.isFavorite, isFalse);
+    expect((await service.load()).first.isFavorite, isFalse);
+  });
+
+  test('LocalSavedTimerPresetService limits home favorite presets', () async {
+    SharedPreferences.setMockInitialValues({});
+    const service = LocalSavedTimerPresetService();
+
+    for (
+      var index = 0;
+      index < LocalSavedTimerPresetService.maxFavoritePresets + 1;
+      index += 1
+    ) {
+      await service.save(
+        ActivityTimerPreset(
+          activityId: 'custom',
+          duration: Duration(minutes: 10 + index),
+          markerMode: ActivityMarkerMode.random,
+          updatedAt: DateTime.utc(2026, 6, 14, index),
+          customName: 'Timer $index',
+        ),
+      );
+    }
+
+    for (
+      var index = 0;
+      index < LocalSavedTimerPresetService.maxFavoritePresets;
+      index += 1
+    ) {
+      final result = await service.toggleFavoriteAt(index);
+      expect(result.didUpdate, isTrue);
+      expect(result.isLimitReached, isFalse);
+    }
+
+    final blocked = await service.toggleFavoriteAt(
+      LocalSavedTimerPresetService.maxFavoritePresets,
+    );
+
+    expect(blocked.didUpdate, isFalse);
+    expect(blocked.isLimitReached, isTrue);
+    expect(
+      blocked.presets.where((preset) => preset.isFavorite),
+      hasLength(LocalSavedTimerPresetService.maxFavoritePresets),
+    );
+  });
+
+  test(
+    'LocalSavedTimerPresetService keeps favorite state when saving duplicate',
+    () async {
+      SharedPreferences.setMockInitialValues({});
+      const service = LocalSavedTimerPresetService();
+
+      await service.save(
+        ActivityTimerPreset(
+          activityId: 'brushing',
+          duration: const Duration(minutes: 2),
+          markerMode: ActivityMarkerMode.random,
+          updatedAt: DateTime.utc(2026, 6, 14, 1),
+        ),
+      );
+      await service.toggleFavoriteAt(0);
+
+      final presets = await service.save(
+        ActivityTimerPreset(
+          activityId: 'brushing',
+          duration: const Duration(minutes: 2),
+          markerMode: ActivityMarkerMode.random,
+          updatedAt: DateTime.utc(2026, 6, 14, 2),
+        ),
+      );
+
+      expect(presets, hasLength(1));
+      expect(presets.first.updatedAt, DateTime.utc(2026, 6, 14, 2));
+      expect(presets.first.isFavorite, isTrue);
+    },
+  );
+
   test('LocalSavedTimerPresetService ignores malformed saved data', () async {
     SharedPreferences.setMockInitialValues({
       'savedActivityTimerPresets': jsonEncode([

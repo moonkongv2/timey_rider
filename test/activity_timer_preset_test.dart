@@ -69,6 +69,39 @@ void main() {
     expect(parsed.customName, 'Piano practice');
   });
 
+  test('ActivityTimerPreset stores optional home favorite state', () {
+    final updatedAt = DateTime.utc(2026, 6, 14, 1, 30);
+
+    final preset = ActivityTimerPreset(
+      activityId: 'cleanup',
+      duration: const Duration(minutes: 5),
+      markerMode: ActivityMarkerMode.random,
+      updatedAt: updatedAt,
+      isFavorite: true,
+    );
+
+    expect(preset.isFavorite, isTrue);
+    expect(preset.toJson()['isFavorite'], isTrue);
+
+    final parsedFavorite = ActivityTimerPreset.fromJson({
+      'activityId': 'cleanup',
+      'durationMs': const Duration(minutes: 5).inMilliseconds,
+      'markerMode': 'random',
+      'updatedAt': updatedAt.toIso8601String(),
+      'isFavorite': true,
+    });
+    final parsedLegacy = ActivityTimerPreset.fromJson({
+      'activityId': 'cleanup',
+      'durationMs': const Duration(minutes: 5).inMilliseconds,
+      'markerMode': 'random',
+      'updatedAt': updatedAt.toIso8601String(),
+    });
+
+    expect(parsedFavorite.isFavorite, isTrue);
+    expect(parsedLegacy.isFavorite, isFalse);
+    expect(parsedLegacy.toJson().containsKey('isFavorite'), isFalse);
+  });
+
   test('ActivityTimerPreset copyWith updates settings immutably', () {
     final updatedAt = DateTime.utc(2026, 6, 14, 1, 30);
     final preset = ActivityTimerPreset(
@@ -85,6 +118,7 @@ void main() {
       markerIds: const [],
       selectedMarkerIds: const ['ignored'],
       updatedAt: updatedAt.add(const Duration(minutes: 1)),
+      isFavorite: true,
     );
 
     expect(preset.duration, const Duration(minutes: 15));
@@ -97,6 +131,7 @@ void main() {
     expect(copied.markerIds, isEmpty);
     expect(copied.selectedMarkerIds, ['ignored']);
     expect(copied.updatedAt, updatedAt.add(const Duration(minutes: 1)));
+    expect(copied.isFavorite, isTrue);
   });
 
   test('ActivityTimerPreset rejects invalid required json fields', () {
