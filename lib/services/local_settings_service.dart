@@ -17,6 +17,7 @@ class LocalSettingsService {
   static const _activityIdKey = 'activityId';
   static const _vehicleIdKey = 'vehicleId';
   static const _childNameKey = 'childName';
+  static const _hasSeenOnboardingKey = 'hasSeenOnboarding';
   static const _avatarModeKey = 'avatarMode';
   static const _customAvatarImagePathKey = 'customAvatarImagePath';
   static const _customAvatarVehicleIdKey = 'customAvatarVehicleId';
@@ -189,6 +190,19 @@ class LocalSettingsService {
       _markerModeToString(config.markerMode),
     );
     await preferences.remove(_legacyMarkerModeKey);
+  }
+
+  Future<bool> loadHasSeenOnboarding({String? childName}) async {
+    final preferences = await SharedPreferences.getInstance();
+    if (preferences.containsKey(_hasSeenOnboardingKey)) {
+      return preferences.getBool(_hasSeenOnboardingKey) ?? false;
+    }
+    return childName?.trim().isNotEmpty ?? false;
+  }
+
+  Future<void> saveHasSeenOnboarding(bool value) async {
+    final preferences = await SharedPreferences.getInstance();
+    await preferences.setBool(_hasSeenOnboardingKey, value);
   }
 
   AvatarImageMode _avatarModeFromString(String? value) {

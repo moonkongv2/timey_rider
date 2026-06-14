@@ -16,6 +16,9 @@ Future<void> main() async {
   final activityProgressService = LocalActivityProgressService();
   const activeSessionStore = ActiveActivityTimerSessionStore();
   final initialConfig = await settingsService.loadConfig();
+  final initialHasSeenOnboarding = await settingsService.loadHasSeenOnboarding(
+    childName: initialConfig.childName,
+  );
 
   runApp(
     TimeyRiderApp(
@@ -23,6 +26,7 @@ Future<void> main() async {
       activityProgressService: activityProgressService,
       activeSessionStore: activeSessionStore,
       initialConfig: initialConfig,
+      initialHasSeenOnboarding: initialHasSeenOnboarding,
     ),
   );
 }

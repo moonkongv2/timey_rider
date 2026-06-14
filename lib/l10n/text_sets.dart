@@ -1,3 +1,5 @@
+import 'package:flutter/foundation.dart';
+
 import '../models/activity_completion_status.dart';
 
 abstract interface class CommonTextSet {
@@ -11,6 +13,27 @@ abstract interface class CommonTextSet {
   String get restartRide;
   String get settings;
   String get start;
+}
+
+@immutable
+class OnboardingCardText {
+  const OnboardingCardText({
+    required this.title,
+    required this.body,
+    required this.note,
+    required this.ctaLabel,
+  });
+
+  final String title;
+  final String body;
+  final String note;
+  final String ctaLabel;
+}
+
+abstract interface class OnboardingTextSet {
+  String get skipButton;
+  String pageIndicatorLabel(int currentPage, int totalPages);
+  List<OnboardingCardText> get cards;
 }
 
 abstract interface class HomeTextSet {

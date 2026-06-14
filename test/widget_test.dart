@@ -1632,10 +1632,22 @@ void main() {
     expect(pteranodonPrompt, contains('프테라노돈'));
   });
 
-  testWidgets('First launch asks for child name before home', (tester) async {
+  testWidgets('First launch shows onboarding before child name setup', (
+    tester,
+  ) async {
     SharedPreferences.setMockInitialValues({});
 
-    await _startApp(tester, const Locale('ko'), completeChildNameSetup: false);
+    await _startApp(
+      tester,
+      const Locale('ko'),
+      completeOnboarding: false,
+      completeChildNameSetup: false,
+    );
+
+    expect(find.byKey(const ValueKey('onboardingScreen')), findsOneWidget);
+
+    await tester.tap(find.byKey(const ValueKey('onboardingSkipButton')));
+    await tester.pumpAndSettle();
 
     expect(find.text('누가 Timey Rider를 탈까?'), findsOneWidget);
     expect(find.text('이름 저장'), findsOneWidget);
@@ -1648,6 +1660,7 @@ void main() {
     expect(find.byKey(const ValueKey('homeLogo')), findsOneWidget);
     final preferences = await SharedPreferences.getInstance();
     expect(preferences.getString('childName'), '민준');
+    expect(preferences.getBool('hasSeenOnboarding'), isTrue);
   });
 
   testWidgets('Home screen shows activity timer actions', (tester) async {
@@ -8066,6 +8079,7 @@ Future<ui.Image> _createTestFootprintImage() async {
 Future<void> _startApp(
   WidgetTester tester,
   Locale locale, {
+  bool completeOnboarding = true,
   bool completeChildNameSetup = true,
 }) async {
   tester.binding.platformDispatcher.localeTestValue = locale;
@@ -8076,6 +8090,14 @@ Future<void> _startApp(
   await app.main();
   await tester.pump(const Duration(milliseconds: 3500));
   await tester.pumpAndSettle();
+  if (completeOnboarding &&
+      find
+          .byKey(const ValueKey('onboardingSkipButton'))
+          .evaluate()
+          .isNotEmpty) {
+    await tester.tap(find.byKey(const ValueKey('onboardingSkipButton')));
+    await tester.pumpAndSettle();
+  }
   if (!completeChildNameSetup || find.byType(TextField).evaluate().isEmpty) {
     return;
   }
