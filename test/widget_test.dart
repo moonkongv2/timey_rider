@@ -6165,6 +6165,12 @@ void main() {
     await tester.pumpWidget(
       MaterialApp(
         locale: const Locale('ko'),
+        supportedLocales: const [Locale('ko'), Locale('en')],
+        localizationsDelegates: const [
+          GlobalMaterialLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+        ],
         home: TimerScreen(
           config: ActivityTimerConfig.defaults().copyWith(
             activityId: ActivityCatalog.play.id,
@@ -6184,6 +6190,8 @@ void main() {
 
     expect(find.byType(ResultScreen), findsOneWidget);
     expect(find.byType(AlertDialog), findsNothing);
+    expect(find.text('시간이 다 되었어요'), findsOneWidget);
+    expect(find.text('아이와 함께 돌아본 뒤 스티커를 받을지 선택해 주세요.'), findsOneWidget);
     expect(
       find.byKey(const ValueKey('resultSkipStickerButton')),
       findsOneWidget,

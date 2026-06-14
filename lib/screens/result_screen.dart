@@ -269,8 +269,8 @@ class _ResultScreenState extends State<ResultScreen> {
 
     if (recordedSession == null) {
       return _StickerChoiceScreen(
-        title: texts.result.stickerChoiceTitle,
-        message: texts.result.stickerChoiceMessage,
+        title: texts.result.stickerChoiceTitleForStatus(completionStatus),
+        message: texts.result.stickerChoiceMessageForStatus(completionStatus),
         getStickerLabel: texts.result.getStickerButton,
         skipStickerLabel: texts.result.skipStickerButton,
         onGetSticker: () => _chooseSticker(true),

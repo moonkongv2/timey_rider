@@ -292,6 +292,8 @@ abstract interface class ResultTextSet {
   String get getStickerButton;
   String get skipStickerButton;
 
+  String stickerChoiceTitleForStatus(ActivityCompletionStatus status);
+  String stickerChoiceMessageForStatus(ActivityCompletionStatus status);
   String title(ActivityCompletionStatus status);
   String primaryMessage(ActivityCompletionStatus status, {String? vehicleId});
   String secondaryMessage(ActivityCompletionStatus status);

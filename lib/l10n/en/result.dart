@@ -13,6 +13,21 @@ class EnResultTexts implements ResultTextSet {
   String get getStickerButton => 'Get Sticker';
   String get skipStickerButton => 'No Sticker This Time';
 
+  String stickerChoiceTitleForStatus(ActivityCompletionStatus status) {
+    return switch (status) {
+      ActivityCompletionStatus.timeEnded => 'Time is up',
+      _ => stickerChoiceTitle,
+    };
+  }
+
+  String stickerChoiceMessageForStatus(ActivityCompletionStatus status) {
+    return switch (status) {
+      ActivityCompletionStatus.timeEnded =>
+        'Check in together, then choose whether to get a sticker.',
+      _ => stickerChoiceMessage,
+    };
+  }
+
   String title(ActivityCompletionStatus status) {
     return switch (status) {
       ActivityCompletionStatus.completedBeforeEnd ||

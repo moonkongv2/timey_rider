@@ -13,6 +13,20 @@ class ResultTexts implements ResultTextSet {
   String get getStickerButton => '스티커 받기';
   String get skipStickerButton => '이번엔 스티커 받지 않기';
 
+  String stickerChoiceTitleForStatus(ActivityCompletionStatus status) {
+    return switch (status) {
+      ActivityCompletionStatus.timeEnded => '시간이 다 되었어요',
+      _ => stickerChoiceTitle,
+    };
+  }
+
+  String stickerChoiceMessageForStatus(ActivityCompletionStatus status) {
+    return switch (status) {
+      ActivityCompletionStatus.timeEnded => '아이와 함께 돌아본 뒤 스티커를 받을지 선택해 주세요.',
+      _ => stickerChoiceMessage,
+    };
+  }
+
   String title(ActivityCompletionStatus status) {
     return switch (status) {
       ActivityCompletionStatus.completedBeforeEnd ||
