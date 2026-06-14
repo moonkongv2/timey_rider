@@ -87,6 +87,7 @@ assets/
 - Launcher icon: Timey Rider source icon is configured at `assets/icons/timey_rider_app_icon.png`.
 - Adaptive icon foreground/background: Timey Rider adaptive icon assets are configured at `assets/icons/timey_rider_app_icon_foreground.png` and `assets/icons/timey_rider_app_icon_background.png`.
 - Timey Rider logo: the home header uses `assets/images/timey_rider_logo.png` with a text fallback if the asset cannot load.
+- Onboarding illustrations: add card images under `assets/images/onboarding/`; the vehicle choice card uses existing vehicle chip assets.
 - Activity marker image assets: add optional marker images under `assets/images/markers/` when emoji-only markers are not enough.
 - Routine-themed stickers: add image assets for routine reward IDs such as `sticker_sparkly_teeth`, `sticker_book_buddy`, `sticker_cleanup_champ`, `sticker_happy_clock`, and `sticker_rocket`.
 

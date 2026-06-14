@@ -239,36 +239,97 @@ class _OnboardingIllustration extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final spec = _OnboardingIllustrationSpec.forPage(pageIndex);
+
     return AspectRatio(
       aspectRatio: 1.55,
       child: DecoratedBox(
         decoration: BoxDecoration(
-          color: _backgroundColor,
+          color: spec.backgroundColor,
           borderRadius: AppRadius.card,
           border: Border.all(color: AppColors.borderSoft),
         ),
-        child: Padding(
-          padding: const EdgeInsets.all(AppSpacing.lg),
-          child: switch (pageIndex) {
-            0 => const _SoftTimeIllustration(),
-            1 => const _RideCourseIllustration(),
-            2 => const _VehicleChoiceIllustration(),
-            3 => const _MarkerCourseIllustration(),
-            _ => const _GentleResultIllustration(),
-          },
+        child: ClipRRect(
+          borderRadius: AppRadius.card,
+          child: _OnboardingIllustrationAsset(
+            assetPath: spec.assetPath,
+            fallback: Padding(
+              padding: const EdgeInsets.all(AppSpacing.lg),
+              child: spec.fallback,
+            ),
+          ),
         ),
       ),
     );
   }
+}
 
-  Color get _backgroundColor {
+class _OnboardingIllustrationSpec {
+  const _OnboardingIllustrationSpec({
+    required this.assetPath,
+    required this.backgroundColor,
+    required this.fallback,
+  });
+
+  final String? assetPath;
+  final Color backgroundColor;
+  final Widget fallback;
+
+  static _OnboardingIllustrationSpec forPage(int pageIndex) {
     return switch (pageIndex) {
-      0 => AppColors.surfaceBlue,
-      1 => AppColors.surfaceMint,
-      2 => AppColors.surfaceYellow,
-      3 => AppColors.surfacePink,
-      _ => AppColors.primarySoft,
+      0 => const _OnboardingIllustrationSpec(
+        assetPath: 'assets/images/onboarding/onboarding_01_time.png',
+        backgroundColor: AppColors.surfaceBlue,
+        fallback: _SoftTimeIllustration(),
+      ),
+      1 => const _OnboardingIllustrationSpec(
+        assetPath: 'assets/images/onboarding/onboarding_02_routine_ride.png',
+        backgroundColor: AppColors.surfaceMint,
+        fallback: _RideCourseIllustration(),
+      ),
+      2 => const _OnboardingIllustrationSpec(
+        assetPath: null,
+        backgroundColor: AppColors.surfaceYellow,
+        fallback: _VehicleChoiceIllustration(),
+      ),
+      3 => const _OnboardingIllustrationSpec(
+        assetPath: 'assets/images/onboarding/onboarding_04_course_markers.png',
+        backgroundColor: AppColors.surfacePink,
+        fallback: _MarkerCourseIllustration(),
+      ),
+      _ => const _OnboardingIllustrationSpec(
+        assetPath:
+            'assets/images/onboarding/onboarding_05_result_encouragement.png',
+        backgroundColor: AppColors.primarySoft,
+        fallback: _GentleResultIllustration(),
+      ),
     };
+  }
+}
+
+class _OnboardingIllustrationAsset extends StatelessWidget {
+  const _OnboardingIllustrationAsset({
+    required this.assetPath,
+    required this.fallback,
+  });
+
+  final String? assetPath;
+  final Widget fallback;
+
+  @override
+  Widget build(BuildContext context) {
+    final assetPath = this.assetPath;
+    if (assetPath == null) {
+      return fallback;
+    }
+
+    return Image.asset(
+      assetPath,
+      width: double.infinity,
+      height: double.infinity,
+      fit: BoxFit.cover,
+      errorBuilder: (context, error, stackTrace) => fallback,
+    );
   }
 }
 
@@ -340,13 +401,88 @@ class _VehicleChoiceIllustration extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Row(
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-      children: [
-        _EmojiChip(emoji: '🏍️', large: true),
-        _EmojiChip(emoji: '🦈', large: true),
-        _EmojiChip(emoji: '🦖', large: true),
+    return Stack(
+      children: const [
+        Positioned(top: 4, left: 18, child: _DecorativeDot(size: 9)),
+        Positioned(top: 12, right: 32, child: _DecorativeDot(size: 12)),
+        Positioned(bottom: 10, left: 74, child: _DecorativeDot(size: 7)),
+        Positioned(bottom: 18, right: 12, child: _DecorativeDot(size: 10)),
+        Align(
+          alignment: Alignment(-0.86, -0.72),
+          child: _VehicleImageChip(
+            assetPath: 'assets/images/vehicle_motorcycle_chip.png',
+            size: 64,
+          ),
+        ),
+        Align(
+          alignment: Alignment(0.0, -0.78),
+          child: _VehicleImageChip(
+            assetPath: 'assets/images/vehicle_shark_chip.png',
+            size: 64,
+          ),
+        ),
+        Align(
+          alignment: Alignment(0.86, -0.72),
+          child: _VehicleImageChip(
+            assetPath: 'assets/images/vehicle_t_rex_chip.png',
+            size: 64,
+          ),
+        ),
+        Align(
+          alignment: Alignment(-0.86, 0.76),
+          child: _VehicleImageChip(
+            assetPath: 'assets/images/vehicle_police_car_chip.png',
+            size: 64,
+          ),
+        ),
+        Align(
+          alignment: Alignment(0.0, 0.82),
+          child: _VehicleImageChip(
+            assetPath: 'assets/images/vehicle_excavator_chip.png',
+            size: 64,
+          ),
+        ),
+        Align(
+          alignment: Alignment(0.86, 0.76),
+          child: _VehicleImageChip(
+            assetPath: 'assets/images/vehicle_airplane_chip.png',
+            size: 64,
+          ),
+        ),
       ],
+    );
+  }
+}
+
+class _VehicleImageChip extends StatelessWidget {
+  const _VehicleImageChip({required this.assetPath, required this.size});
+
+  final String assetPath;
+  final double size;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: size,
+      height: size,
+      padding: const EdgeInsets.all(AppSpacing.xs),
+      decoration: BoxDecoration(
+        color: AppColors.white,
+        borderRadius: AppRadius.pill,
+        border: Border.all(color: AppColors.borderSoft),
+        boxShadow: AppShadows.surface,
+      ),
+      child: ClipRRect(
+        borderRadius: AppRadius.pill,
+        child: Image.asset(
+          assetPath,
+          fit: BoxFit.contain,
+          errorBuilder: (context, error, stackTrace) => const Icon(
+            Icons.directions_car_filled_rounded,
+            color: AppColors.primary,
+          ),
+        ),
+      ),
     );
   }
 }
