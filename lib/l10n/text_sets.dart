@@ -287,6 +287,10 @@ abstract interface class TimerTextSet {
 abstract interface class ResultTextSet {
   String get rewardLoading;
   String get recordSaved;
+  String get stickerChoiceTitle;
+  String get stickerChoiceMessage;
+  String get getStickerButton;
+  String get skipStickerButton;
 
   String title(ActivityCompletionStatus status);
   String primaryMessage(ActivityCompletionStatus status, {String? vehicleId});

@@ -8,6 +8,10 @@ class ResultTexts implements ResultTextSet {
 
   String get rewardLoading => '보상 정리 중...';
   String get recordSaved => '오늘의 기록을 저장했어';
+  String get stickerChoiceTitle => '미션을 마쳤나요?';
+  String get stickerChoiceMessage => '아이와 함께 미션을 확인한 뒤 선택해 주세요.';
+  String get getStickerButton => '스티커 받기';
+  String get skipStickerButton => '이번엔 스티커 받지 않기';
 
   String title(ActivityCompletionStatus status) {
     return switch (status) {

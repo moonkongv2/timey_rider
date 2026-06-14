@@ -10,6 +10,7 @@ class ActivitySessionResult {
     required this.completedBeforeEnd,
     required this.completionStatus,
     this.selectedMarkerIds = const [],
+    this.receiveSticker,
   });
 
   final String activityId;
@@ -20,11 +21,15 @@ class ActivitySessionResult {
   final bool completedBeforeEnd;
   final ActivityCompletionStatus completionStatus;
   final List<String> selectedMarkerIds;
+  final bool? receiveSticker;
 
   bool get activityCompleted =>
       activityCompletionStatusIsCompleted(completionStatus);
 
-  ActivitySessionResult copyWith({List<String>? selectedMarkerIds}) {
+  ActivitySessionResult copyWith({
+    List<String>? selectedMarkerIds,
+    bool? receiveSticker,
+  }) {
     return ActivitySessionResult(
       activityId: activityId,
       startedAt: startedAt,
@@ -34,6 +39,7 @@ class ActivitySessionResult {
       completedBeforeEnd: completedBeforeEnd,
       completionStatus: completionStatus,
       selectedMarkerIds: selectedMarkerIds ?? this.selectedMarkerIds,
+      receiveSticker: receiveSticker ?? this.receiveSticker,
     );
   }
 }

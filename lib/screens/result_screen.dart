@@ -131,7 +131,8 @@ class _ResultScreenState extends State<ResultScreen> {
   static const _successImagePath = 'assets/images/result_success.png';
 
   VideoPlayerController? _introController;
-  late final Future<RecordedActivitySession> _recordedSession;
+  Future<RecordedActivitySession>? _recordedSession;
+  bool? _receiveSticker;
   bool _introFinished = false;
   bool _introFallback = false;
   bool _handoffOrientation = false;
@@ -140,10 +141,25 @@ class _ResultScreenState extends State<ResultScreen> {
   void initState() {
     super.initState();
     unawaited(widget.orientationService.allowTimerOrientations());
+    if (!_needsStickerChoice) {
+      _recordResult(widget.result);
+    }
+  }
+
+  bool get _needsStickerChoice {
+    return widget.result.receiveSticker == null &&
+        activityCompletionStatusIsCompleted(widget.result.completionStatus);
+  }
+
+  void _recordResult(ActivitySessionResult result) {
+    final receiveSticker =
+        result.receiveSticker ??
+        activityCompletionStatusCanReceiveSticker(result.completionStatus);
+    _receiveSticker = receiveSticker;
     _recordedSession = widget.activityProgressService.recordActivityResult(
-      widget.result,
+      result,
     );
-    if (!isRewardableResult(widget.result.completionStatus)) {
+    if (!receiveSticker) {
       _introFinished = true;
       return;
     }
@@ -154,6 +170,11 @@ class _ResultScreenState extends State<ResultScreen> {
     _introController = introController;
     introController.addListener(_handleIntroChanged);
     _initializeIntroVideo();
+  }
+
+  void _chooseSticker(bool receiveSticker) {
+    _recordResult(widget.result.copyWith(receiveSticker: receiveSticker));
+    setState(() {});
   }
 
   String get _introVideoPath =>
@@ -239,11 +260,23 @@ class _ResultScreenState extends State<ResultScreen> {
   Widget build(BuildContext context) {
     final completionStatus = widget.result.completionStatus;
     final isPositive = isPositiveResult(completionStatus);
-    final isRewardable = isRewardableResult(completionStatus);
+    final recordedSession = _recordedSession;
+    final receiveSticker = _receiveSticker ?? false;
     final texts = AppTexts.of(context);
     final failureRiderAssetPath = failureRiderAssetPathForVehicle(
       vehicleId: widget.config.vehicleId,
     );
+
+    if (recordedSession == null) {
+      return _StickerChoiceScreen(
+        title: texts.result.stickerChoiceTitle,
+        message: texts.result.stickerChoiceMessage,
+        getStickerLabel: texts.result.getStickerButton,
+        skipStickerLabel: texts.result.skipStickerButton,
+        onGetSticker: () => _chooseSticker(true),
+        onSkipSticker: () => _chooseSticker(false),
+      );
+    }
 
     final introController = _introController;
     if (!_introFinished && introController != null) {
@@ -267,12 +300,13 @@ class _ResultScreenState extends State<ResultScreen> {
                       constraints.maxWidth > constraints.maxHeight &&
                       constraints.maxHeight < 430;
                   final isPortraitSuccess =
-                      isRewardable &&
+                      receiveSticker &&
                       constraints.maxHeight >= constraints.maxWidth;
                   if (isCompactLandscape) {
                     return _CompactLandscapeResultLayout(
                       completionStatus: completionStatus,
-                      recordedSession: _recordedSession,
+                      recordedSession: recordedSession,
+                      showReward: receiveSticker,
                       activityProgressService: widget.activityProgressService,
                       orientationService: widget.orientationService,
                       failureRiderAssetPath: failureRiderAssetPath,
@@ -308,7 +342,7 @@ class _ResultScreenState extends State<ResultScreen> {
                                         fallbackIconSize: 96,
                                       ),
                                       const SizedBox(height: AppSpacing.lg),
-                                    ] else if (!isRewardable) ...[
+                                    ] else if (!receiveSticker) ...[
                                       const _NeutralResultIcon(),
                                       const SizedBox(height: AppSpacing.lg),
                                     ],
@@ -322,14 +356,14 @@ class _ResultScreenState extends State<ResultScreen> {
                                             fontWeight: FontWeight.w900,
                                           ),
                                     ),
-                                    if (isRewardable) ...[
+                                    if (receiveSticker) ...[
                                       SizedBox(
                                         height: isPortraitSuccess
                                             ? AppSpacing.lg
                                             : AppSpacing.xl,
                                       ),
                                       FutureBuilder<RecordedActivitySession>(
-                                        future: _recordedSession,
+                                        future: recordedSession,
                                         builder: (context, snapshot) {
                                           final recordedSession = snapshot.data;
 
@@ -642,10 +676,98 @@ class _ResultBackground extends StatelessWidget {
   }
 }
 
+class _StickerChoiceScreen extends StatelessWidget {
+  const _StickerChoiceScreen({
+    required this.title,
+    required this.message,
+    required this.getStickerLabel,
+    required this.skipStickerLabel,
+    required this.onGetSticker,
+    required this.onSkipSticker,
+  });
+
+  final String title;
+  final String message;
+  final String getStickerLabel;
+  final String skipStickerLabel;
+  final VoidCallback onGetSticker;
+  final VoidCallback onSkipSticker;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: AppColors.cream,
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(AppSpacing.xl),
+          child: Center(
+            child: Card(
+              color: AppColors.white.withValues(alpha: 0.92),
+              shape: RoundedRectangleBorder(borderRadius: AppRadius.card),
+              child: Padding(
+                padding: const EdgeInsets.all(AppSpacing.xxl),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    const Icon(
+                      Icons.verified_rounded,
+                      color: AppColors.primary,
+                      size: 54,
+                    ),
+                    const SizedBox(height: AppSpacing.lg),
+                    Text(
+                      title,
+                      textAlign: TextAlign.center,
+                      style: Theme.of(context).textTheme.headlineSmall
+                          ?.copyWith(
+                            color: AppColors.textStrong,
+                            fontWeight: FontWeight.w900,
+                          ),
+                    ),
+                    const SizedBox(height: AppSpacing.sm),
+                    Text(
+                      message,
+                      textAlign: TextAlign.center,
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        color: AppColors.textSecondary,
+                        height: 1.35,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                    const SizedBox(height: AppSpacing.xl),
+                    FilledButton.icon(
+                      key: const ValueKey('resultGetStickerButton'),
+                      onPressed: onGetSticker,
+                      icon: const Icon(Icons.auto_awesome_rounded),
+                      label: Text(getStickerLabel),
+                    ),
+                    const SizedBox(height: AppSpacing.md),
+                    OutlinedButton(
+                      key: const ValueKey('resultSkipStickerButton'),
+                      onPressed: onSkipSticker,
+                      style: OutlinedButton.styleFrom(
+                        backgroundColor: AppColors.white,
+                        side: BorderSide.none,
+                      ),
+                      child: Text(skipStickerLabel),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 class _CompactLandscapeResultLayout extends StatelessWidget {
   const _CompactLandscapeResultLayout({
     required this.completionStatus,
     required this.recordedSession,
+    required this.showReward,
     required this.activityProgressService,
     required this.orientationService,
     required this.failureRiderAssetPath,
@@ -656,6 +778,7 @@ class _CompactLandscapeResultLayout extends StatelessWidget {
 
   final ActivityCompletionStatus completionStatus;
   final Future<RecordedActivitySession> recordedSession;
+  final bool showReward;
   final LocalActivityProgressService activityProgressService;
   final OrientationService orientationService;
   final String failureRiderAssetPath;
@@ -668,7 +791,6 @@ class _CompactLandscapeResultLayout extends StatelessWidget {
     final texts = AppTexts.of(context);
     final theme = Theme.of(context);
     final isPositive = isPositiveResult(completionStatus);
-    final isRewardable = isRewardableResult(completionStatus);
 
     return SizedBox.expand(
       child: Card(
@@ -683,7 +805,7 @@ class _CompactLandscapeResultLayout extends StatelessWidget {
             children: [
               Expanded(
                 flex: 5,
-                child: isRewardable
+                child: showReward
                     ? FutureBuilder<RecordedActivitySession>(
                         future: recordedSession,
                         builder: (context, snapshot) {

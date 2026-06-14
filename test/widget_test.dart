@@ -738,6 +738,46 @@ void main() {
     expect(find.textContaining('sticker'), findsNothing);
   });
 
+  testWidgets('Result screen records after the sticker choice', (tester) async {
+    SharedPreferences.setMockInitialValues({});
+    final service = LocalActivityProgressService();
+
+    await tester.pumpWidget(
+      MaterialApp(
+        locale: const Locale('ko'),
+        supportedLocales: const [Locale('ko'), Locale('en')],
+        localizationsDelegates: const [
+          GlobalMaterialLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+        ],
+        home: ResultScreen(
+          result: _activityResult(includeStickerDecision: false),
+          config: ActivityTimerConfig.defaults(),
+          activityProgressService: service,
+          onConfigChanged: (_) {},
+        ),
+      ),
+    );
+    await tester.pump();
+
+    expect(find.text('미션을 마쳤나요?'), findsOneWidget);
+    expect(find.text('스티커 받기'), findsOneWidget);
+    expect(find.text('이번엔 스티커 받지 않기'), findsOneWidget);
+    expect((await service.loadSnapshot()).history, isEmpty);
+
+    await tester.tap(find.byKey(const ValueKey('resultSkipStickerButton')));
+    await tester.pumpAndSettle();
+
+    expect(find.text('미션 완료!'), findsOneWidget);
+    expect(find.byType(RewardStickerImage), findsNothing);
+    final snapshot = await service.loadSnapshot();
+    expect(snapshot.history, hasLength(1));
+    expect(snapshot.history.single.activityCompleted, isTrue);
+    expect(snapshot.history.single.rewardIds, isEmpty);
+    expect(snapshot.inventory, isEmpty);
+  });
+
   testWidgets('Success result screen uses portrait background after intro', (
     tester,
   ) async {
@@ -6144,6 +6184,14 @@ void main() {
 
     expect(find.byType(ResultScreen), findsOneWidget);
     expect(find.byType(AlertDialog), findsNothing);
+    expect(
+      find.byKey(const ValueKey('resultSkipStickerButton')),
+      findsOneWidget,
+    );
+    expect((await service.loadSnapshot()).history, isEmpty);
+
+    await tester.tap(find.byKey(const ValueKey('resultSkipStickerButton')));
+    await tester.pumpAndSettle();
 
     final snapshot = await service.loadSnapshot();
     expect(
@@ -6188,6 +6236,9 @@ void main() {
     await tester.tap(find.byType(FilledButton).last);
     await tester.pump();
     await tester.pump();
+
+    await tester.tap(find.byKey(const ValueKey('resultSkipStickerButton')));
+    await tester.pumpAndSettle();
 
     final snapshot = await service.loadSnapshot();
     expect(snapshot.history.single.selectedMarkerIds, [
@@ -7230,6 +7281,23 @@ void main() {
     expect(recordedSession.entry.activityCompleted, isTrue);
   });
 
+  test('Time-ended activity can award stickers by parent choice', () async {
+    SharedPreferences.setMockInitialValues({});
+
+    final service = LocalActivityProgressService();
+    final recordedSession = await service.recordActivityResult(
+      _activityResult(
+        activityId: 'play',
+        completionStatus: ActivityCompletionStatus.timeEnded,
+        receiveSticker: true,
+      ),
+    );
+
+    expect(recordedSession.awardedRewards, hasLength(1));
+    expect(recordedSession.entry.activityId, 'play');
+    expect(recordedSession.entry.activityCompleted, isTrue);
+  });
+
   test('Play time ended does not award stickers', () async {
     SharedPreferences.setMockInitialValues({});
 
@@ -8080,9 +8148,18 @@ ActivitySessionResult _activityResult({
   bool activityCompleted = true,
   ActivityCompletionStatus? completionStatus,
   List<String> selectedMarkerIds = const [],
+  bool includeStickerDecision = true,
+  bool? receiveSticker,
 }) {
   final resolvedStartedAt = startedAt ?? DateTime(2026, 5, 4, 12);
   final resolvedEndedAt = endedAt ?? resolvedStartedAt.add(actualDuration);
+  final resolvedCompletionStatus =
+      completionStatus ??
+      (activityCompleted
+          ? (completedBeforeEnd
+                ? ActivityCompletionStatus.completedBeforeEnd
+                : ActivityCompletionStatus.completedAfterEnd)
+          : ActivityCompletionStatus.needsMoreTime);
 
   return ActivitySessionResult(
     activityId: activityId,
@@ -8091,14 +8168,15 @@ ActivitySessionResult _activityResult({
     targetDuration: targetDuration,
     actualDuration: actualDuration,
     completedBeforeEnd: completedBeforeEnd,
-    completionStatus:
-        completionStatus ??
-        (activityCompleted
-            ? (completedBeforeEnd
-                  ? ActivityCompletionStatus.completedBeforeEnd
-                  : ActivityCompletionStatus.completedAfterEnd)
-            : ActivityCompletionStatus.needsMoreTime),
+    completionStatus: resolvedCompletionStatus,
     selectedMarkerIds: selectedMarkerIds,
+    receiveSticker: includeStickerDecision
+        ? receiveSticker ??
+              (ActivityCatalog.findById(activityId).rewardEnabledByDefault &&
+                  activityCompletionStatusCanReceiveSticker(
+                    resolvedCompletionStatus,
+                  ))
+        : null,
   );
 }
 

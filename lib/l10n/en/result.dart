@@ -8,6 +8,10 @@ class EnResultTexts implements ResultTextSet {
 
   String get rewardLoading => 'Getting your reward ready...';
   String get recordSaved => "Today's record is saved.";
+  String get stickerChoiceTitle => 'Mission complete?';
+  String get stickerChoiceMessage => 'Check the mission together, then choose.';
+  String get getStickerButton => 'Get Sticker';
+  String get skipStickerButton => 'No Sticker This Time';
 
   String title(ActivityCompletionStatus status) {
     return switch (status) {

@@ -316,8 +316,11 @@ class LocalActivityProgressService {
 
   List<RewardDefinition> _selectRewards(ActivitySessionResult result) {
     final activity = ActivityCatalog.findById(result.activityId);
-    if (!activity.rewardEnabledByDefault ||
-        !activityCompletionStatusCanReceiveSticker(result.completionStatus)) {
+    final shouldReceiveSticker =
+        result.receiveSticker ??
+        (activity.rewardEnabledByDefault &&
+            activityCompletionStatusCanReceiveSticker(result.completionStatus));
+    if (!shouldReceiveSticker) {
       return const [];
     }
 
@@ -358,8 +361,10 @@ class LocalActivityProgressService {
     required ActivitySessionResult result,
     required String activitySessionId,
   }) {
-    if (goals.isEmpty ||
-        !activityCompletionStatusCanReceiveSticker(result.completionStatus)) {
+    final shouldReceiveSticker =
+        result.receiveSticker ??
+        activityCompletionStatusCanReceiveSticker(result.completionStatus);
+    if (goals.isEmpty || !shouldReceiveSticker) {
       return _RewardGoalUpdate(activeGoals: goals);
     }
 
