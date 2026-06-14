@@ -1409,12 +1409,7 @@ class _TimerBuilderSheetState extends State<_TimerBuilderSheet> {
   }
 
   List<ActivityMarkerDefinition> get _availableMarkers {
-    final candidateIds = ActivityMarkerCatalog.defaultSelectionIdsForActivity(
-      _selectedActivity.id,
-    );
-    return List.unmodifiable(
-      candidateIds.map(ActivityMarkerCatalog.findById).nonNulls,
-    );
+    return ActivityMarkerCatalog.all;
   }
 
   void _selectActivity(ActivityDefinition activity) {
@@ -1602,6 +1597,7 @@ class _TimerBuilderSheetState extends State<_TimerBuilderSheet> {
     final mediaQuery = MediaQuery.of(context);
     final languageCode = Localizations.localeOf(context).languageCode;
     final selectedMinuteLabel = homeTexts.minuteLabel(_minutes.round());
+    final maxMarkerCount = ActivityMarkerCatalog.maxSelectableMarkerCount;
     final recentPreset = widget.recentPreset;
     final recentActivity = recentPreset == null
         ? null
@@ -1824,6 +1820,18 @@ class _TimerBuilderSheetState extends State<_TimerBuilderSheet> {
                     if (_markerMode == ActivityMarkerMode.manual) ...[
                       const SizedBox(height: AppSpacing.sm),
                       Text(
+                        texts.activityMarker.selectedCount(
+                          _selectedMarkerIds.length,
+                          maxMarkerCount,
+                        ),
+                        key: const ValueKey('timerBuilderSelectedMarkerCount'),
+                        style: textTheme.labelLarge?.copyWith(
+                          color: AppColors.textPrimary,
+                          fontWeight: FontWeight.w900,
+                        ),
+                      ),
+                      const SizedBox(height: AppSpacing.xs),
+                      Text(
                         homeTexts.timerBuilderSelectedMarkerEmpty,
                         style: textTheme.labelMedium?.copyWith(
                           color: AppColors.textSecondary,
@@ -1843,9 +1851,7 @@ class _TimerBuilderSheetState extends State<_TimerBuilderSheet> {
                               ),
                               isEnabled:
                                   _selectedMarkerIds.contains(marker.id) ||
-                                  _selectedMarkerIds.length <
-                                      ActivityMarkerCatalog
-                                          .maxSelectableMarkerCount,
+                                  _selectedMarkerIds.length < maxMarkerCount,
                               onSelected: () => _toggleMarker(marker),
                             ),
                         ],
@@ -2134,10 +2140,9 @@ String _presetActivityLabel(
 }
 
 _PresetStartSettings _startSettingsForPreset(ActivityTimerPreset preset) {
-  final candidateMarkerIds =
-      ActivityMarkerCatalog.defaultSelectionIdsForActivity(
-        preset.activityId,
-      ).toSet();
+  final candidateMarkerIds = ActivityMarkerCatalog.all
+      .map((marker) => marker.id)
+      .toSet();
   final savedMarkerIds =
       preset.selectedMarkerIds.isEmpty &&
           preset.markerMode == ActivityMarkerMode.manual

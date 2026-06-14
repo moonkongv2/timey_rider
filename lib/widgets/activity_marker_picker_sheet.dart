@@ -43,19 +43,7 @@ class _ActivityMarkerPickerSheetState extends State<ActivityMarkerPickerSheet> {
   late final Set<String> _selectedIds = _validInitialSelectedIds();
 
   late final List<ActivityMarkerDefinition> _availableMarkers =
-      _markersForActivity();
-
-  List<ActivityMarkerDefinition> _markersForActivity() {
-    final activityMarkerIds = ActivityMarkerCatalog.markerIdsForActivity(
-      widget.activityId,
-    );
-    final candidateIds = activityMarkerIds.isEmpty
-        ? ActivityMarkerCatalog.defaultSelectionIds
-        : activityMarkerIds;
-    return List.unmodifiable(
-      candidateIds.map(ActivityMarkerCatalog.findById).nonNulls,
-    );
-  }
+      ActivityMarkerCatalog.all;
 
   Set<String> _validInitialSelectedIds() {
     final selectedIds = <String>{};

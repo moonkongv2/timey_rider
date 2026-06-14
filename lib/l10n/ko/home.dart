@@ -42,7 +42,7 @@ class HomeTexts implements HomeTextSet {
   String get timerBuilderUseOtherNameButton => '기타로 저장';
   String get timerBuilderTimeStepTitle => '3. 시간';
   String get timerBuilderStartButton => '출발';
-  String get timerBuilderSelectedMarkerEmpty => '마커를 하나 이상 선택해요.';
+  String get timerBuilderSelectedMarkerEmpty => '마커를 1~5개 선택해요.';
   String get activitySummaryLabel => '미션';
   String get stickerKindSummaryLabel => '종류';
   String get stickerSummaryLabel => '스티커';
