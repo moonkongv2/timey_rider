@@ -7520,6 +7520,59 @@ void main() {
     expect(snapshot.activeRewardGoals.map((goal) => goal.filledCount), [1, 1]);
   });
 
+  test(
+    'Parent-skipped completed activity does not fill reward goals',
+    () async {
+      SharedPreferences.setMockInitialValues({});
+
+      final service = LocalActivityProgressService();
+      await service.createRewardGoal(
+        requiredStickerCount: 5,
+        rewardText: '아이스크림',
+      );
+
+      final recordedSession = await service.recordActivityResult(
+        _activityResult(
+          completionStatus: ActivityCompletionStatus.completedAtEnd,
+          receiveSticker: false,
+        ),
+      );
+      final snapshot = await service.loadSnapshot();
+
+      expect(recordedSession.awardedRewards, isEmpty);
+      expect(recordedSession.updatedRewardGoal, isNull);
+      expect(snapshot.activeRewardGoals.single.filledCount, 0);
+      expect(snapshot.history.single.activityCompleted, isTrue);
+    },
+  );
+
+  test('Parent-awarded time-ended activity fills reward goals', () async {
+    SharedPreferences.setMockInitialValues({});
+
+    final service = LocalActivityProgressService();
+    await service.createRewardGoal(
+      requiredStickerCount: 5,
+      rewardText: '아이스크림',
+    );
+
+    final recordedSession = await service.recordActivityResult(
+      _activityResult(
+        activityId: 'play',
+        completionStatus: ActivityCompletionStatus.timeEnded,
+        receiveSticker: true,
+      ),
+    );
+    final snapshot = await service.loadSnapshot();
+
+    expect(recordedSession.awardedRewards, hasLength(1));
+    expect(recordedSession.updatedRewardGoal?.filledCount, 1);
+    expect(snapshot.activeRewardGoals.single.filledCount, 1);
+    expect(
+      snapshot.history.single.completionStatus,
+      ActivityCompletionStatus.timeEnded,
+    );
+  });
+
   test('Only two active reward goals can be created', () async {
     SharedPreferences.setMockInitialValues({});
 
