@@ -3229,7 +3229,7 @@ void main() {
     expect(find.text('아이 얼굴 탑승 중'), findsOneWidget);
     expect(
       find.byKey(const ValueKey('avatarCompositeOverlayImage')),
-      findsNWidgets(2),
+      findsOneWidget,
     );
     final customAvatarPreview = find.byWidgetPredicate((widget) {
       return widget is AvatarCompositePreview &&
@@ -3238,7 +3238,7 @@ void main() {
           widget.avatarOffsetY == -0.03 &&
           widget.avatarRotationDegrees == 5.0;
     });
-    expect(customAvatarPreview, findsNWidgets(2));
+    expect(customAvatarPreview, findsOneWidget);
 
     await tester.pumpWidget(const SizedBox.shrink());
     await tester.pump();
@@ -3282,7 +3282,7 @@ void main() {
 
     expect(
       find.byKey(const ValueKey('avatarCompositeOverlayImage')),
-      findsOneWidget,
+      findsNothing,
     );
     expect(
       find.byWidgetPredicate((widget) {
@@ -3291,6 +3291,15 @@ void main() {
             widget.avatarMode == AvatarImageMode.custom;
       }),
       findsNothing,
+    );
+
+    await tester.tap(find.byKey(const ValueKey('vehiclePickerOpenButton')));
+    await tester.pumpAndSettle();
+
+    expect(find.text('빠방 고르기'), findsOneWidget);
+    expect(
+      find.byKey(const ValueKey('avatarCompositeOverlayImage')),
+      findsOneWidget,
     );
 
     await tester.pumpWidget(const SizedBox.shrink());
@@ -4289,7 +4298,7 @@ void main() {
     expect(find.byType(VehicleSelectionCard), findsNothing);
   });
 
-  testWidgets('Home screen shows vehicle choices above timer builder', (
+  testWidgets('Home screen shows vehicle summary above timer builder', (
     tester,
   ) async {
     SharedPreferences.setMockInitialValues({});
@@ -4300,6 +4309,7 @@ void main() {
     expect(find.byKey(const ValueKey('createTimerCard')), findsOneWidget);
     expect(find.byKey(const ValueKey('createTimerButton')), findsOneWidget);
     expect(find.text('빠방 고르기'), findsNothing);
+    expect(find.text('변경'), findsOneWidget);
     expect(find.text('오토바이'), findsNothing);
     expect(find.text('소방차'), findsNothing);
     expect(find.text('경찰차'), findsNothing);
@@ -4308,24 +4318,30 @@ void main() {
     for (final vehicle in VehicleCatalog.all) {
       expect(
         _assetImage(vehicle.selectionImagePath),
-        vehicle.id == 'motorcycle' ? findsNWidgets(2) : findsOneWidget,
+        vehicle.id == 'motorcycle' ? findsOneWidget : findsNothing,
       );
     }
     expect(
       find.byKey(const ValueKey('selectedVehiclePreview')),
       findsOneWidget,
     );
-
-    expect(
-      tester.getSize(_vehicleChoiceFinder('motorcycle')).width,
-      tester.getSize(_vehicleChoiceFinder('fire_truck')).width,
-    );
+    expect(_vehicleChoiceFinder('motorcycle'), findsNothing);
 
     final vehicleTitleTop = tester.getTopLeft(find.text('오늘의 빠방')).dy;
     final timerBuilderTop = tester
         .getTopLeft(find.byKey(const ValueKey('createTimerCard')))
         .dy;
     expect(timerBuilderTop, greaterThan(vehicleTitleTop));
+
+    await tester.tap(find.byKey(const ValueKey('vehiclePickerOpenButton')));
+    await tester.pumpAndSettle();
+
+    expect(find.text('빠방 고르기'), findsOneWidget);
+    expect(_vehicleChoiceFinder('motorcycle'), findsOneWidget);
+    expect(
+      tester.getSize(_vehicleChoiceFinder('motorcycle')).width,
+      tester.getSize(_vehicleChoiceFinder('fire_truck')).width,
+    );
   });
 
   testWidgets(
@@ -4405,24 +4421,20 @@ void main() {
 
     await _startApp(tester, const Locale('ko'));
 
-    await tester.scrollUntilVisible(
-      _vehicleChoiceFinder('police_car'),
-      220,
-      scrollable: find.byType(Scrollable).first,
-    );
+    await tester.tap(find.byKey(const ValueKey('vehiclePickerOpenButton')));
     await tester.pumpAndSettle();
     await tester.tap(_vehicleChoiceFinder('police_car'));
-    await tester.pump();
+    await tester.pumpAndSettle();
 
     final preferences = await SharedPreferences.getInstance();
     expect(preferences.getString('vehicleId'), 'police_car');
     expect(
       _assetImage(VehicleCatalog.policeCar.selectionImagePath),
-      findsNWidgets(2),
+      findsOneWidget,
     );
     expect(
       _assetImage(VehicleCatalog.motorcycle.selectionImagePath),
-      findsOneWidget,
+      findsNothing,
     );
   });
 
@@ -4445,22 +4457,23 @@ void main() {
       ),
     );
 
+    await tester.tap(find.byKey(const ValueKey('vehiclePickerOpenButton')));
+    await tester.pumpAndSettle();
+
     final selectedColor = _vehicleChoiceMaterial(tester, 'fire_truck').color;
     final unselectedColor = _vehicleChoiceMaterial(tester, 'police_car').color;
     expect(selectedColor, isNot(unselectedColor));
 
-    await tester.scrollUntilVisible(
-      _vehicleChoiceFinder('police_car'),
-      220,
-      scrollable: find.byType(Scrollable).first,
-    );
-    await tester.pumpAndSettle();
     await tester.tap(_vehicleChoiceFinder('police_car'));
-    await tester.pump();
+    await tester.pumpAndSettle();
 
     expect(changedConfig?.vehicleId, 'police_car');
-    expect(_vehicleChoiceMaterial(tester, 'fire_truck').color, unselectedColor);
-    expect(_vehicleChoiceMaterial(tester, 'police_car').color, selectedColor);
+    expect(_vehicleChoiceFinder('fire_truck'), findsNothing);
+    expect(_vehicleChoiceFinder('police_car'), findsNothing);
+    expect(
+      _assetImage(VehicleCatalog.policeCar.selectionImagePath),
+      findsOneWidget,
+    );
   });
 
   testWidgets('Child name can be changed in settings', (tester) async {

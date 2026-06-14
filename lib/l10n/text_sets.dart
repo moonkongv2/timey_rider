@@ -41,6 +41,8 @@ abstract interface class HomeTextSet {
   String get heroMissionTitle;
   String get heroMissionSubtitle;
   String get todayVehicleTitle;
+  String get vehiclePickerTitle;
+  String get vehicleChangeButton;
   String get morningCourse;
   String get morningCourseSubtitle;
   String get slowCourse;

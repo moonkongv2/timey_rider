@@ -409,6 +409,30 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
     );
   }
 
+  Future<void> _openVehiclePicker() async {
+    final texts = AppTexts.of(context);
+    final selectedVehicle = VehicleCatalog.findById(_config.vehicleId);
+    final selectedVehicleAvatar = _config.avatarPresentationForVehicle(
+      selectedVehicle.id,
+    );
+
+    await showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: AppColors.transparent,
+      builder: (_) => _VehiclePickerSheet(
+        title: texts.home.vehiclePickerTitle,
+        selectedVehicleId: _config.vehicleId,
+        avatar: selectedVehicleAvatar,
+        avatarForVehicle: _config.avatarPresentationForVehicle,
+        avatarImageBuilder: widget.avatarImageBuilder,
+        onVehicleSelected: (vehicleId) {
+          _updateConfig(_config.copyWith(vehicleId: vehicleId));
+        },
+      ),
+    );
+  }
+
   Future<void> _openSettings() async {
     await Navigator.of(context).push(
       MaterialPageRoute(
@@ -530,6 +554,10 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
                   avatarForVehicle: _config.avatarPresentationForVehicle,
                   avatarImageBuilder: widget.avatarImageBuilder,
                   showSelectedPreview: true,
+                  showChoices: false,
+                  actionLabel: texts.home.vehicleChangeButton,
+                  actionButtonKey: const ValueKey('vehiclePickerOpenButton'),
+                  onActionPressed: _openVehiclePicker,
                   footer: _AvatarInlineCta(
                     stateText: avatarStateText,
                     description: texts.home.avatarCtaSubtitle,
@@ -641,6 +669,76 @@ class _PresetStartSettings {
 
   final ActivityMarkerMode markerMode;
   final _ActivityMarkerSelection markerSelection;
+}
+
+class _VehiclePickerSheet extends StatelessWidget {
+  const _VehiclePickerSheet({
+    required this.title,
+    required this.selectedVehicleId,
+    required this.avatar,
+    required this.avatarForVehicle,
+    required this.onVehicleSelected,
+    this.avatarImageBuilder,
+  });
+
+  final String title;
+  final String selectedVehicleId;
+  final VehicleAvatarPresentation avatar;
+  final VehicleAvatarPresentationResolver avatarForVehicle;
+  final ValueChanged<String> onVehicleSelected;
+  final Widget Function(BuildContext context, String imagePath)?
+  avatarImageBuilder;
+
+  @override
+  Widget build(BuildContext context) {
+    return DraggableScrollableSheet(
+      initialChildSize: 0.72,
+      minChildSize: 0.46,
+      maxChildSize: 0.92,
+      expand: false,
+      builder: (context, scrollController) {
+        return DecoratedBox(
+          decoration: const BoxDecoration(
+            color: AppColors.cream,
+            borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+          ),
+          child: ListView(
+            controller: scrollController,
+            padding: const EdgeInsets.fromLTRB(
+              AppSpacing.xl,
+              AppSpacing.md,
+              AppSpacing.xl,
+              AppSpacing.xxl,
+            ),
+            children: [
+              Center(
+                child: DecoratedBox(
+                  decoration: BoxDecoration(
+                    color: AppColors.borderSoft,
+                    borderRadius: AppRadius.pill,
+                  ),
+                  child: const SizedBox(width: 44, height: 5),
+                ),
+              ),
+              const SizedBox(height: AppSpacing.lg),
+              VehicleSelectionCard(
+                title: title,
+                selectedVehicleId: selectedVehicleId,
+                onVehicleSelected: (vehicleId) {
+                  onVehicleSelected(vehicleId);
+                  Navigator.of(context).pop();
+                },
+                avatar: avatar,
+                avatarForVehicle: avatarForVehicle,
+                avatarImageBuilder: avatarImageBuilder,
+                showSelectedPreview: false,
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
 }
 
 class _CustomPresetNameResult {

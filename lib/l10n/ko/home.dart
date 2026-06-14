@@ -10,6 +10,8 @@ class HomeTexts implements HomeTextSet {
   String get heroMissionTitle => '오늘의 미션';
   String get heroMissionSubtitle => '라이더가 즐거운 완주를 기다리고 있어요';
   String get todayVehicleTitle => '오늘의 빠방';
+  String get vehiclePickerTitle => '빠방 고르기';
+  String get vehicleChangeButton => '변경';
   String get morningCourse => '15분 코스';
   String get morningCourseSubtitle => '가볍게 워밍업';
   String get slowCourse => '35분 코스';

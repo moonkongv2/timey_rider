@@ -23,6 +23,10 @@ class VehicleSelectionCard extends StatelessWidget {
     this.avatarForVehicle,
     this.avatarImageBuilder,
     this.showSelectedPreview = false,
+    this.showChoices = true,
+    this.actionLabel,
+    this.actionButtonKey,
+    this.onActionPressed,
     this.footer,
   });
 
@@ -35,6 +39,10 @@ class VehicleSelectionCard extends StatelessWidget {
   final Widget Function(BuildContext context, String imagePath)?
   avatarImageBuilder;
   final bool showSelectedPreview;
+  final bool showChoices;
+  final String? actionLabel;
+  final Key? actionButtonKey;
+  final VoidCallback? onActionPressed;
   final Widget? footer;
 
   @override
@@ -90,6 +98,14 @@ class VehicleSelectionCard extends StatelessWidget {
                       ),
                     ),
                   ),
+                if (actionLabel != null && onActionPressed != null) ...[
+                  const SizedBox(width: AppSpacing.sm),
+                  TextButton(
+                    key: actionButtonKey,
+                    onPressed: onActionPressed,
+                    child: Text(actionLabel!),
+                  ),
+                ],
               ],
             ),
             const SizedBox(height: AppSpacing.md),
@@ -99,35 +115,36 @@ class VehicleSelectionCard extends StatelessWidget {
                 avatar: avatar,
                 avatarImageBuilder: avatarImageBuilder,
               ),
-              const SizedBox(height: AppSpacing.md),
+              if (showChoices) const SizedBox(height: AppSpacing.md),
             ],
-            LayoutBuilder(
-              builder: (context, constraints) {
-                const spacing = AppSpacing.sm;
-                final fourAcrossWidth =
-                    (constraints.maxWidth - (spacing * 3)) / 4;
-                final itemSize = fourAcrossWidth.clamp(72.0, 84.0).toDouble();
+            if (showChoices)
+              LayoutBuilder(
+                builder: (context, constraints) {
+                  const spacing = AppSpacing.sm;
+                  final fourAcrossWidth =
+                      (constraints.maxWidth - (spacing * 3)) / 4;
+                  final itemSize = fourAcrossWidth.clamp(72.0, 84.0).toDouble();
 
-                return Wrap(
-                  alignment: WrapAlignment.center,
-                  spacing: spacing,
-                  runSpacing: spacing,
-                  clipBehavior: Clip.none,
-                  children: [
-                    for (final vehicle in VehicleCatalog.all)
-                      _VehicleChoiceButton(
-                        size: itemSize,
-                        vehicle: vehicle,
-                        isSelected: selectedVehicle.id == vehicle.id,
-                        onTap: () => onVehicleSelected(vehicle.id),
-                        avatar: avatar,
-                        resolvedAvatar: avatarForVehicle?.call(vehicle.id),
-                        avatarImageBuilder: avatarImageBuilder,
-                      ),
-                  ],
-                );
-              },
-            ),
+                  return Wrap(
+                    alignment: WrapAlignment.center,
+                    spacing: spacing,
+                    runSpacing: spacing,
+                    clipBehavior: Clip.none,
+                    children: [
+                      for (final vehicle in VehicleCatalog.all)
+                        _VehicleChoiceButton(
+                          size: itemSize,
+                          vehicle: vehicle,
+                          isSelected: selectedVehicle.id == vehicle.id,
+                          onTap: () => onVehicleSelected(vehicle.id),
+                          avatar: avatar,
+                          resolvedAvatar: avatarForVehicle?.call(vehicle.id),
+                          avatarImageBuilder: avatarImageBuilder,
+                        ),
+                    ],
+                  );
+                },
+              ),
             if (footer != null) ...[
               const SizedBox(height: AppSpacing.md),
               const Divider(

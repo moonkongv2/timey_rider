@@ -11,6 +11,8 @@ class EnHomeTexts implements HomeTextSet {
   String get heroMissionSubtitle =>
       'Your rider is waiting for a playful finish';
   String get todayVehicleTitle => "Today's vehicle";
+  String get vehiclePickerTitle => 'Choose vehicle';
+  String get vehicleChangeButton => 'Change';
   String get morningCourse => '15-min Ride';
   String get morningCourseSubtitle => 'A light warm-up';
   String get slowCourse => '35-min Ride';
