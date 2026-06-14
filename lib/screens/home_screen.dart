@@ -1202,7 +1202,12 @@ class _TimerBuilderSection extends StatelessWidget {
                     border: Border.all(color: AppColors.borderSoft),
                   ),
                   child: Padding(
-                    padding: const EdgeInsets.all(AppSpacing.md),
+                    padding: const EdgeInsetsDirectional.fromSTEB(
+                      AppSpacing.md,
+                      AppSpacing.md,
+                      AppSpacing.sm,
+                      AppSpacing.md,
+                    ),
                     child: Row(
                       children: [
                         DecoratedBox(
@@ -1359,8 +1364,8 @@ class _HomeFavoriteTimerCard extends StatelessWidget {
                     borderRadius: AppRadius.pill,
                   ),
                   child: const SizedBox(
-                    width: 36,
-                    height: 36,
+                    width: 40,
+                    height: 40,
                     child: Icon(
                       Icons.play_arrow_rounded,
                       color: AppColors.brown700,
@@ -1397,7 +1402,7 @@ class _TimerBuilderSheet extends StatefulWidget {
 class _TimerBuilderSheetState extends State<_TimerBuilderSheet> {
   late ActivityDefinition _selectedActivity = ActivityCatalog.defaultActivity;
   late double _minutes = _selectedActivity.defaultDuration.inMinutes.toDouble();
-  ActivityMarkerMode _markerMode = ActivityMarkerMode.random;
+  ActivityMarkerMode _markerMode = ActivityMarkerMode.activityDefault;
   final Set<String> _selectedMarkerIds = {};
   late List<ActivityTimerPreset> _savedPresets;
   String? _favoritePresetLimitMessage;
@@ -1796,13 +1801,15 @@ class _TimerBuilderSheetState extends State<_TimerBuilderSheet> {
                       children: [
                         Expanded(
                           child: _TimerBuilderModeButton(
-                            key: const ValueKey('timerBuilderMarkerRandom'),
-                            label: homeTexts.timerBuilderRandomMarkerOption,
+                            key: const ValueKey('timerBuilderMarkerAutomatic'),
+                            label: homeTexts.timerBuilderAutomaticMarkerOption,
                             icon: Icons.shuffle_rounded,
                             isSelected:
-                                _markerMode == ActivityMarkerMode.random,
-                            onPressed: () =>
-                                _selectMarkerMode(ActivityMarkerMode.random),
+                                _markerMode ==
+                                ActivityMarkerMode.activityDefault,
+                            onPressed: () => _selectMarkerMode(
+                              ActivityMarkerMode.activityDefault,
+                            ),
                           ),
                         ),
                         const SizedBox(width: AppSpacing.sm),
@@ -2155,7 +2162,7 @@ String _presetActivityLabel(
 }
 
 List<String> _autoMarkerSelectionIds(String activityId) {
-  return ActivityMarkerCatalog.randomSelectionIds(
+  return ActivityMarkerCatalog.automaticSelectionIds(
     activityId: activityId,
     count: ActivityMarkerCatalog.autoSelectionIdsForActivity(activityId).length,
   );
@@ -2178,7 +2185,7 @@ _PresetStartSettings _startSettingsForPreset(ActivityTimerPreset preset) {
       preset.markerMode == ActivityMarkerMode.manual &&
           selectedMarkerIds.isNotEmpty
       ? ActivityMarkerMode.manual
-      : ActivityMarkerMode.random;
+      : ActivityMarkerMode.activityDefault;
 
   return switch (markerMode) {
     ActivityMarkerMode.manual => _PresetStartSettings(

@@ -304,7 +304,7 @@ abstract final class ActivityMarkerCatalog {
     return List.unmodifiable(_uniqueKnownIds(ids));
   }
 
-  static List<String> randomSelectionIds({
+  static List<String> automaticSelectionIds({
     String? activityId,
     int count = maxSelectableMarkerCount,
     math.Random? random,

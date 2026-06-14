@@ -18,7 +18,7 @@ class ActivityMarkerTexts implements ActivityMarkerTextSet {
     '직접 선택: 시작 전 그림 마커를 최대 5개까지 골라요.',
     '활동 기록에는 직접 고른 그림 마커만 남아요.',
   ];
-  String get randomStartButton => '자동으로 출발';
+  String get automaticStartButton => '자동으로 출발';
   String get selectedStartButton => '선택한 마커로 출발';
 
   String selectedCount(int selectedCount, int maxCount) {

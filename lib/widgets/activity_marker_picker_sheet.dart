@@ -13,8 +13,8 @@ sealed class ActivityMarkerPickerResult {
   const ActivityMarkerPickerResult();
 }
 
-class RandomActivityMarkers extends ActivityMarkerPickerResult {
-  const RandomActivityMarkers();
+class AutomaticActivityMarkers extends ActivityMarkerPickerResult {
+  const AutomaticActivityMarkers();
 }
 
 class SelectedActivityMarkers extends ActivityMarkerPickerResult {
@@ -73,8 +73,8 @@ class _ActivityMarkerPickerSheetState extends State<ActivityMarkerPickerSheet> {
     });
   }
 
-  void _startRandom() {
-    Navigator.of(context).pop(const RandomActivityMarkers());
+  void _startAutomatic() {
+    Navigator.of(context).pop(const AutomaticActivityMarkers());
   }
 
   void _startSelected() {
@@ -237,11 +237,11 @@ class _ActivityMarkerPickerSheetState extends State<ActivityMarkerPickerSheet> {
                         Expanded(
                           child: OutlinedButton.icon(
                             key: const ValueKey(
-                              'randomStartActivityMarkersButton',
+                              'automaticStartActivityMarkersButton',
                             ),
-                            onPressed: _startRandom,
+                            onPressed: _startAutomatic,
                             icon: const Icon(Icons.shuffle_rounded),
-                            label: Text(texts.randomStartButton),
+                            label: Text(texts.automaticStartButton),
                           ),
                         ),
                         const SizedBox(width: AppSpacing.sm),

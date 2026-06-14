@@ -87,8 +87,8 @@ void main() {
     expect(ids.toSet(), hasLength(ids.length));
   });
 
-  test('Activity marker random selection returns valid ids', () {
-    final ids = ActivityMarkerCatalog.randomSelectionIds();
+  test('Activity marker automatic selection returns valid ids', () {
+    final ids = ActivityMarkerCatalog.automaticSelectionIds();
 
     expect(ids, isNotEmpty);
     expect(ids, hasLength(2));
@@ -2297,7 +2297,7 @@ void main() {
     );
   });
 
-  testWidgets('Timer builder random marker starts timer', (tester) async {
+  testWidgets('Timer builder automatic marker starts timer', (tester) async {
     SharedPreferences.setMockInitialValues({});
     addTearDown(() async {
       await const ActiveActivityTimerSessionStore().clear();
@@ -2316,7 +2316,7 @@ void main() {
           config: ActivityTimerConfig.defaults().copyWith(
             childName: '지율',
             duration: const Duration(minutes: 35),
-            markerMode: ActivityMarkerMode.random,
+            markerMode: ActivityMarkerMode.activityDefault,
           ),
           activityProgressService: LocalActivityProgressService(),
           onConfigChanged: (_) {},
@@ -2332,7 +2332,9 @@ void main() {
     expect(find.byType(TimerScreen), findsOneWidget);
     expect(
       tester.widget<TimerScreen>(find.byType(TimerScreen)).config.markerIds,
-      hasLength(ActivityMarkerCatalog.maxSelectableMarkerCount),
+      hasLength(
+        ActivityMarkerCatalog.autoSelectionIdsForActivity('brushing').length,
+      ),
     );
     expect(
       tester
@@ -2853,6 +2855,19 @@ void main() {
         .getTopLeft(find.byKey(const ValueKey('createTimerCard')))
         .dy;
     expect(favoriteTop, lessThan(createTimerTop));
+    final favoriteActionCenter = tester.getCenter(
+      find.descendant(
+        of: find.byKey(const ValueKey('homeFavoriteTimerCard_0')),
+        matching: find.byIcon(Icons.play_arrow_rounded),
+      ),
+    );
+    final createActionCenter = tester.getCenter(
+      find.descendant(
+        of: find.byKey(const ValueKey('createTimerCard')),
+        matching: find.byIcon(Icons.add_rounded),
+      ),
+    );
+    expect(createActionCenter.dx, closeTo(favoriteActionCenter.dx, 0.1));
 
     await tester.tap(find.byKey(const ValueKey('homeFavoriteTimerCard_0')));
     await tester.pump();

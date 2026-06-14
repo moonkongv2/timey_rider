@@ -18,7 +18,7 @@ class EnActivityMarkerTexts implements ActivityMarkerTextSet {
     'Choose: pick up to 5 picture markers before starting.',
     'Only manually chosen picture markers are saved to activity records.',
   ];
-  String get randomStartButton => 'Start automatically';
+  String get automaticStartButton => 'Start automatically';
   String get selectedStartButton => 'Start with markers';
 
   String selectedCount(int selectedCount, int maxCount) {

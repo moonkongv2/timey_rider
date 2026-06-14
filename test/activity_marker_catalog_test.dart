@@ -10,8 +10,8 @@ void main() {
     expect(markerIds, ['top_teeth', 'bottom_teeth', 'molars', 'tongue']);
   });
 
-  test('randomSelectionIds for reading returns only reading markers', () {
-    final selectedIds = ActivityMarkerCatalog.randomSelectionIds(
+  test('automaticSelectionIds for reading returns only reading markers', () {
+    final selectedIds = ActivityMarkerCatalog.automaticSelectionIds(
       activityId: 'reading',
       count: 7,
       random: math.Random(1),

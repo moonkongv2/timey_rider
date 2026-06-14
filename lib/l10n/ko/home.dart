@@ -24,7 +24,7 @@ class HomeTexts implements HomeTextSet {
   String get timerBuilderSheetTitle => '타이머 만들기';
   String get timerBuilderActivityStepTitle => '1. 미션 종류';
   String get timerBuilderMarkerStepTitle => '2. 마커';
-  String get timerBuilderRandomMarkerOption => '자동';
+  String get timerBuilderAutomaticMarkerOption => '자동';
   String get timerBuilderManualMarkerOption => '선택';
   String get timerBuilderRecentPresetTitle => '최근 설정';
   String get timerBuilderRecentPresetApplyButton => '적용';
