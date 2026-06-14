@@ -3968,7 +3968,10 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('Course markers'), findsOneWidget);
-    expect(find.textContaining('Chosen markers are saved'), findsOneWidget);
+    expect(
+      find.textContaining('Only manually chosen picture markers'),
+      findsOneWidget,
+    );
   });
 
   testWidgets('User guide shows key Korean guide copy', (tester) async {
@@ -3995,13 +3998,13 @@ void main() {
     expect(find.text('코스 마커'), findsOneWidget);
 
     await tester.scrollUntilVisible(
-      find.textContaining('직접 고른 마커').first,
+      find.textContaining('직접 고른 그림 마커').first,
       200,
       scrollable: find.byType(Scrollable).first,
     );
     await tester.pumpAndSettle();
 
-    expect(find.textContaining('직접 고른 마커'), findsWidgets);
+    expect(find.textContaining('직접 고른 그림 마커'), findsWidgets);
 
     await tester.scrollUntilVisible(
       find.text('동기부여 영상'),
@@ -4053,7 +4056,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.byKey(const ValueKey('appHelpSheet')), findsOneWidget);
-    expect(find.textContaining('직접 고른 마커'), findsWidgets);
+    expect(find.textContaining('직접 고른 그림 마커'), findsWidgets);
   });
 
   testWidgets('Settings screen updates course marker mode', (tester) async {
@@ -4101,7 +4104,7 @@ void main() {
     expect(find.text('자동'), findsOneWidget);
     expect(find.text('활동에 맞게'), findsNothing);
     expect(
-      find.text('자동은 활동에 맞는 마커를 앱이 알아서 사용해요. 직접 선택한 마커만 활동 기록에 남아요.'),
+      find.text('자동은 활동에 맞는 그림 마커를 미리 보여주고 사용해요. 직접 고른 그림 마커만 활동 기록에 남아요.'),
       findsOneWidget,
     );
 

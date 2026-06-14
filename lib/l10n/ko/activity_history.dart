@@ -12,7 +12,7 @@ class ActivityHistoryTexts implements ActivityHistoryTextSet {
   String get helpTitle => '활동 기록 안내';
   List<String> get helpBulletItems => const [
     '활동 기록에는 미션, 목표 시간, 실제 시간, 완료 상태, 받은 스티커가 표시돼요.',
-    '직접 고른 마커가 있으면 기록에 함께 표시돼요.',
+    '직접 고른 그림 마커가 있으면 기록에 함께 표시돼요.',
     '자동 선택 마커는 도로에만 보이고 기록에는 남지 않아요.',
     '미완료 기록은 스티커 없음으로 표시될 수 있어요.',
   ];

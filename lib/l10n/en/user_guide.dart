@@ -37,8 +37,9 @@ class EnUserGuideTexts implements UserGuideTextSet {
   List<String> get courseMarkersItems => const [
     'Course markers are small route goals shown during an activity.',
     'Off: no markers are shown on the road.',
-    'Auto: the app uses markers that fit the selected activity.',
-    'Choose: pick up to 5 markers before starting. Chosen markers are saved to activity records.',
+    'Auto: the app previews and uses picture markers that fit the selected activity.',
+    'Choose: pick up to 5 picture markers before starting.',
+    'Only manually chosen picture markers are saved to activity records.',
     'Markers do not decide completion or sticker results.',
   ];
 
@@ -63,7 +64,7 @@ class EnUserGuideTexts implements UserGuideTextSet {
   String get historyRewardsTitle => 'Activity history and reward goals';
   List<String> get historyRewardsItems => const [
     'Activity history shows activity name, target time, actual time, and completion status.',
-    'Earned stickers and manually chosen markers can appear with the record.',
+    'Earned stickers and manually chosen picture markers can appear with the record.',
     'Earned stickers collect in the sticker collection screen.',
     'If reward goals are active, success stickers can fill goal slots.',
   ];

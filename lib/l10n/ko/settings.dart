@@ -33,7 +33,7 @@ class SettingsTexts implements SettingsTextSet {
   String get markerModeRandom => '자동';
   String get markerModeActivityDefault => '자동';
   String get markerModeDescription =>
-      '자동은 활동에 맞는 마커를 앱이 알아서 사용해요. 직접 선택한 마커만 활동 기록에 남아요.';
+      '자동은 활동에 맞는 그림 마커를 미리 보여주고 사용해요. 직접 고른 그림 마커만 활동 기록에 남아요.';
   String get defaultTimerDuration => '기본 타이머 시간';
   String get vehicleSelection => '빠방 고르기';
   String get childNameTitle => '아이 이름';

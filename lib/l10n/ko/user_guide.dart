@@ -36,8 +36,9 @@ class UserGuideTexts implements UserGuideTextSet {
   List<String> get courseMarkersItems => const [
     '코스 마커는 활동 중 도로 위에 나타나는 작은 목표 표시예요.',
     '사용 안 함: 도로 위에 마커를 표시하지 않아요.',
-    '자동: 선택한 활동에 어울리는 마커를 앱이 알아서 사용해요.',
-    '직접 선택: 시작 전 최대 5개까지 골라요. 직접 고른 마커는 활동 기록에 남아요.',
+    '자동: 선택한 활동에 어울리는 그림 마커를 미리 보여주고 사용해요.',
+    '직접 선택: 시작 전 그림 마커를 최대 5개까지 골라요.',
+    '활동 기록에는 직접 고른 그림 마커만 남아요.',
     '마커는 완료 여부나 스티커 판정을 직접 결정하지 않아요.',
   ];
 
@@ -62,7 +63,7 @@ class UserGuideTexts implements UserGuideTextSet {
   String get historyRewardsTitle => '활동 기록과 보상 목표';
   List<String> get historyRewardsItems => const [
     '활동 기록에서 활동 이름, 목표 시간, 실제 시간, 완료 상태를 볼 수 있어요.',
-    '받은 스티커와 직접 고른 마커도 함께 확인할 수 있어요.',
+    '받은 스티커와 직접 고른 그림 마커도 함께 확인할 수 있어요.',
     '받은 스티커는 스티커 모음 화면에 쌓여요.',
     '보상 목표가 있으면 성공 스티커가 목표 칸을 채울 수 있어요.',
   ];

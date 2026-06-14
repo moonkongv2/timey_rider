@@ -14,9 +14,9 @@ class EnActivityMarkerTexts implements ActivityMarkerTextSet {
     'They do not decide completion or sticker results.',
   ];
   List<String> get helpBulletItems => const [
-    'Auto: the app uses markers that fit the selected activity.',
-    'Choose: pick up to 5 markers before starting. Chosen markers are saved to activity records.',
-    'Only manually chosen markers are saved to activity records.',
+    'Auto: the app previews and uses picture markers that fit the selected activity.',
+    'Choose: pick up to 5 picture markers before starting.',
+    'Only manually chosen picture markers are saved to activity records.',
   ];
   String get randomStartButton => 'Start automatically';
   String get selectedStartButton => 'Start with markers';

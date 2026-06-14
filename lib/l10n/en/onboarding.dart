@@ -38,9 +38,9 @@ class EnOnboardingTexts implements OnboardingTextSet {
     OnboardingCardText(
       title: 'Small goals appear on the course',
       body:
-          'Top teeth and bottom teeth for brushing,\ncover and first pages for reading.',
+          'Small picture markers that fit the mission\nappear one by one along the course.',
       note:
-          'Markers are not score cards. They are little signs that help the routine flow.',
+          'Markers are not score cards. They are visual signs that help the routine flow.',
       ctaLabel: 'Sounds good',
     ),
     OnboardingCardText(

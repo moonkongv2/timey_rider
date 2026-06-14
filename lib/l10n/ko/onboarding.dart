@@ -32,8 +32,8 @@ class OnboardingTexts implements OnboardingTextSet {
     ),
     OnboardingCardText(
       title: '단기 목표가 코스 위에 나타나요',
-      body: '양치할 땐 윗니·아랫니,\n책 읽을 땐 표지·첫 장처럼요.',
-      note: '마커는 아이가 시간의 흐름을\n따라가게 해주는 표지판이에요.',
+      body: '미션에 어울리는 작은 그림 마커가\n코스 위에 차례로 나타나요.',
+      note: '마커는 아이가 시간의 흐름을\n따라가게 해주는 시각적 표지예요.',
       ctaLabel: '좋아, 다음!',
     ),
     OnboardingCardText(

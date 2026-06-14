@@ -34,7 +34,7 @@ class EnSettingsTexts implements SettingsTextSet {
   String get markerModeRandom => 'Auto';
   String get markerModeActivityDefault => 'Auto';
   String get markerModeDescription =>
-      'Auto uses markers that fit the activity. Only manually chosen markers are saved to activity records.';
+      'Auto previews and uses picture markers that fit the activity. Only manually chosen picture markers are saved to activity records.';
   String get defaultTimerDuration => 'Default timer duration';
   String get vehicleSelection => 'Choose vehicle';
   String get childNameTitle => "Child's name";
