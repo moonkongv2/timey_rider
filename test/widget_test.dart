@@ -8059,8 +8059,10 @@ void main() {
     );
     expect(find.text('활동 기록 안내'), findsOneWidget);
     expect(find.text('고른 마커'), findsOneWidget);
-    expect(find.text('위쪽 반짝'), findsOneWidget);
-    expect(find.text('아래쪽 반짝'), findsOneWidget);
+    expect(find.text('위쪽 반짝'), findsNothing);
+    expect(find.text('아래쪽 반짝'), findsNothing);
+    expect(find.text('😁'), findsOneWidget);
+    expect(find.text('🫧'), findsOneWidget);
   });
 
   testWidgets('Activity history screen shows needs-more-time records', (
