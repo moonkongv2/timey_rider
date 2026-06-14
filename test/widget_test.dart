@@ -4034,17 +4034,17 @@ void main() {
     expect(segmentedButtonRect.right, lessThanOrEqualTo(cardRect.right));
     expect(find.text('사용 안 함'), findsOneWidget);
     expect(find.text('직접 선택'), findsOneWidget);
-    expect(find.text('자동 선택'), findsOneWidget);
-    expect(find.text('활동에 맞게'), findsOneWidget);
+    expect(find.text('자동'), findsOneWidget);
+    expect(find.text('활동에 맞게'), findsNothing);
     expect(
-      find.text('직접 선택한 마커만 활동 기록에 남아요. 자동 선택은 도로에만 표시돼요.'),
+      find.text('자동은 활동에 맞는 마커를 앱이 알아서 사용해요. 직접 선택한 마커만 활동 기록에 남아요.'),
       findsOneWidget,
     );
 
-    segmentedButton.onSelectionChanged!({ActivityMarkerMode.random});
+    segmentedButton.onSelectionChanged!({ActivityMarkerMode.manual});
     await tester.pump();
 
-    expect(latestConfig.markerMode, ActivityMarkerMode.random);
+    expect(latestConfig.markerMode, ActivityMarkerMode.manual);
   });
 
   testWidgets('Settings screen updates motivation video settings', (

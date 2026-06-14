@@ -14,12 +14,11 @@ class EnActivityMarkerTexts implements ActivityMarkerTextSet {
     'They do not decide completion or sticker results.',
   ];
   List<String> get helpBulletItems => const [
-    'Match activity: use markers that fit the selected activity.',
+    'Auto: the app uses markers that fit the selected activity.',
     'Choose: pick up to 5 markers before starting. Chosen markers are saved to activity records.',
-    'Random: the app picks markers that fit the activity.',
     'Only manually chosen markers are saved to activity records.',
   ];
-  String get randomStartButton => 'Start with random';
+  String get randomStartButton => 'Start automatically';
   String get selectedStartButton => 'Start with markers';
 
   String selectedCount(int selectedCount, int maxCount) {

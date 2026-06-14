@@ -28,7 +28,7 @@ abstract final class ActivityMarkerCatalog {
     id: 'front_teeth',
     labelKo: '앞니',
     labelEn: 'Front teeth',
-    emoji: '🦷',
+    emoji: '😁',
     activityIds: ['brushing'],
   );
 

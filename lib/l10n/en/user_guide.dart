@@ -37,9 +37,8 @@ class EnUserGuideTexts implements UserGuideTextSet {
   List<String> get courseMarkersItems => const [
     'Course markers are small route goals shown during an activity.',
     'Off: no markers are shown on the road.',
-    'Match activity: use markers that fit the selected activity.',
+    'Auto: the app uses markers that fit the selected activity.',
     'Choose: pick up to 5 markers before starting. Chosen markers are saved to activity records.',
-    'Random: the app shows random markers that fit the activity.',
     'Markers do not decide completion or sticker results.',
   ];
 
