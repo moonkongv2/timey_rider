@@ -225,7 +225,6 @@ class LocalSettingsService {
   }) {
     return switch (value) {
       'off' => ActivityMarkerMode.off,
-      'random' => ActivityMarkerMode.random,
       'manual' => ActivityMarkerMode.manual,
       'activityDefault' => ActivityMarkerMode.activityDefault,
       _ => fallback,
@@ -236,7 +235,6 @@ class LocalSettingsService {
     return switch (mode) {
       ActivityMarkerMode.off => 'off',
       ActivityMarkerMode.manual => 'manual',
-      ActivityMarkerMode.random => 'random',
       ActivityMarkerMode.activityDefault => 'activityDefault',
     };
   }

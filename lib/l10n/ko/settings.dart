@@ -30,7 +30,6 @@ class SettingsTexts implements SettingsTextSet {
   String get markerModeTitle => '코스 마커';
   String get markerModeOff => '사용 안 함';
   String get markerModeManual => '직접 선택';
-  String get markerModeRandom => '자동';
   String get markerModeActivityDefault => '자동';
   String get markerModeDescription =>
       '자동은 활동에 맞는 그림 마커를 미리 보여주고 사용해요. 직접 고른 그림 마커만 활동 기록에 남아요.';

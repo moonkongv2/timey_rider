@@ -205,7 +205,6 @@ abstract interface class SettingsTextSet {
   String get markerModeTitle;
   String get markerModeOff;
   String get markerModeManual;
-  String get markerModeRandom;
   String get markerModeActivityDefault;
   String get markerModeDescription;
   String get defaultTimerDuration;

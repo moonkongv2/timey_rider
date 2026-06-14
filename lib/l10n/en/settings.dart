@@ -31,7 +31,6 @@ class EnSettingsTexts implements SettingsTextSet {
   String get markerModeTitle => 'Course markers';
   String get markerModeOff => 'Off';
   String get markerModeManual => 'Choose';
-  String get markerModeRandom => 'Auto';
   String get markerModeActivityDefault => 'Auto';
   String get markerModeDescription =>
       'Auto previews and uses picture markers that fit the activity. Only manually chosen picture markers are saved to activity records.';

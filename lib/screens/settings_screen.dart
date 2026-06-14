@@ -26,18 +26,11 @@ String _markerModeLabel(SettingsTextSet texts, ActivityMarkerMode mode) {
   return switch (mode) {
     ActivityMarkerMode.off => texts.markerModeOff,
     ActivityMarkerMode.manual => texts.markerModeManual,
-    ActivityMarkerMode.random => texts.markerModeRandom,
     ActivityMarkerMode.activityDefault => texts.markerModeActivityDefault,
   };
 }
 
-ActivityMarkerMode _visibleMarkerMode(ActivityMarkerMode mode) {
-  return mode == ActivityMarkerMode.random
-      ? ActivityMarkerMode.activityDefault
-      : mode;
-}
-
-const _visibleMarkerModes = [
+const _markerModes = [
   ActivityMarkerMode.off,
   ActivityMarkerMode.manual,
   ActivityMarkerMode.activityDefault,
@@ -270,7 +263,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             ),
                           ),
                           segments: [
-                            for (final mode in _visibleMarkerModes)
+                            for (final mode in _markerModes)
                               ButtonSegment(
                                 value: mode,
                                 label: FittedBox(
@@ -283,7 +276,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                 ),
                               ),
                           ],
-                          selected: {_visibleMarkerMode(_config.markerMode)},
+                          selected: {_config.markerMode},
                           onSelectionChanged: (selected) {
                             if (selected.isEmpty) {
                               return;

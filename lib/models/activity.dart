@@ -1,6 +1,6 @@
 enum ActivityCompletionMode { confirmDone, timeEndsAutomatically, parentCheck }
 
-enum ActivityMarkerMode { off, manual, random, activityDefault }
+enum ActivityMarkerMode { off, manual, activityDefault }
 
 class ActivityDefinition {
   const ActivityDefinition({

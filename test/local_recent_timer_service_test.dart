@@ -60,7 +60,7 @@ void main() {
       ActivityTimerPreset(
         activityId: 'cleanup',
         duration: const Duration(minutes: 5),
-        markerMode: ActivityMarkerMode.random,
+        markerMode: ActivityMarkerMode.activityDefault,
         markerIds: const ['blocks', 'books'],
         updatedAt: DateTime.utc(2026, 6, 14, 2),
       ),
@@ -71,7 +71,7 @@ void main() {
     expect(loadedPreset, isNotNull);
     expect(loadedPreset!.activityId, 'cleanup');
     expect(loadedPreset.duration, const Duration(minutes: 5));
-    expect(loadedPreset.markerMode, ActivityMarkerMode.random);
+    expect(loadedPreset.markerMode, ActivityMarkerMode.activityDefault);
     expect(loadedPreset.markerIds, ['blocks', 'books']);
   });
 

@@ -30,7 +30,7 @@ void main() {
     final preset = ActivityTimerPreset.fromJson({
       'activityId': 'cleanup',
       'durationMs': const Duration(minutes: 7).inMilliseconds,
-      'markerMode': 'random',
+      'markerMode': 'activityDefault',
       'markerIds': ['blocks', '', 3, 'books'],
       'selectedMarkerIds': ['blocks', null, 'books'],
       'updatedAt': updatedAt.toIso8601String(),
@@ -38,7 +38,7 @@ void main() {
 
     expect(preset.activityId, 'cleanup');
     expect(preset.duration, const Duration(minutes: 7));
-    expect(preset.markerMode, ActivityMarkerMode.random);
+    expect(preset.markerMode, ActivityMarkerMode.activityDefault);
     expect(preset.markerIds, ['blocks', 'books']);
     expect(preset.selectedMarkerIds, ['blocks', 'books']);
     expect(preset.updatedAt, updatedAt);
@@ -50,7 +50,7 @@ void main() {
     final preset = ActivityTimerPreset(
       activityId: 'custom',
       duration: const Duration(minutes: 12),
-      markerMode: ActivityMarkerMode.random,
+      markerMode: ActivityMarkerMode.activityDefault,
       updatedAt: updatedAt,
       customName: '  Piano  ',
     );
@@ -61,7 +61,7 @@ void main() {
     final parsed = ActivityTimerPreset.fromJson({
       'activityId': 'custom',
       'durationMs': const Duration(minutes: 12).inMilliseconds,
-      'markerMode': 'random',
+      'markerMode': 'activityDefault',
       'updatedAt': updatedAt.toIso8601String(),
       'customName': 'Piano',
     });
@@ -75,7 +75,7 @@ void main() {
     final preset = ActivityTimerPreset(
       activityId: 'custom',
       duration: const Duration(minutes: 12),
-      markerMode: ActivityMarkerMode.random,
+      markerMode: ActivityMarkerMode.activityDefault,
       updatedAt: updatedAt,
       customName: '12345678901234567890',
     );
@@ -90,7 +90,7 @@ void main() {
     final preset = ActivityTimerPreset(
       activityId: 'cleanup',
       duration: const Duration(minutes: 5),
-      markerMode: ActivityMarkerMode.random,
+      markerMode: ActivityMarkerMode.activityDefault,
       updatedAt: updatedAt,
       isFavorite: true,
     );
@@ -101,14 +101,14 @@ void main() {
     final parsedFavorite = ActivityTimerPreset.fromJson({
       'activityId': 'cleanup',
       'durationMs': const Duration(minutes: 5).inMilliseconds,
-      'markerMode': 'random',
+      'markerMode': 'activityDefault',
       'updatedAt': updatedAt.toIso8601String(),
       'isFavorite': true,
     });
     final parsedLegacy = ActivityTimerPreset.fromJson({
       'activityId': 'cleanup',
       'durationMs': const Duration(minutes: 5).inMilliseconds,
-      'markerMode': 'random',
+      'markerMode': 'activityDefault',
       'updatedAt': updatedAt.toIso8601String(),
     });
 

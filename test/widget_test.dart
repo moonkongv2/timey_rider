@@ -258,12 +258,12 @@ void main() {
 
   test('ActivityTimerConfig copyWith updates marker mode', () {
     final config = ActivityTimerConfig.defaults().copyWith(
-      markerMode: ActivityMarkerMode.random,
+      markerMode: ActivityMarkerMode.activityDefault,
     );
     final preservedConfig = config.copyWith(vehicleId: 'bus');
     final updatedConfig = config.copyWith(markerMode: ActivityMarkerMode.off);
 
-    expect(preservedConfig.markerMode, ActivityMarkerMode.random);
+    expect(preservedConfig.markerMode, ActivityMarkerMode.activityDefault);
     expect(updatedConfig.markerMode, ActivityMarkerMode.off);
   });
 
@@ -339,14 +339,14 @@ void main() {
     final service = LocalSettingsService();
     await service.saveConfig(
       ActivityTimerConfig.defaults().copyWith(
-        markerMode: ActivityMarkerMode.random,
+        markerMode: ActivityMarkerMode.activityDefault,
       ),
     );
 
     final loadedConfig = await service.loadConfig();
     final preferences = await SharedPreferences.getInstance();
-    expect(loadedConfig.markerMode, ActivityMarkerMode.random);
-    expect(preferences.getString('markerMode'), 'random');
+    expect(loadedConfig.markerMode, ActivityMarkerMode.activityDefault);
+    expect(preferences.getString('markerMode'), 'activityDefault');
     expect(preferences.getString('courseIngredientMode'), isNull);
   });
 
@@ -2613,7 +2613,7 @@ void main() {
         ActivityTimerPreset(
           activityId: 'custom',
           duration: Duration(minutes: 10 + index),
-          markerMode: ActivityMarkerMode.random,
+          markerMode: ActivityMarkerMode.activityDefault,
           markerIds: const ['star'],
           selectedMarkerIds: const [],
           updatedAt: DateTime(2026, 6, 14, index),
@@ -2674,7 +2674,7 @@ void main() {
       ActivityTimerPreset(
         activityId: 'reading',
         duration: const Duration(minutes: 15),
-        markerMode: ActivityMarkerMode.random,
+        markerMode: ActivityMarkerMode.activityDefault,
         updatedAt: DateTime(2026, 6, 14, 8),
       ),
     );
@@ -2741,7 +2741,7 @@ void main() {
         ActivityTimerPreset(
           activityId: 'custom',
           duration: Duration(minutes: 10 + index),
-          markerMode: ActivityMarkerMode.random,
+          markerMode: ActivityMarkerMode.activityDefault,
           updatedAt: DateTime(2026, 6, 14, index),
           customName: '홈 타이머 $index',
         ),
