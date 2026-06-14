@@ -307,17 +307,13 @@ abstract final class ActivityMarkerCatalog {
   static List<String> automaticSelectionIds({
     String? activityId,
     int count = maxSelectableMarkerCount,
-    math.Random? random,
   }) {
     if (count <= 0) {
       return const [];
     }
 
     final candidateIds = autoSelectionIdsForActivity(activityId);
-    final candidates = candidateIds.map(findById).nonNulls.toList();
-    final shuffled = candidates.map((marker) => marker.id).toList();
-    shuffled.shuffle(random ?? math.Random());
-    return List.unmodifiable(shuffled.take(math.min(count, shuffled.length)));
+    return List.unmodifiable(candidateIds.take(count));
   }
 
   static List<ActivityMarkerDefinition> courseSlotsFor(

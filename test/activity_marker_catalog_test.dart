@@ -1,5 +1,3 @@
-import 'dart:math' as math;
-
 import 'package:flutter_test/flutter_test.dart';
 import 'package:timey_rider/catalogs/activity_marker_catalog.dart';
 
@@ -10,18 +8,21 @@ void main() {
     expect(markerIds, ['top_teeth', 'bottom_teeth', 'molars', 'tongue']);
   });
 
-  test('automaticSelectionIds for reading returns only reading markers', () {
+  test('automaticSelectionIds for reading keeps auto marker order', () {
     final selectedIds = ActivityMarkerCatalog.automaticSelectionIds(
       activityId: 'reading',
       count: 7,
-      random: math.Random(1),
-    );
-    final readingIds = ActivityMarkerCatalog.autoSelectionIdsForActivity(
-      'reading',
     );
 
-    expect(selectedIds, hasLength(7));
-    expect(selectedIds.every(readingIds.contains), isTrue);
+    expect(selectedIds, [
+      'cover',
+      'first_pages',
+      'favorite_scene',
+      'bookmark',
+      'finish',
+      'star',
+      'flag',
+    ]);
   });
 
   test('autoSelectionIdsForActivity combines activity and common markers', () {
