@@ -13,12 +13,37 @@ void main() {
   test('randomSelectionIds for reading returns only reading markers', () {
     final selectedIds = ActivityMarkerCatalog.randomSelectionIds(
       activityId: 'reading',
+      count: 7,
       random: math.Random(1),
     );
-    final readingIds = ActivityMarkerCatalog.markerIdsForActivity('reading');
+    final readingIds = ActivityMarkerCatalog.autoSelectionIdsForActivity(
+      'reading',
+    );
 
-    expect(selectedIds, hasLength(5));
+    expect(selectedIds, hasLength(7));
     expect(selectedIds.every(readingIds.contains), isTrue);
+  });
+
+  test('autoSelectionIdsForActivity combines activity and common markers', () {
+    final brushingIds = ActivityMarkerCatalog.autoSelectionIdsForActivity(
+      'brushing',
+    );
+
+    expect(brushingIds, [
+      'top_teeth',
+      'bottom_teeth',
+      'molars',
+      'tongue',
+      'star',
+      'flag',
+    ]);
+  });
+
+  test('autoSelectionIdsForActivity falls back to common markers', () {
+    expect(ActivityMarkerCatalog.autoSelectionIdsForActivity('play'), [
+      'star',
+      'flag',
+    ]);
   });
 
   test('courseSlotCountForDuration clamps between min and max', () {

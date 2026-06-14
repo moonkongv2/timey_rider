@@ -1572,9 +1572,7 @@ class _TimerBuilderSheetState extends State<_TimerBuilderSheet> {
         selectedMarkerIds: _selectedMarkerIds.toList(growable: false),
       ),
       _ => _ActivityMarkerSelection(
-        markerIds: ActivityMarkerCatalog.randomSelectionIds(
-          activityId: _selectedActivity.id,
-        ),
+        markerIds: _autoMarkerSelectionIds(_selectedActivity.id),
         selectedMarkerIds: const [],
       ),
     };
@@ -1599,7 +1597,7 @@ class _TimerBuilderSheetState extends State<_TimerBuilderSheet> {
     final selectedMinuteLabel = homeTexts.minuteLabel(_minutes.round());
     final maxMarkerCount = ActivityMarkerCatalog.maxSelectableMarkerCount;
     final autoPreviewMarkers =
-        ActivityMarkerCatalog.defaultSelectionIdsForActivity(
+        ActivityMarkerCatalog.autoSelectionIdsForActivity(
           _selectedActivity.id,
         ).map(ActivityMarkerCatalog.findById).nonNulls.toList(growable: false);
     final recentPreset = widget.recentPreset;
@@ -2156,6 +2154,13 @@ String _presetActivityLabel(
   return preset.customName ?? activity.labelForLanguage(languageCode);
 }
 
+List<String> _autoMarkerSelectionIds(String activityId) {
+  return ActivityMarkerCatalog.randomSelectionIds(
+    activityId: activityId,
+    count: ActivityMarkerCatalog.autoSelectionIdsForActivity(activityId).length,
+  );
+}
+
 _PresetStartSettings _startSettingsForPreset(ActivityTimerPreset preset) {
   final candidateMarkerIds = ActivityMarkerCatalog.all
       .map((marker) => marker.id)
@@ -2186,9 +2191,7 @@ _PresetStartSettings _startSettingsForPreset(ActivityTimerPreset preset) {
     _ => _PresetStartSettings(
       markerMode: markerMode,
       markerSelection: _ActivityMarkerSelection(
-        markerIds: ActivityMarkerCatalog.randomSelectionIds(
-          activityId: preset.activityId,
-        ),
+        markerIds: _autoMarkerSelectionIds(preset.activityId),
         selectedMarkerIds: const [],
       ),
     ),

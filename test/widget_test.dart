@@ -91,7 +91,7 @@ void main() {
     final ids = ActivityMarkerCatalog.randomSelectionIds();
 
     expect(ids, isNotEmpty);
-    expect(ids, hasLength(5));
+    expect(ids, hasLength(2));
     for (final id in ids) {
       expect(ActivityMarkerCatalog.findById(id), isNotNull);
     }
@@ -2270,6 +2270,14 @@ void main() {
       find.byKey(const ValueKey('timerBuilderAutoMarkerPreview_bottom_teeth')),
       findsOneWidget,
     );
+    expect(
+      find.byKey(const ValueKey('timerBuilderAutoMarkerPreview_star')),
+      findsOneWidget,
+    );
+    expect(
+      find.byKey(const ValueKey('timerBuilderAutoMarkerPreview_flag')),
+      findsOneWidget,
+    );
     await _startTimerBuilder(tester);
 
     expect(find.byKey(const ValueKey('timerBuilderSheet')), findsNothing);
@@ -2277,7 +2285,7 @@ void main() {
     expect(
       tester.widget<TimerScreen>(find.byType(TimerScreen)).config.markerIds,
       hasLength(
-        ActivityMarkerCatalog.defaultSelectionIdsForActivity('brushing').length,
+        ActivityMarkerCatalog.autoSelectionIdsForActivity('brushing').length,
       ),
     );
     expect(

@@ -197,6 +197,8 @@ abstract final class ActivityMarkerCatalog {
     'rocket',
   ];
 
+  static const commonAutoSelectionIds = ['star', 'flag'];
+
   static ActivityMarkerDefinition? findById(String id) {
     for (final marker in [...all, ...legacyMarkers]) {
       if (marker.id == id) {
@@ -215,11 +217,19 @@ abstract final class ActivityMarkerCatalog {
   }
 
   static List<String> defaultSelectionIdsForActivity(String activityId) {
-    final markerIds = markerIdsForActivity(activityId);
-    if (markerIds.isEmpty) {
-      return defaultSelectionIds;
+    return autoSelectionIdsForActivity(activityId);
+  }
+
+  static List<String> autoSelectionIdsForActivity(String? activityId) {
+    final ids = <String>[];
+    if (activityId != null) {
+      ids.addAll(markerIdsForActivity(activityId));
     }
-    return List.unmodifiable(markerIds.take(maxSelectableMarkerCount));
+    ids.addAll(commonAutoSelectionIds);
+    if (ids.isEmpty) {
+      ids.addAll(defaultSelectionIds);
+    }
+    return List.unmodifiable(_uniqueKnownIds(ids));
   }
 
   static List<String> randomSelectionIds({
@@ -231,7 +241,8 @@ abstract final class ActivityMarkerCatalog {
       return const [];
     }
 
-    final candidates = _randomCandidatesForActivity(activityId);
+    final candidateIds = autoSelectionIdsForActivity(activityId);
+    final candidates = candidateIds.map(findById).nonNulls.toList();
     final shuffled = candidates.map((marker) => marker.id).toList();
     shuffled.shuffle(random ?? math.Random());
     return List.unmodifiable(shuffled.take(math.min(count, shuffled.length)));
@@ -279,19 +290,6 @@ abstract final class ActivityMarkerCatalog {
         .toInt();
   }
 
-  static List<ActivityMarkerDefinition> _randomCandidatesForActivity(
-    String? activityId,
-  ) {
-    if (activityId == null) {
-      return all;
-    }
-
-    final markers = all
-        .where((marker) => marker.activityIds.contains(activityId))
-        .toList();
-    return markers.isEmpty ? genericMarkers : markers;
-  }
-
   static List<ActivityMarkerDefinition> _markersForIds(List<String> ids) {
     final markers = <ActivityMarkerDefinition>[];
     final seenIds = <String>{};
@@ -303,5 +301,17 @@ abstract final class ActivityMarkerCatalog {
       markers.add(marker);
     }
     return markers;
+  }
+
+  static List<String> _uniqueKnownIds(List<String> ids) {
+    final selectedIds = <String>[];
+    final seenIds = <String>{};
+    for (final id in ids) {
+      if (!seenIds.add(id) || findById(id) == null) {
+        continue;
+      }
+      selectedIds.add(id);
+    }
+    return selectedIds;
   }
 }
