@@ -8665,10 +8665,12 @@ Future<void> _tapVisible(WidgetTester tester, Finder finder) async {
 }
 
 Future<void> _pumpHomeAvatarFileCheck(WidgetTester tester) async {
-  await tester.runAsync(() async {
-    await Future<void>.delayed(const Duration(milliseconds: 10));
-  });
-  await tester.pump();
+  for (var index = 0; index < 5; index += 1) {
+    await tester.runAsync(() async {
+      await Future<void>.delayed(const Duration(milliseconds: 20));
+    });
+    await tester.pump();
+  }
 }
 
 class _CountingActivityProgressService extends LocalActivityProgressService {
