@@ -1026,6 +1026,16 @@ void main() {
       _assetImage('assets/images/result_success_bg_portrait.png'),
       findsOneWidget,
     );
+    expect(
+      tester.getSize(
+        find.byKey(
+          ValueKey(
+            'resultRewardImage_${RewardCatalog.vehicleStickerIdForVehicle(VehicleCatalog.motorcycle.id)}',
+          ),
+        ),
+      ),
+      const Size.square(132),
+    );
   });
 
   testWidgets('Completed result help explains sticker reward', (tester) async {
@@ -1320,6 +1330,16 @@ void main() {
     expect(
       _assetImage('assets/images/result_success_bg_landscape.png'),
       findsOneWidget,
+    );
+    expect(
+      tester.getSize(
+        find.byKey(
+          ValueKey(
+            'resultRewardImage_${RewardCatalog.vehicleStickerIdForVehicle(VehicleCatalog.motorcycle.id)}',
+          ),
+        ),
+      ),
+      const Size.square(160),
     );
     expect(restartButton, findsOneWidget);
     expect(homeButton, findsOneWidget);

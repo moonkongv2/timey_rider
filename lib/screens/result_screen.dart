@@ -17,7 +17,6 @@ import '../theme/app_colors.dart';
 import '../theme/app_radius.dart';
 import '../theme/app_spacing.dart';
 import '../widgets/app/app_help_sheet.dart';
-import '../widgets/reward_sticker_image.dart';
 import 'reward_goal_screen.dart';
 import 'timer_screen.dart';
 
@@ -1278,8 +1277,8 @@ class _RewardBadge extends StatelessWidget {
 
     if (isCompact) {
       return SizedBox(
-        width: 196,
-        height: 196,
+        width: 220,
+        height: 220,
         child: Stack(
           children: [
             const _RewardConfettiDot(
@@ -1329,27 +1328,10 @@ class _RewardBadge extends StatelessWidget {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  DecoratedBox(
-                    decoration: BoxDecoration(
-                      color: AppColors.white.withValues(alpha: 0.74),
-                      shape: BoxShape.circle,
-                      border: Border.all(color: AppColors.white, width: 2),
-                      boxShadow: [
-                        BoxShadow(
-                          color: AppColors.orange.withValues(alpha: 0.12),
-                          blurRadius: 16,
-                          offset: const Offset(0, 6),
-                        ),
-                      ],
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.all(AppSpacing.md),
-                      child: RewardStickerImage(
-                        reward: reward,
-                        semanticLabel: rewardName,
-                        size: 78,
-                      ),
-                    ),
+                  _ResultRewardImage(
+                    reward: reward,
+                    semanticLabel: rewardName,
+                    size: 160,
                   ),
                   const SizedBox(height: AppSpacing.md),
                   Text(
@@ -1370,16 +1352,15 @@ class _RewardBadge extends StatelessWidget {
       );
     }
 
-    final stickerSize = isCondensed ? 58.0 : 64.0;
     return SizedBox(
-      width: isCondensed ? 104 : 116,
+      width: isCondensed ? 164 : 180,
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          RewardStickerImage(
+          _ResultRewardImage(
             reward: reward,
             semanticLabel: rewardName,
-            size: stickerSize,
+            size: isCondensed ? 132 : 148,
           ),
           const SizedBox(height: AppSpacing.sm),
           Text(
@@ -1393,6 +1374,37 @@ class _RewardBadge extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _ResultRewardImage extends StatelessWidget {
+  const _ResultRewardImage({
+    required this.reward,
+    required this.semanticLabel,
+    required this.size,
+  });
+
+  final RewardDefinition reward;
+  final String semanticLabel;
+  final double size;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox.square(
+      key: ValueKey('resultRewardImage_${reward.id}'),
+      dimension: size,
+      child: Center(
+        child: Image.asset(
+          reward.imageAssetPath,
+          width: size,
+          height: size,
+          fit: BoxFit.contain,
+          semanticLabel: semanticLabel,
+          errorBuilder: (_, _, _) =>
+              Text(reward.emoji, style: TextStyle(fontSize: size * 0.56)),
+        ),
       ),
     );
   }
