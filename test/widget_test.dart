@@ -173,6 +173,19 @@ void main() {
       'sticker_rocket',
     ]);
     expect(RewardCatalog.sparklyTeethSticker.emoji, '✨');
+    expect(
+      RewardCatalog.sparklyTeethSticker.imageAssetPath,
+      'assets/images/sticker_sparkly_teeth.png',
+    );
+    expect(
+      RewardCatalog.sparklyTeethSticker.labelForLanguage('ko'),
+      '반짝 양치 스티커',
+    );
+    expect(
+      RewardCatalog.sparklyTeethSticker.labelForLanguage('en'),
+      'Sparkly Teeth Sticker',
+    );
+    expect(RewardCatalog.sparklyTeethSticker.vehicleId, isNull);
     expect(RewardCatalog.bookBuddySticker.emoji, '📚');
     expect(RewardCatalog.cleanupChampSticker.emoji, '🧸');
     expect(RewardCatalog.happyClockSticker.emoji, '⏰');
