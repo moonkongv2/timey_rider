@@ -157,51 +157,57 @@ void main() {
     });
   });
 
-  test('Reward catalog uses routine activity stickers', () {
+  test('Reward catalog uses vehicle stickers', () {
     final ids = RewardCatalog.successStickers
         .map((reward) => reward.id)
         .toList();
+    final expectedIds = VehicleCatalog.all
+        .map((vehicle) => RewardCatalog.vehicleStickerIdForVehicle(vehicle.id))
+        .toList();
+    final motorcycleSticker = RewardCatalog.findVehicleStickerByVehicleId(
+      VehicleCatalog.motorcycle.id,
+    );
 
-    expect(ids, [
-      'sticker_finish_flag',
-      'sticker_twinkle_star',
-      'sticker_sparkly_teeth',
-      'sticker_book_buddy',
-      'sticker_cleanup_champ',
-      'sticker_happy_clock',
-      'sticker_rainbow_course',
-      'sticker_rocket',
-    ]);
-    expect(RewardCatalog.sparklyTeethSticker.emoji, '✨');
+    expect(ids, expectedIds);
+    expect(RewardCatalog.successStickers, same(RewardCatalog.all));
+    expect(motorcycleSticker, isNotNull);
+    expect(motorcycleSticker!.id, 'sticker_vehicle_motorcycle');
+    expect(motorcycleSticker.type, RewardType.sticker);
+    expect(motorcycleSticker.emoji, VehicleCatalog.motorcycle.emoji);
     expect(
-      RewardCatalog.sparklyTeethSticker.imageAssetPath,
-      'assets/images/sticker_sparkly_teeth.png',
+      motorcycleSticker.imageAssetPath,
+      VehicleCatalog.motorcycle.assetPath,
     );
     expect(
-      RewardCatalog.sparklyTeethSticker.labelForLanguage('ko'),
-      '반짝 양치 스티커',
+      motorcycleSticker.labelForLanguage('ko'),
+      '${VehicleCatalog.motorcycle.labelKo} 스티커',
     );
     expect(
-      RewardCatalog.sparklyTeethSticker.labelForLanguage('en'),
-      'Sparkly Teeth Sticker',
+      motorcycleSticker.labelForLanguage('en'),
+      '${VehicleCatalog.motorcycle.labelEn} Sticker',
     );
-    expect(RewardCatalog.sparklyTeethSticker.vehicleId, isNull);
-    expect(RewardCatalog.bookBuddySticker.emoji, '📚');
-    expect(RewardCatalog.cleanupChampSticker.emoji, '🧸');
-    expect(RewardCatalog.happyClockSticker.emoji, '⏰');
+    expect(motorcycleSticker.vehicleId, VehicleCatalog.motorcycle.id);
+    expect(RewardCatalog.findById(motorcycleSticker.id), motorcycleSticker);
   });
 
-  testWidgets('Reward sticker image falls back for missing routine assets', (
+  testWidgets('Reward sticker image falls back for missing assets', (
     tester,
   ) async {
+    const missingAssetReward = RewardDefinition(
+      id: 'missing_reward_asset',
+      type: RewardType.sticker,
+      emoji: '?',
+      imageAssetPath: 'assets/images/missing_reward_asset.png',
+      labelKo: '없는 스티커',
+      labelEn: 'Missing Sticker',
+    );
+
     await tester.pumpWidget(
-      const MaterialApp(
-        home: RewardStickerImage(reward: RewardCatalog.sparklyTeethSticker),
-      ),
+      const MaterialApp(home: RewardStickerImage(reward: missingAssetReward)),
     );
     await tester.pumpAndSettle();
 
-    expect(find.text('✨'), findsOneWidget);
+    expect(find.text('?'), findsOneWidget);
   });
 
   test('Activity marker course slots fall back for invalid selected ids', () {
@@ -7559,7 +7565,7 @@ void main() {
     );
   });
 
-  test('Brushing completed at end awards one routine sticker', () async {
+  test('Brushing completed at end awards one sticker', () async {
     SharedPreferences.setMockInitialValues({});
 
     final service = LocalActivityProgressService();
@@ -7667,6 +7673,9 @@ void main() {
   test('Local activity progress skips malformed history items', () async {
     final startedAt = DateTime(2026, 5, 4, 12);
     final endedAt = DateTime(2026, 5, 4, 12, 20);
+    final vehicleStickerId = RewardCatalog.vehicleStickerIdForVehicle(
+      VehicleCatalog.motorcycle.id,
+    );
     final validHistory = <String>[
       jsonEncode({
         'id': 'valid-1',
@@ -7677,7 +7686,7 @@ void main() {
         'actualMs': const Duration(minutes: 20).inMilliseconds,
         'completedBeforeEnd': false,
         'completionStatus': ActivityCompletionStatus.completedAtEnd.name,
-        'rewardIds': [RewardCatalog.finishFlagStickerId],
+        'rewardIds': [vehicleStickerId],
         'selectedMarkerIds': ['top_teeth'],
       }),
       'not-json',
@@ -7701,9 +7710,7 @@ void main() {
     final snapshot = await LocalActivityProgressService().loadSnapshot();
 
     expect(snapshot.history.map((entry) => entry.id), ['valid-1', 'valid-2']);
-    expect(snapshot.history.first.rewardIds, [
-      RewardCatalog.finishFlagStickerId,
-    ]);
+    expect(snapshot.history.first.rewardIds, [vehicleStickerId]);
     expect(snapshot.history.first.selectedMarkerIds, ['top_teeth']);
     expect(snapshot.history.last.activityId, 'play');
     expect(snapshot.history.last.selectedMarkerIds, ['bottom_teeth']);
@@ -7711,17 +7718,26 @@ void main() {
 
   test('Local activity progress skips malformed inventory items', () async {
     final acquiredAt = DateTime(2026, 5, 4, 12);
+    final motorcycleStickerId = RewardCatalog.vehicleStickerIdForVehicle(
+      VehicleCatalog.motorcycle.id,
+    );
+    final fireTruckStickerId = RewardCatalog.vehicleStickerIdForVehicle(
+      VehicleCatalog.fireTruck.id,
+    );
+    final policeCarStickerId = RewardCatalog.vehicleStickerIdForVehicle(
+      VehicleCatalog.policeCar.id,
+    );
     final validInventory = <String>[
       jsonEncode({
-        'rewardId': RewardCatalog.finishFlagStickerId,
+        'rewardId': motorcycleStickerId,
         'acquiredAt': acquiredAt.toIso8601String(),
         'count': 2,
       }),
       'not-json',
       jsonEncode('not-a-map'),
-      jsonEncode({'rewardId': RewardCatalog.twinkleStarStickerId}),
+      jsonEncode({'rewardId': fireTruckStickerId}),
       jsonEncode({
-        'rewardId': RewardCatalog.sparklyTeethStickerId,
+        'rewardId': policeCarStickerId,
         'acquiredAt': acquiredAt
             .add(const Duration(minutes: 1))
             .toIso8601String(),
@@ -7735,8 +7751,8 @@ void main() {
     final snapshot = await LocalActivityProgressService().loadSnapshot();
 
     expect(snapshot.inventory.map((item) => item.rewardId), [
-      RewardCatalog.finishFlagStickerId,
-      RewardCatalog.sparklyTeethStickerId,
+      motorcycleStickerId,
+      policeCarStickerId,
     ]);
     expect(snapshot.inventory.map((item) => item.count), [2, 1]);
   });
@@ -7926,7 +7942,9 @@ void main() {
         requiredStickerCount: 1,
         filledSlots: [
           RewardGoalSlot(
-            rewardId: 'sticker_finish_flag',
+            rewardId: RewardCatalog.vehicleStickerIdForVehicle(
+              VehicleCatalog.motorcycle.id,
+            ),
             filledAt: DateTime(2026, 5, 4, 12),
             activitySessionId: 'activity-1',
           ),
