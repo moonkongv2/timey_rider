@@ -159,20 +159,23 @@ void main() {
   });
 
   test('Reward catalog uses vehicle stickers', () {
-    final ids = RewardCatalog.successStickers
-        .map((reward) => reward.id)
-        .toList();
-    final expectedIds = VehicleCatalog.all
-        .map((vehicle) => RewardCatalog.vehicleStickerIdForVehicle(vehicle.id))
-        .toList();
+    final ids = RewardCatalog.all.map((reward) => reward.id).toList();
+    final expectedIds = VehicleCatalog.all.map((vehicle) {
+      return RewardCatalog.vehicleStickerIdForVehicle(vehicle.id);
+    }).toList();
     final motorcycleSticker = RewardCatalog.findVehicleStickerByVehicleId(
       VehicleCatalog.motorcycle.id,
     );
 
+    expect(RewardCatalog.all, hasLength(VehicleCatalog.all.length));
     expect(ids, expectedIds);
     expect(RewardCatalog.successStickers, same(RewardCatalog.all));
     expect(motorcycleSticker, isNotNull);
     expect(motorcycleSticker!.id, 'sticker_vehicle_motorcycle');
+    expect(
+      RewardCatalog.findById(motorcycleSticker.id),
+      same(motorcycleSticker),
+    );
     expect(motorcycleSticker.type, RewardType.sticker);
     expect(motorcycleSticker.emoji, VehicleCatalog.motorcycle.emoji);
     expect(
@@ -188,7 +191,21 @@ void main() {
       '${VehicleCatalog.motorcycle.labelEn} Sticker',
     );
     expect(motorcycleSticker.vehicleId, VehicleCatalog.motorcycle.id);
-    expect(RewardCatalog.findById(motorcycleSticker.id), motorcycleSticker);
+
+    for (final vehicle in VehicleCatalog.all) {
+      final sticker = RewardCatalog.findVehicleStickerByVehicleId(vehicle.id);
+
+      expect(sticker, isNotNull);
+      expect(sticker!.id, 'sticker_vehicle_${vehicle.id}');
+      expect(sticker.imageAssetPath, vehicle.assetPath);
+      expect(sticker.vehicleId, vehicle.id);
+      expect(RewardCatalog.findById(sticker.id), same(sticker));
+    }
+
+    expect(
+      RewardCatalog.findVehicleStickerByVehicleId('unknown_vehicle'),
+      isNull,
+    );
   });
 
   testWidgets('Reward sticker image falls back for missing assets', (
@@ -7619,6 +7636,90 @@ void main() {
       RewardCatalog.vehicleStickerIdForVehicle(VehicleCatalog.fireTruck.id),
     ]);
   });
+
+  test('Incomplete activity awards no vehicle sticker', () async {
+    SharedPreferences.setMockInitialValues({});
+
+    final service = LocalActivityProgressService();
+    final recordedSession = await _recordActivityResult(
+      service,
+      _activityResult(activityCompleted: false),
+      vehicleId: VehicleCatalog.fireTruck.id,
+    );
+    final snapshot = await service.loadSnapshot();
+
+    expect(recordedSession.awardedRewards, isEmpty);
+    expect(recordedSession.entry.rewardIds, isEmpty);
+    expect(snapshot.inventory, isEmpty);
+  });
+
+  test(
+    'Completing same vehicle increments vehicle sticker inventory',
+    () async {
+      SharedPreferences.setMockInitialValues({});
+
+      final service = LocalActivityProgressService();
+      await _recordActivityResult(
+        service,
+        _activityResult(endedAt: DateTime(2026, 5, 4, 12, 10)),
+        vehicleId: VehicleCatalog.fireTruck.id,
+      );
+      await _recordActivityResult(
+        service,
+        _activityResult(endedAt: DateTime(2026, 5, 4, 12, 40)),
+        vehicleId: VehicleCatalog.fireTruck.id,
+      );
+
+      final snapshot = await service.loadSnapshot();
+      final stickerId = RewardCatalog.vehicleStickerIdForVehicle(
+        VehicleCatalog.fireTruck.id,
+      );
+
+      expect(snapshot.inventory, hasLength(1));
+      expect(snapshot.inventory.single.rewardId, stickerId);
+      expect(snapshot.inventory.single.count, 2);
+    },
+  );
+
+  test(
+    'Completing different vehicles creates separate inventory items',
+    () async {
+      SharedPreferences.setMockInitialValues({});
+
+      final service = LocalActivityProgressService();
+      await _recordActivityResult(
+        service,
+        _activityResult(endedAt: DateTime(2026, 5, 4, 12, 10)),
+        vehicleId: VehicleCatalog.fireTruck.id,
+      );
+      await _recordActivityResult(
+        service,
+        _activityResult(endedAt: DateTime(2026, 5, 4, 12, 40)),
+        vehicleId: VehicleCatalog.policeCar.id,
+      );
+
+      final snapshot = await service.loadSnapshot();
+      final inventoryByRewardId = {
+        for (final item in snapshot.inventory) item.rewardId: item.count,
+      };
+
+      expect(snapshot.inventory, hasLength(2));
+      expect(
+        inventoryByRewardId,
+        containsPair(
+          RewardCatalog.vehicleStickerIdForVehicle(VehicleCatalog.fireTruck.id),
+          1,
+        ),
+      );
+      expect(
+        inventoryByRewardId,
+        containsPair(
+          RewardCatalog.vehicleStickerIdForVehicle(VehicleCatalog.policeCar.id),
+          1,
+        ),
+      );
+    },
+  );
 
   test(
     'Completed overtime activity awards the selected vehicle sticker',
