@@ -46,6 +46,7 @@ import 'package:timey_rider/services/local_settings_service.dart';
 import 'package:timey_rider/services/motivation_audio_service.dart';
 import 'package:timey_rider/services/orientation_service.dart';
 import 'package:timey_rider/services/screen_awake_service.dart';
+import 'package:timey_rider/theme/app_colors.dart';
 import 'package:timey_rider/utils/motivation_video_schedule.dart'
     as motivation_schedule;
 import 'package:timey_rider/widgets/app/app_bouncy_button.dart';
@@ -285,6 +286,50 @@ void main() {
       tester.getSize(find.byKey(const ValueKey('rewardSticker24Locked'))),
       const Size.square(24),
     );
+  });
+
+  testWidgets('Locked reward sticker image renders as a silhouette', (
+    tester,
+  ) async {
+    final reward = RewardCatalog.findVehicleStickerByVehicleId(
+      VehicleCatalog.fireTruck.id,
+    )!;
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Column(
+          children: [
+            RewardStickerImage(
+              key: const ValueKey('unlockedVehicleSticker'),
+              reward: reward,
+            ),
+            RewardStickerImage(
+              key: const ValueKey('lockedVehicleSticker'),
+              reward: reward,
+              locked: true,
+            ),
+          ],
+        ),
+      ),
+    );
+
+    final unlockedImage = tester.widget<Image>(
+      find.descendant(
+        of: find.byKey(const ValueKey('unlockedVehicleSticker')),
+        matching: find.byType(Image),
+      ),
+    );
+    final lockedImage = tester.widget<Image>(
+      find.descendant(
+        of: find.byKey(const ValueKey('lockedVehicleSticker')),
+        matching: find.byType(Image),
+      ),
+    );
+
+    expect(unlockedImage.color, isNull);
+    expect(unlockedImage.colorBlendMode, isNull);
+    expect(lockedImage.color, AppColors.textMuted.withValues(alpha: 0.82));
+    expect(lockedImage.colorBlendMode, BlendMode.srcIn);
   });
 
   testWidgets('Sticker collection shows localized vehicle sticker names', (

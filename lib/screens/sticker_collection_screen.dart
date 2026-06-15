@@ -97,7 +97,7 @@ class _StickerCard extends StatelessWidget {
               semanticLabel: _isCollected
                   ? stickerName
                   : texts.rewards.uncollectedSemanticLabel,
-              size: 72,
+              size: 85,
               locked: !_isCollected,
             ),
             const SizedBox(height: AppSpacing.md),
