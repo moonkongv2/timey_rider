@@ -363,5 +363,4 @@ abstract interface class RewardTextSet {
   String rewardGoalSlotSemanticLabel(int slotNumber, String rewardName);
   String rewardGoalReadyAt(String dateLabel);
   String rewardGoalRedeemedAt(String dateLabel);
-  String name(String rewardId);
 }

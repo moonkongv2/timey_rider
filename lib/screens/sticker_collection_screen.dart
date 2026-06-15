@@ -81,7 +81,9 @@ class _StickerCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
     final texts = AppTexts.of(context);
-    final stickerName = texts.rewards.name(sticker.id);
+    final stickerName = sticker.labelForLanguage(
+      Localizations.localeOf(context).languageCode,
+    );
 
     return Card(
       color: _isCollected ? AppColors.white : AppColors.cream,

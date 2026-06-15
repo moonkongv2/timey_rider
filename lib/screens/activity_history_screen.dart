@@ -598,6 +598,7 @@ class _RewardRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final texts = AppTexts.of(context);
+    final languageCode = Localizations.localeOf(context).languageCode;
     final rewards = rewardIds
         .map(RewardCatalog.findById)
         .whereType<RewardDefinition>()
@@ -618,7 +619,10 @@ class _RewardRow extends StatelessWidget {
       runSpacing: AppSpacing.sm,
       children: [
         for (final reward in rewards)
-          _RewardPill(reward: reward, label: texts.rewards.name(reward.id)),
+          _RewardPill(
+            reward: reward,
+            label: reward.labelForLanguage(languageCode),
+          ),
       ],
     );
   }

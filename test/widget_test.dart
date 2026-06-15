@@ -33,6 +33,7 @@ import 'package:timey_rider/screens/activity_history_screen.dart';
 import 'package:timey_rider/screens/reward_goal_screen.dart';
 import 'package:timey_rider/screens/result_screen.dart';
 import 'package:timey_rider/screens/settings_screen.dart';
+import 'package:timey_rider/screens/sticker_collection_screen.dart';
 import 'package:timey_rider/screens/timer_screen.dart';
 import 'package:timey_rider/screens/user_guide_screen.dart';
 import 'package:timey_rider/services/active_activity_timer_session_store.dart';
@@ -208,6 +209,30 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('?'), findsOneWidget);
+  });
+
+  testWidgets('Sticker collection shows localized vehicle sticker names', (
+    tester,
+  ) async {
+    SharedPreferences.setMockInitialValues({});
+    final service = LocalActivityProgressService();
+    await _recordActivityResult(
+      service,
+      _activityResult(),
+      vehicleId: VehicleCatalog.fireTruck.id,
+    );
+
+    await tester.pumpWidget(
+      MaterialApp(
+        locale: const Locale('en'),
+        localizationsDelegates: GlobalMaterialLocalizations.delegates,
+        supportedLocales: AppTexts.supportedLocales,
+        home: StickerCollectionScreen(activityProgressService: service),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('Fire truck Sticker'), findsOneWidget);
   });
 
   test('Activity marker course slots fall back for invalid selected ids', () {

@@ -1,6 +1,5 @@
 // ignore_for_file: annotate_overrides
 
-import '../../models/reward_item.dart';
 import '../text_sets.dart';
 
 class RewardTexts implements RewardTextSet {
@@ -56,8 +55,4 @@ class RewardTexts implements RewardTextSet {
       '$slotNumber번째 보상칸, $rewardName';
   String rewardGoalReadyAt(String dateLabel) => '완료: $dateLabel';
   String rewardGoalRedeemedAt(String dateLabel) => '지급: $dateLabel';
-
-  String name(String rewardId) {
-    return RewardCatalog.findById(rewardId)?.labelForLanguage('ko') ?? rewardId;
-  }
 }

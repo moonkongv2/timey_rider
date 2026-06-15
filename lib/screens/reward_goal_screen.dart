@@ -954,7 +954,9 @@ class _RewardGoalSlotTile extends StatelessWidget {
     final slot = this.slot;
     final reward = slot == null ? null : RewardCatalog.findById(slot.rewardId);
     final texts = AppTexts.of(context);
-    final rewardName = reward == null ? null : texts.rewards.name(reward.id);
+    final rewardName = reward?.labelForLanguage(
+      Localizations.localeOf(context).languageCode,
+    );
 
     return Semantics(
       label: rewardName == null

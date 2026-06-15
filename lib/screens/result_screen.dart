@@ -1272,8 +1272,9 @@ class _RewardBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final texts = AppTexts.of(context);
-    final rewardName = texts.rewards.name(reward.id);
+    final rewardName = reward.labelForLanguage(
+      Localizations.localeOf(context).languageCode,
+    );
 
     if (isCompact) {
       return SizedBox(
