@@ -4523,6 +4523,69 @@ void main() {
     },
   );
 
+  testWidgets(
+    'Vehicle selection card limits custom avatar size in selected preview',
+    (tester) async {
+      final avatarFile = _createTemporaryAvatarImage();
+
+      await tester.pumpWidget(
+        MaterialApp(
+          locale: const Locale('ko'),
+          home: Scaffold(
+            body: SizedBox(
+              width: 420,
+              child: VehicleSelectionCard(
+                title: '차량 선택',
+                selectedVehicleId: 'fire_truck',
+                onVehicleSelected: (_) {},
+                showSelectedPreview: true,
+                showChoices: false,
+                avatar: VehicleAvatarPresentation(
+                  mode: AvatarImageMode.custom,
+                  imagePath: avatarFile.path,
+                  scale: 1.25,
+                  offsetX: 0.07,
+                  offsetY: -0.03,
+                  rotationDegrees: 5.0,
+                ),
+                avatarImageBuilder: (context, imagePath) {
+                  return const ColoredBox(
+                    key: ValueKey('avatarCompositeOverlayImage'),
+                    color: Colors.pink,
+                  );
+                },
+              ),
+            ),
+          ),
+        ),
+      );
+
+      expect(
+        find.byKey(const ValueKey('selectedVehiclePreview')),
+        findsOneWidget,
+      );
+      expect(
+        find.byKey(const ValueKey('avatarCompositeOverlayImage')),
+        findsOneWidget,
+      );
+      expect(
+        find.byWidgetPredicate((widget) {
+          return widget is AvatarCompositePreview &&
+              widget.vehicle.id == 'fire_truck' &&
+              widget.size == 96.0 &&
+              widget.avatarScale == 1.25 &&
+              widget.avatarOffsetX == 0.07 &&
+              widget.avatarOffsetY == -0.03 &&
+              widget.avatarRotationDegrees == 5.0;
+        }),
+        findsOneWidget,
+      );
+
+      await tester.pumpWidget(const SizedBox.shrink());
+      await tester.pump();
+    },
+  );
+
   testWidgets('Selected vehicle on home is saved to preferences', (
     tester,
   ) async {

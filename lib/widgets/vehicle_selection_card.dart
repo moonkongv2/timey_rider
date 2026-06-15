@@ -181,6 +181,7 @@ class _SelectedVehiclePreview extends StatelessWidget {
     final vehicleLabel = vehicle.labelForLanguage(
       Localizations.localeOf(context).languageCode,
     );
+    final previewImageSize = avatar.isCustom ? 96.0 : 120.0;
 
     return Semantics(
       label: vehicleLabel,
@@ -197,11 +198,11 @@ class _SelectedVehiclePreview extends StatelessWidget {
           width: double.infinity,
           child: Center(
             child: SizedBox(
-              width: 148,
-              height: 104,
+              width: previewImageSize,
+              height: previewImageSize,
               child: _VehicleChoiceImage(
                 vehicle: vehicle,
-                size: 120,
+                size: previewImageSize,
                 avatar: avatar,
                 avatarImageBuilder: avatarImageBuilder,
               ),
