@@ -1988,6 +1988,66 @@ void main() {
     expect(progressService.loadSnapshotCallCount, 1);
   });
 
+  testWidgets('Home paused active timer resume card does not tick', (
+    tester,
+  ) async {
+    SharedPreferences.setMockInitialValues({});
+    addTearDown(() async {
+      await const ActiveActivityTimerSessionStore().clear();
+    });
+    var now = DateTime(2026, 6, 10, 8);
+    await const ActiveActivityTimerSessionStore().save(
+      ActiveActivityTimerSession(
+        sessionId: 'paused-session',
+        startedAt: now.subtract(const Duration(minutes: 10)),
+        config: ActivityTimerConfig.defaults().copyWith(
+          childName: '지율',
+          duration: const Duration(minutes: 25),
+        ),
+        state: ActiveActivityTimerSessionState.paused,
+        pausedAt: now.subtract(const Duration(minutes: 2)),
+      ),
+    );
+
+    await tester.pumpWidget(
+      MaterialApp(
+        locale: const Locale('ko'),
+        supportedLocales: const [Locale('ko'), Locale('en')],
+        localizationsDelegates: const [
+          GlobalMaterialLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+        ],
+        home: HomeScreen(
+          config: ActivityTimerConfig.defaults().copyWith(childName: '지율'),
+          activityProgressService: LocalActivityProgressService(),
+          onConfigChanged: (_) {},
+          now: () => now,
+        ),
+      ),
+    );
+    await tester.pump();
+
+    final activeTimerCard = find.byKey(const ValueKey('activeTimerResumeCard'));
+    String remainingText() {
+      return tester
+          .widget<Text>(
+            find.descendant(
+              of: activeTimerCard,
+              matching: find.textContaining('남은 시간'),
+            ),
+          )
+          .data!;
+    }
+
+    final initialRemainingText = remainingText();
+
+    now = now.add(const Duration(seconds: 2));
+    await tester.pump(const Duration(seconds: 2));
+
+    expect(remainingText(), initialRemainingText);
+  });
+
   testWidgets('Home screen shows finished copy for arrived active sessions', (
     tester,
   ) async {

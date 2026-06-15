@@ -77,8 +77,7 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
   late Future<ActiveActivityTimerSession?> _activeSessionFuture;
   late Future<List<ActivityTimerPreset>> _favoriteTimerPresetsFuture;
   late Future<ActivityProgressSnapshot> _progressSnapshotFuture;
-  ActiveActivityTimerSession? _activeSession;
-  Timer? _activeSessionTicker;
+  bool _isRouteVisible = true;
   final Map<String, bool> _customAvatarFileExistsByPath = {};
   String? _selectedVehicleCustomAvatarPath;
   bool _selectedVehicleCustomAvatarExists = false;
@@ -107,8 +106,11 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
     }
   }
 
-  void _refreshHomeData() {
+  void _refreshHomeData({bool? isRouteVisible}) {
     setState(() {
+      if (isRouteVisible != null) {
+        _isRouteVisible = isRouteVisible;
+      }
       _activeSessionFuture = _loadActiveSession();
       _progressSnapshotFuture = widget.activityProgressService.loadSnapshot();
     });
@@ -128,10 +130,6 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
       await widget.activeSessionStore.clear();
       session = null;
     }
-    if (mounted) {
-      _activeSession = session;
-      _updateActiveSessionTicker(session);
-    }
     return session;
   }
 
@@ -142,42 +140,6 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
           .where((preset) => preset.isFavorite)
           .take(LocalSavedTimerPresetService.maxFavoritePresets),
     );
-  }
-
-  void _updateActiveSessionTicker(ActiveActivityTimerSession? session) {
-    if (session?.state == ActiveActivityTimerSessionState.running &&
-        _remainingForActiveSession(session!, now: _now()) > Duration.zero) {
-      _activeSessionTicker ??= Timer.periodic(
-        const Duration(seconds: 1),
-        _handleActiveSessionTick,
-      );
-      return;
-    }
-
-    _stopActiveSessionTicker();
-  }
-
-  void _handleActiveSessionTick(Timer timer) {
-    final session = _activeSession;
-    if (!mounted || session == null) {
-      timer.cancel();
-      if (identical(_activeSessionTicker, timer)) {
-        _activeSessionTicker = null;
-      }
-      return;
-    }
-
-    if (session.state != ActiveActivityTimerSessionState.running ||
-        _remainingForActiveSession(session, now: _now()) <= Duration.zero) {
-      _stopActiveSessionTicker();
-    }
-
-    setState(() {});
-  }
-
-  void _stopActiveSessionTicker() {
-    _activeSessionTicker?.cancel();
-    _activeSessionTicker = null;
   }
 
   @override
@@ -191,19 +153,23 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
 
   @override
   void dispose() {
-    _stopActiveSessionTicker();
     appRouteObserver.unsubscribe(this);
     super.dispose();
   }
 
   @override
   void didPushNext() {
-    _stopActiveSessionTicker();
+    if (!_isRouteVisible) {
+      return;
+    }
+    setState(() {
+      _isRouteVisible = false;
+    });
   }
 
   @override
   void didPopNext() {
-    _refreshHomeData();
+    _refreshHomeData(isRouteVisible: true);
   }
 
   void _updateConfig(ActivityTimerConfig config) {
@@ -612,15 +578,10 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
 
                     return Padding(
                       padding: const EdgeInsets.only(bottom: AppSpacing.xl),
-                      child: _ActiveTimerResumeCard(
-                        remaining: _remainingForActiveSession(
-                          activeSession,
-                          now: _now(),
-                        ),
-                        hasArrived: _hasActiveSessionArrived(
-                          activeSession,
-                          now: _now(),
-                        ),
+                      child: _ActiveTimerResumeCardContainer(
+                        session: activeSession,
+                        now: _now,
+                        isRouteVisible: _isRouteVisible,
                         onPressed: () => _resumeActiveTimer(activeSession),
                         onCancel: _cancelActiveTimer,
                       ),
@@ -938,6 +899,97 @@ Duration _remainingForActiveSession(
   final remaining =
       session.duration - (elapsed.isNegative ? Duration.zero : elapsed);
   return remaining.isNegative ? Duration.zero : remaining;
+}
+
+class _ActiveTimerResumeCardContainer extends StatefulWidget {
+  const _ActiveTimerResumeCardContainer({
+    required this.session,
+    required this.now,
+    required this.isRouteVisible,
+    required this.onPressed,
+    required this.onCancel,
+  });
+
+  final ActiveActivityTimerSession session;
+  final DateTime Function() now;
+  final bool isRouteVisible;
+  final VoidCallback onPressed;
+  final VoidCallback onCancel;
+
+  @override
+  State<_ActiveTimerResumeCardContainer> createState() =>
+      _ActiveTimerResumeCardContainerState();
+}
+
+class _ActiveTimerResumeCardContainerState
+    extends State<_ActiveTimerResumeCardContainer> {
+  Timer? _ticker;
+
+  @override
+  void initState() {
+    super.initState();
+    _syncTicker();
+  }
+
+  @override
+  void didUpdateWidget(covariant _ActiveTimerResumeCardContainer oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.session != widget.session ||
+        oldWidget.isRouteVisible != widget.isRouteVisible ||
+        oldWidget.now != widget.now) {
+      _syncTicker();
+    }
+  }
+
+  @override
+  void dispose() {
+    _stopTicker();
+    super.dispose();
+  }
+
+  bool get _shouldTick {
+    return widget.isRouteVisible &&
+        widget.session.state == ActiveActivityTimerSessionState.running &&
+        _remainingForActiveSession(widget.session, now: widget.now()) >
+            Duration.zero;
+  }
+
+  void _syncTicker() {
+    if (_shouldTick) {
+      _ticker ??= Timer.periodic(const Duration(seconds: 1), _handleTick);
+      return;
+    }
+
+    _stopTicker();
+  }
+
+  void _handleTick(Timer timer) {
+    if (!mounted) {
+      timer.cancel();
+      return;
+    }
+
+    if (!_shouldTick) {
+      _stopTicker();
+    }
+
+    setState(() {});
+  }
+
+  void _stopTicker() {
+    _ticker?.cancel();
+    _ticker = null;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return _ActiveTimerResumeCard(
+      remaining: _remainingForActiveSession(widget.session, now: widget.now()),
+      hasArrived: _hasActiveSessionArrived(widget.session, now: widget.now()),
+      onPressed: widget.onPressed,
+      onCancel: widget.onCancel,
+    );
+  }
 }
 
 class _ActiveTimerResumeCard extends StatelessWidget {
