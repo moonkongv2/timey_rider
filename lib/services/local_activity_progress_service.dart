@@ -557,9 +557,13 @@ class LocalActivityProgressService {
 
     final items = <T>[];
     for (final rawItem in rawItems) {
-      final decoded = jsonDecode(rawItem);
-      if (decoded is Map) {
-        items.add(fromJson(Map<String, Object?>.from(decoded)));
+      try {
+        final decoded = jsonDecode(rawItem);
+        if (decoded is Map) {
+          items.add(fromJson(Map<String, Object?>.from(decoded)));
+        }
+      } catch (_) {
+        continue;
       }
     }
     return items;

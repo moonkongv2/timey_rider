@@ -7651,6 +7651,83 @@ void main() {
     expect(historyJson.containsKey('mealCompleted'), isFalse);
   });
 
+  test('Local activity progress skips malformed history items', () async {
+    final startedAt = DateTime(2026, 5, 4, 12);
+    final endedAt = DateTime(2026, 5, 4, 12, 20);
+    final validHistory = <String>[
+      jsonEncode({
+        'id': 'valid-1',
+        'activityId': 'brushing',
+        'startedAt': startedAt.toIso8601String(),
+        'endedAt': endedAt.toIso8601String(),
+        'targetMs': const Duration(minutes: 20).inMilliseconds,
+        'actualMs': const Duration(minutes: 20).inMilliseconds,
+        'completedBeforeEnd': false,
+        'completionStatus': ActivityCompletionStatus.completedAtEnd.name,
+        'rewardIds': [RewardCatalog.finishFlagStickerId],
+        'selectedMarkerIds': ['top_teeth'],
+      }),
+      'not-json',
+      jsonEncode(['not', 'a', 'map']),
+      jsonEncode({'id': 'broken'}),
+      jsonEncode({
+        'id': 'valid-2',
+        'activityId': 'play',
+        'startedAt': startedAt.toIso8601String(),
+        'endedAt': endedAt.toIso8601String(),
+        'targetMs': const Duration(minutes: 10).inMilliseconds,
+        'actualMs': const Duration(minutes: 11).inMilliseconds,
+        'completedBeforeEnd': false,
+        'completionStatus': ActivityCompletionStatus.completedAfterEnd.name,
+        'rewardIds': <String>[],
+        'selectedMarkerIds': ['bottom_teeth'],
+      }),
+    ];
+    SharedPreferences.setMockInitialValues({'activityHistory': validHistory});
+
+    final snapshot = await LocalActivityProgressService().loadSnapshot();
+
+    expect(snapshot.history.map((entry) => entry.id), ['valid-1', 'valid-2']);
+    expect(snapshot.history.first.rewardIds, [
+      RewardCatalog.finishFlagStickerId,
+    ]);
+    expect(snapshot.history.first.selectedMarkerIds, ['top_teeth']);
+    expect(snapshot.history.last.activityId, 'play');
+    expect(snapshot.history.last.selectedMarkerIds, ['bottom_teeth']);
+  });
+
+  test('Local activity progress skips malformed inventory items', () async {
+    final acquiredAt = DateTime(2026, 5, 4, 12);
+    final validInventory = <String>[
+      jsonEncode({
+        'rewardId': RewardCatalog.finishFlagStickerId,
+        'acquiredAt': acquiredAt.toIso8601String(),
+        'count': 2,
+      }),
+      'not-json',
+      jsonEncode('not-a-map'),
+      jsonEncode({'rewardId': RewardCatalog.twinkleStarStickerId}),
+      jsonEncode({
+        'rewardId': RewardCatalog.sparklyTeethStickerId,
+        'acquiredAt': acquiredAt
+            .add(const Duration(minutes: 1))
+            .toIso8601String(),
+        'count': 1,
+      }),
+    ];
+    SharedPreferences.setMockInitialValues({
+      'activityRewardInventory': validInventory,
+    });
+
+    final snapshot = await LocalActivityProgressService().loadSnapshot();
+
+    expect(snapshot.inventory.map((item) => item.rewardId), [
+      RewardCatalog.finishFlagStickerId,
+      RewardCatalog.sparklyTeethStickerId,
+    ]);
+    expect(snapshot.inventory.map((item) => item.count), [2, 1]);
+  });
+
   test('Deleting activity history removes only the saved record', () async {
     SharedPreferences.setMockInitialValues({});
 
