@@ -89,7 +89,7 @@ assets/
 - Timey Rider logo: the home header uses `assets/images/timey_rider_logo.png` with a text fallback if the asset cannot load.
 - Onboarding illustrations: add card images under `assets/images/onboarding/`; the vehicle choice card uses existing vehicle chip assets.
 - Activity marker image assets: add optional marker images under `assets/images/markers/` when emoji-only markers are not enough.
-- Routine-themed stickers: add image assets for routine reward IDs such as `sticker_sparkly_teeth`, `sticker_book_buddy`, `sticker_cleanup_champ`, `sticker_happy_clock`, and `sticker_rocket`.
+- Vehicle stickers: reward stickers reuse the standalone vehicle image assets in `assets/images/`.
 
 ## Tech Stack
 
@@ -184,7 +184,7 @@ lib/
 assets/
   audio/motivation/                  # Locale-based shared motivation voice clips
   fonts/                             # Cal Sans font
-  images/                            # Vehicles, stickers, markers, result fallbacks
+  images/                            # Vehicles, markers, result fallbacks
   icons/                             # Launcher icon source assets
   videos/                            # Splash and result media
   videos/motivation/                 # Vehicle-specific silent motivation videos
