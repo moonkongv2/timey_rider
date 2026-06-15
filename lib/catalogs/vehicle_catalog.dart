@@ -194,12 +194,12 @@ abstract final class VehicleCatalog {
 
   static const all = [
     motorcycle,
+    supercar,
     fireTruck,
     policeCar,
     excavator,
     airplane,
     bus,
-    supercar,
     train,
     tRex,
     shark,

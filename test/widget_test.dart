@@ -169,6 +169,10 @@ void main() {
     );
 
     expect(RewardCatalog.all, hasLength(VehicleCatalog.all.length));
+    expect(VehicleCatalog.all.take(2).map((vehicle) => vehicle.id), [
+      VehicleCatalog.motorcycle.id,
+      VehicleCatalog.supercar.id,
+    ]);
     expect(ids, expectedIds);
     expect(RewardCatalog.successStickers, same(RewardCatalog.all));
     expect(motorcycleSticker, isNotNull);
