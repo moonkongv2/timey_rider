@@ -78,12 +78,17 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
   late Future<List<ActivityTimerPreset>> _favoriteTimerPresetsFuture;
   ActiveActivityTimerSession? _activeSession;
   Timer? _activeSessionTicker;
+  final Map<String, bool> _customAvatarFileExistsByPath = {};
+  String? _selectedVehicleCustomAvatarPath;
+  bool _selectedVehicleCustomAvatarExists = false;
+  int _customAvatarFileCheckRequestId = 0;
 
   @override
   void initState() {
     super.initState();
     _activeSessionFuture = _loadActiveSession();
     _favoriteTimerPresetsFuture = _loadFavoriteTimerPresets();
+    _syncSelectedVehicleCustomAvatarExists(notify: false);
   }
 
   @override
@@ -91,6 +96,7 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.config != widget.config) {
       _config = widget.config;
+      _syncSelectedVehicleCustomAvatarExists(notify: false);
     }
     if (oldWidget.activeSessionStore != widget.activeSessionStore) {
       _refreshProgressSnapshot();
@@ -199,7 +205,76 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
     setState(() {
       _config = config;
     });
+    _syncSelectedVehicleCustomAvatarExists();
     widget.onConfigChanged(config);
+  }
+
+  String? _selectedVehicleCustomAvatarPathForConfig(
+    ActivityTimerConfig config,
+  ) {
+    final selectedVehicleAvatar = config.avatarPresentationForVehicle(
+      config.vehicleId,
+    );
+    if (!selectedVehicleAvatar.isCustom) {
+      return null;
+    }
+
+    final imagePath = selectedVehicleAvatar.imagePath?.trim();
+    return imagePath == null || imagePath.isEmpty ? null : imagePath;
+  }
+
+  void _syncSelectedVehicleCustomAvatarExists({bool notify = true}) {
+    final selectedPath = _selectedVehicleCustomAvatarPathForConfig(_config);
+    final cachedExists = selectedPath == null
+        ? false
+        : _customAvatarFileExistsByPath[selectedPath] ?? false;
+    final shouldUpdateState =
+        _selectedVehicleCustomAvatarPath != selectedPath ||
+        _selectedVehicleCustomAvatarExists != cachedExists;
+    final requestId = ++_customAvatarFileCheckRequestId;
+
+    void updateSelectedAvatarState() {
+      _selectedVehicleCustomAvatarPath = selectedPath;
+      _selectedVehicleCustomAvatarExists = cachedExists;
+    }
+
+    if (notify && shouldUpdateState && mounted) {
+      setState(updateSelectedAvatarState);
+    } else {
+      updateSelectedAvatarState();
+    }
+
+    if (selectedPath != null) {
+      _resolveSelectedVehicleCustomAvatarExists(selectedPath, requestId);
+    }
+  }
+
+  Future<void> _resolveSelectedVehicleCustomAvatarExists(
+    String path,
+    int requestId,
+  ) async {
+    bool exists;
+    try {
+      exists = await File(path).exists();
+    } catch (_) {
+      exists = false;
+    }
+
+    if (!mounted ||
+        requestId != _customAvatarFileCheckRequestId ||
+        path != _selectedVehicleCustomAvatarPath) {
+      return;
+    }
+
+    if (_customAvatarFileExistsByPath[path] == exists &&
+        _selectedVehicleCustomAvatarExists == exists) {
+      return;
+    }
+
+    setState(() {
+      _customAvatarFileExistsByPath[path] = exists;
+      _selectedVehicleCustomAvatarExists = exists;
+    });
   }
 
   void _updateTimerRuntimeConfig(ActivityTimerConfig config) {
@@ -461,11 +536,14 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
     final selectedVehicleAvatar = _config.avatarPresentationForVehicle(
       selectedVehicle.id,
     );
-    final selectedVehicleAvatarImagePath = selectedVehicleAvatar.imagePath;
+    final selectedVehicleAvatarImagePath =
+        _selectedVehicleCustomAvatarPathForConfig(_config);
     final isUsingCustomAvatar =
         selectedVehicleAvatar.isCustom &&
         selectedVehicleAvatarImagePath != null &&
-        File(selectedVehicleAvatarImagePath).existsSync();
+        selectedVehicleAvatar.imagePath == selectedVehicleAvatarImagePath &&
+        _selectedVehicleCustomAvatarPath == selectedVehicleAvatarImagePath &&
+        _selectedVehicleCustomAvatarExists;
     final avatarStateText = isUsingCustomAvatar
         ? texts.home.avatarInlineCustomState
         : texts.home.avatarInlineDefaultState;

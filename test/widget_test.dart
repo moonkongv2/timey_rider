@@ -3328,7 +3328,7 @@ void main() {
         ),
       ),
     );
-    await tester.pump();
+    await _pumpHomeAvatarFileCheck(tester);
 
     expect(find.text('오늘의 미션'), findsOneWidget);
     expect(find.text('오늘의 빠방'), findsOneWidget);
@@ -3350,11 +3350,49 @@ void main() {
     await tester.pump();
   });
 
+  testWidgets(
+    'Home screen falls back to default avatar state when file is missing',
+    (tester) async {
+      SharedPreferences.setMockInitialValues({});
+
+      await tester.pumpWidget(
+        MaterialApp(
+          locale: const Locale('ko'),
+          supportedLocales: const [Locale('ko'), Locale('en')],
+          localizationsDelegates: const [
+            GlobalMaterialLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+          ],
+          home: HomeScreen(
+            config: ActivityTimerConfig.defaults().copyWith(
+              childName: '지율',
+              avatarMode: AvatarImageMode.custom,
+              customAvatarImagePath: '/missing/avatar.png',
+              customAvatarVehicleId: 'motorcycle',
+            ),
+            activityProgressService: LocalActivityProgressService(),
+            onConfigChanged: (_) {},
+          ),
+        ),
+      );
+      await _pumpHomeAvatarFileCheck(tester);
+
+      expect(find.text('기본 얼굴 사용 중'), findsOneWidget);
+      expect(find.text('만들기'), findsOneWidget);
+      expect(find.text('아이 얼굴 탑승 중'), findsNothing);
+
+      await tester.pumpWidget(const SizedBox.shrink());
+      await tester.pump();
+    },
+  );
+
   testWidgets('Home screen shows saved avatar only on its vehicle choice', (
     tester,
   ) async {
     SharedPreferences.setMockInitialValues({});
     final avatarFile = _createTemporaryAvatarImage();
+    ActivityTimerConfig? changedConfig;
 
     await tester.pumpWidget(
       MaterialApp(
@@ -3374,7 +3412,7 @@ void main() {
             customAvatarVehicleId: 'police_car',
           ),
           activityProgressService: LocalActivityProgressService(),
-          onConfigChanged: (_) {},
+          onConfigChanged: (config) => changedConfig = config,
           avatarImageBuilder: (context, imagePath) {
             return const ColoredBox(
               key: ValueKey('avatarCompositeOverlayImage'),
@@ -3384,8 +3422,10 @@ void main() {
         ),
       ),
     );
-    await tester.pump();
+    await _pumpHomeAvatarFileCheck(tester);
 
+    expect(find.text('기본 얼굴 사용 중'), findsOneWidget);
+    expect(find.text('아이 얼굴 탑승 중'), findsNothing);
     expect(
       find.byKey(const ValueKey('avatarCompositeOverlayImage')),
       findsNothing,
@@ -3407,6 +3447,14 @@ void main() {
       find.byKey(const ValueKey('avatarCompositeOverlayImage')),
       findsOneWidget,
     );
+
+    await tester.tap(_vehicleChoiceFinder('police_car'));
+    await tester.pumpAndSettle();
+    await _pumpHomeAvatarFileCheck(tester);
+
+    expect(changedConfig?.vehicleId, 'police_car');
+    expect(find.text('아이 얼굴 탑승 중'), findsOneWidget);
+    expect(find.text('기본 얼굴 사용 중'), findsNothing);
 
     await tester.pumpWidget(const SizedBox.shrink());
     await tester.pump();
@@ -8504,6 +8552,13 @@ Future<void> _tapVisible(WidgetTester tester, Finder finder) async {
   await tester.ensureVisible(finder);
   await tester.pumpAndSettle();
   await tester.tap(finder);
+}
+
+Future<void> _pumpHomeAvatarFileCheck(WidgetTester tester) async {
+  await tester.runAsync(() async {
+    await Future<void>.delayed(const Duration(milliseconds: 10));
+  });
+  await tester.pump();
 }
 
 Slider _avatarSlider(WidgetTester tester, String keyValue) {
