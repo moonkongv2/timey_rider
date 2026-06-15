@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:math';
 
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -12,7 +11,7 @@ import '../models/reward_goal.dart';
 import '../models/reward_item.dart';
 
 class LocalActivityProgressService {
-  LocalActivityProgressService({Random? random}) : _random = random ?? Random();
+  LocalActivityProgressService();
 
   static const _historyKey = 'activityHistory';
   // Migration fallback: old local keys are read once, then new saves use the
@@ -29,8 +28,6 @@ class LocalActivityProgressService {
   static const _usedRewardGoalsKey = 'activityUsedRewardGoals';
   static const _legacyUsedRewardGoalsKey = 'usedRewardGoals';
   static const maxActiveRewardGoals = 2;
-
-  final Random _random;
 
   Future<ActivityProgressSnapshot> loadSnapshot() async {
     final preferences = await SharedPreferences.getInstance();
@@ -240,8 +237,9 @@ class LocalActivityProgressService {
   }
 
   Future<RecordedActivitySession> recordActivityResult(
-    ActivitySessionResult result,
-  ) async {
+    ActivitySessionResult result, {
+    required String vehicleId,
+  }) async {
     final preferences = await SharedPreferences.getInstance();
     final history = _decodeList(
       preferences.getStringList(_historyKey) ??
@@ -256,7 +254,7 @@ class LocalActivityProgressService {
     final activeRewardGoals = _loadActiveRewardGoals(preferences).toList();
     final earnedRewardGoals = _loadEarnedRewardGoals(preferences).toList();
 
-    final awardedRewards = _selectRewards(result);
+    final awardedRewards = _selectRewards(result, vehicleId: vehicleId);
     final entry = ActivityHistoryEntry(
       id: result.endedAt.microsecondsSinceEpoch.toString(),
       activityId: result.activityId,
@@ -314,7 +312,14 @@ class LocalActivityProgressService {
     );
   }
 
-  List<RewardDefinition> _selectRewards(ActivitySessionResult result) {
+  List<RewardDefinition> _selectRewards(
+    ActivitySessionResult result, {
+    required String vehicleId,
+  }) {
+    if (!result.activityCompleted) {
+      return const [];
+    }
+
     final activity = ActivityCatalog.findById(result.activityId);
     final shouldReceiveSticker =
         result.receiveSticker ??
@@ -324,12 +329,8 @@ class LocalActivityProgressService {
       return const [];
     }
 
-    return [_randomSuccessSticker()];
-  }
-
-  RewardDefinition _randomSuccessSticker() {
-    final stickerIndex = _random.nextInt(RewardCatalog.successStickers.length);
-    return RewardCatalog.successStickers[stickerIndex];
+    final reward = RewardCatalog.findVehicleStickerByVehicleId(vehicleId);
+    return reward == null ? const [] : [reward];
   }
 
   void _addRewardsToInventory(

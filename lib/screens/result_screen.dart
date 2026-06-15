@@ -158,6 +158,7 @@ class _ResultScreenState extends State<ResultScreen> {
     _receiveSticker = receiveSticker;
     _recordedSession = widget.activityProgressService.recordActivityResult(
       result,
+      vehicleId: widget.config.vehicleId,
     );
     if (!receiveSticker) {
       _introFinished = true;

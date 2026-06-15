@@ -798,6 +798,43 @@ void main() {
     expect(snapshot.inventory, isEmpty);
   });
 
+  testWidgets('Result screen records selected vehicle sticker', (tester) async {
+    SharedPreferences.setMockInitialValues({});
+    final service = LocalActivityProgressService();
+    final expectedStickerId = RewardCatalog.vehicleStickerIdForVehicle(
+      VehicleCatalog.fireTruck.id,
+    );
+
+    await tester.pumpWidget(
+      MaterialApp(
+        locale: const Locale('ko'),
+        supportedLocales: const [Locale('ko'), Locale('en')],
+        localizationsDelegates: const [
+          GlobalMaterialLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+        ],
+        home: ResultScreen(
+          result: _activityResult(includeStickerDecision: false),
+          config: ActivityTimerConfig.defaults().copyWith(
+            vehicleId: VehicleCatalog.fireTruck.id,
+          ),
+          activityProgressService: service,
+          onConfigChanged: (_) {},
+        ),
+      ),
+    );
+    await tester.pump();
+
+    await tester.tap(find.byKey(const ValueKey('resultGetStickerButton')));
+    await tester.pump();
+
+    final snapshot = await service.loadSnapshot();
+    expect(snapshot.history.single.rewardIds, [expectedStickerId]);
+    expect(snapshot.inventory.single.rewardId, expectedStickerId);
+    expect(snapshot.inventory.single.count, 1);
+  });
+
   testWidgets('Success result screen uses portrait background after intro', (
     tester,
   ) async {
@@ -7471,11 +7508,12 @@ void main() {
     expect(find.textContaining('Create Timer'), findsWidgets);
   });
 
-  test('Fast activity awards only one random sticker', () async {
+  test('Fast activity awards the selected vehicle sticker', () async {
     SharedPreferences.setMockInitialValues({});
 
     final service = LocalActivityProgressService();
-    final recordedSession = await service.recordActivityResult(
+    final recordedSession = await _recordActivityResult(
+      service,
       _activityResult(
         startedAt: DateTime(2026, 5, 4, 12),
         endedAt: DateTime(2026, 5, 4, 12, 10),
@@ -7483,33 +7521,50 @@ void main() {
         actualDuration: const Duration(minutes: 13),
         completedBeforeEnd: true,
       ),
+      vehicleId: VehicleCatalog.fireTruck.id,
     );
 
     expect(recordedSession.awardedRewards, hasLength(1));
-  });
-
-  test('Completed overtime activity awards a random sticker', () async {
-    SharedPreferences.setMockInitialValues({});
-
-    final service = LocalActivityProgressService();
-    final recordedSession = await service.recordActivityResult(
-      _activityResult(
-        startedAt: DateTime(2026, 5, 4, 12),
-        endedAt: DateTime(2026, 5, 4, 12, 25),
-        targetDuration: const Duration(minutes: 20),
-        actualDuration: const Duration(minutes: 25),
-        completedBeforeEnd: false,
-      ),
+    expect(
+      recordedSession.awardedRewards.single.id,
+      RewardCatalog.vehicleStickerIdForVehicle(VehicleCatalog.fireTruck.id),
     );
-
-    expect(recordedSession.awardedRewards, hasLength(1));
+    expect(recordedSession.entry.rewardIds, [
+      RewardCatalog.vehicleStickerIdForVehicle(VehicleCatalog.fireTruck.id),
+    ]);
   });
+
+  test(
+    'Completed overtime activity awards the selected vehicle sticker',
+    () async {
+      SharedPreferences.setMockInitialValues({});
+
+      final service = LocalActivityProgressService();
+      final recordedSession = await _recordActivityResult(
+        service,
+        _activityResult(
+          startedAt: DateTime(2026, 5, 4, 12),
+          endedAt: DateTime(2026, 5, 4, 12, 25),
+          targetDuration: const Duration(minutes: 20),
+          actualDuration: const Duration(minutes: 25),
+          completedBeforeEnd: false,
+        ),
+      );
+
+      expect(recordedSession.awardedRewards, hasLength(1));
+      expect(
+        recordedSession.awardedRewards.single.vehicleId,
+        VehicleCatalog.motorcycle.id,
+      );
+    },
+  );
 
   test('Activity with disabled rewards does not award stickers', () async {
     SharedPreferences.setMockInitialValues({});
 
     final service = LocalActivityProgressService();
-    final recordedSession = await service.recordActivityResult(
+    final recordedSession = await _recordActivityResult(
+      service,
       _activityResult(activityId: 'play'),
     );
 
@@ -7517,11 +7572,26 @@ void main() {
     expect(recordedSession.entry.activityId, 'play');
   });
 
+  test('Missing selected vehicle sticker does not award stickers', () async {
+    SharedPreferences.setMockInitialValues({});
+
+    final service = LocalActivityProgressService();
+    final recordedSession = await _recordActivityResult(
+      service,
+      _activityResult(),
+      vehicleId: 'missing_vehicle',
+    );
+
+    expect(recordedSession.awardedRewards, isEmpty);
+    expect(recordedSession.entry.rewardIds, isEmpty);
+  });
+
   test('Time-ended activity does not award stickers', () async {
     SharedPreferences.setMockInitialValues({});
 
     final service = LocalActivityProgressService();
-    final recordedSession = await service.recordActivityResult(
+    final recordedSession = await _recordActivityResult(
+      service,
       _activityResult(completionStatus: ActivityCompletionStatus.timeEnded),
     );
 
@@ -7533,7 +7603,8 @@ void main() {
     SharedPreferences.setMockInitialValues({});
 
     final service = LocalActivityProgressService();
-    final recordedSession = await service.recordActivityResult(
+    final recordedSession = await _recordActivityResult(
+      service,
       _activityResult(
         activityId: 'play',
         completionStatus: ActivityCompletionStatus.timeEnded,
@@ -7550,7 +7621,8 @@ void main() {
     SharedPreferences.setMockInitialValues({});
 
     final service = LocalActivityProgressService();
-    final recordedSession = await service.recordActivityResult(
+    final recordedSession = await _recordActivityResult(
+      service,
       _activityResult(
         activityId: 'play',
         completionStatus: ActivityCompletionStatus.timeEnded,
@@ -7569,7 +7641,8 @@ void main() {
     SharedPreferences.setMockInitialValues({});
 
     final service = LocalActivityProgressService();
-    final recordedSession = await service.recordActivityResult(
+    final recordedSession = await _recordActivityResult(
+      service,
       _activityResult(
         activityId: 'brushing',
         completionStatus: ActivityCompletionStatus.completedAtEnd,
@@ -7592,7 +7665,8 @@ void main() {
     SharedPreferences.setMockInitialValues({});
 
     final service = LocalActivityProgressService();
-    final recordedSession = await service.recordActivityResult(
+    final recordedSession = await _recordActivityResult(
+      service,
       _activityResult(
         startedAt: DateTime(2026, 5, 4, 12),
         endedAt: DateTime(2026, 5, 4, 12, 25),
@@ -7616,7 +7690,8 @@ void main() {
     SharedPreferences.setMockInitialValues({});
 
     final service = LocalActivityProgressService();
-    final recordedSession = await service.recordActivityResult(
+    final recordedSession = await _recordActivityResult(
+      service,
       _activityResult(
         actualDuration: const Duration(minutes: 20),
         completedBeforeEnd: false,
@@ -7639,7 +7714,8 @@ void main() {
     SharedPreferences.setMockInitialValues({});
 
     final service = LocalActivityProgressService();
-    final recordedSession = await service.recordActivityResult(
+    final recordedSession = await _recordActivityResult(
+      service,
       _activityResult(selectedMarkerIds: const ['top_teeth', 'bottom_teeth']),
     );
     final snapshot = await service.loadSnapshot();
@@ -7765,7 +7841,8 @@ void main() {
       requiredStickerCount: 2,
       rewardText: '아이스크림',
     );
-    final recordedSession = await service.recordActivityResult(
+    final recordedSession = await _recordActivityResult(
+      service,
       _activityResult(),
     );
     final beforeDelete = await service.loadSnapshot();
@@ -7803,7 +7880,7 @@ void main() {
       SharedPreferences.setMockInitialValues({});
 
       final service = LocalActivityProgressService();
-      await service.recordActivityResult(_activityResult());
+      await _recordActivityResult(service, _activityResult());
 
       final deleted = await service.deleteActivityHistoryEntry('missing');
       final snapshot = await service.loadSnapshot();
@@ -7824,7 +7901,8 @@ void main() {
         rewardText: '아이스크림',
       );
 
-      final recordedSession = await service.recordActivityResult(
+      final recordedSession = await _recordActivityResult(
+        service,
         _activityResult(),
       );
       final snapshot = await service.loadSnapshot();
@@ -7845,7 +7923,8 @@ void main() {
     );
     await service.createRewardGoal(requiredStickerCount: 7, rewardText: '딸기');
 
-    final recordedSession = await service.recordActivityResult(
+    final recordedSession = await _recordActivityResult(
+      service,
       _activityResult(),
     );
     final snapshot = await service.loadSnapshot();
@@ -7866,7 +7945,8 @@ void main() {
         rewardText: '아이스크림',
       );
 
-      final recordedSession = await service.recordActivityResult(
+      final recordedSession = await _recordActivityResult(
+        service,
         _activityResult(
           completionStatus: ActivityCompletionStatus.completedAtEnd,
           receiveSticker: false,
@@ -7890,7 +7970,8 @@ void main() {
       rewardText: '아이스크림',
     );
 
-    final recordedSession = await service.recordActivityResult(
+    final recordedSession = await _recordActivityResult(
+      service,
       _activityResult(
         activityId: 'play',
         completionStatus: ActivityCompletionStatus.timeEnded,
@@ -8005,7 +8086,8 @@ void main() {
       rewardText: '아이스크림',
     );
 
-    final recordedSession = await service.recordActivityResult(
+    final recordedSession = await _recordActivityResult(
+      service,
       _activityResult(
         targetDuration: const Duration(minutes: 20),
         actualDuration: const Duration(minutes: 13),
@@ -8026,7 +8108,8 @@ void main() {
       rewardText: '아이스크림',
     );
 
-    final recordedSession = await service.recordActivityResult(
+    final recordedSession = await _recordActivityResult(
+      service,
       _activityResult(activityCompleted: false),
     );
     final snapshot = await service.loadSnapshot();
@@ -8044,10 +8127,12 @@ void main() {
       rewardText: '아이스크림',
     );
 
-    await service.recordActivityResult(
+    await _recordActivityResult(
+      service,
       _activityResult(endedAt: DateTime(2026, 5, 4, 12)),
     );
-    final recordedSession = await service.recordActivityResult(
+    final recordedSession = await _recordActivityResult(
+      service,
       _activityResult(endedAt: DateTime(2026, 5, 4, 13)),
     );
     final snapshot = await service.loadSnapshot();
@@ -8066,7 +8151,7 @@ void main() {
       requiredStickerCount: 1,
       rewardText: '아이스크림',
     );
-    await service.recordActivityResult(_activityResult());
+    await _recordActivityResult(service, _activityResult());
 
     final usedGoal = await service.useEarnedRewardGoal();
     final snapshot = await service.loadSnapshot();
@@ -8110,8 +8195,9 @@ void main() {
         requiredStickerCount: 5,
         rewardText: '아이스크림',
       );
-      await service.recordActivityResult(_activityResult());
-      await service.recordActivityResult(
+      await _recordActivityResult(service, _activityResult());
+      await _recordActivityResult(
+        service,
         _activityResult(endedAt: DateTime(2026, 5, 4, 13)),
       );
 
@@ -8155,7 +8241,8 @@ void main() {
       rewardText: '아이스크림',
     );
 
-    final recordedSession = await service.recordActivityResult(
+    final recordedSession = await _recordActivityResult(
+      service,
       _activityResult(),
     );
     final snapshot = await service.loadSnapshot();
@@ -8193,7 +8280,8 @@ void main() {
   ) async {
     SharedPreferences.setMockInitialValues({});
     final service = LocalActivityProgressService();
-    await service.recordActivityResult(
+    await _recordActivityResult(
+      service,
       _activityResult(
         targetDuration: const Duration(minutes: 20),
         actualDuration: const Duration(minutes: 25),
@@ -8228,7 +8316,8 @@ void main() {
   ) async {
     SharedPreferences.setMockInitialValues({});
     final service = LocalActivityProgressService();
-    await service.recordActivityResult(
+    await _recordActivityResult(
+      service,
       _activityResult(
         targetDuration: const Duration(minutes: 20),
         actualDuration: const Duration(minutes: 25),
@@ -8290,7 +8379,7 @@ void main() {
       requiredStickerCount: 1,
       rewardText: 'ice cream',
     );
-    await service.recordActivityResult(_activityResult());
+    await _recordActivityResult(service, _activityResult());
 
     await tester.pumpWidget(
       MaterialApp(
@@ -8351,7 +8440,8 @@ void main() {
   ) async {
     SharedPreferences.setMockInitialValues({});
     final service = LocalActivityProgressService();
-    await service.recordActivityResult(
+    await _recordActivityResult(
+      service,
       _activityResult(
         startedAt: DateTime(2026, 5, 4, 12),
         targetDuration: const Duration(minutes: 20),
@@ -8388,7 +8478,8 @@ void main() {
   ) async {
     SharedPreferences.setMockInitialValues({});
     final service = LocalActivityProgressService();
-    final recordedSession = await service.recordActivityResult(
+    final recordedSession = await _recordActivityResult(
+      service,
       _activityResult(
         startedAt: DateTime(2026, 5, 4, 12),
         targetDuration: const Duration(minutes: 20),
@@ -8430,7 +8521,8 @@ void main() {
   testWidgets('Activity history delete dialog can be canceled', (tester) async {
     SharedPreferences.setMockInitialValues({});
     final service = LocalActivityProgressService();
-    final recordedSession = await service.recordActivityResult(
+    final recordedSession = await _recordActivityResult(
+      service,
       _activityResult(
         startedAt: DateTime(2026, 5, 4, 12),
         targetDuration: const Duration(minutes: 20),
@@ -8466,7 +8558,8 @@ void main() {
   ) async {
     SharedPreferences.setMockInitialValues({});
     final service = LocalActivityProgressService();
-    await service.recordActivityResult(
+    await _recordActivityResult(
+      service,
       _activityResult(
         startedAt: DateTime(2026, 5, 4, 12),
         targetDuration: const Duration(minutes: 20),
@@ -8502,7 +8595,8 @@ void main() {
   ) async {
     SharedPreferences.setMockInitialValues({});
     final service = LocalActivityProgressService();
-    await service.recordActivityResult(
+    await _recordActivityResult(
+      service,
       _activityResult(
         startedAt: DateTime(2026, 5, 4, 12),
         targetDuration: const Duration(minutes: 20),
@@ -8568,6 +8662,14 @@ ActivitySessionResult _activityResult({
                   ))
         : null,
   );
+}
+
+Future<RecordedActivitySession> _recordActivityResult(
+  LocalActivityProgressService service,
+  ActivitySessionResult result, {
+  String vehicleId = 'motorcycle',
+}) {
+  return service.recordActivityResult(result, vehicleId: vehicleId);
 }
 
 Future<ui.Image> _createTestFootprintImage() async {
