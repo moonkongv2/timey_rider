@@ -211,6 +211,65 @@ void main() {
     expect(find.text('?'), findsOneWidget);
   });
 
+  testWidgets('Reward sticker image keeps framed outer sizes', (tester) async {
+    const missingAssetReward = RewardDefinition(
+      id: 'missing_reward_asset',
+      type: RewardType.sticker,
+      emoji: '?',
+      imageAssetPath: 'assets/images/missing_reward_asset.png',
+      labelKo: '없는 스티커',
+      labelEn: 'Missing Sticker',
+    );
+
+    await tester.pumpWidget(
+      const MaterialApp(
+        home: Column(
+          children: [
+            RewardStickerImage(
+              key: ValueKey('rewardSticker78'),
+              reward: missingAssetReward,
+              size: 78,
+            ),
+            RewardStickerImage(
+              key: ValueKey('rewardSticker48'),
+              reward: missingAssetReward,
+              size: 48,
+            ),
+            RewardStickerImage(
+              key: ValueKey('rewardSticker28'),
+              reward: missingAssetReward,
+              size: 28,
+            ),
+            RewardStickerImage(
+              key: ValueKey('rewardSticker24Locked'),
+              reward: missingAssetReward,
+              size: 24,
+              locked: true,
+            ),
+          ],
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(
+      tester.getSize(find.byKey(const ValueKey('rewardSticker78'))),
+      const Size.square(78),
+    );
+    expect(
+      tester.getSize(find.byKey(const ValueKey('rewardSticker48'))),
+      const Size.square(48),
+    );
+    expect(
+      tester.getSize(find.byKey(const ValueKey('rewardSticker28'))),
+      const Size.square(28),
+    );
+    expect(
+      tester.getSize(find.byKey(const ValueKey('rewardSticker24Locked'))),
+      const Size.square(24),
+    );
+  });
+
   testWidgets('Sticker collection shows localized vehicle sticker names', (
     tester,
   ) async {
