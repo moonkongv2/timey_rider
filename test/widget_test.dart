@@ -19,6 +19,7 @@ import 'package:timey_rider/l10n/app_texts.dart';
 import 'package:timey_rider/main.dart' as app;
 import 'package:timey_rider/models/active_activity_timer_session.dart';
 import 'package:timey_rider/models/activity_completion_status.dart';
+import 'package:timey_rider/models/activity_progress_snapshot.dart';
 import 'package:timey_rider/models/activity_session_result.dart';
 import 'package:timey_rider/models/activity_timer_config.dart';
 import 'package:timey_rider/models/activity_timer_preset.dart';
@@ -1936,6 +1937,55 @@ void main() {
     await tester.pump(const Duration(seconds: 2));
 
     expect(remainingText(), isNot(initialRemainingText));
+  });
+
+  testWidgets('Home active timer tick does not reload progress snapshot', (
+    tester,
+  ) async {
+    SharedPreferences.setMockInitialValues({});
+    addTearDown(() async {
+      await const ActiveActivityTimerSessionStore().clear();
+    });
+    var now = DateTime(2026, 6, 10, 8);
+    await const ActiveActivityTimerSessionStore().save(
+      ActiveActivityTimerSession(
+        sessionId: 'active-session',
+        startedAt: now.subtract(const Duration(minutes: 5)),
+        config: ActivityTimerConfig.defaults().copyWith(
+          childName: '지율',
+          duration: const Duration(minutes: 25),
+        ),
+        state: ActiveActivityTimerSessionState.running,
+      ),
+    );
+    final progressService = _CountingActivityProgressService();
+
+    await tester.pumpWidget(
+      MaterialApp(
+        locale: const Locale('ko'),
+        supportedLocales: const [Locale('ko'), Locale('en')],
+        localizationsDelegates: const [
+          GlobalMaterialLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+        ],
+        home: HomeScreen(
+          config: ActivityTimerConfig.defaults().copyWith(childName: '지율'),
+          activityProgressService: progressService,
+          onConfigChanged: (_) {},
+          now: () => now,
+        ),
+      ),
+    );
+    await tester.pump();
+
+    expect(progressService.loadSnapshotCallCount, 1);
+
+    now = now.add(const Duration(seconds: 2));
+    await tester.pump(const Duration(seconds: 2));
+
+    expect(find.byKey(const ValueKey('activeTimerResumeCard')), findsOneWidget);
+    expect(progressService.loadSnapshotCallCount, 1);
   });
 
   testWidgets('Home screen shows finished copy for arrived active sessions', (
@@ -8559,6 +8609,16 @@ Future<void> _pumpHomeAvatarFileCheck(WidgetTester tester) async {
     await Future<void>.delayed(const Duration(milliseconds: 10));
   });
   await tester.pump();
+}
+
+class _CountingActivityProgressService extends LocalActivityProgressService {
+  int loadSnapshotCallCount = 0;
+
+  @override
+  Future<ActivityProgressSnapshot> loadSnapshot() {
+    loadSnapshotCallCount += 1;
+    return super.loadSnapshot();
+  }
 }
 
 Slider _avatarSlider(WidgetTester tester, String keyValue) {

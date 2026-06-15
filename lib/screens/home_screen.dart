@@ -76,6 +76,7 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
   late ActivityTimerConfig _config = widget.config;
   late Future<ActiveActivityTimerSession?> _activeSessionFuture;
   late Future<List<ActivityTimerPreset>> _favoriteTimerPresetsFuture;
+  late Future<ActivityProgressSnapshot> _progressSnapshotFuture;
   ActiveActivityTimerSession? _activeSession;
   Timer? _activeSessionTicker;
   final Map<String, bool> _customAvatarFileExistsByPath = {};
@@ -88,6 +89,7 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
     super.initState();
     _activeSessionFuture = _loadActiveSession();
     _favoriteTimerPresetsFuture = _loadFavoriteTimerPresets();
+    _progressSnapshotFuture = widget.activityProgressService.loadSnapshot();
     _syncSelectedVehicleCustomAvatarExists(notify: false);
   }
 
@@ -98,14 +100,17 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
       _config = widget.config;
       _syncSelectedVehicleCustomAvatarExists(notify: false);
     }
-    if (oldWidget.activeSessionStore != widget.activeSessionStore) {
-      _refreshProgressSnapshot();
+    if (oldWidget.activeSessionStore != widget.activeSessionStore ||
+        oldWidget.activityProgressService != widget.activityProgressService) {
+      _activeSessionFuture = _loadActiveSession();
+      _progressSnapshotFuture = widget.activityProgressService.loadSnapshot();
     }
   }
 
-  void _refreshProgressSnapshot() {
+  void _refreshHomeData() {
     setState(() {
       _activeSessionFuture = _loadActiveSession();
+      _progressSnapshotFuture = widget.activityProgressService.loadSnapshot();
     });
   }
 
@@ -198,7 +203,7 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
 
   @override
   void didPopNext() {
-    _refreshProgressSnapshot();
+    _refreshHomeData();
   }
 
   void _updateConfig(ActivityTimerConfig config) {
@@ -331,7 +336,7 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
       ),
     );
     if (mounted) {
-      _refreshProgressSnapshot();
+      _refreshHomeData();
     }
   }
 
@@ -353,7 +358,7 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
       return false;
     }
     if (activeSession == null) {
-      _refreshProgressSnapshot();
+      _refreshHomeData();
       return true;
     }
 
@@ -390,7 +395,7 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
       case _ActiveTimerStartChoice.startNew:
         await widget.activeSessionStore.clear();
         if (mounted) {
-          _refreshProgressSnapshot();
+          _refreshHomeData();
         }
         return mounted;
       case _ActiveTimerStartChoice.cancel:
@@ -412,7 +417,7 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
       ),
     );
     if (mounted) {
-      _refreshProgressSnapshot();
+      _refreshHomeData();
     }
   }
 
@@ -444,7 +449,7 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
 
     await widget.activeSessionStore.clear();
     if (mounted) {
-      _refreshProgressSnapshot();
+      _refreshHomeData();
     }
   }
 
@@ -667,7 +672,7 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
             ),
             const SizedBox(height: AppSpacing.xxl),
             FutureBuilder<ActivityProgressSnapshot>(
-              future: widget.activityProgressService.loadSnapshot(),
+              future: _progressSnapshotFuture,
               builder: (context, snapshot) {
                 return _ProgressSummary(
                   childName: childName,
@@ -692,7 +697,7 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
                       ),
                     );
                     if (context.mounted) {
-                      _refreshProgressSnapshot();
+                      _refreshHomeData();
                     }
                   },
                   onOpenStickers: () {
