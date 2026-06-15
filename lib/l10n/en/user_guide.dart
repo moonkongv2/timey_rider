@@ -7,7 +7,7 @@ class EnUserGuideTexts implements UserGuideTextSet {
 
   String get title => 'Parent Guide';
   String get subtitle =>
-      'Review activity missions, cheer videos, and sticker rules.';
+      'Review activity missions, cheer videos, and vehicle sticker rules.';
   String get introTitle => 'Parent Guide';
   String get introBody =>
       'Use this guide to understand Timey Rider activity missions and app rules before starting a ride. This guide is for parents and other caregivers helping with daily routines.';
@@ -40,33 +40,33 @@ class EnUserGuideTexts implements UserGuideTextSet {
     'Auto: the app previews and uses picture markers that fit the selected activity.',
     'Choose: pick up to 5 picture markers before starting.',
     'Only manually chosen picture markers are saved to activity records.',
-    'Markers do not decide completion or sticker results.',
+    'Markers do not decide completion or vehicle sticker results.',
   ];
 
   List<String> get motivationItems => const [
     'Motivation videos are short encouragement clips during the timer.',
-    'They do not decide stickers or results.',
+    'They do not decide vehicle stickers or results.',
     'Short timers may skip some milestones to avoid overlap.',
     'Longer timers or custom interval mode may use time-based scheduling.',
     'You can choose 3, 5, or 10 minute intervals.',
     'If sound is off, the video may appear without voice playback.',
   ];
 
-  String get completionTitle => 'Completion and stickers';
+  String get completionTitle => 'Completion and vehicle stickers';
   List<String> get completionItems => const [
     'When you confirm the activity is done, it is recorded as complete.',
-    'After the timer ends, check together and choose whether to get a sticker.',
-    'Choose Get Sticker to receive a random success sticker.',
-    'Choose No Sticker This Time to save the record and guide the next timer choice.',
+    'After the timer ends, check together and choose whether to get a vehicle sticker.',
+    'Choose Get Vehicle Sticker to receive the selected vehicle sticker.',
+    'Choose No Vehicle Sticker This Time to save the record and guide the next timer choice.',
     'The child-facing result keeps a next-try tone instead of harsh failure wording.',
   ];
 
   String get historyRewardsTitle => 'Activity history and reward goals';
   List<String> get historyRewardsItems => const [
     'Activity history shows activity name, target time, actual time, and completion status.',
-    'Earned stickers and manually chosen picture markers can appear with the record.',
-    'Earned stickers collect in the sticker collection screen.',
-    'If reward goals are active, received stickers can fill goal slots.',
+    'Earned vehicle stickers and manually chosen picture markers can appear with the record.',
+    'Earned vehicle stickers collect in the vehicle sticker collection screen.',
+    'If reward goals are active, received vehicle stickers can fill goal slots.',
   ];
 
   String get exitResumeTitle => 'Leaving and resuming during a timer';
@@ -77,7 +77,7 @@ class EnUserGuideTexts implements UserGuideTextSet {
   ];
 
   List<String> get guardianTipsItems => const [
-    'Praise the routine attempt first, not only the sticker.',
+    'Praise the routine attempt first, not only the vehicle sticker.',
     'Set the default timer duration to a pace that fits the child instead of making the goal too short.',
     'Treat needs-more-time results as notes for the next try, not as punishment.',
   ];

@@ -46,10 +46,10 @@ class HomeTexts implements HomeTextSet {
   String get timerBuilderStartButton => '출발';
   String get timerBuilderSelectedMarkerEmpty => '마커를 1~5개 선택해요.';
   String get activitySummaryLabel => '미션';
-  String get stickerKindSummaryLabel => '종류';
-  String get stickerSummaryLabel => '스티커';
+  String get stickerKindSummaryLabel => '차량 종류';
+  String get stickerSummaryLabel => '차량 스티커';
   String get noActivityHistory => '아직 저장된 활동 기록이 없어.';
-  String get openStickerCollection => '스티커 보관함 보기';
+  String get openStickerCollection => '차량 스티커 보관함 보기';
   String get avatarCtaSubtitle => '아이 얼굴을 빠방에 태워보세요.';
   String get avatarCtaButton => '만들기';
   String get avatarCtaEditButton => '편집';

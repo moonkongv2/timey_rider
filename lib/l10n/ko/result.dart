@@ -10,8 +10,8 @@ class ResultTexts implements ResultTextSet {
   String get recordSaved => '오늘의 기록을 저장했어';
   String get stickerChoiceTitle => '미션을 마쳤나요?';
   String get stickerChoiceMessage => '아이와 함께 미션을 확인한 뒤 선택해 주세요.';
-  String get getStickerButton => '스티커 받기';
-  String get skipStickerButton => '이번엔 스티커 받지 않기';
+  String get getStickerButton => '차량 스티커 받기';
+  String get skipStickerButton => '이번엔 차량 스티커 받지 않기';
 
   String stickerChoiceTitleForStatus(ActivityCompletionStatus status) {
     return switch (status) {
@@ -22,7 +22,7 @@ class ResultTexts implements ResultTextSet {
 
   String stickerChoiceMessageForStatus(ActivityCompletionStatus status) {
     return switch (status) {
-      ActivityCompletionStatus.timeEnded => '아이와 함께 돌아본 뒤 스티커를 받을지 선택해 주세요.',
+      ActivityCompletionStatus.timeEnded => '아이와 함께 돌아본 뒤 차량 스티커를 받을지 선택해 주세요.',
       _ => stickerChoiceMessage,
     };
   }
@@ -79,7 +79,7 @@ class ResultTexts implements ResultTextSet {
       ActivityCompletionStatus.completedBeforeEnd ||
       ActivityCompletionStatus.completedAtEnd ||
       ActivityCompletionStatus.completedAfterEnd =>
-        '스티커보다 해낸 과정과 노력을 먼저 칭찬해 주세요.',
+        '차량 스티커보다 해낸 과정과 노력을 먼저 칭찬해 주세요.',
       ActivityCompletionStatus.timeEnded => '시간이 끝난 것도 자연스러운 루틴의 일부예요.',
       ActivityCompletionStatus.needsMoreTime ||
       ActivityCompletionStatus.canceled => '아쉬운 결과도 다음 조절을 위한 기록이에요.',
@@ -132,16 +132,16 @@ class ResultTexts implements ResultTextSet {
       ActivityCompletionStatus.completedBeforeEnd ||
       ActivityCompletionStatus.completedAtEnd ||
       ActivityCompletionStatus.completedAfterEnd => const [
-        '스티커 받기를 선택하면 랜덤 성공 스티커 1개를 받아요.',
-        '보상 목표가 있으면 받은 스티커가 목표 칸을 채울 수 있어요.',
+        '차량 스티커 받기를 선택하면 선택한 차량 스티커 1장을 받아요.',
+        '보상 목표가 있으면 받은 차량 스티커가 목표 칸을 채울 수 있어요.',
       ],
       ActivityCompletionStatus.timeEnded => const [
         '시간 종료 활동은 완료된 흐름으로 기록돼요.',
-        '아이와 함께 확인한 뒤 스티커를 받을지 선택해요.',
+        '아이와 함께 확인한 뒤 차량 스티커를 받을지 선택해요.',
       ],
       ActivityCompletionStatus.needsMoreTime ||
       ActivityCompletionStatus.canceled => const [
-        '이번엔 스티커 받지 않기를 선택하면 기록만 남아요.',
+        '이번엔 차량 스티커 받지 않기를 선택하면 기록만 남아요.',
         '미완료는 벌이 아니라 다음 조절을 위한 기록이에요.',
       ],
     };
@@ -156,18 +156,18 @@ class ResultTexts implements ResultTextSet {
       ActivityCompletionStatus.completedAtEnd ||
       ActivityCompletionStatus.completedAfterEnd => const [
         '활동을 마쳤다고 확인되어 완료로 기록돼요.',
-        '스티커 받기를 선택하면 랜덤 성공 스티커 1개를 받아요.',
-        '보상 목표가 있으면 받은 스티커가 목표 칸을 채울 수 있어요.',
+        '차량 스티커 받기를 선택하면 선택한 차량 스티커 1장을 받아요.',
+        '보상 목표가 있으면 받은 차량 스티커가 목표 칸을 채울 수 있어요.',
       ],
       ActivityCompletionStatus.timeEnded => const [
         '정해둔 시간이 끝나 활동이 마무리된 기록이에요.',
         '성공이나 실패를 가르는 결과가 아니라 루틴 흐름을 지키는 기록이에요.',
-        '아이와 함께 확인한 뒤 스티커를 받을지 선택해요.',
+        '아이와 함께 확인한 뒤 차량 스티커를 받을지 선택해요.',
       ],
       ActivityCompletionStatus.needsMoreTime ||
       ActivityCompletionStatus.canceled => const [
         '활동을 마치기에는 시간이 조금 부족했던 기록이에요.',
-        '이번엔 스티커 받지 않기를 선택하면 기록만 남아요.',
+        '이번엔 차량 스티커 받지 않기를 선택하면 기록만 남아요.',
         '미완료는 벌이 아니라 다음 조절을 위한 기록이에요.',
       ],
     };
@@ -183,7 +183,7 @@ class ResultTexts implements ResultTextSet {
       ActivityCompletionStatus.completedAfterEnd => const [
         '끝까지 해보려고 한 게 정말 좋았어.',
         '오늘 미션을 해낸 게 정말 멋져.',
-        '스티커도 좋지만, 해낸 마음이 제일 멋져.',
+        '차량 스티커도 좋지만, 해낸 마음이 제일 멋져.',
       ],
       ActivityCompletionStatus.timeEnded => const [
         '시간이 끝났네. 이제 다음 미션으로 가보자.',
@@ -208,7 +208,7 @@ class ResultTexts implements ResultTextSet {
       ActivityCompletionStatus.completedAfterEnd => const [
         '빨리 해서 잘했어.',
         '다음에도 무조건 성공해야 해.',
-        '스티커 받으려면 더 잘해야지.',
+        '차량 스티커 받으려면 더 잘해야지.',
       ],
       ActivityCompletionStatus.timeEnded => const [
         '시간 끝났으니까 무조건 그만해.',
@@ -219,7 +219,7 @@ class ResultTexts implements ResultTextSet {
       ActivityCompletionStatus.canceled => const [
         '실패했네.',
         '왜 이것밖에 못 했어?',
-        '스티커 못 받았으니까 속상하지?',
+        '차량 스티커 못 받았으니까 속상하지?',
       ],
     };
   }
@@ -234,7 +234,7 @@ class ResultTexts implements ResultTextSet {
       ActivityCompletionStatus.completedAfterEnd => const [
         '너무 급하게 끝낸 것 같다면 다음에는 시간을 조금 늘려도 좋아요.',
         '여유 있게 완료했다면 같은 시간을 반복해 안정감을 만들어 주세요.',
-        '스티커보다 활동 흐름과 시도를 먼저 칭찬해 주세요.',
+        '차량 스티커보다 활동 흐름과 시도를 먼저 칭찬해 주세요.',
       ],
       ActivityCompletionStatus.timeEnded => const [
         '시간 종료가 자연스러운 활동은 같은 시간을 유지해도 좋아요.',

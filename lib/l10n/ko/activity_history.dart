@@ -11,20 +11,20 @@ class ActivityHistoryTexts implements ActivityHistoryTextSet {
   String get emptyBody => '미션 타이머를 마치면 기록이 여기에 쌓여요.';
   String get helpTitle => '활동 기록 안내';
   List<String> get helpBulletItems => const [
-    '활동 기록에는 미션, 목표 시간, 실제 시간, 완료 상태, 받은 스티커가 표시돼요.',
+    '활동 기록에는 미션, 목표 시간, 실제 시간, 완료 상태, 받은 차량 스티커가 표시돼요.',
     '직접 고른 그림 마커가 있으면 기록에 함께 표시돼요.',
     '자동 선택 마커는 도로에만 보이고 기록에는 남지 않아요.',
-    '스티커를 받지 않은 기록은 스티커 받지 않음으로 표시돼요.',
+    '차량 스티커를 받지 않은 기록은 차량 스티커 받지 않음으로 표시돼요.',
   ];
   String get targetTimeLabel => '목표';
   String get actualTimeLabel => '실제';
   String get overrunTimeLabel => '초과';
-  String get rewardLabel => '받은 스티커';
-  String get noRewardLabel => '스티커 받지 않음';
+  String get rewardLabel => '받은 차량 스티커';
+  String get noRewardLabel => '차량 스티커 받지 않음';
   String get selectedMarkerLabel => '고른 마커';
   String get deleteRecordLabel => '활동 기록 삭제';
   String get deleteRecordDialogTitle => '이 활동 기록을 삭제할까요?';
-  String get deleteRecordDialogBody => '기록만 삭제되고 받은 스티커는 유지돼요.';
+  String get deleteRecordDialogBody => '기록만 삭제되고 받은 차량 스티커는 유지돼요.';
   String get deleteRecordConfirmLabel => '삭제';
   String get deleteRecordSuccessMessage => '활동 기록을 삭제했어요.';
 

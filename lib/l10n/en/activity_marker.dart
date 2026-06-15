@@ -11,7 +11,7 @@ class EnActivityMarkerTexts implements ActivityMarkerTextSet {
   String get helpTitle => 'Course marker guide';
   List<String> get helpBodyParagraphs => const [
     'Course markers are small route goals shown during an activity.',
-    'They do not decide completion or sticker results.',
+    'They do not decide completion or vehicle sticker results.',
   ];
   List<String> get helpBulletItems => const [
     'Auto: the app previews and uses picture markers that fit the selected activity.',

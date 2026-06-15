@@ -866,8 +866,8 @@ void main() {
     await tester.pump();
 
     expect(find.text('미션을 마쳤나요?'), findsOneWidget);
-    expect(find.text('스티커 받기'), findsOneWidget);
-    expect(find.text('이번엔 스티커 받지 않기'), findsOneWidget);
+    expect(find.text('차량 스티커 받기'), findsOneWidget);
+    expect(find.text('이번엔 차량 스티커 받지 않기'), findsOneWidget);
     expect((await service.loadSnapshot()).history, isEmpty);
 
     await tester.tap(find.byKey(const ValueKey('resultSkipStickerButton')));
@@ -1011,7 +1011,7 @@ void main() {
     expect(find.text('아이에게 이렇게 말해보세요'), findsWidgets);
     expect(find.text('끝까지 해보려고 한 게 정말 좋았어.'), findsOneWidget);
     expect(find.text('빨리 해서 잘했어.'), findsOneWidget);
-    expect(find.textContaining('스티커 1개'), findsOneWidget);
+    expect(find.textContaining('차량 스티커 1장'), findsOneWidget);
   });
 
   testWidgets('Incomplete result help explains record without sticker', (
@@ -4273,7 +4273,7 @@ void main() {
 
     expect(find.byKey(const ValueKey('userGuideSettingsTile')), findsOneWidget);
     expect(find.text('사용 안내'), findsOneWidget);
-    expect(find.text('활동 미션, 응원 영상, 스티커 규칙을 확인해요.'), findsOneWidget);
+    expect(find.text('활동 미션, 응원 영상, 차량 스티커 규칙을 확인해요.'), findsOneWidget);
 
     await tester.tap(find.byKey(const ValueKey('userGuideSettingsTile')));
     await tester.pumpAndSettle();
@@ -4304,7 +4304,9 @@ void main() {
     expect(find.text('Parent Guide'), findsWidgets);
     expect(find.textContaining('parents and other caregivers'), findsOneWidget);
     expect(
-      find.text('Review activity missions, cheer videos, and sticker rules.'),
+      find.text(
+        'Review activity missions, cheer videos, and vehicle sticker rules.',
+      ),
       findsOneWidget,
     );
     expect(find.text('What is Timey Rider?'), findsOneWidget);
@@ -4366,7 +4368,7 @@ void main() {
     expect(find.textContaining('일부 구간을 건너뛸 수 있어요'), findsOneWidget);
 
     await tester.scrollUntilVisible(
-      find.textContaining('스티커 받기를 선택하면 랜덤 성공 스티커'),
+      find.textContaining('차량 스티커 받기를 선택하면 선택한 차량 스티커'),
       200,
       scrollable: find.byType(Scrollable).first,
     );
@@ -6552,7 +6554,7 @@ void main() {
     expect(find.byType(ResultScreen), findsOneWidget);
     expect(find.byType(AlertDialog), findsNothing);
     expect(find.text('시간이 다 되었어요'), findsOneWidget);
-    expect(find.text('아이와 함께 돌아본 뒤 스티커를 받을지 선택해 주세요.'), findsOneWidget);
+    expect(find.text('아이와 함께 돌아본 뒤 차량 스티커를 받을지 선택해 주세요.'), findsOneWidget);
     expect(
       find.byKey(const ValueKey('resultSkipStickerButton')),
       findsOneWidget,
@@ -8427,7 +8429,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(
-      find.text('최근 기록 20:00 · 조금 더 필요 · 스티커 받지 않음 · 초과 +05:00'),
+      find.text('최근 기록 20:00 · 조금 더 필요 · 차량 스티커 받지 않음 · 초과 +05:00'),
       findsOneWidget,
     );
   });
@@ -8553,7 +8555,7 @@ void main() {
     expect(find.text('25:00'), findsNothing);
     expect(find.text('초과 +05:00'), findsNothing);
     expect(find.text('완료'), findsOneWidget);
-    expect(find.text('받은 스티커'), findsOneWidget);
+    expect(find.text('받은 차량 스티커'), findsOneWidget);
     expect(find.text('고른 마커'), findsNothing);
   });
 
@@ -8591,7 +8593,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('이 활동 기록을 삭제할까요?'), findsOneWidget);
-    expect(find.text('기록만 삭제되고 받은 스티커는 유지돼요.'), findsOneWidget);
+    expect(find.text('기록만 삭제되고 받은 차량 스티커는 유지돼요.'), findsOneWidget);
 
     await tester.tap(find.text('삭제'));
     await tester.pumpAndSettle();
@@ -8701,7 +8703,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('조금 더 필요'), findsOneWidget);
-    expect(find.text('스티커 받지 않음'), findsOneWidget);
+    expect(find.text('차량 스티커 받지 않음'), findsOneWidget);
     expect(find.text('초과 +05:00'), findsOneWidget);
   });
 }

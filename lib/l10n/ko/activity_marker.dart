@@ -11,7 +11,7 @@ class ActivityMarkerTexts implements ActivityMarkerTextSet {
   String get helpTitle => '코스 마커 안내';
   List<String> get helpBodyParagraphs => const [
     '코스 마커는 활동 중 도로 위에 나타나는 작은 목표 표시예요.',
-    '완료 여부나 스티커 판정을 직접 결정하지 않아요.',
+    '완료 여부나 차량 스티커 판정을 직접 결정하지 않아요.',
   ];
   List<String> get helpBulletItems => const [
     '자동: 선택한 활동에 어울리는 그림 마커를 미리 보여주고 사용해요.',

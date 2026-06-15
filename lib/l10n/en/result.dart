@@ -10,8 +10,8 @@ class EnResultTexts implements ResultTextSet {
   String get recordSaved => "Today's record is saved.";
   String get stickerChoiceTitle => 'Mission complete?';
   String get stickerChoiceMessage => 'Check the mission together, then choose.';
-  String get getStickerButton => 'Get Sticker';
-  String get skipStickerButton => 'No Sticker This Time';
+  String get getStickerButton => 'Get Vehicle Sticker';
+  String get skipStickerButton => 'No Vehicle Sticker This Time';
 
   String stickerChoiceTitleForStatus(ActivityCompletionStatus status) {
     return switch (status) {
@@ -23,7 +23,7 @@ class EnResultTexts implements ResultTextSet {
   String stickerChoiceMessageForStatus(ActivityCompletionStatus status) {
     return switch (status) {
       ActivityCompletionStatus.timeEnded =>
-        'Check in together, then choose whether to get a sticker.',
+        'Check in together, then choose whether to get a vehicle sticker.',
       _ => stickerChoiceMessage,
     };
   }
@@ -85,7 +85,7 @@ class EnResultTexts implements ResultTextSet {
       ActivityCompletionStatus.completedBeforeEnd ||
       ActivityCompletionStatus.completedAtEnd ||
       ActivityCompletionStatus.completedAfterEnd =>
-        'Focus on the effort, not just the sticker.',
+        'Focus on the effort, not just the vehicle sticker.',
       ActivityCompletionStatus.timeEnded =>
         'A timer ending can be a normal part of the routine.',
       ActivityCompletionStatus.needsMoreTime ||
@@ -144,16 +144,16 @@ class EnResultTexts implements ResultTextSet {
       ActivityCompletionStatus.completedBeforeEnd ||
       ActivityCompletionStatus.completedAtEnd ||
       ActivityCompletionStatus.completedAfterEnd => const [
-        'Choose Get Sticker to receive one random success sticker.',
-        'If a reward goal is active, the received sticker can fill one goal slot.',
+        'Choose Get Vehicle Sticker to receive one sticker for the selected vehicle.',
+        'If a reward goal is active, the received vehicle sticker can fill one goal slot.',
       ],
       ActivityCompletionStatus.timeEnded => const [
         'A time-ended activity is still recorded as part of the routine.',
-        'Check together, then choose whether to get a sticker.',
+        'Check together, then choose whether to get a vehicle sticker.',
       ],
       ActivityCompletionStatus.needsMoreTime ||
       ActivityCompletionStatus.canceled => const [
-        'Choose No Sticker This Time to save the record without a sticker.',
+        'Choose No Vehicle Sticker This Time to save the record without a sticker.',
         'An incomplete result is a planning clue, not a punishment.',
       ],
     };
@@ -168,18 +168,18 @@ class EnResultTexts implements ResultTextSet {
       ActivityCompletionStatus.completedAtEnd ||
       ActivityCompletionStatus.completedAfterEnd => const [
         'The activity was confirmed finished and recorded as complete.',
-        'Choose Get Sticker to receive one random success sticker.',
-        'If a reward goal is active, the received sticker can fill one goal slot.',
+        'Choose Get Vehicle Sticker to receive one sticker for the selected vehicle.',
+        'If a reward goal is active, the received vehicle sticker can fill one goal slot.',
       ],
       ActivityCompletionStatus.timeEnded => const [
         'The timer reached the end and the activity was recorded.',
         'This is a routine transition, not a pass-or-fail result.',
-        'Check together, then choose whether to get a sticker.',
+        'Check together, then choose whether to get a vehicle sticker.',
       ],
       ActivityCompletionStatus.needsMoreTime ||
       ActivityCompletionStatus.canceled => const [
         'The activity needed a little more time.',
-        'Choose No Sticker This Time to save the record without a sticker.',
+        'Choose No Vehicle Sticker This Time to save the record without a sticker.',
         'Use the record to adjust the next try.',
       ],
     };
@@ -195,7 +195,7 @@ class EnResultTexts implements ResultTextSet {
       ActivityCompletionStatus.completedAfterEnd => const [
         'I liked how you kept trying until the end.',
         'You finished today’s mission.',
-        'The sticker is fun, but your effort matters most.',
+        'The vehicle sticker is fun, but your effort matters most.',
       ],
       ActivityCompletionStatus.timeEnded => const [
         'Time is up. Let’s move to the next mission.',
@@ -221,7 +221,7 @@ class EnResultTexts implements ResultTextSet {
       ActivityCompletionStatus.completedAfterEnd => const [
         'Good job being fast.',
         'You have to succeed every time.',
-        'You need to do better if you want a sticker.',
+        'You need to do better if you want a vehicle sticker.',
       ],
       ActivityCompletionStatus.timeEnded => const [
         'Time is up, so you have to stop now.',
@@ -232,7 +232,7 @@ class EnResultTexts implements ResultTextSet {
       ActivityCompletionStatus.canceled => const [
         'You failed.',
         'Why did you only do this much?',
-        'You did not get a sticker because you did not do well.',
+        'You did not get a vehicle sticker because you did not do well.',
       ],
     };
   }
@@ -247,7 +247,7 @@ class EnResultTexts implements ResultTextSet {
       ActivityCompletionStatus.completedAfterEnd => const [
         'If the activity felt rushed, try a slightly longer timer next time.',
         'If your child seemed comfortable, repeat the same duration to build confidence.',
-        'Praise the routine flow and effort more than the sticker.',
+        'Praise the routine flow and effort more than the vehicle sticker.',
       ],
       ActivityCompletionStatus.timeEnded => const [
         'For activities that end by time, keeping the same duration may be enough.',

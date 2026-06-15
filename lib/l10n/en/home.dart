@@ -51,10 +51,10 @@ class EnHomeTexts implements HomeTextSet {
   String get timerBuilderStartButton => 'Start';
   String get timerBuilderSelectedMarkerEmpty => 'Choose 1-5 markers.';
   String get activitySummaryLabel => 'Missions';
-  String get stickerKindSummaryLabel => 'Kinds';
-  String get stickerSummaryLabel => 'Stickers';
+  String get stickerKindSummaryLabel => 'Vehicle kinds';
+  String get stickerSummaryLabel => 'Vehicle stickers';
   String get noActivityHistory => 'No activity history yet.';
-  String get openStickerCollection => 'View Sticker Collection';
+  String get openStickerCollection => 'View Vehicle Sticker Collection';
   String get avatarCtaSubtitle => "Put your child's face on the ride.";
   String get avatarCtaButton => 'Create';
   String get avatarCtaEditButton => 'Edit';

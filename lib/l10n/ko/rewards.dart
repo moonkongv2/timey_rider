@@ -5,16 +5,17 @@ import '../text_sets.dart';
 class RewardTexts implements RewardTextSet {
   const RewardTexts();
 
-  String get collectionTitle => '스티커 보관함';
+  String get collectionTitle => '차량 스티커 보관함';
   String get lockedSticker => '아직 미획득';
   String get lockedStatus => '잠금';
   String get uncollectedSemanticLabel => '아직 미획득';
   String get rewardGoalTitle => '보상 약속';
   String get createRewardGoal => '보상 약속 만들기';
   String get rewardGoalEmptyTitle => '새 보상 약속을 만들어 주세요';
-  String get rewardGoalEmptyBody => '활동 미션을 완료할 때마다 보상판이 한 칸씩 채워져요.';
+  String get rewardGoalEmptyBody =>
+      '활동 미션을 완료할 때마다 선택한 차량 스티커가 쌓이고 보상판이 한 칸씩 채워져요.';
   String get rewardGoalRewardFieldLabel => '받을 보상';
-  String get rewardGoalRequiredStickerCountLabel => '필요한 스티커 수';
+  String get rewardGoalRequiredStickerCountLabel => '필요한 차량 스티커 수';
   String get rewardGoalSaveButton => '약속 저장';
   String get rewardGoalReadyMessage => '보상 받을 준비가 됐어요!';
   String get rewardGoalGivenButton => '사용하기';
@@ -47,7 +48,7 @@ class RewardTexts implements RewardTextSet {
       '사용하면 받은 보상 목록에서 사라지고 사용한 보상에 기록돼요.';
   String get confirmUseRewardGoal => '사용하기';
 
-  String stickerCount(int count) => '$count장';
+  String stickerCount(int count) => '차량 스티커 $count장';
   String rewardGoalProgress(int filledCount, int requiredCount) =>
       '$filledCount/$requiredCount';
   String rewardGoalRemaining(int remainingCount) => '$remainingCount칸 남았어요';

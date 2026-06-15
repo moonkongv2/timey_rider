@@ -15,7 +15,7 @@ class SettingsTexts implements SettingsTextSet {
   String get motivationVideoHelpSummary => '동기부여 영상은 타이머 중간에 나오는 짧은 응원이에요.';
   List<String> get motivationVideoHelpBodyParagraphs => const [
     '동기부여 영상은 타이머 중간에 아이의 흐름을 돕기 위해 나오는 짧은 응원 클립이에요.',
-    '스티커나 결과를 결정하지 않아요.',
+    '차량 스티커나 결과를 결정하지 않아요.',
   ];
   List<String> get motivationVideoHelpBulletItems => const [
     '짧은 타이머에서는 영상이 겹치지 않도록 일부 구간을 건너뛸 수 있어요.',
