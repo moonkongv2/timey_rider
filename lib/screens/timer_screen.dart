@@ -989,18 +989,15 @@ class _TimerScreenState extends State<TimerScreen>
                     ],
                   ),
             body: SafeArea(
-              child: Stack(
-                fit: StackFit.expand,
-                children: [
-                  LayoutBuilder(
-                    builder: (context, constraints) {
+              child: LayoutBuilder(
+                builder: (context, constraints) {
                   final isLandscape =
                       constraints.maxWidth > constraints.maxHeight;
                   final reservesCompactControlsSpace =
                       isLandscape &&
                       constraints.maxHeight - AppSpacing.xs - AppSpacing.md <
                           430;
-                  final roadView = RoadView(
+                  final baseRoadView = RoadView(
                     cameraProgress: cameraDisplayProgress,
                     vehicleProgress: vehicleDisplayProgress,
                     vehicle: vehicle,
@@ -1020,6 +1017,44 @@ class _TimerScreenState extends State<TimerScreen>
                         _isFinishDriving ||
                         _controller.state == ActivityTimerState.running,
                     courseDuration: _timerConfig.duration,
+                  );
+                  
+                  final roadView = Stack(
+                    fit: StackFit.expand,
+                    children: [
+                      baseRoadView,
+                      if (previewMessageText != null)
+                        ClipRRect(
+                          borderRadius: AppRadius.hero,
+                          child: Container(
+                            color: Colors.black38,
+                            alignment: Alignment.center,
+                            child: AnimatedSwitcher(
+                              duration: const Duration(milliseconds: 300),
+                              transitionBuilder: (child, animation) => FadeTransition(
+                                opacity: animation,
+                                child: ScaleTransition(scale: animation, child: child),
+                              ),
+                              child: Text(
+                                previewMessageText,
+                                key: ValueKey(previewMessageText),
+                                textAlign: TextAlign.center,
+                                style: const TextStyle(
+                                  color: AppColors.white,
+                                  fontSize: 40,
+                                  fontWeight: FontWeight.w900,
+                                  shadows: [
+                                    Shadow(
+                                      blurRadius: 12,
+                                      color: AppColors.black,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                    ],
                   );
                   final landscapeVehicleLayer = isLandscape
                       ? RoadVehicleLayer(
@@ -1145,39 +1180,7 @@ class _TimerScreenState extends State<TimerScreen>
                   );
                 },
               ),
-              if (previewMessageText != null)
-                IgnorePointer(
-                  child: Container(
-                    color: Colors.black38,
-                    alignment: Alignment.center,
-                    child: AnimatedSwitcher(
-                      duration: const Duration(milliseconds: 300),
-                      transitionBuilder: (child, animation) => FadeTransition(
-                        opacity: animation,
-                        child: ScaleTransition(scale: animation, child: child),
-                      ),
-                      child: Text(
-                        previewMessageText,
-                        key: ValueKey(previewMessageText),
-                        textAlign: TextAlign.center,
-                        style: const TextStyle(
-                          color: AppColors.white,
-                          fontSize: 40,
-                          fontWeight: FontWeight.w900,
-                          shadows: [
-                            Shadow(
-                              blurRadius: 12,
-                              color: AppColors.black,
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-            ],
-          ),
-        ),
+            ),
           ),
         );
       },
