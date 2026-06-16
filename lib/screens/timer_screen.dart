@@ -286,6 +286,9 @@ class _TimerScreenState extends State<TimerScreen>
       );
       _previewController!.addListener(() => setState(() {}));
 
+      await Future.delayed(const Duration(milliseconds: 500));
+      if (!mounted) return;
+
       await _previewController!.forward();
 
       if (!mounted) return;
