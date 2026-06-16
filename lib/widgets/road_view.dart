@@ -100,7 +100,6 @@ class RoadView extends StatelessWidget {
           geometry: geometry,
           progress: clampedCameraProgress,
         );
-        final disableViewportBounding = cameraProgress != vehicleProgress;
         final vehiclePlacement = _roadVehiclePlacementForGeometryProgress(
           geometry: geometry,
           progress: clampedVehicleProgress,
@@ -108,7 +107,6 @@ class RoadView extends StatelessWidget {
           vehicleSize: vehicleSize,
           cameraOffsetY: cameraOffsetY,
           isLandscape: isLandscape,
-          disableViewportBounding: disableViewportBounding,
         );
         final clearProgress = (markerClearProgress ?? clampedVehicleProgress)
             .clamp(0.0, 1.0)
@@ -643,7 +641,6 @@ class RoadVehicleLayer extends StatelessWidget {
             geometry: geometry,
             progress: clampedCameraProgress,
           );
-          final disableViewportBounding = cameraProgress != vehicleProgress;
           final vehiclePlacement = _roadVehiclePlacementForGeometryProgress(
             geometry: geometry,
             progress: clampedVehicleProgress,
@@ -651,7 +648,6 @@ class RoadVehicleLayer extends StatelessWidget {
             vehicleSize: vehicleSize,
             cameraOffsetY: cameraOffsetY,
             isLandscape: isLandscape,
-            disableViewportBounding: disableViewportBounding,
           );
 
           return Stack(
@@ -693,35 +689,47 @@ _RoadVehiclePlacement _roadVehiclePlacementForGeometryProgress({
   required double vehicleSize,
   required double cameraOffsetY,
   required bool isLandscape,
-  bool disableViewportBounding = false,
 }) {
   final isVehicleFacingLeft = roadIsFacingLeftForGeometryProgress(
     geometry,
     progress,
   );
+  
   final roadPosition = roadPointForGeometryProgress(geometry, progress);
-  final viewportRoadPosition = roadPosition - Offset(0, cameraOffsetY);
-  final vehiclePosition =
-      viewportRoadPosition +
-      _vehicleRoadAnchorOffset(
-        vehicle: vehicle,
-        vehicleSize: vehicleSize,
-        isLandscape: isLandscape,
-        isFacingLeft: isVehicleFacingLeft,
-      );
-  final Offset viewportOffset;
-  if (disableViewportBounding) {
-    viewportOffset = Offset(
-      vehiclePosition.dx - (vehicleSize / 2),
-      vehiclePosition.dy - (vehicleSize / 2),
-    );
-  } else {
-    viewportOffset = _boundedVehicleOffset(
-      size: geometry.viewportSize,
-      position: vehiclePosition,
-      vehicleSize: vehicleSize,
-    );
-  }
+  final anchorOffset = _vehicleRoadAnchorOffset(
+    vehicle: vehicle,
+    vehicleSize: vehicleSize,
+    isLandscape: isLandscape,
+    isFacingLeft: isVehicleFacingLeft,
+  );
+
+  // Calculate baseline bounded position (as if camera was at vehicle progress)
+  final baselineCameraOffsetY = roadCameraOffsetForGeometryProgress(
+    geometry: geometry,
+    progress: progress,
+  );
+  final baselineViewportRoadPosition = roadPosition - Offset(0, baselineCameraOffsetY);
+  final baselineVehiclePosition = baselineViewportRoadPosition + anchorOffset;
+  final baselineBoundedOffset = _boundedVehicleOffset(
+    size: geometry.viewportSize,
+    position: baselineVehiclePosition,
+    vehicleSize: vehicleSize,
+  );
+  final baselineRawOffset = Offset(
+    baselineVehiclePosition.dx - (vehicleSize / 2),
+    baselineVehiclePosition.dy - (vehicleSize / 2),
+  );
+  final correction = baselineBoundedOffset - baselineRawOffset;
+  
+  // Calculate actual raw position (with current camera)
+  final actualViewportRoadPosition = roadPosition - Offset(0, cameraOffsetY);
+  final actualVehiclePosition = actualViewportRoadPosition + anchorOffset;
+  final actualRawOffset = Offset(
+    actualVehiclePosition.dx - (vehicleSize / 2),
+    actualVehiclePosition.dy - (vehicleSize / 2),
+  );
+  
+  final viewportOffset = actualRawOffset + correction;
 
   return _RoadVehiclePlacement(
     contentOffset: viewportOffset + Offset(0, cameraOffsetY),
