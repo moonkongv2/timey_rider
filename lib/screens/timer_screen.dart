@@ -923,7 +923,8 @@ class _TimerScreenState extends State<TimerScreen>
                       constraints.maxHeight - AppSpacing.xs - AppSpacing.md <
                           430;
                   final roadView = RoadView(
-                    progress: displayProgress,
+                    cameraProgress: displayProgress,
+                    vehicleProgress: displayProgress,
                     vehicle: vehicle,
                     avatar: vehicleAvatar,
                     motivationVideoAssetPath: _isFinishDriving
@@ -944,7 +945,8 @@ class _TimerScreenState extends State<TimerScreen>
                   );
                   final landscapeVehicleLayer = isLandscape
                       ? RoadVehicleLayer(
-                          progress: displayProgress,
+                          cameraProgress: displayProgress,
+                          vehicleProgress: displayProgress,
                           vehicle: vehicle,
                           avatar: vehicleAvatar,
                           courseDuration: _timerConfig.duration,
