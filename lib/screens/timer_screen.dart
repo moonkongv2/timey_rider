@@ -198,9 +198,11 @@ class _TimerStatusCopy {
 }
 
 class _TimerScreenState extends State<TimerScreen>
-    with WidgetsBindingObserver, SingleTickerProviderStateMixin {
+    with WidgetsBindingObserver, TickerProviderStateMixin {
   late final ActivityTimerController _controller;
   late final AnimationController _finishDriveController;
+  AnimationController? _previewController;
+  bool _isPreviewing = false;
   late final MotivationAudioService _motivationAudioService;
   late final bool _ownsMotivationAudioService;
   late ActivityTimerConfig _timerConfig;
@@ -241,7 +243,7 @@ class _TimerScreenState extends State<TimerScreen>
         now: widget.now,
       );
       _activeSessionId = _createActiveSessionId();
-      _controller.start();
+      _startPreviewSequence();
     } else {
       _timerConfig = restoredSession.config;
       _shownMotivationMilestones.addAll(
@@ -266,6 +268,34 @@ class _TimerScreenState extends State<TimerScreen>
 
   String _createActiveSessionId() {
     return (widget.now ?? DateTime.now)().microsecondsSinceEpoch.toString();
+  }
+
+  Future<void> _startPreviewSequence() async {
+    if (!mounted) return;
+    setState(() {
+      _isPreviewing = true;
+    });
+
+    _previewController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 2000),
+    );
+    _previewController!.addListener(() => setState(() {}));
+
+    await _previewController!.forward();
+
+    if (!mounted) return;
+    await Future.delayed(const Duration(seconds: 1));
+
+    if (!mounted) return;
+    _previewController!.duration = const Duration(milliseconds: 1000);
+    await _previewController!.reverse();
+
+    if (!mounted) return;
+    setState(() {
+      _isPreviewing = false;
+    });
+    _controller.start();
   }
 
   @override
@@ -295,6 +325,7 @@ class _TimerScreenState extends State<TimerScreen>
     if (_screenAwakeEnabled) {
       unawaited(widget.screenAwakeService.setEnabled(false));
     }
+    _previewController?.dispose();
     _finishDriveController
       ..removeStatusListener(_handleFinishDriveStatusChanged)
       ..dispose();
@@ -844,7 +875,11 @@ class _TimerScreenState extends State<TimerScreen>
     final texts = AppTexts.of(context);
 
     return AnimatedBuilder(
-      animation: Listenable.merge([_controller, _finishDriveController]),
+      animation: Listenable.merge([
+        _controller, 
+        _finishDriveController,
+        if (_previewController != null) _previewController!,
+      ]),
       builder: (context, _) {
         final activity = _activity;
         final vehicle = VehicleCatalog.findById(_timerConfig.vehicleId);
@@ -865,6 +900,11 @@ class _TimerScreenState extends State<TimerScreen>
                   .clamp(0.0, 1.0)
                   .toDouble()
             : timerProgress;
+            
+        final cameraDisplayProgress = _isPreviewing
+            ? (_previewController?.value ?? 0.0).clamp(0.0, 1.0).toDouble()
+            : displayProgress;
+        final vehicleDisplayProgress = _isPreviewing ? 0.0 : displayProgress;
         final statusCopy = _timerStatusCopy(
           texts.timer,
           _controller.state,
@@ -923,8 +963,8 @@ class _TimerScreenState extends State<TimerScreen>
                       constraints.maxHeight - AppSpacing.xs - AppSpacing.md <
                           430;
                   final roadView = RoadView(
-                    cameraProgress: displayProgress,
-                    vehicleProgress: displayProgress,
+                    cameraProgress: cameraDisplayProgress,
+                    vehicleProgress: vehicleDisplayProgress,
                     vehicle: vehicle,
                     avatar: vehicleAvatar,
                     motivationVideoAssetPath: _isFinishDriving
@@ -937,7 +977,7 @@ class _TimerScreenState extends State<TimerScreen>
                     showVehicle: !isLandscape,
                     showMotivationVideo: !isLandscape,
                     markers: courseMarkers,
-                    markerClearProgress: displayProgress,
+                    markerClearProgress: vehicleDisplayProgress,
                     isRoadMotionActive:
                         _isFinishDriving ||
                         _controller.state == ActivityTimerState.running,
@@ -945,8 +985,8 @@ class _TimerScreenState extends State<TimerScreen>
                   );
                   final landscapeVehicleLayer = isLandscape
                       ? RoadVehicleLayer(
-                          cameraProgress: displayProgress,
-                          vehicleProgress: displayProgress,
+                          cameraProgress: cameraDisplayProgress,
+                          vehicleProgress: vehicleDisplayProgress,
                           vehicle: vehicle,
                           avatar: vehicleAvatar,
                           courseDuration: _timerConfig.duration,
