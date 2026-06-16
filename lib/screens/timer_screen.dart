@@ -272,25 +272,29 @@ class _TimerScreenState extends State<TimerScreen>
   }
 
   Future<void> _startPreviewSequence() async {
+    final needsPreview = _timerConfig.duration.inMinutes > 5;
+
     if (!mounted) return;
     setState(() {
       _isPreviewing = true;
     });
 
-    _previewController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 2000),
-    );
-    _previewController!.addListener(() => setState(() {}));
+    if (needsPreview) {
+      _previewController = AnimationController(
+        vsync: this,
+        duration: const Duration(milliseconds: 2000),
+      );
+      _previewController!.addListener(() => setState(() {}));
 
-    await _previewController!.forward();
+      await _previewController!.forward();
 
-    if (!mounted) return;
-    await Future.delayed(const Duration(milliseconds: 1200));
+      if (!mounted) return;
+      await Future.delayed(const Duration(milliseconds: 1200));
 
-    if (!mounted) return;
-    _previewController!.duration = const Duration(milliseconds: 1000);
-    await _previewController!.reverse();
+      if (!mounted) return;
+      _previewController!.duration = const Duration(milliseconds: 1000);
+      await _previewController!.reverse();
+    }
 
     if (!mounted) return;
     setState(() {
