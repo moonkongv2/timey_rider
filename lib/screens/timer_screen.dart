@@ -203,7 +203,7 @@ class _TimerScreenState extends State<TimerScreen>
   late final AnimationController _finishDriveController;
   AnimationController? _previewController;
   bool _isPreviewing = false;
-  String? _previewMessage;
+  _PreviewMessageState _previewMessageState = _PreviewMessageState.none;
   late final MotivationAudioService _motivationAudioService;
   late final bool _ownsMotivationAudioService;
   late ActivityTimerConfig _timerConfig;
@@ -298,20 +298,20 @@ class _TimerScreenState extends State<TimerScreen>
 
     if (!mounted) return;
     setState(() {
-      _previewMessage = AppTexts.of(context).timer.previewReady;
+      _previewMessageState = _PreviewMessageState.ready;
     });
     await Future.delayed(const Duration(milliseconds: 700));
 
     if (!mounted) return;
     setState(() {
-      _previewMessage = AppTexts.of(context).timer.previewGo;
+      _previewMessageState = _PreviewMessageState.go;
     });
     await Future.delayed(const Duration(milliseconds: 700));
 
     if (!mounted) return;
     setState(() {
       _isPreviewing = false;
-      _previewMessage = null;
+      _previewMessageState = _PreviewMessageState.none;
     });
     _controller.start();
   }
@@ -923,6 +923,20 @@ class _TimerScreenState extends State<TimerScreen>
             ? (_previewController?.value ?? 0.0).clamp(0.0, 1.0).toDouble()
             : displayProgress;
         final vehicleDisplayProgress = _isPreviewing ? 0.0 : displayProgress;
+
+        String? previewMessageText;
+        switch (_previewMessageState) {
+          case _PreviewMessageState.ready:
+            previewMessageText = texts.timer.previewReady;
+            break;
+          case _PreviewMessageState.go:
+            previewMessageText = texts.timer.previewGo;
+            break;
+          case _PreviewMessageState.none:
+            previewMessageText = null;
+            break;
+        }
+
         final statusCopy = _timerStatusCopy(
           texts.timer,
           _controller.state,
@@ -1128,7 +1142,7 @@ class _TimerScreenState extends State<TimerScreen>
                   );
                 },
               ),
-              if (_previewMessage != null)
+              if (previewMessageText != null)
                 IgnorePointer(
                   child: Container(
                     color: Colors.black38,
@@ -1140,8 +1154,8 @@ class _TimerScreenState extends State<TimerScreen>
                         child: ScaleTransition(scale: animation, child: child),
                       ),
                       child: Text(
-                        _previewMessage!,
-                        key: ValueKey(_previewMessage),
+                        previewMessageText,
+                        key: ValueKey(previewMessageText),
                         textAlign: TextAlign.center,
                         style: const TextStyle(
                           color: AppColors.white,
@@ -2090,4 +2104,10 @@ class _RemainingTimeCard extends StatelessWidget {
       ),
     );
   }
+}
+
+enum _PreviewMessageState {
+  none,
+  ready,
+  go,
 }
