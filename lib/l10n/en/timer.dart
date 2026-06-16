@@ -40,6 +40,8 @@ class EnTimerTexts implements TimerTextSet {
   String get idleProgressMessage => 'Getting ready';
   String get finishDriveProgressMessage => 'Heading to the finish!';
   String get finishDriveTimeLabel => 'Finishing up';
+  String get previewReady => 'Ready... 🚦';
+  String get previewGo => 'Go! 🌟';
 
   String arrivalDialogMessage(String vehicleLabel, String activityLabel) {
     return 'The ${vehicleLabel.toLowerCase()} arrived. Did you finish $activityLabel?';

@@ -203,6 +203,7 @@ class _TimerScreenState extends State<TimerScreen>
   late final AnimationController _finishDriveController;
   AnimationController? _previewController;
   bool _isPreviewing = false;
+  String? _previewMessage;
   late final MotivationAudioService _motivationAudioService;
   late final bool _ownsMotivationAudioService;
   late ActivityTimerConfig _timerConfig;
@@ -285,7 +286,7 @@ class _TimerScreenState extends State<TimerScreen>
     await _previewController!.forward();
 
     if (!mounted) return;
-    await Future.delayed(const Duration(seconds: 1));
+    await Future.delayed(const Duration(milliseconds: 1200));
 
     if (!mounted) return;
     _previewController!.duration = const Duration(milliseconds: 1000);
@@ -293,7 +294,20 @@ class _TimerScreenState extends State<TimerScreen>
 
     if (!mounted) return;
     setState(() {
+      _previewMessage = AppTexts.of(context).timer.previewReady;
+    });
+    await Future.delayed(const Duration(milliseconds: 700));
+
+    if (!mounted) return;
+    setState(() {
+      _previewMessage = AppTexts.of(context).timer.previewGo;
+    });
+    await Future.delayed(const Duration(milliseconds: 700));
+
+    if (!mounted) return;
+    setState(() {
       _isPreviewing = false;
+      _previewMessage = null;
     });
     _controller.start();
   }
@@ -954,8 +968,11 @@ class _TimerScreenState extends State<TimerScreen>
                     ],
                   ),
             body: SafeArea(
-              child: LayoutBuilder(
-                builder: (context, constraints) {
+              child: Stack(
+                fit: StackFit.expand,
+                children: [
+                  LayoutBuilder(
+                    builder: (context, constraints) {
                   final isLandscape =
                       constraints.maxWidth > constraints.maxHeight;
                   final reservesCompactControlsSpace =
@@ -1107,7 +1124,39 @@ class _TimerScreenState extends State<TimerScreen>
                   );
                 },
               ),
-            ),
+              if (_previewMessage != null)
+                IgnorePointer(
+                  child: Container(
+                    color: Colors.black38,
+                    alignment: Alignment.center,
+                    child: AnimatedSwitcher(
+                      duration: const Duration(milliseconds: 300),
+                      transitionBuilder: (child, animation) => FadeTransition(
+                        opacity: animation,
+                        child: ScaleTransition(scale: animation, child: child),
+                      ),
+                      child: Text(
+                        _previewMessage!,
+                        key: ValueKey(_previewMessage),
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                          color: AppColors.white,
+                          fontSize: 40,
+                          fontWeight: FontWeight.w900,
+                          shadows: [
+                            Shadow(
+                              blurRadius: 12,
+                              color: AppColors.black,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+            ],
+          ),
+        ),
           ),
         );
       },

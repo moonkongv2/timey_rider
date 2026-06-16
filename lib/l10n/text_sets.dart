@@ -278,6 +278,8 @@ abstract interface class TimerTextSet {
   String get idleProgressMessage;
   String get finishDriveProgressMessage;
   String get finishDriveTimeLabel;
+  String get previewReady;
+  String get previewGo;
 
   String arrivalDialogMessage(String vehicleLabel, String activityLabel);
   String remainingTime(String remaining);
