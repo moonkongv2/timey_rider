@@ -1533,14 +1533,16 @@ class _RewardConfettiDot extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Align(
-      alignment: alignment,
-      child: DecoratedBox(
-        decoration: BoxDecoration(
-          color: color.withValues(alpha: 0.68),
-          shape: BoxShape.circle,
+    return Positioned.fill(
+      child: Align(
+        alignment: alignment,
+        child: DecoratedBox(
+          decoration: BoxDecoration(
+            color: color.withValues(alpha: 0.68),
+            shape: BoxShape.circle,
+          ),
+          child: SizedBox.square(dimension: size),
         ),
-        child: SizedBox.square(dimension: size),
       ),
     );
   }
@@ -1554,12 +1556,14 @@ class _RewardConfettiSparkle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Align(
-      alignment: alignment,
-      child: Icon(
-        Icons.auto_awesome_rounded,
-        color: color.withValues(alpha: 0.32),
-        size: 24,
+    return Positioned.fill(
+      child: Align(
+        alignment: alignment,
+        child: Icon(
+          Icons.auto_awesome_rounded,
+          color: color.withValues(alpha: 0.32),
+          size: 24,
+        ),
       ),
     );
   }
