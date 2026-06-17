@@ -1443,10 +1443,34 @@ class _RewardBadge extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          _ResultRewardImage(
-            reward: reward,
-            semanticLabel: rewardName,
-            size: isCondensed ? 132 : 148,
+          Stack(
+            clipBehavior: Clip.none,
+            children: [
+              const _RewardConfettiDot(
+                alignment: Alignment(-0.84, -0.62),
+                size: 6,
+                color: AppColors.primarySoft,
+              ),
+              const _RewardConfettiDot(
+                alignment: Alignment(0.84, -0.68),
+                size: 8,
+                color: AppColors.accentBlueSoft,
+              ),
+              const _RewardConfettiDot(
+                alignment: Alignment(-0.76, 0.60),
+                size: 5,
+                color: AppColors.surfacePink,
+              ),
+              const _RewardConfettiSparkle(
+                alignment: Alignment(0.80, 0.52),
+                color: AppColors.orange,
+              ),
+              _ResultRewardImage(
+                reward: reward,
+                semanticLabel: rewardName,
+                size: isCondensed ? 132 : 148,
+              ),
+            ],
           ),
           const SizedBox(height: AppSpacing.sm),
           Text(
