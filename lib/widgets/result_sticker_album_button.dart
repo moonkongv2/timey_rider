@@ -41,7 +41,7 @@ class ResultStickerAlbumButton extends StatelessWidget {
             ),
             child: const Icon(
               Icons.collections_bookmark_rounded,
-              color: AppColors.primaryLight,
+              color: AppColors.primary,
               size: 32,
             ),
           ),
