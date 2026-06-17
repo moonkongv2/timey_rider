@@ -17,6 +17,7 @@ import '../theme/app_colors.dart';
 import '../theme/app_radius.dart';
 import '../theme/app_spacing.dart';
 import '../widgets/app/app_help_sheet.dart';
+import '../widgets/flying_sticker_animation.dart';
 import '../widgets/result_sticker_album_button.dart';
 import '../widgets/result_sticker_album_sheet.dart';
 import '../widgets/reward_sticker_image.dart';
@@ -138,6 +139,7 @@ class _ResultScreenState extends State<ResultScreen> {
   bool _introFinished = false;
   bool _introFallback = false;
   bool _handoffOrientation = false;
+  bool _flyingAnimationFinished = false;
   final GlobalKey _albumButtonKey = GlobalKey();
 
   @override
@@ -485,10 +487,32 @@ class _ResultScreenState extends State<ResultScreen> {
                       return const SizedBox.shrink();
                     }
 
+                    final awardedRewards = recordedSession.awardedRewards;
+                    final hasAward = awardedRewards.isNotEmpty;
+                    bool isNewSticker = false;
+                    if (hasAward) {
+                      final reward = awardedRewards.first;
+                      final item = recordedSession.inventory
+                          .where((i) => i.rewardId == reward.id)
+                          .firstOrNull;
+                      isNewSticker = item != null && item.count == 1;
+                    }
+
+                    int displayCount = recordedSession.collectedStickerTypeCount;
+                    bool badgeJustUpdated = false;
+                    if (hasAward && !_flyingAnimationFinished) {
+                      if (isNewSticker) {
+                        displayCount = displayCount - 1;
+                      }
+                    } else if (hasAward && _flyingAnimationFinished) {
+                      badgeJustUpdated = true;
+                    }
+
                     return ResultStickerAlbumButton(
                       buttonKey: _albumButtonKey,
-                      collectedCount: recordedSession.collectedStickerTypeCount,
+                      collectedCount: displayCount,
                       totalCount: recordedSession.totalStickerTypeCount,
+                      badgeJustUpdated: badgeJustUpdated,
                       onPressed: () {
                         showResultStickerAlbumSheet(
                           context,
@@ -500,6 +524,32 @@ class _ResultScreenState extends State<ResultScreen> {
                 ),
               ),
             ),
+          ),
+          FutureBuilder<RecordedActivitySession>(
+            future: _recordedSession,
+            builder: (context, snapshot) {
+              final recordedSession = snapshot.data;
+              if (recordedSession == null || _flyingAnimationFinished) {
+                return const SizedBox.shrink();
+              }
+
+              final awardedRewards = recordedSession.awardedRewards;
+              if (awardedRewards.isEmpty) {
+                return const SizedBox.shrink();
+              }
+
+              return FlyingStickerAnimation(
+                reward: awardedRewards.first,
+                targetKey: _albumButtonKey,
+                onAnimationFinished: () {
+                  if (mounted) {
+                    setState(() {
+                      _flyingAnimationFinished = true;
+                    });
+                  }
+                },
+              );
+            },
           ),
         ],
       ),
