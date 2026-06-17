@@ -108,6 +108,7 @@ class _FlyingStickerAnimationState extends State<FlyingStickerAnimation>
               reward: widget.reward,
               size: currentSize,
               locked: false,
+              framed: false,
             ),
           ),
         );

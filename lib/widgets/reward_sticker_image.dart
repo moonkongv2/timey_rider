@@ -10,16 +10,18 @@ class RewardStickerImage extends StatelessWidget {
     this.semanticLabel,
     this.size = 88,
     this.locked = false,
+    this.framed = true,
   });
 
   final RewardDefinition reward;
   final String? semanticLabel;
   final double size;
   final bool locked;
+  final bool framed;
 
   @override
   Widget build(BuildContext context) {
-    final padding = (size * 0.12).clamp(2.0, 10.0).toDouble();
+    final padding = framed ? (size * 0.12).clamp(2.0, 10.0).toDouble() : 0.0;
     final radius = (size * 0.22).clamp(6.0, 18.0).toDouble();
     final borderWidth = size < 36 ? 0.8 : 1.2;
     final shadowBlur = (size * 0.10).clamp(0.0, 8.0).toDouble();
@@ -37,6 +39,11 @@ class RewardStickerImage extends StatelessWidget {
       errorBuilder: (_, _, _) =>
           _FallbackStickerIcon(reward: reward, size: imageSize, locked: locked),
     );
+
+    if (!framed) {
+      if (!locked) return stickerContent;
+      return Opacity(opacity: 0.72, child: stickerContent);
+    }
 
     final framedSticker = SizedBox.square(
       dimension: size,
