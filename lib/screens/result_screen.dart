@@ -17,6 +17,9 @@ import '../theme/app_colors.dart';
 import '../theme/app_radius.dart';
 import '../theme/app_spacing.dart';
 import '../widgets/app/app_help_sheet.dart';
+import '../widgets/result_sticker_album_button.dart';
+import '../widgets/result_sticker_album_sheet.dart';
+import '../widgets/reward_sticker_image.dart';
 import 'reward_goal_screen.dart';
 import 'timer_screen.dart';
 
@@ -135,6 +138,7 @@ class _ResultScreenState extends State<ResultScreen> {
   bool _introFinished = false;
   bool _introFallback = false;
   bool _handoffOrientation = false;
+  final GlobalKey _albumButtonKey = GlobalKey();
 
   @override
   void initState() {
@@ -462,6 +466,37 @@ class _ResultScreenState extends State<ResultScreen> {
                     ),
                   );
                 },
+              ),
+            ),
+          SafeArea(
+            child: Align(
+              alignment: Alignment.topRight,
+              child: Padding(
+                padding: const EdgeInsets.only(
+                  top: AppSpacing.md,
+                  right: AppSpacing.lg,
+                ),
+                child: FutureBuilder<RecordedActivitySession>(
+                  future: _recordedSession,
+                  builder: (context, snapshot) {
+                    final recordedSession = snapshot.data;
+                    if (recordedSession == null) {
+                      return const SizedBox.shrink();
+                    }
+
+                    return ResultStickerAlbumButton(
+                      buttonKey: _albumButtonKey,
+                      collectedCount: recordedSession.collectedStickerTypeCount,
+                      totalCount: recordedSession.totalStickerTypeCount,
+                      onPressed: () {
+                        showResultStickerAlbumSheet(
+                          context,
+                          inventory: recordedSession.inventory,
+                        );
+                      },
+                    );
+                  },
+                ),
               ),
             ),
           ),
