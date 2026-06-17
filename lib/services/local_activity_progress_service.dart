@@ -309,6 +309,7 @@ class LocalActivityProgressService {
       awardedRewards: awardedRewards,
       updatedRewardGoals: goalUpdate.updatedGoals,
       earnedRewardGoals: goalUpdate.earnedGoals,
+      inventory: inventory,
     );
   }
 

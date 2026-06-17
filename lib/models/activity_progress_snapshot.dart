@@ -28,12 +28,14 @@ class RecordedActivitySession {
     required this.awardedRewards,
     required this.updatedRewardGoals,
     required this.earnedRewardGoals,
+    required this.inventory,
   });
 
   final ActivityHistoryEntry entry;
   final List<RewardDefinition> awardedRewards;
   final List<RewardGoal> updatedRewardGoals;
   final List<RewardGoal> earnedRewardGoals;
+  final List<RewardInventoryItem> inventory;
 
   RewardGoal? get updatedRewardGoal {
     final goals = [...earnedRewardGoals, ...updatedRewardGoals];
@@ -41,4 +43,10 @@ class RecordedActivitySession {
   }
 
   bool get rewardGoalJustReady => earnedRewardGoals.isNotEmpty;
+
+  int get collectedStickerTypeCount {
+    return inventory.where((item) => item.count > 0).length;
+  }
+
+  int get totalStickerTypeCount => RewardCatalog.all.length;
 }
