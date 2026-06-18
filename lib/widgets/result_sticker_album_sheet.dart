@@ -112,6 +112,55 @@ class _AlbumStickerCard extends StatelessWidget {
 
   bool get _isCollected => count > 0;
 
+  Widget _buildStickerStack(String semanticLabel) {
+    final stickerImage = RewardStickerImage(
+      reward: sticker,
+      semanticLabel: semanticLabel,
+      size: 85,
+      locked: !_isCollected,
+    );
+
+    if (count <= 1) {
+      return stickerImage;
+    }
+
+    return SizedBox(
+      width: 85,
+      height: 85,
+      child: Stack(
+        clipBehavior: Clip.none,
+        alignment: Alignment.center,
+        children: [
+          if (count >= 5)
+            Positioned(
+              left: -12,
+              top: 4,
+              child: Transform.rotate(
+                angle: -0.25,
+                child: Opacity(
+                  opacity: 0.6,
+                  child: stickerImage,
+                ),
+              ),
+            ),
+          if (count >= 2)
+            Positioned(
+              right: -10,
+              top: -6,
+              child: Transform.rotate(
+                angle: 0.18,
+                child: Opacity(
+                  opacity: 0.8,
+                  child: stickerImage,
+                ),
+              ),
+            ),
+          stickerImage,
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
@@ -127,13 +176,10 @@ class _AlbumStickerCard extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            RewardStickerImage(
-              reward: sticker,
-              semanticLabel: _isCollected
+            _buildStickerStack(
+              _isCollected
                   ? stickerName
                   : texts.rewards.uncollectedSemanticLabel,
-              size: 85,
-              locked: !_isCollected,
             ),
             const SizedBox(height: AppSpacing.md),
             Text(
