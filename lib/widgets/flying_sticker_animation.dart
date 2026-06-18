@@ -110,23 +110,41 @@ class _FlyingStickerAnimationState extends State<FlyingStickerAnimation>
               children: [
                 if (_flyAnimation.value == 0) ...[
                   const _RewardConfettiDot(
-                    alignment: Alignment(-0.84, -0.62),
-                    size: 8,
-                    color: AppColors.primarySoft,
+                    alignment: Alignment(-0.85, -0.65),
+                    size: 14,
+                    color: AppColors.primary,
                   ),
                   const _RewardConfettiDot(
-                    alignment: Alignment(0.84, -0.68),
-                    size: 10,
-                    color: AppColors.accentBlueSoft,
+                    alignment: Alignment(0.85, -0.70),
+                    size: 18,
+                    color: AppColors.accentBlue,
                   ),
                   const _RewardConfettiDot(
-                    alignment: Alignment(-0.76, 0.60),
-                    size: 7,
+                    alignment: Alignment(-0.75, 0.65),
+                    size: 12,
                     color: AppColors.surfacePink,
                   ),
                   const _RewardConfettiSparkle(
-                    alignment: Alignment(0.80, 0.52),
+                    alignment: Alignment(0.80, 0.55),
                     color: AppColors.orange,
+                  ),
+                  const _RewardConfettiSparkle(
+                    alignment: Alignment(-0.40, -0.85),
+                    color: AppColors.surfaceYellow,
+                  ),
+                  const _RewardConfettiDot(
+                    alignment: Alignment(0.60, 0.85),
+                    size: 10,
+                    color: AppColors.primary,
+                  ),
+                  const _RewardConfettiDot(
+                    alignment: Alignment(-0.90, 0.0),
+                    size: 16,
+                    color: AppColors.accentBlue,
+                  ),
+                  const _RewardConfettiSparkle(
+                    alignment: Alignment(0.95, -0.10),
+                    color: AppColors.surfacePink,
                   ),
                 ],
                 RewardStickerImage(
@@ -166,7 +184,7 @@ class _RewardConfettiDot extends StatelessWidget {
         alignment: alignment,
         child: DecoratedBox(
           decoration: BoxDecoration(
-            color: color.withValues(alpha: 0.68),
+            color: color,
             shape: BoxShape.circle,
           ),
           child: SizedBox.square(dimension: size),
@@ -193,8 +211,8 @@ class _RewardConfettiSparkle extends StatelessWidget {
         alignment: alignment,
         child: Icon(
           Icons.auto_awesome_rounded,
-          color: color.withValues(alpha: 0.32),
-          size: 24,
+          color: color,
+          size: 36,
         ),
       ),
     );
