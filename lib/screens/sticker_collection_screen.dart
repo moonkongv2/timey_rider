@@ -8,6 +8,7 @@ import '../theme/app_colors.dart';
 import '../theme/app_radius.dart';
 import '../theme/app_spacing.dart';
 import '../widgets/reward_sticker_image.dart';
+import '../widgets/sticker_fountain_animation.dart';
 
 class StickerCollectionScreen extends StatelessWidget {
   const StickerCollectionScreen({
@@ -134,11 +135,21 @@ class _StickerCard extends StatelessWidget {
       Localizations.localeOf(context).languageCode,
     );
 
-    return Card(
-      color: _isCollected ? AppColors.white : AppColors.cream,
-      child: Padding(
-        padding: const EdgeInsets.all(AppSpacing.lg),
-        child: Column(
+    return GestureDetector(
+      onTap: _isCollected && count > 1
+          ? () {
+              showStickerFountain(
+                context: context,
+                reward: sticker,
+                count: count,
+              );
+            }
+          : null,
+      child: Card(
+        color: _isCollected ? AppColors.white : AppColors.cream,
+        child: Padding(
+          padding: const EdgeInsets.all(AppSpacing.lg),
+          child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             _buildStickerStack(
