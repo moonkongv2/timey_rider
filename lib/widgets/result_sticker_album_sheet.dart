@@ -232,6 +232,6 @@ class _AlbumStickerCard extends StatelessWidget {
           ],
         ),
       ),
-    );
+    ));
   }
 }
