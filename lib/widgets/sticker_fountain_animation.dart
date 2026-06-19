@@ -76,8 +76,8 @@ class _StickerFountainOverlayState extends State<_StickerFountainOverlay>
       final angle = rng.nextDouble() * 2 * pi;
       // Random distance – how far the sticker flies (Reduced distance)
       final distance = 80.0 + rng.nextDouble() * 120.0;
-      // Random size for visual variety (Increased size)
-      final size = 45.0 + rng.nextDouble() * 35.0;
+      // Random size for visual variety (Even larger size)
+      final size = 70.0 + rng.nextDouble() * 40.0;
       // Random rotation
       final rotation = (rng.nextDouble() - 0.5) * 1.6;
       // Slight delay so particles don't all start at same time
