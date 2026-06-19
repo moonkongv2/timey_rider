@@ -171,7 +171,7 @@ class _AlbumStickerCard extends StatelessWidget {
     );
 
     return GestureDetector(
-      onTapUp: _isCollected && count > 1
+      onTapUp: _isCollected
           ? (details) {
               showStickerFountain(
                 context: context,
