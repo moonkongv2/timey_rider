@@ -69,7 +69,7 @@ class _StickerFountainOverlayState extends State<_StickerFountainOverlay>
 
   List<_ParticleData> _generateParticles() {
     final rng = Random();
-    final particleCount = widget.count.clamp(3, _maxParticles);
+    final particleCount = widget.count.clamp(1, _maxParticles);
 
     return List.generate(particleCount, (_) {
       // Random angle from center (full circle)
