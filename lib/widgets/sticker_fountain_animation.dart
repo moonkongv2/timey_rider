@@ -13,6 +13,7 @@ void showStickerFountain({
   required BuildContext context,
   required RewardDefinition reward,
   required int count,
+  Offset? position,
 }) {
   final overlay = Overlay.of(context);
   late final OverlayEntry entry;
@@ -21,6 +22,7 @@ void showStickerFountain({
     builder: (_) => _StickerFountainOverlay(
       reward: reward,
       count: count,
+      position: position,
       onFinished: () => entry.remove(),
     ),
   );
@@ -33,11 +35,13 @@ class _StickerFountainOverlay extends StatefulWidget {
   const _StickerFountainOverlay({
     required this.reward,
     required this.count,
+    this.position,
     required this.onFinished,
   });
 
   final RewardDefinition reward;
   final int count;
+  final Offset? position;
   final VoidCallback onFinished;
 
   @override
@@ -70,10 +74,10 @@ class _StickerFountainOverlayState extends State<_StickerFountainOverlay>
     return List.generate(particleCount, (_) {
       // Random angle from center (full circle)
       final angle = rng.nextDouble() * 2 * pi;
-      // Random distance – how far the sticker flies
-      final distance = 120.0 + rng.nextDouble() * 260.0;
-      // Random size for visual variety
-      final size = 28.0 + rng.nextDouble() * 32.0;
+      // Random distance – how far the sticker flies (Reduced distance)
+      final distance = 80.0 + rng.nextDouble() * 120.0;
+      // Random size for visual variety (Increased size)
+      final size = 45.0 + rng.nextDouble() * 35.0;
       // Random rotation
       final rotation = (rng.nextDouble() - 0.5) * 1.6;
       // Slight delay so particles don't all start at same time
@@ -101,7 +105,7 @@ class _StickerFountainOverlayState extends State<_StickerFountainOverlay>
       animation: _controller,
       builder: (context, _) {
         final screenSize = MediaQuery.of(context).size;
-        final center = Offset(screenSize.width / 2, screenSize.height / 2);
+        final center = widget.position ?? Offset(screenSize.width / 2, screenSize.height / 2);
 
         return Stack(
           children: [

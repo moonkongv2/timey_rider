@@ -171,12 +171,13 @@ class _AlbumStickerCard extends StatelessWidget {
     );
 
     return GestureDetector(
-      onTap: _isCollected && count > 1
-          ? () {
+      onTapUp: _isCollected && count > 1
+          ? (details) {
               showStickerFountain(
                 context: context,
                 reward: sticker,
                 count: count,
+                position: details.globalPosition,
               );
             }
           : null,
