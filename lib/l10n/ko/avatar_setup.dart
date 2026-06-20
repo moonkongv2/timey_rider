@@ -39,7 +39,11 @@ class AvatarSetupTexts implements AvatarSetupTextSet {
     '배경은 투명하거나 단순한 배경이면 좋아요.',
     '텍스트, 로고, 워터마크는 없어야 해요.',
   ];
-  String get promptCopyTitle => '프롬프트 복사';
+  String get promptCopyTitle => '아바타 생성 프롬프트';
+  String get promptHelperText => '선택한 차량에 맞춘 프롬프트예요. 외부 AI 서비스에 붙여넣어 사용해 주세요.';
+  String get promptExpandLabel => '프롬프트 열기';
+  String get promptCollapseLabel => '프롬프트 접기';
+  String get promptToggleSemanticLabel => '아바타 생성 프롬프트 열고 닫기';
   String get copyPromptButton => '프롬프트 복사하기';
   String get uploadTitle => '아바타 이미지 업로드';
   String get uploadInstructions =>

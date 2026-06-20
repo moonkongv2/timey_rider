@@ -144,6 +144,10 @@ abstract interface class AvatarSetupTextSet {
   String get guideTitle;
   List<String> get guideItems;
   String get promptCopyTitle;
+  String get promptHelperText;
+  String get promptExpandLabel;
+  String get promptCollapseLabel;
+  String get promptToggleSemanticLabel;
   String get copyPromptButton;
   String get uploadTitle;
   String get uploadInstructions;

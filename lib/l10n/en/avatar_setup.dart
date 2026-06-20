@@ -43,7 +43,13 @@ class EnAvatarSetupTexts implements AvatarSetupTextSet {
     'Use a transparent or simple background.',
     'Do not include text, logos, or watermarks.',
   ];
-  String get promptCopyTitle => 'Copy prompt';
+  String get promptCopyTitle => 'Avatar generation prompt';
+  String get promptHelperText =>
+      'This prompt matches the selected vehicle. Paste it into an external AI service.';
+  String get promptExpandLabel => 'Open prompt';
+  String get promptCollapseLabel => 'Close prompt';
+  String get promptToggleSemanticLabel =>
+      'Open or close the avatar generation prompt';
   String get copyPromptButton => 'Copy prompt';
   String get uploadTitle => 'Upload avatar image';
   String get uploadInstructions =>

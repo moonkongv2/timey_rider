@@ -374,6 +374,22 @@ class _AvatarSetupScreenState extends State<AvatarSetupScreen> {
             ),
             if (_avatarMode == AvatarImageMode.custom) ...[
               const SizedBox(height: AppSpacing.xl),
+              VehicleSelectionCard(
+                title: texts.vehicleSelectionTitle,
+                subtitle: texts.vehicleSelectionSubtitle,
+                selectedVehicleId: _config.vehicleId,
+                onVehicleSelected: _handleVehicleSelected,
+                avatar: currentEditingAvatar,
+                avatarForVehicle: _avatarPresentationForVehicleChoice,
+              ),
+              const SizedBox(height: AppSpacing.xl),
+              _AvatarGuideCard(items: texts.guideItems),
+              const SizedBox(height: AppSpacing.md),
+              _AvatarPromptCard(
+                prompt: prompt,
+                onCopyPressed: () => _copyPrompt(prompt),
+              ),
+              const SizedBox(height: AppSpacing.md),
               _AvatarUploadCard(
                 imagePath: hasPreviewAvatarImage
                     ? previewAvatarImagePath
@@ -423,24 +439,17 @@ class _AvatarSetupScreenState extends State<AvatarSetupScreen> {
                 vehicle: vehicle,
                 onUseDefaultPressed: _useDefaultAvatarImage,
               ),
-            ],
-            const SizedBox(height: AppSpacing.xl),
-            VehicleSelectionCard(
-              title: texts.vehicleSelectionTitle,
-              subtitle: texts.vehicleSelectionSubtitle,
-              selectedVehicleId: _config.vehicleId,
-              onVehicleSelected: _handleVehicleSelected,
-              avatar: currentEditingAvatar,
-              avatarForVehicle: _avatarPresentationForVehicleChoice,
-            ),
-            if (_avatarMode == AvatarImageMode.custom) ...[
               const SizedBox(height: AppSpacing.xl),
-              _AvatarGuideCard(items: texts.guideItems),
-              const SizedBox(height: AppSpacing.md),
-              _AvatarPromptCard(
-                prompt: prompt,
-                onCopyPressed: () => _copyPrompt(prompt),
+              VehicleSelectionCard(
+                title: texts.vehicleSelectionTitle,
+                subtitle: texts.vehicleSelectionSubtitle,
+                selectedVehicleId: _config.vehicleId,
+                onVehicleSelected: _handleVehicleSelected,
+                avatar: currentEditingAvatar,
+                avatarForVehicle: _avatarPresentationForVehicleChoice,
               ),
+            ],
+            if (_avatarMode == AvatarImageMode.custom) ...[
               const SizedBox(height: AppSpacing.md),
               const _AvatarPrivacyNoteCard(),
               const SizedBox(height: AppSpacing.md),
@@ -896,74 +905,124 @@ class _GuideBullet extends StatelessWidget {
   }
 }
 
-class _AvatarPromptCard extends StatelessWidget {
+class _AvatarPromptCard extends StatefulWidget {
   const _AvatarPromptCard({required this.prompt, required this.onCopyPressed});
 
   final String prompt;
   final VoidCallback onCopyPressed;
 
   @override
+  State<_AvatarPromptCard> createState() => _AvatarPromptCardState();
+}
+
+class _AvatarPromptCardState extends State<_AvatarPromptCard> {
+  bool _isExpanded = false;
+
+  void _toggleExpanded() {
+    setState(() => _isExpanded = !_isExpanded);
+  }
+
+  @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
     final texts = AppTexts.of(context).avatarSetup;
+    final toggleLabel = _isExpanded
+        ? texts.promptCollapseLabel
+        : texts.promptExpandLabel;
 
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        color: AppColors.surfaceWarm,
+    return Material(
+      color: AppColors.surfaceWarm,
+      borderRadius: AppRadius.card,
+      child: InkWell(
+        key: const ValueKey('avatarPromptToggle'),
+        onTap: _toggleExpanded,
         borderRadius: AppRadius.card,
-        border: Border.all(color: AppColors.borderWarm),
-        boxShadow: AppShadows.surface,
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(AppSpacing.md),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                const Icon(
-                  Icons.content_copy_rounded,
-                  color: AppColors.brown700,
+        child: Container(
+          decoration: BoxDecoration(
+            borderRadius: AppRadius.card,
+            border: Border.all(color: AppColors.borderWarm),
+            boxShadow: AppShadows.surface,
+          ),
+          padding: const EdgeInsets.all(AppSpacing.md),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Semantics(
+                button: true,
+                label: '${texts.promptToggleSemanticLabel}, $toggleLabel',
+                child: ExcludeSemantics(
+                  child: Row(
+                    children: [
+                      const Icon(
+                        Icons.content_copy_rounded,
+                        color: AppColors.brown700,
+                      ),
+                      const SizedBox(width: AppSpacing.sm),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              texts.promptCopyTitle,
+                              style: textTheme.titleMedium?.copyWith(
+                                color: AppColors.textStrong,
+                                fontWeight: FontWeight.w800,
+                              ),
+                            ),
+                            const SizedBox(height: AppSpacing.xs),
+                            Text(
+                              texts.promptHelperText,
+                              style: textTheme.bodyMedium?.copyWith(
+                                color: AppColors.textPrimary,
+                                fontWeight: FontWeight.w600,
+                                height: 1.34,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(width: AppSpacing.sm),
+                      Icon(
+                        _isExpanded
+                            ? Icons.expand_less_rounded
+                            : Icons.expand_more_rounded,
+                        color: AppColors.brown700,
+                      ),
+                    ],
+                  ),
                 ),
-                const SizedBox(width: AppSpacing.sm),
-                Expanded(
-                  child: Text(
-                    texts.promptCopyTitle,
-                    style: textTheme.titleMedium?.copyWith(
-                      color: AppColors.textStrong,
-                      fontWeight: FontWeight.w800,
+              ),
+              if (_isExpanded) ...[
+                const SizedBox(height: AppSpacing.md),
+                DecoratedBox(
+                  decoration: BoxDecoration(
+                    color: AppColors.white.withValues(alpha: 0.78),
+                    borderRadius: AppRadius.compactCard,
+                    border: Border.all(color: AppColors.borderSoft),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(AppSpacing.md),
+                    child: SelectableText(
+                      key: const ValueKey('avatarPromptText'),
+                      widget.prompt,
+                      style: textTheme.bodyMedium?.copyWith(
+                        color: AppColors.textPrimary,
+                        fontWeight: FontWeight.w600,
+                        height: 1.42,
+                      ),
                     ),
                   ),
                 ),
-              ],
-            ),
-            const SizedBox(height: AppSpacing.md),
-            DecoratedBox(
-              decoration: BoxDecoration(
-                color: AppColors.white.withValues(alpha: 0.78),
-                borderRadius: AppRadius.compactCard,
-                border: Border.all(color: AppColors.borderSoft),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(AppSpacing.md),
-                child: SelectableText(
-                  key: const ValueKey('avatarPromptText'),
-                  prompt,
-                  style: textTheme.bodyMedium?.copyWith(
-                    color: AppColors.textPrimary,
-                    fontWeight: FontWeight.w600,
-                    height: 1.42,
-                  ),
+                const SizedBox(height: AppSpacing.md),
+                FilledButton.icon(
+                  key: const ValueKey('avatarPromptCopyButton'),
+                  onPressed: widget.onCopyPressed,
+                  icon: const Icon(Icons.content_copy_rounded),
+                  label: Text(texts.copyPromptButton),
                 ),
-              ),
-            ),
-            const SizedBox(height: AppSpacing.md),
-            FilledButton.icon(
-              onPressed: onCopyPressed,
-              icon: const Icon(Icons.content_copy_rounded),
-              label: Text(texts.copyPromptButton),
-            ),
-          ],
+              ],
+            ],
+          ),
         ),
       ),
     );
