@@ -2,156 +2,130 @@ import '../models/vehicle.dart';
 
 abstract final class AvatarPromptCatalog {
   static const _koreanBasePrompt = '''
-첨부한 아이 사진을 참고해서 아이의 주요 얼굴 특징은 유지해 주세요.
-귀엽고 친근한 캐릭터 스타일로 만들어 주세요.
-정사각형 1:1 헤드샷 구도로, 얼굴 중앙에 배치해 주세요.
-머리 전체 + 얼굴 + 목 일부가 보이게 하고, 어깨/몸통은 최소화해 주세요.
-모바일 앱에 어울리는 단순하고 선명한 캐릭터풍 또는 부드러운 3D 캐릭터풍으로 만들어 주세요.
-투명 배경을 권장합니다.
-투명 배경이 어렵다면 단순한 흰색 또는 밝은 단색 배경으로 만들어 주세요.
+첨부한 아이 사진을 참고해서 Timey Rider에 사용할 라이더 이미지를 만들어 주세요.
+아이의 실제 얼굴 특징을 최대한 유지해 주세요.
+새로운 캐릭터처럼 바꾸지 말고, 아이 본인처럼 알아볼 수 있게 만들어 주세요.
+정사각형 1:1 이미지로, 얼굴이 중앙에 크게 보이게 해 주세요.
+머리 전체와 얼굴이 보이게 하고, 몸통/전신/차량 이미지는 만들지 마세요.
+배경은 반드시 투명 배경으로 만들어 주세요.
+가능하면 PNG 투명 배경으로 만들어 주세요.
+그림자, 배경색, 배경 장식은 넣지 마세요.
 텍스트, 로고, 워터마크 금지.
-전신, 여러 사람, 복잡한 배경은 금지해 주세요.
+여러 사람, 복잡한 소품, 과한 의상 변화는 피해주세요.
 ''';
 
   static const _englishBasePrompt = '''
-Use the attached child photo as reference and keep the child's main facial features.
-Create a cute, friendly character-style square 1:1 headshot.
-Place the face in the center, showing the full head, face, and a small part of the neck.
-Minimize shoulders and torso.
-Use a simple, clear character style or a soft 3D character style suitable for a mobile app.
-A transparent background is recommended.
-If transparency is difficult, use a simple white or bright solid background.
+Use the attached child photo to create a rider image for Timey Rider.
+Preserve the child's real facial features as much as possible.
+Do not turn the child into a new character. The child should still be recognizable.
+Use a square 1:1 image with the face large and centered.
+Show the full head and face, but do not create a full body, torso, or vehicle image.
+The background must be transparent.
+Use a transparent PNG if possible.
+Do not add shadows, background colors, or background decorations.
 Do not include text, logos, or watermarks.
-Avoid full-body images, multiple people, or complex backgrounds.
+Avoid multiple people, complex props, or major outfit changes.
 ''';
 
   static const _koreanAdditionsByVehicleId = {
     'motorcycle': '''
-오토바이 라이더 컨셉으로 만들어 주세요.
-귀여운 헬멧을 씌워 주세요.
-필요하면 고글/선글라스를 추가해도 됩니다.
-얼굴은 가리지 않게 해 주세요.
+오토바이에 어울리도록 작은 헬멧 느낌을 아주 약하게 넣어도 됩니다.
+단, 아이 얼굴을 가리지 말고 차량 이미지는 만들지 마세요.
 ''',
     'fire_truck': '''
-소방관 라이더 컨셉으로 만들어 주세요.
-소방관 헬멧 또는 소방관 모자를 씌워 주세요.
-밝고 든든한 느낌으로 만들어 주세요.
+소방차에 어울리도록 작은 소방관 헬멧 느낌을 아주 약하게 넣어도 됩니다.
+단, 아이 얼굴을 가리지 말고 차량 이미지는 만들지 마세요.
 ''',
     'police_car': '''
-경찰관 라이더 컨셉으로 만들어 주세요.
-경찰 모자 또는 경찰 헬멧을 씌워 주세요.
-밝고 자신감 있는 표정으로 만들어 주세요.
+경찰차에 어울리도록 작은 경찰 모자 느낌을 아주 약하게 넣어도 됩니다.
+단, 아이 얼굴을 가리지 말고 차량 이미지는 만들지 마세요.
 ''',
     'excavator': '''
-포크레인 기사 컨셉으로 만들어 주세요.
-노란 안전모를 씌워 주세요.
-필요하면 작업복 느낌은 아주 약하게 넣어 주세요.
-얼굴 중심을 유지해 주세요.
+포크레인에 어울리도록 작은 노란 안전모 느낌을 아주 약하게 넣어도 됩니다.
+단, 아이 얼굴을 가리지 말고 차량 이미지는 만들지 마세요.
 ''',
     'airplane': '''
-비행기 조종사 컨셉으로 만들어 주세요.
-파일럿 모자 또는 항공 헬멧을 씌워 주세요.
-밝고 자신감 있는 표정으로 만들어 주세요.
+비행기에 어울리도록 작은 파일럿 모자 느낌을 아주 약하게 넣어도 됩니다.
+단, 아이 얼굴을 가리지 말고 차량 이미지는 만들지 마세요.
 ''',
     'bus': '''
-버스 기사 컨셉으로 만들어 주세요.
-운전기사 모자 또는 단정한 모자를 씌워 주세요.
-친근하고 든든한 느낌으로 만들어 주세요.
+버스에 어울리도록 작은 운전기사 모자 느낌을 아주 약하게 넣어도 됩니다.
+단, 아이 얼굴을 가리지 말고 차량 이미지는 만들지 마세요.
 ''',
     'supercar': '''
-레이서 드라이버 컨셉으로 만들어 주세요.
-스포티한 모자 또는 가벼운 헬멧을 씌워 주세요.
-신나고 활기찬 표정으로 만들어 주세요.
+슈퍼카에 어울리도록 작은 레이서 모자 느낌을 아주 약하게 넣어도 됩니다.
+단, 아이 얼굴을 가리지 말고 차량 이미지는 만들지 마세요.
 ''',
     'train': '''
-기차 기관사 컨셉으로 만들어 주세요.
-기관사 모자 또는 기차 승무원 느낌의 모자를 씌워 주세요.
-차분하고 믿음직한 느낌으로 만들어 주세요.
+기차에 어울리도록 작은 기관사 모자 느낌을 아주 약하게 넣어도 됩니다.
+단, 아이 얼굴을 가리지 말고 차량 이미지는 만들지 마세요.
 ''',
     't_rex': '''
-티렉스 탐험가 컨셉으로 만들어 주세요.
-귀여운 탐험가 모자 또는 공룡 테마 소품을 아주 약하게 넣어 주세요.
-신나고 용감한 표정으로 만들어 주세요.
+티렉스에 어울리도록 아주 작은 공룡 테마 소품을 약하게 넣어도 됩니다.
+단, 아이 얼굴을 가리지 말고 티렉스 몸이나 차량 이미지는 만들지 마세요.
 ''',
     'shark': '''
-상어 바다 탐험가 컨셉으로 만들어 주세요.
-귀여운 선원 모자 또는 바다 테마 소품을 아주 약하게 넣어 주세요.
-밝고 장난기 있는 표정으로 만들어 주세요.
+상어에 어울리도록 아주 작은 바다 테마 소품을 약하게 넣어도 됩니다.
+단, 아이 얼굴을 가리지 말고 상어 몸이나 차량 이미지는 만들지 마세요.
 ''',
     'brachio': '''
-브라키오 공룡 탐험가 컨셉으로 만들어 주세요.
-귀여운 사파리 모자 또는 초록 공룡 테마 소품을 아주 약하게 넣어 주세요.
-차분하고 다정한 표정으로 만들어 주세요.
+브라키오에 어울리도록 아주 작은 초록 공룡 테마 소품을 약하게 넣어도 됩니다.
+단, 아이 얼굴을 가리지 말고 공룡 몸이나 차량 이미지는 만들지 마세요.
 ''',
     'pteranodon': '''
-프테라노돈 하늘 탐험가 컨셉으로 만들어 주세요.
-귀여운 파일럿 고글 또는 하늘 테마 소품을 아주 약하게 넣어 주세요.
-밝고 용감한 표정으로 만들어 주세요.
+프테라노돈에 어울리도록 아주 작은 하늘 테마 소품을 약하게 넣어도 됩니다.
+단, 아이 얼굴을 가리지 말고 공룡 몸이나 차량 이미지는 만들지 마세요.
 ''',
   };
 
   static const _englishAdditionsByVehicleId = {
     'motorcycle': '''
-Use a motorcycle rider concept.
-Add a cute helmet.
-Goggles or sunglasses are okay if needed.
-Do not cover the face.
+You may add a very subtle small helmet detail to match the motorcycle.
+Do not cover the child's face, and do not create the vehicle itself.
 ''',
     'fire_truck': '''
-Use a firefighter rider concept.
-Add a firefighter helmet or firefighter hat.
-Make the character feel bright and dependable.
+You may add a very subtle small firefighter helmet detail to match the fire truck.
+Do not cover the child's face, and do not create the vehicle itself.
 ''',
     'police_car': '''
-Use a police officer rider concept.
-Add a police hat or police helmet.
-Use a bright, confident expression.
+You may add a very subtle small police hat detail to match the police car.
+Do not cover the child's face, and do not create the vehicle itself.
 ''',
     'excavator': '''
-Use an excavator operator concept.
-Add a yellow safety helmet.
-If needed, add only a very subtle workwear feeling.
-Keep the face centered.
+You may add a very subtle small yellow safety helmet detail to match the excavator.
+Do not cover the child's face, and do not create the vehicle itself.
 ''',
     'airplane': '''
-Use an airplane pilot concept.
-Add a pilot hat or aviation helmet.
-Use a bright, confident expression.
+You may add a very subtle small pilot hat detail to match the airplane.
+Do not cover the child's face, and do not create the vehicle itself.
 ''',
     'bus': '''
-Use a bus driver concept.
-Add a driver hat or neat cap.
-Make the character feel friendly and dependable.
+You may add a very subtle small driver hat detail to match the bus.
+Do not cover the child's face, and do not create the vehicle itself.
 ''',
     'supercar': '''
-Use a race driver concept.
-Add a sporty cap or light helmet.
-Use an excited, energetic expression.
+You may add a very subtle small racer cap detail to match the supercar.
+Do not cover the child's face, and do not create the vehicle itself.
 ''',
     'train': '''
-Use a train engineer concept.
-Add a train engineer hat or conductor-style cap.
-Make the character feel calm and reliable.
+You may add a very subtle small train engineer hat detail to match the train.
+Do not cover the child's face, and do not create the vehicle itself.
 ''',
     't_rex': '''
-Use a T-rex explorer concept.
-Add a cute explorer hat or very subtle dinosaur-themed detail.
-Use an excited, brave expression.
+You may add a very subtle small dinosaur-themed detail to match the T-rex.
+Do not cover the child's face, and do not create a dinosaur body or vehicle image.
 ''',
     'shark': '''
-Use a shark ocean explorer concept.
-Add a cute sailor hat or very subtle ocean-themed detail.
-Use a bright, playful expression.
+You may add a very subtle small ocean-themed detail to match the shark.
+Do not cover the child's face, and do not create a shark body or vehicle image.
 ''',
     'brachio': '''
-Use a brachio dinosaur explorer concept.
-Add a cute safari hat or very subtle green dinosaur-themed detail.
-Use a calm, kind expression.
+You may add a very subtle small green dinosaur-themed detail to match the brachio.
+Do not cover the child's face, and do not create a dinosaur body or vehicle image.
 ''',
     'pteranodon': '''
-Use a pteranodon sky explorer concept.
-Add cute pilot goggles or very subtle sky-themed detail.
-Use a bright, brave expression.
+You may add a very subtle small sky-themed detail to match the pteranodon.
+Do not cover the child's face, and do not create a dinosaur body or vehicle image.
 ''',
   };
 

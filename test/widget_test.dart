@@ -1823,9 +1823,10 @@ void main() {
       final prompt = AvatarPromptCatalog.promptForVehicle(vehicle, 'ko');
 
       expect(prompt.trim(), isNotEmpty, reason: vehicle.id);
-      expect(prompt, contains('첨부한 아이 사진을 참고'));
-      expect(prompt, contains('아이의 주요 얼굴 특징은 유지'));
-      expect(prompt, contains('정사각형 1:1 헤드샷'));
+      expect(prompt, contains('Timey Rider에 사용할 라이더 이미지'));
+      expect(prompt, contains('아이의 실제 얼굴 특징을 최대한 유지'));
+      expect(prompt, contains('새로운 캐릭터처럼 바꾸지'));
+      expect(prompt, contains('배경은 반드시 투명 배경'));
       expect(prompt, contains('텍스트, 로고, 워터마크 금지'));
     }
   });
@@ -3806,19 +3807,19 @@ void main() {
     await tester.tap(find.text('만들기'));
     await tester.pumpAndSettle();
 
-    expect(find.text('우리 아이 아바타 만들기'), findsOneWidget);
+    expect(find.text('우리 아이 라이더 만들기'), findsOneWidget);
     expect(
-      find.text('외부 AI 서비스에서 아이 사진을 귀여운 라이더 캐릭터로 만든 뒤 업로드해 주세요.'),
+      find.text('외부 AI 서비스에서 Timey Rider에 사용할 아이 라이더 이미지를 만든 뒤 업로드해 주세요.'),
       findsOneWidget,
     );
     expect(find.text('기본 이미지 미리보기'), findsOneWidget);
 
-    await tester.tap(find.text('직접 만든 아바타 사용'));
+    await tester.tap(find.text('직접 만든 라이더 사용'));
     await tester.pump();
 
     await _scrollAvatarPromptToggleIntoView(tester);
-    expect(find.text('이미지 생성 가이드'), findsOneWidget);
-    expect(find.text('아바타 생성 프롬프트'), findsOneWidget);
+    expect(find.text('라이더 이미지 만들기 가이드'), findsOneWidget);
+    expect(find.text('라이더 이미지 프롬프트'), findsOneWidget);
     expect(find.byKey(const ValueKey('avatarPromptText')), findsNothing);
     expect(find.text('프롬프트 복사하기'), findsNothing);
   });
@@ -3828,15 +3829,16 @@ void main() {
   ) async {
     await _pumpAvatarSetupScreen(tester, ActivityTimerConfig.defaults());
 
-    await tester.tap(find.text('직접 만든 아바타 사용'));
+    await tester.tap(find.text('직접 만든 라이더 사용'));
     await tester.pump();
 
     await _expandAvatarPrompt(tester);
     expect(find.text('아이 얼굴이 잘 보이는 정면 사진을 사용해 주세요.'), findsOneWidget);
     expect(find.text('얼굴이 크고 선명할수록 좋아요.'), findsOneWidget);
     expect(find.text('텍스트, 로고, 워터마크는 없어야 해요.'), findsOneWidget);
-    expect(_avatarPromptText(tester), contains('첨부한 아이 사진을 참고'));
-    expect(_avatarPromptText(tester), contains('정사각형 1:1 헤드샷'));
+    expect(_avatarPromptText(tester), contains('Timey Rider에 사용할 라이더 이미지'));
+    expect(_avatarPromptText(tester), contains('새로운 캐릭터처럼 바꾸지'));
+    expect(_avatarPromptText(tester), contains('배경은 반드시 투명 배경'));
     expect(find.text('프롬프트 복사하기'), findsOneWidget);
   });
 
@@ -3847,17 +3849,17 @@ void main() {
       locale: const Locale('en'),
     );
 
-    expect(find.text("Create Your Child's Avatar"), findsOneWidget);
-    expect(find.text('우리 아이 아바타 만들기'), findsNothing);
+    expect(find.text("Create Your Child's Rider Image"), findsOneWidget);
+    expect(find.text('우리 아이 라이더 만들기'), findsNothing);
     expect(find.text('Selected vehicle'), findsOneWidget);
     expect(find.text('Default image preview'), findsOneWidget);
 
-    await tester.tap(find.text('Use custom avatar'));
+    await tester.tap(find.text('Use custom rider'));
     await tester.pump();
 
     await _scrollAvatarPromptToggleIntoView(tester);
-    expect(find.text('Image generation guide'), findsOneWidget);
-    expect(find.text('Avatar generation prompt'), findsOneWidget);
+    expect(find.text('Rider image guide'), findsOneWidget);
+    expect(find.text('Rider image prompt'), findsOneWidget);
     expect(find.text('Open prompt'), findsNothing);
     expect(find.text('Copy prompt'), findsNothing);
     expect(find.byKey(const ValueKey('avatarPromptCopyButton')), findsNothing);
@@ -3874,7 +3876,7 @@ void main() {
       ActivityTimerConfig.defaults().copyWith(vehicleId: 'fire_truck'),
     );
 
-    await tester.tap(find.text('직접 만든 아바타 사용'));
+    await tester.tap(find.text('직접 만든 라이더 사용'));
     await tester.pump();
     await _expandAvatarPrompt(tester);
     expect(_avatarPromptText(tester), contains('소방관'));
@@ -3888,7 +3890,7 @@ void main() {
       ActivityTimerConfig.defaults().copyWith(vehicleId: 'police_car'),
     );
 
-    await tester.tap(find.text('직접 만든 아바타 사용'));
+    await tester.tap(find.text('직접 만든 라이더 사용'));
     await tester.pump();
     await _expandAvatarPrompt(tester);
     expect(_avatarPromptText(tester), contains('경찰'));
@@ -3904,10 +3906,10 @@ void main() {
       onConfigChanged: (config) => changedConfig = config,
     );
 
-    await tester.tap(find.text('직접 만든 아바타 사용'));
+    await tester.tap(find.text('직접 만든 라이더 사용'));
     await tester.pump();
     await _scrollAvatarVehicleSelectionIntoView(tester);
-    expect(find.text('아바타를 태울 차량'), findsOneWidget);
+    expect(find.text('라이더를 태울 차량'), findsOneWidget);
 
     await _tapVisible(tester, _vehicleChoiceFinder('fire_truck'));
     await tester.pump();
@@ -3922,18 +3924,18 @@ void main() {
   ) async {
     await _pumpAvatarSetupScreen(tester, ActivityTimerConfig.defaults());
 
-    await tester.tap(find.text('직접 만든 아바타 사용'));
+    await tester.tap(find.text('직접 만든 라이더 사용'));
     await tester.pump();
 
-    expect(find.widgetWithText(FilledButton, '아바타 이미지 업로드'), findsOneWidget);
+    expect(find.widgetWithText(FilledButton, '라이더 이미지 업로드'), findsOneWidget);
     expect(
-      find.textContaining('생성형 AI에서 만든 정사각형 아바타 이미지를 업로드해 주세요.'),
+      find.textContaining('외부 AI 서비스에서 만든 정사각형 라이더 이미지를 업로드해 주세요.'),
       findsOneWidget,
     );
 
     await _scrollAvatarSetupToBottom(tester);
     expect(find.text('합성 미리보기'), findsNothing);
-    expect(find.text('아바타 위치 조정'), findsNothing);
+    expect(find.text('라이더 위치 조정'), findsNothing);
     expect(find.byKey(const ValueKey('avatarConfirmButton')), findsNothing);
   });
 
@@ -3949,9 +3951,9 @@ void main() {
       onConfigChanged: (config) => changedConfig = config,
     );
 
-    await tester.tap(find.text('직접 만든 아바타 사용'));
+    await tester.tap(find.text('직접 만든 라이더 사용'));
     await tester.pump();
-    await tester.tap(find.widgetWithText(FilledButton, '아바타 이미지 업로드'));
+    await tester.tap(find.widgetWithText(FilledButton, '라이더 이미지 업로드'));
     await tester.pumpAndSettle();
 
     expect(changedConfig, isNull);
@@ -3979,9 +3981,9 @@ void main() {
       onConfigChanged: (config) => changedConfig = config,
     );
 
-    await tester.tap(find.text('직접 만든 아바타 사용'));
+    await tester.tap(find.text('직접 만든 라이더 사용'));
     await tester.pump();
-    await tester.tap(find.widgetWithText(FilledButton, '아바타 이미지 업로드'));
+    await tester.tap(find.widgetWithText(FilledButton, '라이더 이미지 업로드'));
     await tester.pumpAndSettle();
 
     expect(changedConfig, isNull);
@@ -4006,7 +4008,7 @@ void main() {
       ),
     );
 
-    expect(find.text('직접 만든 아바타 사용'), findsWidgets);
+    expect(find.text('직접 만든 라이더 사용'), findsWidgets);
     expect(find.widgetWithText(FilledButton, '다시 업로드'), findsOneWidget);
     expect(
       find.byKey(const ValueKey('pendingAvatarImagePreview')),
@@ -4028,7 +4030,7 @@ void main() {
       ),
     );
 
-    expect(find.text('아바타 이미지를 찾을 수 없어 기본 이미지로 보여드려요.'), findsOneWidget);
+    expect(find.text('라이더 이미지를 찾을 수 없어 기본 이미지로 보여드려요.'), findsOneWidget);
     expect(
       find.byKey(const ValueKey('pendingAvatarImagePreview')),
       findsNothing,
@@ -4129,7 +4131,7 @@ void main() {
     expect(savedAvatar?.offsetX, 0.1);
     expect(savedAvatar?.offsetY, -0.05);
     expect(savedAvatar?.rotationDegrees, 7.0);
-    expect(find.text('아바타를 저장했어요.'), findsOneWidget);
+    expect(find.text('라이더를 저장했어요.'), findsOneWidget);
   });
 
   testWidgets('Avatar setup default image button saves default avatar mode', (
@@ -4309,13 +4311,10 @@ void main() {
       onConfigChanged: (config) => changedConfig = config,
     );
 
-    await tester.tap(find.text('직접 만든 아바타 사용'));
+    await tester.tap(find.text('직접 만든 라이더 사용'));
     await tester.pump();
 
-    final confirmButton = tester.widget<FilledButton>(
-      find.byKey(const ValueKey('avatarConfirmButton')),
-    );
-    expect(confirmButton.onPressed, isNull);
+    expect(find.byKey(const ValueKey('avatarConfirmButton')), findsNothing);
     expect(changedConfig, isNull);
     expect(tester.takeException(), isNull);
   });
@@ -4763,9 +4762,9 @@ void main() {
     await tester.drag(find.byType(ListView), const Offset(0, -700));
     await tester.pumpAndSettle();
 
-    expect(find.text('아바타 설정'), findsNothing);
+    expect(find.text('라이더 설정'), findsNothing);
     expect(find.text('기본 이미지 사용 중'), findsNothing);
-    expect(find.text('아바타 설정하기'), findsNothing);
+    expect(find.text('라이더 설정하기'), findsNothing);
     expect(find.text('빠방 고르기'), findsNothing);
     expect(_vehicleChoiceFinder('motorcycle'), findsNothing);
   });
@@ -4798,8 +4797,8 @@ void main() {
     await tester.drag(find.byType(ListView), const Offset(0, -700));
     await tester.pumpAndSettle();
 
-    expect(find.text('아바타 설정'), findsNothing);
-    expect(find.text('직접 만든 아바타 사용 중'), findsNothing);
+    expect(find.text('라이더 설정'), findsNothing);
+    expect(find.text('직접 만든 라이더 사용 중'), findsNothing);
     expect(find.text('빠방 고르기'), findsNothing);
     expect(find.byType(VehicleSelectionCard), findsNothing);
   });
@@ -9107,7 +9106,7 @@ Future<void> _expandAvatarPrompt(WidgetTester tester) async {
 
 Future<void> _scrollAvatarVehicleSelectionIntoView(WidgetTester tester) async {
   for (var index = 0; index < 4; index += 1) {
-    if (find.text('아바타를 태울 차량').evaluate().isNotEmpty) {
+    if (find.text('라이더를 태울 차량').evaluate().isNotEmpty) {
       return;
     }
     await tester.drag(find.byType(ListView), const Offset(0, -500));

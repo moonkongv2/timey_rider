@@ -42,10 +42,10 @@ class SettingsTexts implements SettingsTextSet {
   String get saveChildName => '이름 저장';
   String get childNameRequiredMessage => '아이 이름을 입력해 주세요.';
   String get childNameSavedMessage => '이름을 저장했어요.';
-  String get avatarSettingsTitle => '아바타 설정';
+  String get avatarSettingsTitle => '라이더 설정';
   String get avatarDefaultState => '기본 이미지 사용 중';
-  String get avatarCustomState => '직접 만든 아바타 사용 중';
-  String get avatarSettingsButton => '아바타 설정하기';
+  String get avatarCustomState => '직접 만든 라이더 사용 중';
+  String get avatarSettingsButton => '라이더 설정하기';
 
   String durationSegmentLabel(int minutes) => '$minutes분';
   String motivationVideoIntervalSegmentLabel(int minutes) => '$minutes분';

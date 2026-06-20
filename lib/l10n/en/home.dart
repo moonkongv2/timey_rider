@@ -58,8 +58,8 @@ class EnHomeTexts implements HomeTextSet {
   String get avatarCtaSubtitle => "Put your child's face on the ride.";
   String get avatarCtaButton => 'Create';
   String get avatarCtaEditButton => 'Edit';
-  String get avatarCtaCreateSemantics => 'Create avatar';
-  String get avatarCtaEditSemantics => 'Edit avatar';
+  String get avatarCtaCreateSemantics => 'Create rider image';
+  String get avatarCtaEditSemantics => 'Edit rider image';
   String get avatarInlineDefaultState => 'Using default face';
   String get avatarInlineCustomState => 'Child face on board';
   String get activeTimerTitle => 'Activity timer in progress';

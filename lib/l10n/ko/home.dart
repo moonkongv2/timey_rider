@@ -53,8 +53,8 @@ class HomeTexts implements HomeTextSet {
   String get avatarCtaSubtitle => '아이 얼굴을 빠방에 태워보세요.';
   String get avatarCtaButton => '만들기';
   String get avatarCtaEditButton => '편집';
-  String get avatarCtaCreateSemantics => '아바타 만들기';
-  String get avatarCtaEditSemantics => '아바타 편집';
+  String get avatarCtaCreateSemantics => '라이더 만들기';
+  String get avatarCtaEditSemantics => '라이더 편집';
   String get avatarInlineDefaultState => '기본 얼굴 사용 중';
   String get avatarInlineCustomState => '아이 얼굴 탑승 중';
   String get activeTimerTitle => '진행 중인 활동 타이머';

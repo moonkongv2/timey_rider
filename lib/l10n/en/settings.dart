@@ -43,10 +43,10 @@ class EnSettingsTexts implements SettingsTextSet {
   String get saveChildName => 'Save name';
   String get childNameRequiredMessage => "Enter your child's name.";
   String get childNameSavedMessage => 'Name saved.';
-  String get avatarSettingsTitle => 'Avatar settings';
+  String get avatarSettingsTitle => 'Rider image settings';
   String get avatarDefaultState => 'Using default image';
-  String get avatarCustomState => 'Using custom avatar';
-  String get avatarSettingsButton => 'Open avatar settings';
+  String get avatarCustomState => 'Using custom rider';
+  String get avatarSettingsButton => 'Open rider image settings';
 
   String durationSegmentLabel(int minutes) => '$minutes min';
   String motivationVideoIntervalSegmentLabel(int minutes) => '$minutes min';
