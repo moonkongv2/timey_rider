@@ -1,28 +1,46 @@
 # Codex Review Loop Protocol
 
 ## Purpose
-Use a newly launched Codex instance only as a reviewer. The primary Codex keeps responsibility for implementation decisions, code changes, verification, and final reporting.
+Use a newly launched reviewer agent only as a reviewer. The primary Codex keeps responsibility for implementation decisions, code changes, verification, and final reporting.
 
-The reviewer Codex is a helper, not an implementer.
+The reviewer agent is a helper, not an implementer.
 
 ## Roles
 
 ### Primary Codex
 - Reads this protocol before starting a review loop.
 - Summarizes the task, implemented changes, design intent, and constraints for the reviewer.
-- Runs the reviewer Codex with a review-only prompt.
+- Runs the selected reviewer agent with a review-only prompt.
 - Saves every loop artifact under `codex_reviews/`.
 - Reads the reviewer output and classifies each finding.
 - Applies only findings judged valid and in scope.
 - Runs relevant formatting, analysis, and tests.
 - Reports accepted, rejected, and blocked findings to the user.
 
-### Reviewer Codex
+### Reviewer Agent
 - Reviews only the current scope provided by the primary Codex.
 - Does not modify files.
 - Does not run broad refactors.
 - Focuses on correctness, regressions, edge cases, missing tests, and mismatches with the stated task.
 - Ignores style-only preferences, unrelated existing issues, and broad architectural suggestions unless they directly affect correctness.
+
+## Reviewer Selection
+Default reviewer:
+- `codex`
+
+Available reviewers:
+- `codex`: run a newly launched Codex reviewer.
+- `agy`: run Antigravity through `/Users/moonkong/.local/bin/agy --print --sandbox`.
+
+Reviewer selection shortcuts:
+- `code-review-loop N [scope]`: use the default `codex` reviewer.
+- `agy-code-review-loop N [scope]`: use the `agy` reviewer.
+- `codex-code-review-loop N [scope]`: explicitly use the `codex` reviewer.
+- `plan-review-loop N <plan>`: use the default `codex` reviewer.
+- `agy-plan-review-loop N <plan>`: use the `agy` reviewer.
+- `codex-plan-review-loop N <plan>`: explicitly use the `codex` reviewer.
+
+Do not use `agy --dangerously-skip-permissions` for review loops unless the user explicitly asks for it.
 
 ## Loop Inputs
 - Loop count: provided by the user.
@@ -45,7 +63,7 @@ Defaults:
 - Review mode: code diff review.
 - Loop count: `N`.
 - Scope: current git diff unless `[scope]` is provided.
-- Reviewer: newly launched Codex, reviewer only.
+- Reviewer: selected reviewer agent, reviewer only.
 - Artifacts: `codex_reviews/`.
 - Apply valid findings to code.
 - Run relevant verification.
@@ -55,6 +73,8 @@ Examples:
 - `code-review-loop 1`
 - `code-review-loop 2`
 - `code-review-loop 1 lib/screens/result_screen.dart`
+- `agy-code-review-loop 1`
+- `codex-code-review-loop 1 lib/screens/result_screen.dart`
 
 ### `plan-review-loop N <plan>`
 Run a plan review loop using this protocol.
@@ -63,7 +83,7 @@ Defaults:
 - Review mode: plan review.
 - Loop count: `N`.
 - Scope: provided plan file or pasted plan text.
-- Reviewer: newly launched Codex, reviewer only.
+- Reviewer: selected reviewer agent, reviewer only.
 - Artifacts: `codex_reviews/`.
 - Apply valid findings to the plan only.
 - Do not modify implementation code.
@@ -73,13 +93,15 @@ Examples:
 - `plan-review-loop 1 docs/feature_plan.md`
 - `plan-review-loop 2 docs/timer_result_plan.md`
 - `plan-review-loop 1` followed by pasted plan text
+- `agy-plan-review-loop 1 docs/feature_plan.md`
+- `codex-plan-review-loop 1` followed by pasted plan text
 
 ## Primary Codex Loop Steps
 For each loop `N`:
 
 1. Inspect the current git diff and relevant context.
 2. Write the exact reviewer prompt to `codex_reviews/loop_N_prompt.md`.
-3. Run a newly launched Codex reviewer using that prompt.
+3. Run the selected newly launched reviewer agent using that prompt.
 4. Save the raw reviewer output to `codex_reviews/loop_N_review.md`.
 5. Read the review output.
 6. Classify each finding as:
@@ -92,6 +114,21 @@ For each loop `N`:
 10. Save verification output or summary to `codex_reviews/loop_N_verification.txt`.
 11. Update `codex_reviews/summary.md`.
 12. Continue until the requested loop count is reached or a stop condition applies.
+
+## Reviewer Commands
+Use the selected reviewer command to produce `codex_reviews/loop_N_review.md`.
+
+Codex reviewer:
+
+```sh
+codex exec --ephemeral -s read-only -C /Users/moonkong/dev/timey_rider -o codex_reviews/loop_N_review.md - < codex_reviews/loop_N_prompt.md
+```
+
+Antigravity reviewer:
+
+```sh
+/Users/moonkong/.local/bin/agy --print --sandbox --print-timeout 10m "$(cat codex_reviews/loop_N_prompt.md)" > codex_reviews/loop_N_review.md
+```
 
 ## Reviewer Prompt Template
 The primary Codex should fill in the placeholders before each loop and save the final prompt verbatim.

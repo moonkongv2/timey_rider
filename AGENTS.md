@@ -12,7 +12,9 @@
 
 ## Review Loop Shortcuts
 - If the user says `code-review-loop`, read `CODEX_REVIEW_LOOP.md` and follow that protocol for a code review loop.
+- If the user says `agy-code-review-loop` or `codex-code-review-loop`, read `CODEX_REVIEW_LOOP.md` and follow that protocol for a code review loop with the selected reviewer.
 - If the user says `plan-review-loop`, read `CODEX_REVIEW_LOOP.md` and follow that protocol for a plan review loop.
+- If the user says `agy-plan-review-loop` or `codex-plan-review-loop`, read `CODEX_REVIEW_LOOP.md` and follow that protocol for a plan review loop with the selected reviewer.
 - Do not read or apply `CODEX_REVIEW_LOOP.md` for unrelated implementation, debugging, explanation, or commit requests.
 
 ## Communication

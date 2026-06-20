@@ -16,6 +16,7 @@ import '../theme/app_radius.dart';
 import '../theme/app_shadows.dart';
 import '../theme/app_spacing.dart';
 import '../widgets/avatar/avatar_composite_preview.dart';
+import '../widgets/avatar/rider_guide_bottom_sheet.dart';
 import '../widgets/vehicle_selection_card.dart';
 
 class AvatarSetupScreen extends StatefulWidget {
@@ -1051,6 +1052,22 @@ class _AvatarUploadCard extends StatelessWidget {
                       fontWeight: FontWeight.w800,
                     ),
                   ),
+                ),
+                IconButton(
+                  onPressed: () {
+                    showModalBottomSheet(
+                      context: context,
+                      isScrollControlled: true,
+                      backgroundColor: AppColors.surfaceWarm,
+                      shape: const RoundedRectangleBorder(
+                        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+                      ),
+                      builder: (context) => const RiderGuideBottomSheet(),
+                    );
+                  },
+                  icon: const Icon(Icons.info_outline_rounded),
+                  color: AppColors.primary,
+                  tooltip: texts.guidePopupTitle,
                 ),
               ],
             ),

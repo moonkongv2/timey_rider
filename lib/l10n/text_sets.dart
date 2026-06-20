@@ -155,6 +155,19 @@ abstract interface class AvatarSetupTextSet {
   String get uploadButton;
   String get selectedImageFallback;
   String get privacyNote;
+
+  String get guidePopupTitle;
+  String get guidePopupMethodTitle;
+  String get guidePopupMethodIntro;
+  String get guidePopupMethod1Title;
+  String get guidePopupMethod1Body;
+  String get guidePopupMethod2Title;
+  String get guidePopupMethod2Body;
+  String get guidePopupPrivacyTitle;
+  String get guidePopupPrivacyBody;
+  String get guidePopupSafetyTitle;
+  String get guidePopupSafetyBody;
+  String get guidePopupConfirmButton;
 }
 
 abstract interface class ActivityHistoryTextSet {
