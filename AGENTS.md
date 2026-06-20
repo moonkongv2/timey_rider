@@ -17,3 +17,4 @@
 
 ## Communication
 - Briefly summarize what changed, why it changed, and how it was verified.
+- After each implementation task, explicitly list the app areas or flows the user should manually check.
