@@ -50,6 +50,23 @@ class _AvatarSetupScreenState extends State<AvatarSetupScreen> {
   bool _isUploadingAvatar = false;
 
   @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      showModalBottomSheet(
+        context: context,
+        isScrollControlled: true,
+        backgroundColor: AppColors.surfaceWarm,
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        ),
+        builder: (context) => const RiderGuideBottomSheet(),
+      );
+    });
+  }
+
+  @override
   void didUpdateWidget(covariant AvatarSetupScreen oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.config != widget.config) {
