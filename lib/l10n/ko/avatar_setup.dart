@@ -28,7 +28,6 @@ class AvatarSetupTexts implements AvatarSetupTextSet {
   String get verticalPositionLabel => '위아래 위치';
   String get rotationLabel => '기울기';
   String get resetPositionButton => '위치 초기화';
-  String get adjustmentUnavailable => '아바타 이미지를 업로드하면 얼굴 크기와 위치를 조정할 수 있어요.';
   String get confirmAvatarButton => '이 아바타로 사용하기';
   String get guideTitle => '이미지 생성 가이드';
   List<String> get guideItems => const [

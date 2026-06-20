@@ -3930,6 +3930,11 @@ void main() {
       find.textContaining('생성형 AI에서 만든 정사각형 아바타 이미지를 업로드해 주세요.'),
       findsOneWidget,
     );
+
+    await _scrollAvatarSetupToBottom(tester);
+    expect(find.text('합성 미리보기'), findsNothing);
+    expect(find.text('아바타 위치 조정'), findsNothing);
+    expect(find.byKey(const ValueKey('avatarConfirmButton')), findsNothing);
   });
 
   testWidgets('Avatar setup picker cancellation does not update config', (
@@ -9136,6 +9141,13 @@ Future<void> _scrollAvatarAdjustmentBackIntoView(WidgetTester tester) async {
       return;
     }
     await tester.drag(find.byType(ListView), const Offset(0, 500));
+    await tester.pumpAndSettle();
+  }
+}
+
+Future<void> _scrollAvatarSetupToBottom(WidgetTester tester) async {
+  for (var index = 0; index < 6; index += 1) {
+    await tester.drag(find.byType(ListView), const Offset(0, -700));
     await tester.pumpAndSettle();
   }
 }

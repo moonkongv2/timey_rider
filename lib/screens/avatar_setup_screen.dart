@@ -408,31 +408,28 @@ class _AvatarSetupScreenState extends State<AvatarSetupScreen> {
                   avatar: currentEditingAvatar,
                 ),
                 const SizedBox(height: AppSpacing.md),
+                _AvatarAdjustmentCard(
+                  avatarScale: _avatarScale,
+                  avatarOffsetX: _avatarOffsetX,
+                  avatarOffsetY: _avatarOffsetY,
+                  avatarRotationDegrees: _avatarRotationDegrees,
+                  onScaleChanged: (value) {
+                    setState(() => _avatarScale = value);
+                  },
+                  onOffsetXChanged: (value) {
+                    setState(() => _avatarOffsetX = value);
+                  },
+                  onOffsetYChanged: (value) {
+                    setState(() => _avatarOffsetY = value);
+                  },
+                  onRotationChanged: (value) {
+                    setState(() => _avatarRotationDegrees = value);
+                  },
+                  onResetPressed: _resetAvatarAdjustment,
+                  onConfirmPressed: _confirmCustomAvatar,
+                  onUseDefaultPressed: _useDefaultAvatarImage,
+                ),
               ],
-              _AvatarAdjustmentCard(
-                hasImagePath: shouldShowCompositePreview,
-                avatarScale: _avatarScale,
-                avatarOffsetX: _avatarOffsetX,
-                avatarOffsetY: _avatarOffsetY,
-                avatarRotationDegrees: _avatarRotationDegrees,
-                onScaleChanged: (value) {
-                  setState(() => _avatarScale = value);
-                },
-                onOffsetXChanged: (value) {
-                  setState(() => _avatarOffsetX = value);
-                },
-                onOffsetYChanged: (value) {
-                  setState(() => _avatarOffsetY = value);
-                },
-                onRotationChanged: (value) {
-                  setState(() => _avatarRotationDegrees = value);
-                },
-                onResetPressed: _resetAvatarAdjustment,
-                onConfirmPressed: shouldShowCompositePreview
-                    ? _confirmCustomAvatar
-                    : null,
-                onUseDefaultPressed: _useDefaultAvatarImage,
-              ),
             ] else ...[
               const SizedBox(height: AppSpacing.xl),
               _DefaultAvatarPreviewCard(
@@ -452,12 +449,6 @@ class _AvatarSetupScreenState extends State<AvatarSetupScreen> {
             if (_avatarMode == AvatarImageMode.custom) ...[
               const SizedBox(height: AppSpacing.md),
               const _AvatarPrivacyNoteCard(),
-              const SizedBox(height: AppSpacing.md),
-              if (!shouldShowCompositePreview)
-                _AvatarSetupStepCard(
-                  title: texts.compositePreviewTitle,
-                  icon: Icons.preview_rounded,
-                ),
             ],
           ],
         ),
@@ -632,7 +623,6 @@ class _AvatarWarningCard extends StatelessWidget {
 
 class _AvatarAdjustmentCard extends StatelessWidget {
   const _AvatarAdjustmentCard({
-    required this.hasImagePath,
     required this.avatarScale,
     required this.avatarOffsetX,
     required this.avatarOffsetY,
@@ -646,7 +636,6 @@ class _AvatarAdjustmentCard extends StatelessWidget {
     required this.onUseDefaultPressed,
   });
 
-  final bool hasImagePath;
   final double avatarScale;
   final double avatarOffsetX;
   final double avatarOffsetY;
@@ -656,7 +645,7 @@ class _AvatarAdjustmentCard extends StatelessWidget {
   final ValueChanged<double> onOffsetYChanged;
   final ValueChanged<double> onRotationChanged;
   final VoidCallback onResetPressed;
-  final VoidCallback? onConfirmPressed;
+  final VoidCallback onConfirmPressed;
   final VoidCallback onUseDefaultPressed;
 
   @override
@@ -691,62 +680,50 @@ class _AvatarAdjustmentCard extends StatelessWidget {
                 ),
               ],
             ),
-            if (hasImagePath) ...[
-              const SizedBox(height: AppSpacing.md),
-              _AvatarAdjustmentSlider(
-                label: texts.faceSizeLabel,
-                value: avatarScale,
-                min: 0.7,
-                max: 2.0,
-                divisions: 26,
-                keyValue: 'avatarScaleSlider',
-                onChanged: onScaleChanged,
-              ),
-              _AvatarAdjustmentSlider(
-                label: texts.horizontalPositionLabel,
-                value: avatarOffsetX,
-                min: -0.2,
-                max: 0.2,
-                divisions: 16,
-                keyValue: 'avatarOffsetXSlider',
-                onChanged: onOffsetXChanged,
-              ),
-              _AvatarAdjustmentSlider(
-                label: texts.verticalPositionLabel,
-                value: avatarOffsetY,
-                min: -0.2,
-                max: 0.2,
-                divisions: 16,
-                keyValue: 'avatarOffsetYSlider',
-                onChanged: onOffsetYChanged,
-              ),
-              _AvatarAdjustmentSlider(
-                label: texts.rotationLabel,
-                value: avatarRotationDegrees,
-                min: -15,
-                max: 15,
-                divisions: 30,
-                keyValue: 'avatarRotationSlider',
-                onChanged: onRotationChanged,
-              ),
-              const SizedBox(height: AppSpacing.sm),
-              OutlinedButton.icon(
-                key: const ValueKey('avatarResetButton'),
-                onPressed: onResetPressed,
-                icon: const Icon(Icons.restart_alt_rounded),
-                label: Text(texts.resetPositionButton),
-              ),
-            ] else ...[
-              const SizedBox(height: AppSpacing.md),
-              Text(
-                texts.adjustmentUnavailable,
-                style: textTheme.bodyMedium?.copyWith(
-                  color: AppColors.textPrimary,
-                  fontWeight: FontWeight.w600,
-                  height: 1.36,
-                ),
-              ),
-            ],
+            const SizedBox(height: AppSpacing.md),
+            _AvatarAdjustmentSlider(
+              label: texts.faceSizeLabel,
+              value: avatarScale,
+              min: 0.7,
+              max: 2.0,
+              divisions: 26,
+              keyValue: 'avatarScaleSlider',
+              onChanged: onScaleChanged,
+            ),
+            _AvatarAdjustmentSlider(
+              label: texts.horizontalPositionLabel,
+              value: avatarOffsetX,
+              min: -0.2,
+              max: 0.2,
+              divisions: 16,
+              keyValue: 'avatarOffsetXSlider',
+              onChanged: onOffsetXChanged,
+            ),
+            _AvatarAdjustmentSlider(
+              label: texts.verticalPositionLabel,
+              value: avatarOffsetY,
+              min: -0.2,
+              max: 0.2,
+              divisions: 16,
+              keyValue: 'avatarOffsetYSlider',
+              onChanged: onOffsetYChanged,
+            ),
+            _AvatarAdjustmentSlider(
+              label: texts.rotationLabel,
+              value: avatarRotationDegrees,
+              min: -15,
+              max: 15,
+              divisions: 30,
+              keyValue: 'avatarRotationSlider',
+              onChanged: onRotationChanged,
+            ),
+            const SizedBox(height: AppSpacing.sm),
+            OutlinedButton.icon(
+              key: const ValueKey('avatarResetButton'),
+              onPressed: onResetPressed,
+              icon: const Icon(Icons.restart_alt_rounded),
+              label: Text(texts.resetPositionButton),
+            ),
             const SizedBox(height: AppSpacing.md),
             FilledButton.icon(
               key: const ValueKey('avatarConfirmButton'),
@@ -1242,43 +1219,6 @@ class _AvatarInfoCard extends StatelessWidget {
                     ),
                   ),
                 ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _AvatarSetupStepCard extends StatelessWidget {
-  const _AvatarSetupStepCard({required this.title, required this.icon});
-
-  final String title;
-  final IconData icon;
-
-  @override
-  Widget build(BuildContext context) {
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        color: AppColors.white.withValues(alpha: 0.82),
-        borderRadius: AppRadius.card,
-        border: Border.all(color: AppColors.borderSoft),
-        boxShadow: AppShadows.surface,
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(AppSpacing.md),
-        child: Row(
-          children: [
-            Icon(icon, color: AppColors.brown700),
-            const SizedBox(width: AppSpacing.md),
-            Expanded(
-              child: Text(
-                title,
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  color: AppColors.textStrong,
-                  fontWeight: FontWeight.w800,
-                ),
               ),
             ),
           ],

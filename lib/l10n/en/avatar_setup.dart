@@ -31,8 +31,6 @@ class EnAvatarSetupTexts implements AvatarSetupTextSet {
   String get verticalPositionLabel => 'Vertical position';
   String get rotationLabel => 'Tilt';
   String get resetPositionButton => 'Reset position';
-  String get adjustmentUnavailable =>
-      'Upload an avatar image to adjust the face size and position.';
   String get confirmAvatarButton => 'Use this avatar';
   String get guideTitle => 'Image generation guide';
   List<String> get guideItems => const [
