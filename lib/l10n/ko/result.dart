@@ -6,16 +6,16 @@ import '../text_sets.dart';
 class ResultTexts implements ResultTextSet {
   const ResultTexts();
 
-  String get rewardLoading => '보상 정리 중...';
+  String get rewardLoading => '기록 정리 중...';
   String get recordSaved => '오늘의 기록을 저장했어';
-  String get stickerChoiceTitle => '미션을 마쳤나요?';
-  String get stickerChoiceMessage => '아이와 함께 미션을 확인한 뒤 선택해 주세요.';
+  String get stickerChoiceTitle => '이번 활동을 확인했나요?';
+  String get stickerChoiceMessage => '아이와 함께 오늘 활동을 돌아본 뒤 선택해 주세요.';
   String get getStickerButton => '차량 스티커 받기';
   String get skipStickerButton => '이번엔 차량 스티커 받지 않기';
 
   String stickerChoiceTitleForStatus(ActivityCompletionStatus status) {
     return switch (status) {
-      ActivityCompletionStatus.timeEnded => '시간이 다 되었어요',
+      ActivityCompletionStatus.timeEnded => '정해둔 시간이 끝났어요',
       _ => stickerChoiceTitle,
     };
   }
@@ -31,10 +31,10 @@ class ResultTexts implements ResultTextSet {
     return switch (status) {
       ActivityCompletionStatus.completedBeforeEnd ||
       ActivityCompletionStatus.completedAtEnd ||
-      ActivityCompletionStatus.completedAfterEnd => '미션 완료!',
-      ActivityCompletionStatus.timeEnded => '시간이 다 되었어!',
-      ActivityCompletionStatus.needsMoreTime => '조금 더 필요했어',
-      ActivityCompletionStatus.canceled => '미션을 멈췄어',
+      ActivityCompletionStatus.completedAfterEnd => '오늘 활동을 기록했어!',
+      ActivityCompletionStatus.timeEnded => '정해둔 시간이 끝났어',
+      ActivityCompletionStatus.needsMoreTime => '조금 더 시간이 필요했어',
+      ActivityCompletionStatus.canceled => '오늘 활동을 여기까지 했어',
     };
   }
 
@@ -42,7 +42,7 @@ class ResultTexts implements ResultTextSet {
     return switch (status) {
       ActivityCompletionStatus.completedBeforeEnd ||
       ActivityCompletionStatus.completedAtEnd ||
-      ActivityCompletionStatus.completedAfterEnd => '오늘의 미션을 끝까지 잘 마쳤어.',
+      ActivityCompletionStatus.completedAfterEnd => '오늘 활동을 확인하고 기록했어.',
       ActivityCompletionStatus.timeEnded => '정해둔 시간이 끝났어.',
       ActivityCompletionStatus.needsMoreTime =>
         _needsMoreTimeMessagesByVehicle[vehicleId] ?? '조금 더 시간이 필요했어.',
@@ -54,8 +54,8 @@ class ResultTexts implements ResultTextSet {
     return switch (status) {
       ActivityCompletionStatus.completedBeforeEnd ||
       ActivityCompletionStatus.completedAtEnd ||
-      ActivityCompletionStatus.completedAfterEnd => '오늘도 멋지게 해냈어.',
-      ActivityCompletionStatus.timeEnded => '다음 미션으로 천천히 넘어가자.',
+      ActivityCompletionStatus.completedAfterEnd => '시도한 과정도 함께 기억할게.',
+      ActivityCompletionStatus.timeEnded => '이제 다음 흐름을 차분히 정해보자.',
       ActivityCompletionStatus.needsMoreTime => '괜찮아. 다음에는 시간을 살짝 바꿔보자.',
       ActivityCompletionStatus.canceled => '다음에 다시 이어가도 괜찮아.',
     };
@@ -79,7 +79,7 @@ class ResultTexts implements ResultTextSet {
       ActivityCompletionStatus.completedBeforeEnd ||
       ActivityCompletionStatus.completedAtEnd ||
       ActivityCompletionStatus.completedAfterEnd =>
-        '차량 스티커보다 해낸 과정과 노력을 먼저 칭찬해 주세요.',
+        '결과보다 활동에 참여한 과정과 노력을 먼저 봐주세요.',
       ActivityCompletionStatus.timeEnded => '시간이 끝난 것도 자연스러운 루틴의 일부예요.',
       ActivityCompletionStatus.needsMoreTime ||
       ActivityCompletionStatus.canceled => '아쉬운 결과도 다음 조절을 위한 기록이에요.',
@@ -101,10 +101,10 @@ class ResultTexts implements ResultTextSet {
     return switch (status) {
       ActivityCompletionStatus.completedBeforeEnd ||
       ActivityCompletionStatus.completedAtEnd ||
-      ActivityCompletionStatus.completedAfterEnd => '완료와 격려 안내',
-      ActivityCompletionStatus.timeEnded => '시간 종료와 다음 미션 안내',
+      ActivityCompletionStatus.completedAfterEnd => '활동 기록과 격려 안내',
+      ActivityCompletionStatus.timeEnded => '시간 종료와 다음 흐름 안내',
       ActivityCompletionStatus.needsMoreTime ||
-      ActivityCompletionStatus.canceled => '미완료와 다음 도전 안내',
+      ActivityCompletionStatus.canceled => '다음 시도를 위한 안내',
     };
   }
 
@@ -115,14 +115,14 @@ class ResultTexts implements ResultTextSet {
       ActivityCompletionStatus.completedBeforeEnd ||
       ActivityCompletionStatus.completedAtEnd ||
       ActivityCompletionStatus.completedAfterEnd => const [
-        '활동을 마쳤다고 확인하면 완료로 기록돼요.',
+        '아이와 함께 확인한 내용이 오늘 활동 기록으로 남아요.',
       ],
       ActivityCompletionStatus.timeEnded => const [
         '시간이 끝난 뒤 아이와 함께 확인하고 기록돼요.',
       ],
       ActivityCompletionStatus.needsMoreTime ||
       ActivityCompletionStatus.canceled => const [
-        '활동을 마치지 못했으면 다음 시도를 위한 기록으로 남겨요.',
+        '활동이 마무리되지 않았으면 다음 시도를 위한 기록으로 남겨요.',
       ],
     };
   }
@@ -155,7 +155,7 @@ class ResultTexts implements ResultTextSet {
       ActivityCompletionStatus.completedBeforeEnd ||
       ActivityCompletionStatus.completedAtEnd ||
       ActivityCompletionStatus.completedAfterEnd => const [
-        '활동을 마쳤다고 확인되어 완료로 기록돼요.',
+        '아이와 함께 확인한 내용이 오늘 활동 기록으로 남아요.',
         '차량 스티커 받기를 선택하면 선택한 차량 스티커 1장을 받아요.',
         '보상 목표가 있으면 받은 차량 스티커가 목표 칸을 채울 수 있어요.',
       ],
@@ -166,7 +166,7 @@ class ResultTexts implements ResultTextSet {
       ],
       ActivityCompletionStatus.needsMoreTime ||
       ActivityCompletionStatus.canceled => const [
-        '활동을 마치기에는 시간이 조금 부족했던 기록이에요.',
+        '이번 활동에는 시간이 조금 더 필요했다는 기록이에요.',
         '이번엔 차량 스티커 받지 않기를 선택하면 기록만 남아요.',
         '미완료는 벌이 아니라 다음 조절을 위한 기록이에요.',
       ],
@@ -181,14 +181,14 @@ class ResultTexts implements ResultTextSet {
       ActivityCompletionStatus.completedBeforeEnd ||
       ActivityCompletionStatus.completedAtEnd ||
       ActivityCompletionStatus.completedAfterEnd => const [
-        '끝까지 해보려고 한 게 정말 좋았어.',
-        '오늘 미션을 해낸 게 정말 멋져.',
-        '차량 스티커도 좋지만, 해낸 마음이 제일 멋져.',
+        '오늘 활동을 같이 해본 게 좋았어.',
+        '정해둔 시간 동안 해본 걸 기억할게.',
+        '차량 스티커보다 네가 해본 과정이 더 중요해.',
       ],
       ActivityCompletionStatus.timeEnded => const [
-        '시간이 끝났네. 이제 다음 미션으로 가보자.',
-        '오늘도 정해둔 시간만큼 잘 해봤어.',
-        '다음에는 어떤 미션을 해볼까?',
+        '시간이 끝났네. 이제 다음 흐름을 정해보자.',
+        '정해둔 시간 동안 해본 걸 기억할게.',
+        '다음에는 어떤 활동을 해볼까?',
       ],
       ActivityCompletionStatus.needsMoreTime ||
       ActivityCompletionStatus.canceled => const [
@@ -225,14 +225,14 @@ class ResultTexts implements ResultTextSet {
   }
 
   String resultHelpNextCourseTitle(ActivityCompletionStatus status) =>
-      '다음 미션은 이렇게 조절해보세요';
+      '다음 활동은 이렇게 조절해보세요';
 
   List<String> resultHelpNextCourseItems(ActivityCompletionStatus status) {
     return switch (status) {
       ActivityCompletionStatus.completedBeforeEnd ||
       ActivityCompletionStatus.completedAtEnd ||
       ActivityCompletionStatus.completedAfterEnd => const [
-        '너무 급하게 끝낸 것 같다면 다음에는 시간을 조금 늘려도 좋아요.',
+        '활동 흐름이 짧게 느껴졌다면 다음에는 시간을 조금 조절해도 좋아요.',
         '여유 있게 완료했다면 같은 시간을 반복해 안정감을 만들어 주세요.',
         '차량 스티커보다 활동 흐름과 시도를 먼저 칭찬해 주세요.',
       ],
@@ -252,16 +252,16 @@ class ResultTexts implements ResultTextSet {
 }
 
 const _needsMoreTimeMessagesByVehicle = {
-  'motorcycle': '오토바이가 먼저 도착했어.',
-  'fire_truck': '소방차가 먼저 도착했어.',
-  'police_car': '경찰차가 먼저 도착했어.',
-  'excavator': '포크레인이 먼저 도착했어.',
-  'airplane': '비행기가 먼저 도착했어.',
-  'bus': '버스가 먼저 도착했어.',
-  'supercar': '슈퍼카가 먼저 도착했어.',
-  'train': '기차가 먼저 도착했어.',
-  't_rex': '티렉스가 먼저 도착했어.',
-  'shark': '상어가 먼저 도착했어.',
-  'brachio': '브라키오가 먼저 도착했어.',
-  'pteranodon': '프테라노돈이 먼저 도착했어.',
+  'motorcycle': '이번 활동에는 시간이 조금 더 필요했어.',
+  'fire_truck': '이번 활동에는 시간이 조금 더 필요했어.',
+  'police_car': '이번 활동에는 시간이 조금 더 필요했어.',
+  'excavator': '이번 활동에는 시간이 조금 더 필요했어.',
+  'airplane': '이번 활동에는 시간이 조금 더 필요했어.',
+  'bus': '이번 활동에는 시간이 조금 더 필요했어.',
+  'supercar': '이번 활동에는 시간이 조금 더 필요했어.',
+  'train': '이번 활동에는 시간이 조금 더 필요했어.',
+  't_rex': '이번 활동에는 시간이 조금 더 필요했어.',
+  'shark': '이번 활동에는 시간이 조금 더 필요했어.',
+  'brachio': '이번 활동에는 시간이 조금 더 필요했어.',
+  'pteranodon': '이번 활동에는 시간이 조금 더 필요했어.',
 };

@@ -6,16 +6,17 @@ import '../text_sets.dart';
 class EnResultTexts implements ResultTextSet {
   const EnResultTexts();
 
-  String get rewardLoading => 'Getting your reward ready...';
+  String get rewardLoading => 'Saving the record...';
   String get recordSaved => "Today's record is saved.";
-  String get stickerChoiceTitle => 'Mission complete?';
-  String get stickerChoiceMessage => 'Check the mission together, then choose.';
+  String get stickerChoiceTitle => 'Did you check this activity?';
+  String get stickerChoiceMessage =>
+      "Look back on today's activity together, then choose.";
   String get getStickerButton => 'Get Vehicle Sticker';
   String get skipStickerButton => 'No Vehicle Sticker This Time';
 
   String stickerChoiceTitleForStatus(ActivityCompletionStatus status) {
     return switch (status) {
-      ActivityCompletionStatus.timeEnded => 'Time is up',
+      ActivityCompletionStatus.timeEnded => 'The planned time is over',
       _ => stickerChoiceTitle,
     };
   }
@@ -32,10 +33,11 @@ class EnResultTexts implements ResultTextSet {
     return switch (status) {
       ActivityCompletionStatus.completedBeforeEnd ||
       ActivityCompletionStatus.completedAtEnd ||
-      ActivityCompletionStatus.completedAfterEnd => 'Mission Complete!',
-      ActivityCompletionStatus.timeEnded => "Time's Up!",
-      ActivityCompletionStatus.needsMoreTime => 'Need a little more time',
-      ActivityCompletionStatus.canceled => 'Mission Paused',
+      ActivityCompletionStatus.completedAfterEnd =>
+        "Today's activity is recorded!",
+      ActivityCompletionStatus.timeEnded => 'The planned time is over',
+      ActivityCompletionStatus.needsMoreTime => 'A little more time was needed',
+      ActivityCompletionStatus.canceled => "That's enough for today",
     };
   }
 
@@ -44,7 +46,7 @@ class EnResultTexts implements ResultTextSet {
       ActivityCompletionStatus.completedBeforeEnd ||
       ActivityCompletionStatus.completedAtEnd ||
       ActivityCompletionStatus.completedAfterEnd =>
-        "You finished today's little mission.",
+        "We checked and saved today's activity.",
       ActivityCompletionStatus.timeEnded => 'The timer reached the finish.',
       ActivityCompletionStatus.needsMoreTime =>
         _needsMoreTimeMessagesByVehicle[vehicleId] ??
@@ -58,9 +60,9 @@ class EnResultTexts implements ResultTextSet {
       ActivityCompletionStatus.completedBeforeEnd ||
       ActivityCompletionStatus.completedAtEnd ||
       ActivityCompletionStatus.completedAfterEnd =>
-        'You did a great job today.',
+        'We will remember the effort, too.',
       ActivityCompletionStatus.timeEnded =>
-        "Let's move to the next little mission.",
+        "Let's decide the next step calmly.",
       ActivityCompletionStatus.needsMoreTime =>
         "That's okay. We can try a little more time next round.",
       ActivityCompletionStatus.canceled => 'We can try again next time.',
@@ -85,7 +87,7 @@ class EnResultTexts implements ResultTextSet {
       ActivityCompletionStatus.completedBeforeEnd ||
       ActivityCompletionStatus.completedAtEnd ||
       ActivityCompletionStatus.completedAfterEnd =>
-        'Focus on the effort, not just the vehicle sticker.',
+        'Notice the participation and effort before the result.',
       ActivityCompletionStatus.timeEnded =>
         'A timer ending can be a normal part of the routine.',
       ActivityCompletionStatus.needsMoreTime ||
@@ -113,10 +115,10 @@ class EnResultTexts implements ResultTextSet {
       ActivityCompletionStatus.completedBeforeEnd ||
       ActivityCompletionStatus.completedAtEnd ||
       ActivityCompletionStatus.completedAfterEnd =>
-        'Completion and encouragement tips',
-      ActivityCompletionStatus.timeEnded => 'Time-ended routine tips',
+        'Activity record and encouragement tips',
+      ActivityCompletionStatus.timeEnded => 'Time-ended next-step tips',
       ActivityCompletionStatus.needsMoreTime ||
-      ActivityCompletionStatus.canceled => 'Next-try tips',
+      ActivityCompletionStatus.canceled => 'Tips for the next try',
     };
   }
 
@@ -127,14 +129,14 @@ class EnResultTexts implements ResultTextSet {
       ActivityCompletionStatus.completedBeforeEnd ||
       ActivityCompletionStatus.completedAtEnd ||
       ActivityCompletionStatus.completedAfterEnd => const [
-        'When you confirm the activity is finished, it is recorded as complete.',
+        "What you check together is saved in today's activity record.",
       ],
       ActivityCompletionStatus.timeEnded => const [
         'After the timer ends, check the mission together and save the record.',
       ],
       ActivityCompletionStatus.needsMoreTime ||
       ActivityCompletionStatus.canceled => const [
-        'If the activity was not finished, keep the record as guidance for the next try.',
+        'If the activity was not wrapped up, keep the record as guidance for the next try.',
       ],
     };
   }
@@ -167,7 +169,7 @@ class EnResultTexts implements ResultTextSet {
       ActivityCompletionStatus.completedBeforeEnd ||
       ActivityCompletionStatus.completedAtEnd ||
       ActivityCompletionStatus.completedAfterEnd => const [
-        'The activity was confirmed finished and recorded as complete.',
+        "What you check together is saved in today's activity record.",
         'Choose Get Vehicle Sticker to receive one sticker for the selected vehicle.',
         'If a reward goal is active, the received vehicle sticker can fill one goal slot.',
       ],
@@ -178,7 +180,7 @@ class EnResultTexts implements ResultTextSet {
       ],
       ActivityCompletionStatus.needsMoreTime ||
       ActivityCompletionStatus.canceled => const [
-        'The activity needed a little more time.',
+        'This activity needed a little more time today.',
         'Choose No Vehicle Sticker This Time to save the record without a sticker.',
         'Use the record to adjust the next try.',
       ],
@@ -193,14 +195,14 @@ class EnResultTexts implements ResultTextSet {
       ActivityCompletionStatus.completedBeforeEnd ||
       ActivityCompletionStatus.completedAtEnd ||
       ActivityCompletionStatus.completedAfterEnd => const [
-        'I liked how you kept trying until the end.',
-        'You finished today’s mission.',
-        'The vehicle sticker is fun, but your effort matters most.',
+        'I liked doing this activity with you today.',
+        'I will remember what you tried during the planned time.',
+        'The vehicle sticker is fun, but what you tried matters more.',
       ],
       ActivityCompletionStatus.timeEnded => const [
-        'Time is up. Let’s move to the next mission.',
-        'You stayed with it for the time we planned.',
-        'What little mission should we do next?',
+        "Time is up. Let's decide the next step.",
+        'I will remember what you tried during the planned time.',
+        'What activity should we try next?',
       ],
       ActivityCompletionStatus.needsMoreTime ||
       ActivityCompletionStatus.canceled => const [
@@ -238,14 +240,14 @@ class EnResultTexts implements ResultTextSet {
   }
 
   String resultHelpNextCourseTitle(ActivityCompletionStatus status) =>
-      'For the next mission';
+      'For the next activity';
 
   List<String> resultHelpNextCourseItems(ActivityCompletionStatus status) {
     return switch (status) {
       ActivityCompletionStatus.completedBeforeEnd ||
       ActivityCompletionStatus.completedAtEnd ||
       ActivityCompletionStatus.completedAfterEnd => const [
-        'If the activity felt rushed, try a slightly longer timer next time.',
+        'If the activity flow felt short, try adjusting the timer next time.',
         'If your child seemed comfortable, repeat the same duration to build confidence.',
         'Praise the routine flow and effort more than the vehicle sticker.',
       ],
@@ -265,16 +267,16 @@ class EnResultTexts implements ResultTextSet {
 }
 
 const _needsMoreTimeMessagesByVehicle = {
-  'motorcycle': 'The motorcycle reached the finish first.',
-  'fire_truck': 'The fire truck reached the finish first.',
-  'police_car': 'The police car reached the finish first.',
-  'excavator': 'The excavator reached the finish first.',
-  'airplane': 'The airplane reached the finish first.',
-  'bus': 'The bus reached the finish first.',
-  'supercar': 'The supercar reached the finish first.',
-  'train': 'The train reached the finish first.',
-  't_rex': 'The T-rex reached the finish first.',
-  'shark': 'The shark reached the finish first.',
-  'brachio': 'The brachio reached the finish first.',
-  'pteranodon': 'The pteranodon reached the finish first.',
+  'motorcycle': 'This activity needed a little more time today.',
+  'fire_truck': 'This activity needed a little more time today.',
+  'police_car': 'This activity needed a little more time today.',
+  'excavator': 'This activity needed a little more time today.',
+  'airplane': 'This activity needed a little more time today.',
+  'bus': 'This activity needed a little more time today.',
+  'supercar': 'This activity needed a little more time today.',
+  'train': 'This activity needed a little more time today.',
+  't_rex': 'This activity needed a little more time today.',
+  'shark': 'This activity needed a little more time today.',
+  'brachio': 'This activity needed a little more time today.',
+  'pteranodon': 'This activity needed a little more time today.',
 };
