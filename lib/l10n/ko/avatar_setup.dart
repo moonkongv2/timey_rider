@@ -60,7 +60,7 @@ class AvatarSetupTexts implements AvatarSetupTextSet {
 
   String get guidePopupTitle => '우리 아이 라이더 만들기 안내';
   String get guidePopupMethodTitle => '📸 라이더 이미지 준비 방법';
-  String get guidePopupMethodIntro => '앱 자체에는 얼굴만 오려내는 기능이 없습니다. 위 예시처럼 차량에 쏙 들어갈 아이의 얼굴 이미지를 직접 준비해 주세요.';
+  String get guidePopupMethodIntro => '앱 자체에는 얼굴만 오려내는 기능이 없습니다. 위 예시처럼 차량에 쏙 들어갈 아이의 얼굴 이미지를 준비해 주세요.';
   String get guidePopupMethod1Title => '1. 스마트폰 기본 사진 앱 활용하기';
   String get guidePopupMethod1Body =>
       '갤럭시나 아이폰의 기본 사진 앱에서 제공하는 \'피사체 오려내기(배경 지우기)\' 기능을 사용해 아이의 얼굴 부분만 정사각형에 가깝게 잘라내어 저장해 주세요.';
