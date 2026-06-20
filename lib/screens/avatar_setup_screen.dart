@@ -57,6 +57,7 @@ class _AvatarSetupScreenState extends State<AvatarSetupScreen> {
       showModalBottomSheet(
         context: context,
         isScrollControlled: true,
+        useSafeArea: true,
         backgroundColor: AppColors.surfaceWarm,
         shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
@@ -1075,6 +1076,7 @@ class _AvatarUploadCard extends StatelessWidget {
                     showModalBottomSheet(
                       context: context,
                       isScrollControlled: true,
+                      useSafeArea: true,
                       backgroundColor: AppColors.surfaceWarm,
                       shape: const RoundedRectangleBorder(
                         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
