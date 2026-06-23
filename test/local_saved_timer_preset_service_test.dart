@@ -7,8 +7,75 @@ import 'package:timey_rider/models/activity_timer_preset.dart';
 import 'package:timey_rider/services/local_saved_timer_preset_service.dart';
 
 void main() {
-  test('LocalSavedTimerPresetService saves and loads presets', () async {
+  test(
+    'LocalSavedTimerPresetService seeds default presets on first load',
+    () async {
+      SharedPreferences.setMockInitialValues({});
+      const service = LocalSavedTimerPresetService();
+
+      final presets = await service.load();
+
+      expect(presets, hasLength(2));
+      expect(presets.first.activityId, 'brushing');
+      expect(presets.first.duration, const Duration(minutes: 3));
+      expect(presets.first.markerMode, ActivityMarkerMode.activityDefault);
+      expect(presets.first.isFavorite, isTrue);
+      expect(presets.last.activityId, 'play');
+      expect(presets.last.duration, const Duration(minutes: 30));
+      expect(presets.last.markerMode, ActivityMarkerMode.activityDefault);
+      expect(presets.last.isFavorite, isTrue);
+    },
+  );
+
+  test(
+    'LocalSavedTimerPresetService does not recreate deleted defaults',
+    () async {
+      SharedPreferences.setMockInitialValues({});
+      const service = LocalSavedTimerPresetService();
+
+      final oneRemaining = await service.removeAt(0);
+      final reloadedOneRemaining = await service.load();
+      final noneRemaining = await service.removeAt(0);
+      final reloadedNoneRemaining = await service.load();
+
+      expect(oneRemaining, hasLength(1));
+      expect(oneRemaining.first.activityId, 'play');
+      expect(reloadedOneRemaining, hasLength(1));
+      expect(reloadedOneRemaining.first.activityId, 'play');
+      expect(noneRemaining, isEmpty);
+      expect(reloadedNoneRemaining, isEmpty);
+    },
+  );
+
+  test('LocalSavedTimerPresetService clear resets default seeding', () async {
     SharedPreferences.setMockInitialValues({});
+    const service = LocalSavedTimerPresetService();
+
+    await service.removeAt(0);
+    await service.removeAt(0);
+    expect(await service.load(), isEmpty);
+
+    await service.clear();
+    final presets = await service.load();
+
+    expect(presets, hasLength(2));
+    expect(presets.first.activityId, 'brushing');
+    expect(presets.last.activityId, 'play');
+  });
+
+  test(
+    'LocalSavedTimerPresetService does not seed over present empty storage',
+    () async {
+      SharedPreferences.setMockInitialValues({'savedActivityTimerPresets': ''});
+
+      final presets = await const LocalSavedTimerPresetService().load();
+
+      expect(presets, isEmpty);
+    },
+  );
+
+  test('LocalSavedTimerPresetService saves and loads presets', () async {
+    _setInitializedEmptySavedPresets();
     const service = LocalSavedTimerPresetService();
 
     await service.save(
@@ -34,7 +101,7 @@ void main() {
   test(
     'LocalSavedTimerPresetService moves duplicate presets to the top',
     () async {
-      SharedPreferences.setMockInitialValues({});
+      _setInitializedEmptySavedPresets();
       const service = LocalSavedTimerPresetService();
 
       await service.save(
@@ -74,7 +141,7 @@ void main() {
   test(
     'LocalSavedTimerPresetService keeps custom presets with different names',
     () async {
-      SharedPreferences.setMockInitialValues({});
+      _setInitializedEmptySavedPresets();
       const service = LocalSavedTimerPresetService();
 
       await service.save(
@@ -105,7 +172,7 @@ void main() {
   );
 
   test('LocalSavedTimerPresetService caps saved presets', () async {
-    SharedPreferences.setMockInitialValues({});
+    _setInitializedEmptySavedPresets();
     const service = LocalSavedTimerPresetService();
 
     for (
@@ -131,7 +198,7 @@ void main() {
   });
 
   test('LocalSavedTimerPresetService removes a preset by index', () async {
-    SharedPreferences.setMockInitialValues({});
+    _setInitializedEmptySavedPresets();
     const service = LocalSavedTimerPresetService();
 
     await service.save(
@@ -158,7 +225,7 @@ void main() {
   });
 
   test('LocalSavedTimerPresetService toggles favorite presets', () async {
-    SharedPreferences.setMockInitialValues({});
+    _setInitializedEmptySavedPresets();
     const service = LocalSavedTimerPresetService();
 
     await service.save(
@@ -182,7 +249,7 @@ void main() {
   });
 
   test('LocalSavedTimerPresetService limits home favorite presets', () async {
-    SharedPreferences.setMockInitialValues({});
+    _setInitializedEmptySavedPresets();
     const service = LocalSavedTimerPresetService();
 
     for (
@@ -226,7 +293,7 @@ void main() {
   test(
     'LocalSavedTimerPresetService keeps favorite state when saving duplicate',
     () async {
-      SharedPreferences.setMockInitialValues({});
+      _setInitializedEmptySavedPresets();
       const service = LocalSavedTimerPresetService();
 
       await service.save(
@@ -272,5 +339,12 @@ void main() {
 
     expect(presets, hasLength(1));
     expect(presets.first.activityId, 'reading');
+  });
+}
+
+void _setInitializedEmptySavedPresets() {
+  SharedPreferences.setMockInitialValues({
+    'savedActivityTimerPresets': jsonEncode([]),
+    'savedActivityTimerPresetsInitialized': true,
   });
 }

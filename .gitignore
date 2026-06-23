@@ -16,7 +16,7 @@ assets/resources
 docs/
 assets/images/onboarding/onboarding_02_routine_ride2.png
 codex_reviews/
-
+.venv/
 # IntelliJ related
 *.iml
 *.ipr

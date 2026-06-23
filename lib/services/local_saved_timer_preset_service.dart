@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../catalogs/activity_catalog.dart';
 import '../models/activity.dart';
 import '../models/activity_timer_preset.dart';
 
@@ -11,10 +12,39 @@ class LocalSavedTimerPresetService {
   static const maxSavedPresets = 5;
   static const maxFavoritePresets = 3;
   static const _savedTimerPresetsKey = 'savedActivityTimerPresets';
+  static const _savedTimerPresetsInitializedKey =
+      'savedActivityTimerPresetsInitialized';
+  static final List<ActivityTimerPreset> _defaultPresets = List.unmodifiable([
+    ActivityTimerPreset(
+      activityId: ActivityCatalog.brushing.id,
+      duration: const Duration(minutes: 3),
+      markerMode: ActivityMarkerMode.activityDefault,
+      updatedAt: DateTime.utc(2026),
+      isFavorite: true,
+    ),
+    ActivityTimerPreset(
+      activityId: ActivityCatalog.play.id,
+      duration: const Duration(minutes: 30),
+      markerMode: ActivityMarkerMode.activityDefault,
+      updatedAt: DateTime.utc(2026),
+      isFavorite: true,
+    ),
+  ]);
 
   Future<List<ActivityTimerPreset>> load() async {
     final preferences = await SharedPreferences.getInstance();
+    final hasSavedPresets = preferences.getKeys().contains(
+      _savedTimerPresetsKey,
+    );
     final rawPresets = preferences.getString(_savedTimerPresetsKey);
+    if (!hasSavedPresets) {
+      if (preferences.getBool(_savedTimerPresetsInitializedKey) == true) {
+        return const [];
+      }
+      await _write(_defaultPresets);
+      return List.unmodifiable(_defaultPresets);
+    }
+
     if (rawPresets == null || rawPresets.trim().isEmpty) {
       return const [];
     }
@@ -107,6 +137,7 @@ class LocalSavedTimerPresetService {
   Future<void> clear() async {
     final preferences = await SharedPreferences.getInstance();
     await preferences.remove(_savedTimerPresetsKey);
+    await preferences.remove(_savedTimerPresetsInitializedKey);
   }
 
   Future<void> _write(List<ActivityTimerPreset> presets) async {
@@ -115,6 +146,7 @@ class LocalSavedTimerPresetService {
       _savedTimerPresetsKey,
       jsonEncode([for (final preset in presets) preset.toJson()]),
     );
+    await preferences.setBool(_savedTimerPresetsInitializedKey, true);
   }
 }
 

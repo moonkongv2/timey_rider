@@ -2907,7 +2907,7 @@ void main() {
   });
 
   testWidgets('Timer builder saves a reusable timer preset', (tester) async {
-    SharedPreferences.setMockInitialValues({});
+    _setInitializedEmptySavedTimerPresets();
     addTearDown(() async {
       await const ActiveActivityTimerSessionStore().clear();
       await const LocalSavedTimerPresetService().clear();
@@ -2961,7 +2961,7 @@ void main() {
   testWidgets('Timer builder shows the saved timer preset limit', (
     tester,
   ) async {
-    SharedPreferences.setMockInitialValues({});
+    _setInitializedEmptySavedTimerPresets();
     addTearDown(() async {
       await const ActiveActivityTimerSessionStore().clear();
       await const LocalSavedTimerPresetService().clear();
@@ -3028,7 +3028,7 @@ void main() {
   testWidgets('Timer builder toggles saved timer home favorites', (
     tester,
   ) async {
-    SharedPreferences.setMockInitialValues({});
+    _setInitializedEmptySavedTimerPresets();
     addTearDown(() async {
       await const ActiveActivityTimerSessionStore().clear();
       await const LocalSavedTimerPresetService().clear();
@@ -3090,7 +3090,7 @@ void main() {
   testWidgets('Timer builder shows the home favorite limit message', (
     tester,
   ) async {
-    SharedPreferences.setMockInitialValues({});
+    _setInitializedEmptySavedTimerPresets();
     addTearDown(() async {
       await const ActiveActivityTimerSessionStore().clear();
       await const LocalSavedTimerPresetService().clear();
@@ -3169,7 +3169,7 @@ void main() {
   testWidgets('Home shows favorite saved timer presets for quick start', (
     tester,
   ) async {
-    SharedPreferences.setMockInitialValues({});
+    _setInitializedEmptySavedTimerPresets();
     addTearDown(() async {
       await const ActiveActivityTimerSessionStore().clear();
       await const LocalSavedTimerPresetService().clear();
@@ -3248,7 +3248,7 @@ void main() {
   testWidgets('Timer builder saves a named custom timer preset', (
     tester,
   ) async {
-    SharedPreferences.setMockInitialValues({});
+    _setInitializedEmptySavedTimerPresets();
     addTearDown(() async {
       await const ActiveActivityTimerSessionStore().clear();
       await const LocalSavedTimerPresetService().clear();
@@ -3311,7 +3311,7 @@ void main() {
   testWidgets('Timer builder can save a custom timer as Other without a name', (
     tester,
   ) async {
-    SharedPreferences.setMockInitialValues({});
+    _setInitializedEmptySavedTimerPresets();
     addTearDown(() async {
       await const ActiveActivityTimerSessionStore().clear();
       await const LocalSavedTimerPresetService().clear();
@@ -3358,7 +3358,7 @@ void main() {
   testWidgets('Timer builder applies and deletes a saved timer preset', (
     tester,
   ) async {
-    SharedPreferences.setMockInitialValues({});
+    _setInitializedEmptySavedTimerPresets();
     addTearDown(() async {
       await const ActiveActivityTimerSessionStore().clear();
       await const LocalSavedTimerPresetService().clear();
@@ -9281,6 +9281,13 @@ Finder _assetImage(String assetName) {
     return widget is Image &&
         widget.image is AssetImage &&
         (widget.image as AssetImage).assetName == assetName;
+  });
+}
+
+void _setInitializedEmptySavedTimerPresets() {
+  SharedPreferences.setMockInitialValues({
+    'savedActivityTimerPresets': jsonEncode([]),
+    'savedActivityTimerPresetsInitialized': true,
   });
 }
 
