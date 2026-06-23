@@ -414,7 +414,7 @@ class _AvatarSetupScreenState extends State<AvatarSetupScreen> {
                 avatarForVehicle: _avatarPresentationForVehicleChoice,
               ),
               const SizedBox(height: AppSpacing.xl),
-              _AvatarGuideCard(items: texts.guideItems),
+              const _AvatarGuideCard(),
               const SizedBox(height: AppSpacing.md),
               _AvatarPromptCard(
                 prompt: prompt,
@@ -824,9 +824,7 @@ class _AvatarAdjustmentSlider extends StatelessWidget {
 }
 
 class _AvatarGuideCard extends StatelessWidget {
-  const _AvatarGuideCard({required this.items});
-
-  final List<String> items;
+  const _AvatarGuideCard();
 
   @override
   Widget build(BuildContext context) {
@@ -864,10 +862,26 @@ class _AvatarGuideCard extends StatelessWidget {
               ],
             ),
             const SizedBox(height: AppSpacing.md),
-            for (final item in items) ...[
-              _GuideBullet(text: item),
-              if (item != items.last) const SizedBox(height: AppSpacing.sm),
-            ],
+            Text(
+              texts.guideIntro,
+              style: textTheme.bodyMedium?.copyWith(
+                color: AppColors.textPrimary,
+                fontWeight: FontWeight.w600,
+                height: 1.34,
+              ),
+            ),
+            const SizedBox(height: AppSpacing.md),
+            _GuideMethod(
+              title: texts.guidePopupMethod1Title,
+              body: texts.guidePopupMethod1Body,
+              icon: Icons.photo_library_rounded,
+            ),
+            const SizedBox(height: AppSpacing.md),
+            _GuideMethod(
+              title: texts.guidePopupMethod2Title,
+              body: texts.guidePopupMethod2Body,
+              icon: Icons.auto_fix_high_rounded,
+            ),
           ],
         ),
       ),
@@ -875,38 +889,50 @@ class _AvatarGuideCard extends StatelessWidget {
   }
 }
 
-class _GuideBullet extends StatelessWidget {
-  const _GuideBullet({required this.text});
+class _GuideMethod extends StatelessWidget {
+  const _GuideMethod({
+    required this.title,
+    required this.body,
+    required this.icon,
+  });
 
-  final String text;
+  final String title;
+  final String body;
+  final IconData icon;
 
   @override
   Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
+
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Padding(
-          padding: EdgeInsets.only(top: 7),
-          child: SizedBox(
-            width: 6,
-            height: 6,
-            child: DecoratedBox(
-              decoration: BoxDecoration(
-                color: AppColors.orangeDeep,
-                shape: BoxShape.circle,
-              ),
-            ),
-          ),
+        Padding(
+          padding: const EdgeInsets.only(top: 2),
+          child: Icon(icon, color: AppColors.orangeDeep, size: 20),
         ),
         const SizedBox(width: AppSpacing.sm),
         Expanded(
-          child: Text(
-            text,
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-              color: AppColors.textPrimary,
-              fontWeight: FontWeight.w600,
-              height: 1.34,
-            ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                title,
+                style: textTheme.titleSmall?.copyWith(
+                  color: AppColors.textStrong,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+              const SizedBox(height: AppSpacing.xs),
+              Text(
+                body,
+                style: textTheme.bodyMedium?.copyWith(
+                  color: AppColors.textPrimary,
+                  fontWeight: FontWeight.w600,
+                  height: 1.34,
+                ),
+              ),
+            ],
           ),
         ),
       ],

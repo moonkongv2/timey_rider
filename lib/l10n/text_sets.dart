@@ -141,7 +141,7 @@ abstract interface class AvatarSetupTextSet {
   String get resetPositionButton;
   String get confirmAvatarButton;
   String get guideTitle;
-  List<String> get guideItems;
+  String get guideIntro;
   String get promptCopyTitle;
   String get promptHelperText;
   String get promptExpandLabel;

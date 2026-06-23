@@ -6,7 +6,7 @@ class AvatarSetupTexts implements AvatarSetupTextSet {
   const AvatarSetupTexts();
 
   String get title => '우리 아이 라이더 만들기';
-  String get intro => '외부 AI 서비스에서 Timey Rider에 사용할 아이 라이더 이미지를 만든 뒤 업로드해 주세요.';
+  String get intro => 'Timey Rider에 사용할 아이 라이더 이미지를 만든 뒤 업로드해 주세요.';
   String get selectedVehicleTitle => '현재 선택한 차량';
   String get currentAvatarModeTitle => '현재 라이더 모드';
   String get defaultImageMode => '기본 이미지 사용';
@@ -30,17 +30,11 @@ class AvatarSetupTexts implements AvatarSetupTextSet {
   String get resetPositionButton => '위치 초기화';
   String get confirmAvatarButton => '이 라이더로 사용하기';
   String get guideTitle => '라이더 이미지 만들기 가이드';
-  List<String> get guideItems => const [
-    '아이 얼굴이 잘 보이는 정면 사진을 사용해 주세요.',
-    '얼굴이 크고 선명할수록 좋아요.',
-    '모자, 마스크, 손 등으로 얼굴이 많이 가려진 사진은 피해주세요.',
-    '생성 결과는 정사각형 1:1 이미지가 좋아요.',
-    '배경은 투명하거나 단순한 배경이면 좋아요.',
-    '텍스트, 로고, 워터마크는 없어야 해요.',
-  ];
+  String get guideIntro =>
+      '앱에서 직접 얼굴을 오려내지는 않으니, 아래 방법 중 하나로 차량에 넣을 라이더 이미지를 준비해 주세요.';
   String get promptCopyTitle => '라이더 이미지 프롬프트';
   String get promptHelperText =>
-      '선택한 차량에 맞춘 라이더 이미지 프롬프트예요. 외부 AI 서비스에 붙여넣어 사용해 주세요.';
+      'AI 서비스로 만들 때는 선택한 차량에 맞춘 아래 프롬프트를 복사해 붙여넣어 주세요.';
   String get promptExpandLabel => '프롬프트 열기';
   String get promptCollapseLabel => '프롬프트 접기';
   String get promptToggleSemanticLabel => '라이더 이미지 프롬프트 열고 닫기';
