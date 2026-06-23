@@ -32,7 +32,7 @@ class AvatarSetupTexts implements AvatarSetupTextSet {
   String get guideTitle => '라이더 이미지 만들기 가이드';
   String get guideIntro =>
       '앱에서 직접 얼굴을 오려내지는 않으니, 아래 방법 중 하나로 차량에 넣을 라이더 이미지를 준비해 주세요.';
-  String get promptCopyTitle => '라이더 이미지 프롬프트';
+  String get promptCopyTitle => '라이더 이미지 프롬프트 (예시)';
   String get promptHelperText =>
       'AI 서비스로 만들 때는 선택한 차량에 맞춘 아래 프롬프트를 복사해 붙여넣어 주세요.';
   String get promptExpandLabel => '프롬프트 열기';

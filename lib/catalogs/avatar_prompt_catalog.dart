@@ -6,7 +6,9 @@ abstract final class AvatarPromptCatalog {
 아이의 실제 얼굴 특징을 최대한 유지해 주세요.
 새로운 캐릭터처럼 바꾸지 말고, 아이 본인처럼 알아볼 수 있게 만들어 주세요.
 정사각형 1:1 이미지로, 얼굴이 중앙에 크게 보이게 해 주세요.
-머리 전체와 얼굴이 보이게 하고, 몸통/전신/차량 이미지는 만들지 마세요.
+머리카락 끝부터 턱 끝까지 머리 전체와 얼굴만 딱 잘라낸 이미지로 만들어 주세요.
+목, 어깨, 몸통, 옷, 손, 전신, 차량 이미지는 절대 포함하지 마세요.
+머리 일부가 잘리지 않게 하고, 얼굴 외곽에는 최소한의 여백만 남겨 주세요.
 배경은 반드시 투명 배경으로 만들어 주세요.
 가능하면 PNG 투명 배경으로 만들어 주세요.
 그림자, 배경색, 배경 장식은 넣지 마세요.
@@ -19,7 +21,9 @@ Use the attached child photo to create a rider image for Timey Rider.
 Preserve the child's real facial features as much as possible.
 Do not turn the child into a new character. The child should still be recognizable.
 Use a square 1:1 image with the face large and centered.
-Show the full head and face, but do not create a full body, torso, or vehicle image.
+Create a tight cutout of only the full head and face, from the top of the hair to the bottom of the chin.
+Do not include the neck, shoulders, torso, clothes, hands, full body, or vehicle image.
+Do not crop off any part of the head, and leave only minimal padding around the face.
 The background must be transparent.
 Use a transparent PNG if possible.
 Do not add shadows, background colors, or background decorations.

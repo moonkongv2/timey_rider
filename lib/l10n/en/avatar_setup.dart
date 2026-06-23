@@ -35,7 +35,7 @@ class EnAvatarSetupTexts implements AvatarSetupTextSet {
   String get guideTitle => 'Rider image guide';
   String get guideIntro =>
       'The app does not cut out faces itself. Prepare a rider image for the vehicle with one of the methods below.';
-  String get promptCopyTitle => 'Rider image prompt';
+  String get promptCopyTitle => 'Rider image prompt (example)';
   String get promptHelperText =>
       'When using an AI service, copy the vehicle-specific prompt below and paste it into the external AI service.';
   String get promptExpandLabel => 'Open prompt';

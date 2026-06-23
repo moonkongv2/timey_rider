@@ -3819,7 +3819,7 @@ void main() {
 
     await _scrollAvatarPromptToggleIntoView(tester);
     expect(find.text('라이더 이미지 만들기 가이드'), findsOneWidget);
-    expect(find.text('라이더 이미지 프롬프트'), findsOneWidget);
+    expect(find.text('라이더 이미지 프롬프트 (예시)'), findsOneWidget);
     expect(find.byKey(const ValueKey('avatarPromptText')), findsNothing);
     expect(find.text('프롬프트 복사하기'), findsNothing);
   });
@@ -3859,7 +3859,7 @@ void main() {
 
     await _scrollAvatarPromptToggleIntoView(tester);
     expect(find.text('Rider image guide'), findsOneWidget);
-    expect(find.text('Rider image prompt'), findsOneWidget);
+    expect(find.text('Rider image prompt (example)'), findsOneWidget);
     expect(find.text('Open prompt'), findsNothing);
     expect(find.text('Copy prompt'), findsNothing);
     expect(find.byKey(const ValueKey('avatarPromptCopyButton')), findsNothing);
