@@ -38,6 +38,8 @@ class EnAvatarSetupTexts implements AvatarSetupTextSet {
   String get promptCopyTitle => 'Rider image prompt (example)';
   String get promptHelperText =>
       'When using an AI service, copy the vehicle-specific prompt below and paste it into the external AI service.';
+  String get promptGuideHint =>
+      'Copy the example prompt below and paste it into your AI service.';
   String get promptExpandLabel => 'Open prompt';
   String get promptCollapseLabel => 'Close prompt';
   String get promptToggleSemanticLabel =>

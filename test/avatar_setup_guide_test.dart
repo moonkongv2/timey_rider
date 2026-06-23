@@ -28,6 +28,10 @@ void main() {
       expect(find.textContaining('갤럭시나 아이폰의 기본 사진 앱'), findsOneWidget);
       expect(find.text('2. AI 서비스 활용하기'), findsOneWidget);
       expect(find.textContaining('외부 AI 서비스에서 만든 정사각형'), findsOneWidget);
+      expect(
+        find.text('아래 예시 프롬프트를 복사해 AI 서비스에 붙여넣어 활용해 보세요.'),
+        findsOneWidget,
+      );
 
       await _scrollToPromptCard(tester);
       expect(

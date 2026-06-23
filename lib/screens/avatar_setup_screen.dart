@@ -882,9 +882,44 @@ class _AvatarGuideCard extends StatelessWidget {
               body: texts.guidePopupMethod2Body,
               icon: Icons.auto_fix_high_rounded,
             ),
+            const SizedBox(height: AppSpacing.sm),
+            _PromptGuideHint(text: texts.promptGuideHint),
           ],
         ),
       ),
+    );
+  }
+}
+
+class _PromptGuideHint extends StatelessWidget {
+  const _PromptGuideHint({required this.text});
+
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
+
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Icon(
+          Icons.keyboard_arrow_down_rounded,
+          color: AppColors.brown700,
+          size: 20,
+        ),
+        const SizedBox(width: AppSpacing.sm),
+        Expanded(
+          child: Text(
+            text,
+            style: textTheme.bodySmall?.copyWith(
+              color: AppColors.brown700,
+              fontWeight: FontWeight.w700,
+              height: 1.32,
+            ),
+          ),
+        ),
+      ],
     );
   }
 }

@@ -35,6 +35,7 @@ class AvatarSetupTexts implements AvatarSetupTextSet {
   String get promptCopyTitle => '라이더 이미지 프롬프트 (예시)';
   String get promptHelperText =>
       'AI 서비스로 만들 때는 선택한 차량에 맞춘 아래 프롬프트를 복사해 붙여넣어 주세요.';
+  String get promptGuideHint => '아래 예시 프롬프트를 복사해 AI 서비스에 붙여넣어 활용해 보세요.';
   String get promptExpandLabel => '프롬프트 열기';
   String get promptCollapseLabel => '프롬프트 접기';
   String get promptToggleSemanticLabel => '라이더 이미지 프롬프트 열고 닫기';
