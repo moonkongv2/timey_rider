@@ -53,18 +53,22 @@ class _AvatarSetupScreenState extends State<AvatarSetupScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!mounted) return;
-      showModalBottomSheet(
-        context: context,
-        isScrollControlled: true,
-        useSafeArea: true,
-        backgroundColor: AppColors.surfaceWarm,
-        shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-        ),
-        builder: (context) => const RiderGuideBottomSheet(),
-      );
+      _showRiderGuide();
     });
+  }
+
+  void _showRiderGuide() {
+    if (!mounted) return;
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      useSafeArea: true,
+      backgroundColor: AppColors.surfaceWarm,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) => const RiderGuideBottomSheet(),
+    );
   }
 
   @override
@@ -344,6 +348,14 @@ class _AvatarSetupScreenState extends State<AvatarSetupScreen> {
         backgroundColor: AppColors.cream,
         foregroundColor: AppColors.brown900,
         elevation: 0,
+        actions: [
+          IconButton(
+            key: const ValueKey('avatarGuideReplayButton'),
+            onPressed: _showRiderGuide,
+            icon: const Icon(Icons.info_outline_rounded),
+            tooltip: texts.guideReplayTooltip,
+          ),
+        ],
       ),
       body: SafeArea(
         child: ListView(
@@ -415,6 +427,7 @@ class _AvatarSetupScreenState extends State<AvatarSetupScreen> {
                     : null,
                 isUploading: _isUploadingAvatar,
                 onUploadPressed: _pickAvatarImage,
+                onGuidePressed: _showRiderGuide,
               ),
               const SizedBox(height: AppSpacing.md),
               if (shouldShowMissingAvatarWarning) ...[
@@ -1030,11 +1043,13 @@ class _AvatarUploadCard extends StatelessWidget {
     required this.imagePath,
     required this.isUploading,
     required this.onUploadPressed,
+    required this.onGuidePressed,
   });
 
   final String? imagePath;
   final bool isUploading;
   final VoidCallback onUploadPressed;
+  final VoidCallback onGuidePressed;
 
   bool get _hasImagePath => imagePath != null && imagePath!.trim().isNotEmpty;
 
@@ -1072,18 +1087,8 @@ class _AvatarUploadCard extends StatelessWidget {
                   ),
                 ),
                 IconButton(
-                  onPressed: () {
-                    showModalBottomSheet(
-                      context: context,
-                      isScrollControlled: true,
-                      useSafeArea: true,
-                      backgroundColor: AppColors.surfaceWarm,
-                      shape: const RoundedRectangleBorder(
-                        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-                      ),
-                      builder: (context) => const RiderGuideBottomSheet(),
-                    );
-                  },
+                  key: const ValueKey('avatarUploadGuideButton'),
+                  onPressed: onGuidePressed,
                   icon: const Icon(Icons.info_outline_rounded),
                   color: AppColors.primary,
                   tooltip: texts.guidePopupTitle,

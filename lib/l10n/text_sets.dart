@@ -157,6 +157,7 @@ abstract interface class AvatarSetupTextSet {
   String get privacyNote;
 
   String get guidePopupTitle;
+  String get guideReplayTooltip;
   String get guidePopupMethodTitle;
   String get guidePopupMethodIntro;
   String get guidePopupMethod1Title;
