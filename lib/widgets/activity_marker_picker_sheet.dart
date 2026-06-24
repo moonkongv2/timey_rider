@@ -9,6 +9,9 @@ import '../theme/app_shadows.dart';
 import '../theme/app_spacing.dart';
 import 'app/app_help_sheet.dart';
 
+const _courseMarkerGuideImageAssetPath =
+    'assets/images/onboarding/onboarding_04_course_markers.png';
+
 sealed class ActivityMarkerPickerResult {
   const ActivityMarkerPickerResult();
 }
@@ -89,6 +92,7 @@ class _ActivityMarkerPickerSheetState extends State<ActivityMarkerPickerSheet> {
     showAppHelpSheet(
       context: context,
       title: texts.helpTitle,
+      imageAssetPath: _courseMarkerGuideImageAssetPath,
       bodyParagraphs: texts.helpBodyParagraphs,
       bulletItems: texts.helpBulletItems,
     );

@@ -29,6 +29,7 @@ import '../theme/app_shadows.dart';
 import '../theme/app_spacing.dart';
 import '../utils/duration_format.dart';
 import '../widgets/app/app_bouncy_button.dart';
+import '../widgets/app/app_help_sheet.dart';
 import '../widgets/app/app_metric_tile.dart';
 import '../widgets/reward_sticker_image.dart';
 import '../widgets/vehicle_selection_card.dart';
@@ -41,6 +42,8 @@ import 'timer_screen.dart';
 
 const _settingsIconAssetPath = 'assets/images/icon_setting_rgba.png';
 const _homeLogoAssetPath = 'assets/images/timey_rider_logo.png';
+const _courseMarkerGuideImageAssetPath =
+    'assets/images/onboarding/onboarding_04_course_markers.png';
 const _activeSessionMaxAge = Duration(hours: 24);
 const _minCustomActivityMinutes = 1;
 const _maxCustomActivityMinutes = 60;
@@ -1660,6 +1663,17 @@ class _TimerBuilderSheetState extends State<_TimerBuilderSheet> {
     });
   }
 
+  void _showMarkerHelp() {
+    final texts = AppTexts.of(context).activityMarker;
+    showAppHelpSheet(
+      context: context,
+      title: texts.helpTitle,
+      imageAssetPath: _courseMarkerGuideImageAssetPath,
+      bodyParagraphs: texts.helpBodyParagraphs,
+      bulletItems: texts.helpBulletItems,
+    );
+  }
+
   void _toggleMarker(ActivityMarkerDefinition marker) {
     setState(() {
       if (_selectedMarkerIds.contains(marker.id)) {
@@ -2002,8 +2016,22 @@ class _TimerBuilderSheetState extends State<_TimerBuilderSheet> {
                       ],
                     ),
                     const SizedBox(height: AppSpacing.lg),
-                    _TimerBuilderStepTitle(
-                      title: homeTexts.timerBuilderMarkerStepTitle,
+                    Row(
+                      children: [
+                        Expanded(
+                          child: _TimerBuilderStepTitle(
+                            title: homeTexts.timerBuilderMarkerStepTitle,
+                          ),
+                        ),
+                        const SizedBox(width: AppSpacing.sm),
+                        IconButton(
+                          key: const ValueKey('timerBuilderMarkerHelpButton'),
+                          tooltip: texts.activityMarker.helpLinkLabel,
+                          onPressed: _showMarkerHelp,
+                          icon: const Icon(Icons.help_outline_rounded),
+                          color: AppColors.brown700,
+                        ),
+                      ],
                     ),
                     const SizedBox(height: AppSpacing.sm),
                     Row(

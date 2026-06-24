@@ -2590,6 +2590,48 @@ void main() {
     );
   });
 
+  testWidgets('Timer builder opens course marker help sheet', (tester) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        locale: const Locale('ko'),
+        supportedLocales: const [Locale('ko'), Locale('en')],
+        localizationsDelegates: const [
+          GlobalMaterialLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+        ],
+        home: HomeScreen(
+          config: ActivityTimerConfig.defaults().copyWith(childName: '지율'),
+          activityProgressService: LocalActivityProgressService(),
+          onConfigChanged: (_) {},
+        ),
+      ),
+    );
+    await tester.pump();
+
+    await _openTimerBuilder(tester);
+
+    expect(
+      find.byKey(const ValueKey('timerBuilderMarkerHelpButton')),
+      findsOneWidget,
+    );
+
+    await tester.tap(
+      find.byKey(const ValueKey('timerBuilderMarkerHelpButton')),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.byKey(const ValueKey('appHelpSheet')), findsOneWidget);
+    expect(find.textContaining('직접 고른 그림 마커'), findsWidgets);
+    expect(
+      find.descendant(
+        of: find.byKey(const ValueKey('appHelpSheet')),
+        matching: find.byType(Image),
+      ),
+      findsOneWidget,
+    );
+  });
+
   testWidgets('Timer builder auto marker starts timer without manual choices', (
     tester,
   ) async {
@@ -4504,6 +4546,13 @@ void main() {
 
     expect(find.byKey(const ValueKey('appHelpSheet')), findsOneWidget);
     expect(find.textContaining('직접 고른 그림 마커'), findsWidgets);
+    expect(
+      find.descendant(
+        of: find.byKey(const ValueKey('appHelpSheet')),
+        matching: find.byType(Image),
+      ),
+      findsOneWidget,
+    );
   });
 
   testWidgets('Settings screen updates course marker mode', (tester) async {

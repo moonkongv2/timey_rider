@@ -7,6 +7,8 @@ import '../theme/app_colors.dart';
 import '../widgets/app/app_help_sheet.dart';
 import 'user_guide_screen.dart';
 
+const _courseMarkerGuideImageAssetPath =
+    'assets/images/onboarding/onboarding_04_course_markers.png';
 const _motivationVideoIntervalOptions = [
   Duration(minutes: 3),
   Duration(minutes: 5),
@@ -95,6 +97,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     showAppHelpSheet(
       context: context,
       title: texts.helpTitle,
+      imageAssetPath: _courseMarkerGuideImageAssetPath,
       bodyParagraphs: texts.helpBodyParagraphs,
       bulletItems: texts.helpBulletItems,
     );

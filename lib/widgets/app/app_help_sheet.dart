@@ -20,6 +20,7 @@ class AppHelpSection {
 Future<void> showAppHelpSheet({
   required BuildContext context,
   required String title,
+  String? imageAssetPath,
   List<String> bodyParagraphs = const [],
   List<String> bulletItems = const [],
   List<AppHelpSection> sections = const [],
@@ -30,6 +31,7 @@ Future<void> showAppHelpSheet({
     backgroundColor: AppColors.transparent,
     builder: (context) => AppHelpSheet(
       title: title,
+      imageAssetPath: imageAssetPath,
       bodyParagraphs: bodyParagraphs,
       bulletItems: bulletItems,
       sections: sections,
@@ -41,12 +43,14 @@ class AppHelpSheet extends StatelessWidget {
   const AppHelpSheet({
     super.key,
     required this.title,
+    this.imageAssetPath,
     this.bodyParagraphs = const [],
     this.bulletItems = const [],
     this.sections = const [],
   });
 
   final String title;
+  final String? imageAssetPath;
   final List<String> bodyParagraphs;
   final List<String> bulletItems;
   final List<AppHelpSection> sections;
@@ -126,6 +130,10 @@ class AppHelpSheet extends StatelessWidget {
                         ),
                       ],
                     ),
+                    if (imageAssetPath != null) ...[
+                      const SizedBox(height: AppSpacing.md),
+                      _AppHelpImage(assetPath: imageAssetPath!),
+                    ],
                     if (bodyParagraphs.isNotEmpty) ...[
                       const SizedBox(height: AppSpacing.md),
                       for (final paragraph in bodyParagraphs) ...[
@@ -153,6 +161,34 @@ class AppHelpSheet extends StatelessWidget {
                 ),
               ),
             ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _AppHelpImage extends StatelessWidget {
+  const _AppHelpImage({required this.assetPath});
+
+  final String assetPath;
+
+  @override
+  Widget build(BuildContext context) {
+    return ClipRRect(
+      borderRadius: AppRadius.card,
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          color: AppColors.white.withValues(alpha: 0.72),
+          borderRadius: AppRadius.card,
+          border: Border.all(color: AppColors.borderWarm),
+        ),
+        child: AspectRatio(
+          aspectRatio: 16 / 9,
+          child: Image.asset(
+            assetPath,
+            fit: BoxFit.contain,
+            excludeFromSemantics: true,
           ),
         ),
       ),
