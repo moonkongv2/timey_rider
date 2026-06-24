@@ -45,7 +45,10 @@ class RecordedActivitySession {
   bool get rewardGoalJustReady => earnedRewardGoals.isNotEmpty;
 
   int get collectedStickerTypeCount {
-    return inventory.where((item) => item.count > 0).length;
+    return inventory.where((item) {
+      final reward = RewardCatalog.findById(item.rewardId);
+      return item.count > 0 && reward?.type == RewardType.sticker;
+    }).length;
   }
 
   int get totalStickerTypeCount => RewardCatalog.all.length;
