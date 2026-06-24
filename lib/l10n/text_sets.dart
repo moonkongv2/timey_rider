@@ -227,7 +227,6 @@ abstract interface class SettingsTextSet {
   String get markerModeManual;
   String get markerModeActivityDefault;
   String get markerModeDescription;
-  String get defaultTimerDuration;
   String get vehicleSelection;
   String get childNameTitle;
   String get childNameFieldLabel;
@@ -241,7 +240,6 @@ abstract interface class SettingsTextSet {
   String get avatarCustomState;
   String get avatarSettingsButton;
 
-  String durationSegmentLabel(int minutes);
   String motivationVideoIntervalSegmentLabel(int minutes);
 }
 

@@ -34,7 +34,6 @@ class EnSettingsTexts implements SettingsTextSet {
   String get markerModeActivityDefault => 'Auto';
   String get markerModeDescription =>
       'Auto previews and uses picture markers that fit the activity. Only manually chosen picture markers are saved to activity records.';
-  String get defaultTimerDuration => 'Default timer duration';
   String get vehicleSelection => 'Choose vehicle';
   String get childNameTitle => "Child's name";
   String get childNameFieldLabel => 'Name';
@@ -48,6 +47,5 @@ class EnSettingsTexts implements SettingsTextSet {
   String get avatarCustomState => 'Using custom rider';
   String get avatarSettingsButton => 'Open rider image settings';
 
-  String durationSegmentLabel(int minutes) => '$minutes min';
   String motivationVideoIntervalSegmentLabel(int minutes) => '$minutes min';
 }

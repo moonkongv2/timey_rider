@@ -33,7 +33,6 @@ class SettingsTexts implements SettingsTextSet {
   String get markerModeActivityDefault => '자동';
   String get markerModeDescription =>
       '자동은 활동에 맞는 그림 마커를 미리 보여주고 사용해요. 직접 고른 그림 마커만 활동 기록에 남아요.';
-  String get defaultTimerDuration => '기본 타이머 시간';
   String get vehicleSelection => '빠방 고르기';
   String get childNameTitle => '아이 이름';
   String get childNameFieldLabel => '이름';
@@ -47,6 +46,5 @@ class SettingsTexts implements SettingsTextSet {
   String get avatarCustomState => '직접 만든 라이더 사용 중';
   String get avatarSettingsButton => '라이더 설정하기';
 
-  String durationSegmentLabel(int minutes) => '$minutes분';
   String motivationVideoIntervalSegmentLabel(int minutes) => '$minutes분';
 }

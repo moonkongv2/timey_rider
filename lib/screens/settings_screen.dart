@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-import '../catalogs/timer_duration_catalog.dart';
 import '../l10n/app_texts.dart';
 import '../l10n/text_sets.dart';
 import '../models/activity_timer_config.dart';
@@ -170,50 +169,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   FilledButton(
                     onPressed: _saveChildName,
                     child: Text(texts.settings.saveChildName),
-                  ),
-                ],
-              ),
-            ),
-          ),
-          const SizedBox(height: 20),
-          Card(
-            child: Padding(
-              padding: const EdgeInsets.all(20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    texts.settings.defaultTimerDuration,
-                    style: sectionTitleStyle,
-                  ),
-                  const SizedBox(height: 12),
-                  SegmentedButton<int>(
-                    segments: [
-                      for (final minutes in TimerDurationCatalog.presetMinutes)
-                        ButtonSegment(
-                          value: minutes,
-                          label: Text(
-                            texts.settings.durationSegmentLabel(minutes),
-                          ),
-                        ),
-                    ],
-                    selected: {
-                      if (TimerDurationCatalog.isPresetMinutes(
-                        _config.duration.inMinutes,
-                      ))
-                        _config.duration.inMinutes,
-                    },
-                    emptySelectionAllowed: true,
-                    onSelectionChanged: (selected) {
-                      if (selected.isEmpty) {
-                        return;
-                      }
-                      _update(
-                        _config.copyWith(
-                          duration: Duration(minutes: selected.first),
-                        ),
-                      );
-                    },
                   ),
                 ],
               ),
