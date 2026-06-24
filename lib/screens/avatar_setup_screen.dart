@@ -733,12 +733,12 @@ class _AvatarAdjustmentCard extends StatelessWidget {
             ),
             _AvatarAdjustmentSlider(
               label: texts.verticalPositionLabel,
-              value: avatarOffsetY,
+              value: -avatarOffsetY,
               min: -0.2,
               max: 0.2,
               divisions: 16,
               keyValue: 'avatarOffsetYSlider',
-              onChanged: onOffsetYChanged,
+              onChanged: (value) => onOffsetYChanged(-value),
             ),
             _AvatarAdjustmentSlider(
               label: texts.rotationLabel,

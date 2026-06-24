@@ -4117,7 +4117,7 @@ void main() {
     await _scrollAvatarAdjustmentIntoView(tester);
     _avatarSlider(tester, 'avatarScaleSlider').onChanged!(1.25);
     _avatarSlider(tester, 'avatarOffsetXSlider').onChanged!(0.12);
-    _avatarSlider(tester, 'avatarOffsetYSlider').onChanged!(-0.08);
+    _avatarSlider(tester, 'avatarOffsetYSlider').onChanged!(0.08);
     _avatarSlider(tester, 'avatarRotationSlider').onChanged!(9.0);
     await tester.pump();
 
@@ -4148,7 +4148,7 @@ void main() {
     await _scrollAvatarAdjustmentIntoView(tester);
     _avatarSlider(tester, 'avatarScaleSlider').onChanged!(1.3);
     _avatarSlider(tester, 'avatarOffsetXSlider').onChanged!(0.1);
-    _avatarSlider(tester, 'avatarOffsetYSlider').onChanged!(-0.05);
+    _avatarSlider(tester, 'avatarOffsetYSlider').onChanged!(0.05);
     _avatarSlider(tester, 'avatarRotationSlider').onChanged!(7.0);
     await tester.pump();
 
