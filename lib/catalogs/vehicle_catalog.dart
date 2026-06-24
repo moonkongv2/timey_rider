@@ -157,7 +157,7 @@ abstract final class VehicleCatalog {
   static const brachio = VehicleDefinition(
     id: 'brachio',
     labelKo: '브라키오',
-    labelEn: 'Brachio',
+    labelEn: 'Brachiosaurus',
     emoji: '🦕',
     assetPath: 'assets/images/vehicle_brachio.png',
     selectionAssetPath: 'assets/images/vehicle_brachio_chip.png',

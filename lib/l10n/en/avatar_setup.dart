@@ -5,7 +5,7 @@ import '../text_sets.dart';
 class EnAvatarSetupTexts implements AvatarSetupTextSet {
   const EnAvatarSetupTexts();
 
-  String get title => "Create Your Child's Rider Image";
+  String get title => "Create Your Child's Rider";
   String get intro =>
       "Create a rider image for Timey Rider, then upload the finished image here.";
   String get selectedVehicleTitle => 'Selected vehicle';
@@ -21,7 +21,7 @@ class EnAvatarSetupTexts implements AvatarSetupTextSet {
       'Rider image not found. Showing the default image instead.';
   String get vehicleSelectionTitle => 'Vehicle for this rider';
   String get vehicleSelectionSubtitle => 'Prompt reference';
-  String get compositePreviewTitle => 'Composite preview';
+  String get compositePreviewTitle => 'Rider preview';
   String get compositePreviewSubtitle => 'Use this look for Timey Rider?';
   String get defaultPreviewTitle => 'Default image preview';
   String get useDefaultImageButton => 'Use default image';
@@ -48,7 +48,7 @@ class EnAvatarSetupTexts implements AvatarSetupTextSet {
   String get uploadTitle => 'Upload rider image';
   String get uploadInstructions =>
       'Upload a square rider image made with an external AI service.\n'
-      'It works best when the child face is centered on a transparent background.';
+      "It works best when your child's face is centered on a transparent background.";
   String get uploadingButton => 'Uploading';
   String get reuploadButton => 'Upload again';
   String get uploadButton => 'Upload rider image';
@@ -58,7 +58,7 @@ class EnAvatarSetupTexts implements AvatarSetupTextSet {
       'Create the image with an external AI service you choose, then upload only the finished rider image to Timey Rider.\n'
       'Check the photo and privacy policies before using an external service.';
 
-  String get guidePopupTitle => "Create Your Child's Rider Guide";
+  String get guidePopupTitle => "Create Your Child's Rider";
   String get guideReplayTooltip => 'View guide again';
   String get guidePopupMethodTitle => '📸 How to Prepare a Rider Image';
   String get guidePopupMethodIntro =>
@@ -73,8 +73,8 @@ class EnAvatarSetupTexts implements AvatarSetupTextSet {
       '🔒 Why doesn\'t the app process images automatically?';
   String get guidePopupPrivacyBody =>
       'To precisely cut out or convert faces within the app, the original photo would technically need to be sent to an external server. To strictly protect your child\'s photos and privacy, we block server transmissions entirely and guide parents to prepare the rider image themselves.';
-  String get guidePopupSafetyTitle => '🛡️ Safely protected! Rest assured!';
+  String get guidePopupSafetyTitle => '🛡️ Your privacy is protected!';
   String get guidePopupSafetyBody =>
-      'The rider image you prepare and register in this app is safely stored ONLY on your device. It is never transmitted to any external server, so there is absolutely no risk of your personal information being leaked. Please register with peace of mind.';
+      'The rider image you prepare and add to this app is stored only on your device. It is never sent to an external server, so your personal information stays safe.';
   String get guidePopupConfirmButton => 'Confirm';
 }

@@ -54,9 +54,9 @@ void main() {
 
   test('cleanup markers use put-away labels', () {
     expect(ActivityMarkerCatalog.findById('blocks')?.labelKo, '블록 자리');
-    expect(ActivityMarkerCatalog.findById('books')?.labelEn, 'Book spot');
+    expect(ActivityMarkerCatalog.findById('books')?.labelEn, 'Books');
     expect(ActivityMarkerCatalog.findById('cars')?.labelKo, '자동차 자리');
-    expect(ActivityMarkerCatalog.findById('dolls')?.labelEn, 'Doll spot');
+    expect(ActivityMarkerCatalog.findById('dolls')?.labelEn, 'Dolls');
     expect(ActivityMarkerCatalog.findById('box')?.labelKo, '정리 상자');
   });
 

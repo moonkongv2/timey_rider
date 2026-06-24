@@ -83,7 +83,7 @@ abstract final class ActivityMarkerCatalog {
   static const blocks = ActivityMarkerDefinition(
     id: 'blocks',
     labelKo: '블록 자리',
-    labelEn: 'Block spot',
+    labelEn: 'Blocks',
     emoji: '🧱',
     activityIds: ['cleanup'],
   );
@@ -91,7 +91,7 @@ abstract final class ActivityMarkerCatalog {
   static const books = ActivityMarkerDefinition(
     id: 'books',
     labelKo: '책 자리',
-    labelEn: 'Book spot',
+    labelEn: 'Books',
     emoji: '📚',
     activityIds: ['cleanup'],
   );
@@ -99,7 +99,7 @@ abstract final class ActivityMarkerCatalog {
   static const cars = ActivityMarkerDefinition(
     id: 'cars',
     labelKo: '자동차 자리',
-    labelEn: 'Car spot',
+    labelEn: 'Cars',
     emoji: '🚗',
     activityIds: ['cleanup', 'play'],
   );
@@ -107,7 +107,7 @@ abstract final class ActivityMarkerCatalog {
   static const dolls = ActivityMarkerDefinition(
     id: 'dolls',
     labelKo: '인형 자리',
-    labelEn: 'Doll spot',
+    labelEn: 'Dolls',
     emoji: '🧸',
     activityIds: ['cleanup', 'play'],
   );
@@ -115,7 +115,7 @@ abstract final class ActivityMarkerCatalog {
   static const box = ActivityMarkerDefinition(
     id: 'box',
     labelKo: '정리 상자',
-    labelEn: 'Cleanup box',
+    labelEn: 'Toy box',
     emoji: '📦',
     activityIds: ['cleanup'],
   );

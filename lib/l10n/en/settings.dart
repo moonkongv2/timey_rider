@@ -16,7 +16,7 @@ class EnSettingsTexts implements SettingsTextSet {
       'Motivation videos are short encouragement clips during the timer.';
   List<String> get motivationVideoHelpBodyParagraphs => const [
     'Motivation videos are short encouragement clips that can appear during the timer.',
-    'They do not decide vehicle stickers or results.',
+    'They do not decide stickers or results.',
   ];
   List<String> get motivationVideoHelpBulletItems => const [
     'Short timers may skip some milestones so clips do not overlap.',

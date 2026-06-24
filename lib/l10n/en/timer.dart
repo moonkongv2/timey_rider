@@ -25,8 +25,8 @@ class EnTimerTexts implements TimerTextSet {
     return switch (activityId) {
       'brushing' => 'Done Brushing',
       'reading' => 'Done Reading',
-      'cleanup' => 'Done Cleaning',
-      'play' => 'Play Done',
+      'cleanup' => 'Done Cleaning Up',
+      'play' => 'Done Playing',
       _ => 'Mission Done',
     };
   }

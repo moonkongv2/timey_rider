@@ -13,12 +13,12 @@ class EnOnboardingTexts implements OnboardingTextSet {
 
   List<OnboardingCardText> get cards => const [
     OnboardingCardText(
-      title: 'Time is still hard to see',
+      title: "Kids can't see time yet",
       body:
-          '“Five more minutes,” “Time to stop,” “Let’s get ready.”\nDaily routines can start to feel like tiny tug-of-wars.',
+          '“Five more minutes,” “Time to stop,”\n“Let’s get ready.”\nDaily routines can start to feel like\ntiny tug-of-wars.',
       note:
           'Your child may not be trying to delay on purpose.\nThey may still be learning what time feels like.',
-      ctaLabel: 'It’s okay—start together',
+      ctaLabel: 'Start together',
     ),
     OnboardingCardText(
       title: 'Turn routines into little rides',
@@ -26,29 +26,29 @@ class EnOnboardingTexts implements OnboardingTextSet {
           'Brushing, reading, cleanup, and play\ncan start as playful Timey Rider missions.',
       note:
           'Instead of only hearing the time, your child sees a chosen ride move along the course.',
-      ctaLabel: 'Next course',
+      ctaLabel: 'Next',
     ),
     OnboardingCardText(
       title: 'Which vehicle today?',
       body:
           'A motorcycle, shark, T-rex, and more\ncan become today’s mission buddy.',
       note: 'Add your child’s face to make the ride feel like their own story.',
-      ctaLabel: 'Pick a ride',
+      ctaLabel: 'Choose a ride',
     ),
     OnboardingCardText(
-      title: 'Small goals appear on the course',
+      title: 'Small markers show each step',
       body:
-          'Small picture markers that fit the mission\nappear one by one along the course.',
+          'Picture markers that fit the mission\nappear one by one along the course.',
       note:
-          'Markers are not score cards. They are visual signs that help the routine flow.',
+          'Markers are not scorecards. They are visual cues that help the routine flow.',
       ctaLabel: 'Sounds good',
     ),
     OnboardingCardText(
-      title: 'The trying matters most today',
+      title: 'Trying matters most today',
       body:
-          'Finished, time ended,\nor needed a little more time—each result is saved gently.',
+          'Finished, time ended,\nor needed a little more time - each result is saved without judgment.',
       note:
-          'Stickers are small gifts for encouragement. Praise the effort before the reward.',
+          'Stickers are small encouragement gifts. Praise the effort before the reward.',
       ctaLabel: 'Start Timey',
     ),
   ];

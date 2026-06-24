@@ -66,8 +66,8 @@ void main() {
   ) async {
     await _pumpOnboardingScreen(tester, locale: const Locale('en'));
 
-    expect(find.text('Time is still hard to see'), findsOneWidget);
-    expect(find.text('It’s okay—start together'), findsOneWidget);
+    expect(find.text("Kids can't see time yet"), findsOneWidget);
+    expect(find.text('Start together'), findsOneWidget);
   });
 }
 

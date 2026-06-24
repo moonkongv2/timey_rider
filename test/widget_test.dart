@@ -4443,7 +4443,7 @@ void main() {
     expect(find.textContaining('parents and other caregivers'), findsOneWidget);
     expect(
       find.text(
-        'Review activity missions, cheer videos, and vehicle sticker rules.',
+        'Review activity missions, motivation videos, and sticker rules.',
       ),
       findsOneWidget,
     );
@@ -8587,7 +8587,7 @@ void main() {
     await tester.drag(find.byType(ListView), const Offset(0, -700));
     await tester.pumpAndSettle();
 
-    expect(find.text('Create Reward Promise'), findsOneWidget);
+    expect(find.text('Create Reward Goal'), findsOneWidget);
   });
 
   testWidgets('Home activity history summary opens activity history screen', (
@@ -8679,7 +8679,7 @@ void main() {
     await tester.pump();
     await tester.enterText(find.byType(TextField), 'ice cream');
     await tester.pump();
-    await tester.tap(find.text('Save Promise'));
+    await tester.tap(find.text('Save Goal'));
     await tester.pumpAndSettle();
 
     final snapshot = await service.loadSnapshot();
@@ -8706,23 +8706,23 @@ void main() {
 
     await tester.drag(find.byType(ListView), const Offset(0, -700));
     await tester.pumpAndSettle();
-    await tester.ensureVisible(find.text('Use Reward'));
+    await tester.ensureVisible(find.text('Mark Used'));
     await tester.pumpAndSettle();
-    await tester.tap(find.text('Use Reward'));
+    await tester.tap(find.text('Mark Used'));
     await tester.pumpAndSettle();
-    expect(find.text('Use this reward?'), findsOneWidget);
+    expect(find.text('Mark this reward as used?'), findsOneWidget);
 
-    await tester.tap(find.text('Keep Promise'));
+    await tester.tap(find.text('Keep Goal'));
     await tester.pumpAndSettle();
     expect((await service.loadSnapshot()).earnedRewardGoals, hasLength(1));
 
     await tester.drag(find.byType(ListView), const Offset(0, -700));
     await tester.pumpAndSettle();
-    await tester.ensureVisible(find.text('Use Reward'));
+    await tester.ensureVisible(find.text('Mark Used'));
     await tester.pumpAndSettle();
-    await tester.tap(find.text('Use Reward'));
+    await tester.tap(find.text('Mark Used'));
     await tester.pumpAndSettle();
-    await tester.tap(find.text('Use Reward').last);
+    await tester.tap(find.text('Mark Used').last);
     await tester.pumpAndSettle();
 
     final snapshot = await service.loadSnapshot();
