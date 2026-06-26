@@ -36,11 +36,13 @@ void main() {
       'dolls',
     ]);
     expect(ActivityCatalog.meal.markerIds, [
+      'rice',
       'spoon',
       'sip_water',
-      'rice',
+      'soup',
       'plate',
-      'all_done',
+      'apple',
+      'banana',
     ]);
   });
 

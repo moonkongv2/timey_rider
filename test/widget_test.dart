@@ -94,7 +94,7 @@ void main() {
     final ids = ActivityMarkerCatalog.automaticSelectionIds();
 
     expect(ids, isNotEmpty);
-    expect(ids, hasLength(2));
+    expect(ids, hasLength(ActivityMarkerCatalog.maxSelectableMarkerCount));
     for (final id in ids) {
       expect(ActivityMarkerCatalog.findById(id), isNotNull);
     }
@@ -2678,11 +2678,11 @@ void main() {
     );
     expect(
       find.byKey(const ValueKey('timerBuilderAutoMarkerPreview_star')),
-      findsOneWidget,
+      findsNothing,
     );
     expect(
       find.byKey(const ValueKey('timerBuilderAutoMarkerPreview_flag')),
-      findsOneWidget,
+      findsNothing,
     );
     await _startTimerBuilder(tester);
 

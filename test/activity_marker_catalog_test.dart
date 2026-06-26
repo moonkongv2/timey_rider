@@ -8,7 +8,7 @@ void main() {
     expect(markerIds, ['top_teeth', 'bottom_teeth', 'molars', 'tongue']);
   });
 
-  test('automaticSelectionIds for reading keeps auto marker order', () {
+  test('automaticSelectionIds for reading keeps activity marker order', () {
     final selectedIds = ActivityMarkerCatalog.automaticSelectionIds(
       activityId: 'reading',
       count: 7,
@@ -20,24 +20,15 @@ void main() {
       'favorite_scene',
       'bookmark',
       'finish',
-      'star',
-      'flag',
     ]);
   });
 
-  test('autoSelectionIdsForActivity combines activity and common markers', () {
+  test('autoSelectionIdsForActivity only returns activity markers', () {
     final brushingIds = ActivityMarkerCatalog.autoSelectionIdsForActivity(
       'brushing',
     );
 
-    expect(brushingIds, [
-      'top_teeth',
-      'bottom_teeth',
-      'molars',
-      'tongue',
-      'star',
-      'flag',
-    ]);
+    expect(brushingIds, ['top_teeth', 'bottom_teeth', 'molars', 'tongue']);
   });
 
   test('brushing markers use process labels and friendly emoji', () {
@@ -82,12 +73,10 @@ void main() {
       'balloon',
       'ball',
       'music',
-      'star',
-      'flag',
     ]);
   });
 
-  test('meal markers avoid napkin-like emoji', () {
+  test('meal markers use direct food and utensil emoji', () {
     final mealIds = ActivityMarkerCatalog.markerIdsForActivity('meal');
     final mealEmoji = mealIds
         .map(ActivityMarkerCatalog.findById)
@@ -95,14 +84,27 @@ void main() {
         .map((marker) => marker.emoji)
         .toList();
 
-    expect(mealIds, ['spoon', 'sip_water', 'rice', 'plate', 'all_done']);
+    expect(mealIds, [
+      'rice',
+      'spoon',
+      'sip_water',
+      'soup',
+      'plate',
+      'apple',
+      'banana',
+    ]);
+    expect(mealEmoji, ['🍚', '🥄', '🥤', '🥣', '🍽️', '🍎', '🍌']);
     expect(mealEmoji, isNot(contains('🧻')));
   });
 
-  test('autoSelectionIdsForActivity falls back to common markers', () {
+  test('autoSelectionIdsForActivity falls back to common markers only', () {
     expect(ActivityMarkerCatalog.autoSelectionIdsForActivity('custom'), [
+      'smile',
       'star',
       'flag',
+      'heart',
+      'rainbow',
+      'rocket',
     ]);
   });
 
@@ -131,6 +133,9 @@ void main() {
 
     expect(slots, hasLength(7));
     expect(slots.every((marker) => defaultIds.contains(marker.id)), isTrue);
-    expect(slots.map((marker) => marker.id).take(5), defaultIds);
+    expect(
+      slots.map((marker) => marker.id).take(defaultIds.length),
+      defaultIds,
+    );
   });
 }

@@ -78,7 +78,15 @@ abstract final class ActivityCatalog {
     ],
     completionMode: ActivityCompletionMode.parentCheck,
     rewardEnabledByDefault: false,
-    markerIds: ['spoon', 'sip_water', 'rice', 'plate', 'all_done'],
+    markerIds: [
+      'rice',
+      'spoon',
+      'sip_water',
+      'soup',
+      'plate',
+      'apple',
+      'banana',
+    ],
   );
 
   static const custom = ActivityDefinition(

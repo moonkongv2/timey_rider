@@ -168,11 +168,35 @@ abstract final class ActivityMarkerCatalog {
     activityIds: ['meal'],
   );
 
+  static const soup = ActivityMarkerDefinition(
+    id: 'soup',
+    labelKo: '국',
+    labelEn: 'Soup',
+    emoji: '🥣',
+    activityIds: ['meal'],
+  );
+
   static const plate = ActivityMarkerDefinition(
     id: 'plate',
-    labelKo: '접시',
-    labelEn: 'Plate',
+    labelKo: '식기',
+    labelEn: 'Plate and fork',
     emoji: '🍽️',
+    activityIds: ['meal'],
+  );
+
+  static const apple = ActivityMarkerDefinition(
+    id: 'apple',
+    labelKo: '사과',
+    labelEn: 'Apple',
+    emoji: '🍎',
+    activityIds: ['meal'],
+  );
+
+  static const banana = ActivityMarkerDefinition(
+    id: 'banana',
+    labelKo: '바나나',
+    labelEn: 'Banana',
+    emoji: '🍌',
     activityIds: ['meal'],
   );
 
@@ -181,7 +205,13 @@ abstract final class ActivityMarkerCatalog {
     labelKo: '잘 먹었어요',
     labelEn: 'All done',
     emoji: '😋',
-    activityIds: ['meal'],
+  );
+
+  static const smile = ActivityMarkerDefinition(
+    id: 'smile',
+    labelKo: '웃는 얼굴',
+    labelEn: 'Smile',
+    emoji: '🙂',
   );
 
   static const star = ActivityMarkerDefinition(
@@ -219,7 +249,7 @@ abstract final class ActivityMarkerCatalog {
     emoji: '🚀',
   );
 
-  static const genericMarkers = [star, flag, heart, rainbow, rocket];
+  static const genericMarkers = [smile, star, flag, heart, rainbow, rocket];
 
   static const all = [
     topTeeth,
@@ -239,11 +269,15 @@ abstract final class ActivityMarkerCatalog {
     balloon,
     ball,
     music,
+    rice,
     spoon,
     sipWater,
-    rice,
+    soup,
     plate,
+    apple,
+    banana,
     allDone,
+    smile,
     star,
     flag,
     heart,
@@ -252,14 +286,13 @@ abstract final class ActivityMarkerCatalog {
   ];
 
   static const defaultSelectionIds = [
+    'smile',
     'star',
     'flag',
     'heart',
     'rainbow',
     'rocket',
   ];
-
-  static const commonAutoSelectionIds = ['star', 'flag'];
 
   static ActivityMarkerDefinition? findById(String id) {
     for (final marker in all) {
@@ -287,7 +320,6 @@ abstract final class ActivityMarkerCatalog {
     if (activityId != null) {
       ids.addAll(markerIdsForActivity(activityId));
     }
-    ids.addAll(commonAutoSelectionIds);
     if (ids.isEmpty) {
       ids.addAll(defaultSelectionIds);
     }
