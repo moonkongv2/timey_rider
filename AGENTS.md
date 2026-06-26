@@ -20,3 +20,6 @@
 ## Communication
 - Briefly summarize what changed, why it changed, and how it was verified.
 - After each implementation task, explicitly list the app areas or flows the user should manually check.
+
+## Localization
+- When translating Korean phrases into English (or other languages), do not translate them literally. Instead, carefully review the context and translate the phrases so they sound natural and idiomatic to native speakers of the target language.
