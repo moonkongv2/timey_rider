@@ -99,13 +99,18 @@ class ActivityTimerController extends ChangeNotifier {
     notifyListeners();
   }
 
-  ActivitySessionResult complete({ActivityCompletionStatus? completionStatus}) {
+  ActivitySessionResult complete({
+    ActivityCompletionStatus? completionStatus,
+    DateTime? endedAt,
+    Duration? actualDuration,
+  }) {
     _updateElapsed();
     _state = ActivityTimerState.completed;
     _ticker?.cancel();
 
-    final endedAt = _now();
-    final completedBeforeEnd = progress < 1;
+    final resolvedEndedAt = endedAt ?? _now();
+    final resolvedActualDuration = actualDuration ?? _elapsed;
+    final completedBeforeEnd = resolvedActualDuration < config.duration;
     final resolvedCompletionStatus =
         completionStatus ??
         (completedBeforeEnd
@@ -113,10 +118,10 @@ class ActivityTimerController extends ChangeNotifier {
             : ActivityCompletionStatus.completedAfterEnd);
     return ActivitySessionResult(
       activityId: config.activityId,
-      startedAt: _startedAt ?? endedAt,
-      endedAt: endedAt,
+      startedAt: _startedAt ?? resolvedEndedAt,
+      endedAt: resolvedEndedAt,
       targetDuration: config.duration,
-      actualDuration: _elapsed,
+      actualDuration: resolvedActualDuration,
       completedBeforeEnd: completedBeforeEnd,
       completionStatus: resolvedCompletionStatus,
     );
@@ -150,6 +155,7 @@ class ActivityTimerController extends ChangeNotifier {
 
     if (_elapsed >= config.duration && _state == ActivityTimerState.running) {
       _state = ActivityTimerState.arrived;
+      _ticker?.cancel();
     }
   }
 
@@ -181,8 +187,7 @@ class ActivityTimerController extends ChangeNotifier {
       _elapsed = config.duration;
     }
 
-    if (_state == ActivityTimerState.running ||
-        _state == ActivityTimerState.arrived) {
+    if (_state == ActivityTimerState.running) {
       _startTicker();
     }
   }

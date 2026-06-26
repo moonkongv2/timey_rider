@@ -1787,13 +1787,10 @@ void main() {
   test('Arrival dialog copy uses the selected vehicle label', () {
     final timerTexts = AppTexts.ko.timer;
 
-    expect(
-      timerTexts.arrivalDialogMessage('경찰차', '양치'),
-      '경찰차가 도착했어. 양치 미션을 마쳤어?',
-    );
+    expect(timerTexts.arrivalDialogMessage('경찰차', '양치'), '경찰차가 도착했어. 미션을 마쳤어?');
     expect(
       timerTexts.arrivalDialogMessage('포크레인', '정리'),
-      '포크레인이 도착했어. 정리 미션을 마쳤어?',
+      '포크레인이 도착했어. 미션을 마쳤어?',
     );
   });
 
@@ -1805,7 +1802,7 @@ void main() {
         languageCode: 'ko',
         activityLabel: '양치',
       ),
-      '포크레인이 도착했어. 양치 미션을 마쳤어?',
+      '포크레인이 도착했어. 미션을 마쳤어?',
     );
     expect(
       timerArrivalDialogMessage(
@@ -1814,7 +1811,7 @@ void main() {
         languageCode: 'en',
         activityLabel: 'Brush Teeth',
       ),
-      'The police car arrived. Did you finish Brush Teeth?',
+      'The police car arrived. Did you finish the mission?',
     );
   });
 
@@ -6427,6 +6424,86 @@ void main() {
     await tester.pump();
   });
 
+  testWidgets(
+    'TimerScreen restores arrived sessions at the finish until acknowledged',
+    (tester) async {
+      tester.view.physicalSize = const Size(600, 900);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(() {
+        tester.view.resetPhysicalSize();
+        tester.view.resetDevicePixelRatio();
+      });
+      SharedPreferences.setMockInitialValues({});
+      addTearDown(() async {
+        await const ActiveActivityTimerSessionStore().clear();
+      });
+      final startedAt = DateTime(2026, 6, 10, 8);
+      final now = startedAt.add(const Duration(minutes: 30));
+      final session = ActiveActivityTimerSession(
+        sessionId: 'arrived-session',
+        startedAt: startedAt,
+        config: ActivityTimerConfig.defaults().copyWith(
+          duration: const Duration(minutes: 25),
+        ),
+        state: ActiveActivityTimerSessionState.running,
+      );
+
+      await tester.pumpWidget(
+        MaterialApp(
+          locale: const Locale('ko'),
+          supportedLocales: const [Locale('ko'), Locale('en')],
+          localizationsDelegates: const [
+            GlobalMaterialLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+          ],
+          home: TimerScreen(
+            config: ActivityTimerConfig.defaults(),
+            restoredSession: session,
+            activityProgressService: LocalActivityProgressService(),
+            now: () => now,
+            onConfigChanged: (_) {},
+          ),
+        ),
+      );
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 1100));
+
+      expect(tester.widget<RoadView>(find.byType(RoadView)).vehicleProgress, 1);
+      expect(find.byKey(const ValueKey('arrivalActionPanel')), findsOneWidget);
+      expect(
+        find.descendant(
+          of: find.byKey(const ValueKey('arrivalActionPanel')),
+          matching: find.text('도착했어요!'),
+        ),
+        findsOneWidget,
+      );
+      expect(find.text('오토바이가 도착했어. 미션을 마쳤어?'), findsOneWidget);
+      expect(find.byType(AlertDialog), findsNothing);
+      expect(find.byType(ResultScreen), findsNothing);
+
+      await tester.tap(find.byKey(const ValueKey('arrivalPrimaryButton')));
+      await tester.pump();
+      await tester.pump();
+
+      final resultScreen = tester.widget<ResultScreen>(
+        find.byType(ResultScreen),
+      );
+      expect(resultScreen.result.actualDuration, const Duration(minutes: 25));
+      expect(
+        resultScreen.result.endedAt,
+        startedAt.add(const Duration(minutes: 25)),
+      );
+      expect(
+        resultScreen.result.completionStatus,
+        ActivityCompletionStatus.completedAtEnd,
+      );
+
+      await tester.pumpWidget(const SizedBox.shrink());
+      await tester.pump();
+    },
+  );
+
   testWidgets('TimerScreen resumes ticking from a restored paused session', (
     tester,
   ) async {
@@ -6631,44 +6708,22 @@ void main() {
   testWidgets('Completing after arrival opens result without fast finish', (
     tester,
   ) async {
-    var now = DateTime(2026);
-
-    await tester.pumpWidget(
-      MaterialApp(
-        locale: const Locale('ko'),
-        home: TimerScreen(
-          config: ActivityTimerConfig.defaults().copyWith(
-            duration: const Duration(seconds: 1),
-          ),
-          activityProgressService: LocalActivityProgressService(),
-          now: () => now,
-          onConfigChanged: (_) {},
-        ),
+    tester.view.physicalSize = const Size(600, 900);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(() {
+      tester.view.resetPhysicalSize();
+      tester.view.resetDevicePixelRatio();
+    });
+    final startedAt = DateTime(2026);
+    final now = startedAt.add(const Duration(seconds: 2));
+    final session = ActiveActivityTimerSession(
+      sessionId: 'arrived-completion-session',
+      startedAt: startedAt,
+      config: ActivityTimerConfig.defaults().copyWith(
+        duration: const Duration(seconds: 1),
       ),
+      state: ActiveActivityTimerSessionState.running,
     );
-    await tester.pump();
-    now = now.add(const Duration(seconds: 2));
-    await tester.pump(const Duration(milliseconds: 250));
-
-    tester.widget<TimerControlBar>(find.byType(TimerControlBar)).onComplete!();
-    await tester.pump();
-    await tester.tap(find.byType(FilledButton).last);
-    await tester.pump();
-    await tester.pump();
-
-    expect(find.byType(ResultScreen), findsOneWidget);
-
-    await tester.pumpWidget(const SizedBox.shrink());
-    await tester.pump();
-  });
-
-  testWidgets('Time-ended activity opens result automatically at arrival', (
-    tester,
-  ) async {
-    SharedPreferences.setMockInitialValues({});
-
-    var now = DateTime(2026);
-    final service = LocalActivityProgressService();
 
     await tester.pumpWidget(
       MaterialApp(
@@ -6681,62 +6736,212 @@ void main() {
         ],
         home: TimerScreen(
           config: ActivityTimerConfig.defaults().copyWith(
-            activityId: ActivityCatalog.play.id,
             duration: const Duration(seconds: 1),
           ),
-          activityProgressService: service,
+          restoredSession: session,
+          activityProgressService: LocalActivityProgressService(),
           now: () => now,
           onConfigChanged: (_) {},
         ),
       ),
     );
     await tester.pump();
-    now = now.add(const Duration(seconds: 2));
-    await tester.pump(const Duration(milliseconds: 250));
-    await tester.pump(const Duration(milliseconds: 900));
+    await tester.pump(const Duration(milliseconds: 1100));
+
+    expect(find.byKey(const ValueKey('arrivalActionPanel')), findsOneWidget);
+    await tester.tap(find.byKey(const ValueKey('arrivalPrimaryButton')));
+    await tester.pump();
     await tester.pump();
 
     expect(find.byType(ResultScreen), findsOneWidget);
-    expect(find.byType(AlertDialog), findsNothing);
-    expect(find.text('시간이 다 되었어요'), findsOneWidget);
-    expect(find.text('아이와 함께 돌아본 뒤 차량 스티커를 받을지 선택해 주세요.'), findsOneWidget);
-    expect(
-      find.byKey(const ValueKey('resultSkipStickerButton')),
-      findsOneWidget,
-    );
-    expect((await service.loadSnapshot()).history, isEmpty);
-
-    await tester.tap(find.byKey(const ValueKey('resultSkipStickerButton')));
-    await tester.pumpAndSettle();
-
-    final snapshot = await service.loadSnapshot();
-    expect(
-      snapshot.history.single.completionStatus,
-      ActivityCompletionStatus.timeEnded,
-    );
 
     await tester.pumpWidget(const SizedBox.shrink());
     await tester.pump();
   });
 
+  testWidgets(
+    'Live arrival waits for route acknowledgement before completion dialog',
+    (tester) async {
+      tester.view.physicalSize = const Size(600, 900);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(() {
+        tester.view.resetPhysicalSize();
+        tester.view.resetDevicePixelRatio();
+      });
+      final startedAt = DateTime(2026);
+      var now = startedAt;
+      final session = ActiveActivityTimerSession(
+        sessionId: 'running-session',
+        startedAt: startedAt,
+        config: ActivityTimerConfig.defaults().copyWith(
+          duration: const Duration(seconds: 1),
+        ),
+        state: ActiveActivityTimerSessionState.running,
+      );
+
+      await tester.pumpWidget(
+        MaterialApp(
+          locale: const Locale('ko'),
+          supportedLocales: const [Locale('ko'), Locale('en')],
+          localizationsDelegates: const [
+            GlobalMaterialLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+          ],
+          home: TimerScreen(
+            config: ActivityTimerConfig.defaults().copyWith(
+              duration: const Duration(seconds: 1),
+            ),
+            restoredSession: session,
+            activityProgressService: LocalActivityProgressService(),
+            now: () => now,
+            onConfigChanged: (_) {},
+          ),
+        ),
+      );
+      await tester.pump();
+      now = now.add(const Duration(seconds: 2));
+      await tester.pump(const Duration(milliseconds: 250));
+      await tester.pump(const Duration(milliseconds: 1100));
+
+      expect(find.byKey(const ValueKey('arrivalActionPanel')), findsOneWidget);
+      expect(find.text('오토바이가 도착했어. 미션을 마쳤어?'), findsOneWidget);
+      expect(find.byType(AlertDialog), findsNothing);
+      expect(find.byType(ResultScreen), findsNothing);
+      expect(find.byType(TimerControlBar), findsNothing);
+
+      await tester.pumpWidget(const SizedBox.shrink());
+      await tester.pump();
+    },
+  );
+
+  testWidgets(
+    'Time-ended activity opens result after arrival acknowledgement',
+    (tester) async {
+      tester.view.physicalSize = const Size(600, 900);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(() {
+        tester.view.resetPhysicalSize();
+        tester.view.resetDevicePixelRatio();
+      });
+      SharedPreferences.setMockInitialValues({});
+
+      final startedAt = DateTime(2026);
+      final now = startedAt.add(const Duration(seconds: 2));
+      final service = LocalActivityProgressService();
+      final session = ActiveActivityTimerSession(
+        sessionId: 'play-session',
+        startedAt: startedAt,
+        config: ActivityTimerConfig.defaults().copyWith(
+          activityId: ActivityCatalog.play.id,
+          duration: const Duration(seconds: 1),
+        ),
+        state: ActiveActivityTimerSessionState.running,
+      );
+
+      await tester.pumpWidget(
+        MaterialApp(
+          locale: const Locale('ko'),
+          supportedLocales: const [Locale('ko'), Locale('en')],
+          localizationsDelegates: const [
+            GlobalMaterialLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+          ],
+          home: TimerScreen(
+            config: ActivityTimerConfig.defaults().copyWith(
+              activityId: ActivityCatalog.play.id,
+              duration: const Duration(seconds: 1),
+            ),
+            restoredSession: session,
+            activityProgressService: service,
+            now: () => now,
+            onConfigChanged: (_) {},
+          ),
+        ),
+      );
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 1100));
+      await tester.pump();
+
+      expect(find.byKey(const ValueKey('arrivalActionPanel')), findsOneWidget);
+      expect(find.text('오토바이가 도착했어.'), findsOneWidget);
+      expect(find.byType(ResultScreen), findsNothing);
+      expect(find.byType(AlertDialog), findsNothing);
+
+      await tester.tap(find.byKey(const ValueKey('arrivalPrimaryButton')));
+      await tester.pump();
+      await tester.pump();
+
+      expect(find.byType(ResultScreen), findsOneWidget);
+      expect(find.byType(AlertDialog), findsNothing);
+      expect(
+        tester
+            .widget<ResultScreen>(find.byType(ResultScreen))
+            .result
+            .completionStatus,
+        ActivityCompletionStatus.timeEnded,
+      );
+      expect(
+        tester
+            .widget<ResultScreen>(find.byType(ResultScreen))
+            .result
+            .actualDuration,
+        const Duration(seconds: 1),
+      );
+      expect(
+        find.byKey(const ValueKey('resultSkipStickerButton')),
+        findsOneWidget,
+      );
+      expect((await service.loadSnapshot()).history, isEmpty);
+
+      await tester.tap(find.byKey(const ValueKey('resultSkipStickerButton')));
+      await tester.pumpAndSettle();
+
+      final snapshot = await service.loadSnapshot();
+      expect(
+        snapshot.history.single.completionStatus,
+        ActivityCompletionStatus.timeEnded,
+      );
+
+      await tester.pumpWidget(const SizedBox.shrink());
+      await tester.pump();
+    },
+  );
+
   testWidgets('Timer records directly selected markers on completion', (
     tester,
   ) async {
+    tester.view.physicalSize = const Size(600, 900);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(() {
+      tester.view.resetPhysicalSize();
+      tester.view.resetDevicePixelRatio();
+    });
     SharedPreferences.setMockInitialValues({});
 
-    var now = DateTime(2026);
+    final startedAt = DateTime(2026);
+    final now = startedAt.add(const Duration(seconds: 2));
     final service = LocalActivityProgressService();
+    final config = ActivityTimerConfig.defaults().copyWith(
+      duration: const Duration(seconds: 1),
+      markerMode: ActivityMarkerMode.manual,
+      markerIds: const ['top_teeth', 'bottom_teeth'],
+      selectedMarkerIds: const ['top_teeth', 'bottom_teeth'],
+    );
+    final session = ActiveActivityTimerSession(
+      sessionId: 'marker-session',
+      startedAt: startedAt,
+      config: config,
+      state: ActiveActivityTimerSessionState.running,
+    );
 
     await tester.pumpWidget(
       MaterialApp(
         locale: const Locale('ko'),
         home: TimerScreen(
-          config: ActivityTimerConfig.defaults().copyWith(
-            duration: const Duration(seconds: 1),
-            markerMode: ActivityMarkerMode.manual,
-            markerIds: const ['top_teeth', 'bottom_teeth'],
-            selectedMarkerIds: const ['top_teeth', 'bottom_teeth'],
-          ),
+          config: config,
+          restoredSession: session,
           activityProgressService: service,
           now: () => now,
           onConfigChanged: (_) {},
@@ -6744,23 +6949,20 @@ void main() {
       ),
     );
     await tester.pump();
-    now = now.add(const Duration(seconds: 2));
-    await tester.pump(const Duration(milliseconds: 250));
+    await tester.pump(const Duration(milliseconds: 1100));
 
-    tester.widget<TimerControlBar>(find.byType(TimerControlBar)).onComplete!();
-    await tester.pump();
-    await tester.tap(find.byType(FilledButton).last);
+    expect(find.byKey(const ValueKey('arrivalActionPanel')), findsOneWidget);
+    await tester.tap(find.byKey(const ValueKey('arrivalPrimaryButton')));
     await tester.pump();
     await tester.pump();
 
-    await tester.tap(find.byKey(const ValueKey('resultSkipStickerButton')));
-    await tester.pumpAndSettle();
-
-    final snapshot = await service.loadSnapshot();
-    expect(snapshot.history.single.selectedMarkerIds, [
-      'top_teeth',
-      'bottom_teeth',
-    ]);
+    expect(
+      tester
+          .widget<ResultScreen>(find.byType(ResultScreen))
+          .result
+          .selectedMarkerIds,
+      ['top_teeth', 'bottom_teeth'],
+    );
 
     await tester.pumpWidget(const SizedBox.shrink());
     await tester.pump();

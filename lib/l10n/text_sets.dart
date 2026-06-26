@@ -296,8 +296,11 @@ abstract interface class TimerTextSet {
   String get finishDriveTimeLabel;
   String get previewReady;
   String get previewGo;
+  String get arrivalConfirmButton;
+  String get arrivalResultButton;
 
   String arrivalDialogMessage(String vehicleLabel, String activityLabel);
+  String arrivalReachedMessage(String vehicleLabel);
   String remainingTime(String remaining);
   String remainingTimeSemanticLabel(String label, String remaining);
 }

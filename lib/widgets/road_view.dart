@@ -20,8 +20,9 @@ import 'vehicle_widget.dart';
 class RoadView extends StatelessWidget {
   const RoadView({
     super.key,
-    required this.cameraProgress,
-    required this.vehicleProgress,
+    double? progress,
+    double? cameraProgress,
+    double? vehicleProgress,
     required this.vehicle,
     this.avatar = VehicleAvatarPresentation.defaultImage,
     this.avatarImageBuilder,
@@ -34,10 +35,12 @@ class RoadView extends StatelessWidget {
     this.markerClearProgress,
     this.isRoadMotionActive = false,
     this.courseDuration = const Duration(minutes: 5),
-  });
+  }) : cameraProgress = cameraProgress ?? progress ?? 0,
+       vehicleProgress = vehicleProgress ?? progress ?? 0;
 
   final double cameraProgress;
   final double vehicleProgress;
+  double get progress => vehicleProgress;
   final VehicleDefinition vehicle;
   final VehicleAvatarPresentation avatar;
   final Widget Function(BuildContext context, String imagePath)?
@@ -95,7 +98,9 @@ class RoadView extends StatelessWidget {
             ? viewportSize.height * 0.18
             : videoMargin;
         final clampedCameraProgress = cameraProgress.clamp(0.0, 1.0).toDouble();
-        final clampedVehicleProgress = vehicleProgress.clamp(0.0, 1.0).toDouble();
+        final clampedVehicleProgress = vehicleProgress
+            .clamp(0.0, 1.0)
+            .toDouble();
         final cameraOffsetY = roadCameraOffsetForGeometryProgress(
           geometry: geometry,
           progress: clampedCameraProgress,
@@ -594,13 +599,15 @@ class RoadMotivationVideoLayer extends StatelessWidget {
 class RoadVehicleLayer extends StatelessWidget {
   const RoadVehicleLayer({
     super.key,
-    required this.cameraProgress,
-    required this.vehicleProgress,
+    double? progress,
+    double? cameraProgress,
+    double? vehicleProgress,
     required this.vehicle,
     this.avatar = VehicleAvatarPresentation.defaultImage,
     this.avatarImageBuilder,
     this.courseDuration = const Duration(minutes: 5),
-  });
+  }) : cameraProgress = cameraProgress ?? progress ?? 0,
+       vehicleProgress = vehicleProgress ?? progress ?? 0;
 
   final double cameraProgress;
   final double vehicleProgress;
@@ -635,8 +642,12 @@ class RoadVehicleLayer extends StatelessWidget {
                 ),
               )
               .toDouble();
-          final clampedCameraProgress = cameraProgress.clamp(0.0, 1.0).toDouble();
-          final clampedVehicleProgress = vehicleProgress.clamp(0.0, 1.0).toDouble();
+          final clampedCameraProgress = cameraProgress
+              .clamp(0.0, 1.0)
+              .toDouble();
+          final clampedVehicleProgress = vehicleProgress
+              .clamp(0.0, 1.0)
+              .toDouble();
           final cameraOffsetY = roadCameraOffsetForGeometryProgress(
             geometry: geometry,
             progress: clampedCameraProgress,
@@ -694,7 +705,7 @@ _RoadVehiclePlacement _roadVehiclePlacementForGeometryProgress({
     geometry,
     progress,
   );
-  
+
   final roadPosition = roadPointForGeometryProgress(geometry, progress);
   final anchorOffset = _vehicleRoadAnchorOffset(
     vehicle: vehicle,
@@ -708,7 +719,8 @@ _RoadVehiclePlacement _roadVehiclePlacementForGeometryProgress({
     geometry: geometry,
     progress: progress,
   );
-  final baselineViewportRoadPosition = roadPosition - Offset(0, baselineCameraOffsetY);
+  final baselineViewportRoadPosition =
+      roadPosition - Offset(0, baselineCameraOffsetY);
   final baselineVehiclePosition = baselineViewportRoadPosition + anchorOffset;
   final baselineBoundedOffset = _boundedVehicleOffset(
     size: geometry.viewportSize,
@@ -720,7 +732,7 @@ _RoadVehiclePlacement _roadVehiclePlacementForGeometryProgress({
     baselineVehiclePosition.dy - (vehicleSize / 2),
   );
   final correction = baselineBoundedOffset - baselineRawOffset;
-  
+
   // Calculate actual raw position (with current camera)
   final actualViewportRoadPosition = roadPosition - Offset(0, cameraOffsetY);
   final actualVehiclePosition = actualViewportRoadPosition + anchorOffset;
@@ -728,7 +740,7 @@ _RoadVehiclePlacement _roadVehiclePlacementForGeometryProgress({
     actualVehiclePosition.dx - (vehicleSize / 2),
     actualVehiclePosition.dy - (vehicleSize / 2),
   );
-  
+
   final viewportOffset = actualRawOffset + correction;
 
   return _RoadVehiclePlacement(

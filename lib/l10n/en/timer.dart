@@ -42,9 +42,15 @@ class EnTimerTexts implements TimerTextSet {
   String get finishDriveTimeLabel => 'Finishing up';
   String get previewReady => 'Ready... 🚦';
   String get previewGo => 'Go! 🌟';
+  String get arrivalConfirmButton => 'See arrival';
+  String get arrivalResultButton => 'See result';
 
   String arrivalDialogMessage(String vehicleLabel, String activityLabel) {
-    return 'The ${vehicleLabel.toLowerCase()} arrived. Did you finish $activityLabel?';
+    return 'The ${vehicleLabel.toLowerCase()} arrived. Did you finish the mission?';
+  }
+
+  String arrivalReachedMessage(String vehicleLabel) {
+    return 'The ${vehicleLabel.toLowerCase()} arrived.';
   }
 
   String remainingTime(String remaining) => 'Time left $remaining';

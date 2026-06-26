@@ -210,6 +210,8 @@ class _TimerScreenState extends State<TimerScreen>
   final math.Random _motivationRandom = math.Random();
   final Set<int> _shownMotivationMilestones = {};
   bool _arrivalPromptShown = false;
+  bool _arrivalAcknowledged = false;
+  bool _arrivalPanelVisible = false;
   bool _screenAwakeEnabled = false;
   bool _exitPromptShown = false;
   bool _allowExit = false;
@@ -223,11 +225,18 @@ class _TimerScreenState extends State<TimerScreen>
   Animation<double>? _finishDriveAnimation;
   ActivitySessionResult? _pendingFinishDriveResult;
   double _finishDriveStartProgress = 0;
+  DateTime? _arrivalCompletedAt;
+  Duration? _arrivalActualDuration;
   bool _handoffOrientation = false;
   late final String _activeSessionId;
 
   ActivityDefinition get _activity =>
       ActivityCatalog.findById(_timerConfig.activityId);
+
+  bool get _isAwaitingArrivalAcknowledgement =>
+      !_isFinishDriving &&
+      !_arrivalAcknowledged &&
+      _controller.state == ActivityTimerState.arrived;
 
   @override
   void initState() {
@@ -258,6 +267,11 @@ class _TimerScreenState extends State<TimerScreen>
         session: restoredSession,
         now: widget.now,
       );
+      if (_controller.state == ActivityTimerState.arrived) {
+        _arrivalPromptShown = true;
+        _arrivalPanelVisible = true;
+        _captureArrivalSnapshot();
+      }
     }
     _controller.addListener(_handleTimerChanged);
     _finishDriveController = AnimationController(vsync: this)
@@ -400,35 +414,20 @@ class _TimerScreenState extends State<TimerScreen>
     }
 
     _arrivalPromptShown = true;
+    _captureArrivalSnapshot();
     unawaited(_persistActiveSession());
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!mounted) {
+    _arrivalPromptTimer?.cancel();
+    _arrivalPromptTimer = Timer(const Duration(milliseconds: 900), () {
+      if (!mounted ||
+          _isFinishDriving ||
+          _arrivalAcknowledged ||
+          _controller.state != ActivityTimerState.arrived) {
         return;
       }
-      _arrivalPromptTimer?.cancel();
-      _arrivalPromptTimer = Timer(const Duration(milliseconds: 900), () {
-        if (!mounted ||
-            _isFinishDriving ||
-            _controller.state != ActivityTimerState.arrived) {
-          return;
-        }
-        _handleArrival();
+      setState(() {
+        _arrivalPanelVisible = true;
       });
     });
-  }
-
-  Future<void> _handleArrival() async {
-    if (_activity.completionMode ==
-        ActivityCompletionMode.timeEndsAutomatically) {
-      final result = _controller.complete(
-        completionStatus: ActivityCompletionStatus.timeEnded,
-      );
-      unawaited(_clearActiveSession());
-      _openResult(result);
-      return;
-    }
-
-    await _confirmComplete(fromArrival: true);
   }
 
   void _maybeShowMotivationVideo() {
@@ -651,8 +650,15 @@ class _TimerScreenState extends State<TimerScreen>
     }
   }
 
-  Future<void> _confirmComplete({bool fromArrival = false}) async {
+  Future<void> _confirmComplete() async {
     if (_isFinishDriving) {
+      return;
+    }
+    if (_isAwaitingArrivalAcknowledgement) {
+      _arrivalPromptTimer?.cancel();
+      setState(() {
+        _arrivalPanelVisible = true;
+      });
       return;
     }
     _arrivalPromptTimer?.cancel();
@@ -661,23 +667,12 @@ class _TimerScreenState extends State<TimerScreen>
     final activity = _activity;
     final languageCode = Localizations.localeOf(context).languageCode;
     final activityLabel = activity.labelForLanguage(languageCode);
-    final arrivalDialogMessage = timerArrivalDialogMessage(
-      texts: texts.timer,
-      vehicleId: _timerConfig.vehicleId,
-      languageCode: languageCode,
-      activityLabel: activityLabel,
-    );
     final confirmed = await showDialog<bool>(
       context: context,
-      barrierDismissible: !fromArrival,
       builder: (context) {
         return AlertDialog(
           title: Text(texts.timer.completeDialogTitle(activityLabel)),
-          content: Text(
-            fromArrival
-                ? arrivalDialogMessage
-                : texts.timer.completeDialogMessage(activityLabel),
-          ),
+          content: Text(texts.timer.completeDialogMessage(activityLabel)),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(false),
@@ -697,19 +692,10 @@ class _TimerScreenState extends State<TimerScreen>
     }
 
     if (confirmed != true) {
-      if (fromArrival) {
-        final result = _controller.complete(
-          completionStatus: ActivityCompletionStatus.needsMoreTime,
-        );
-        unawaited(_clearActiveSession());
-        _openResult(result);
-      }
       return;
     }
 
-    final completionStatus = fromArrival
-        ? ActivityCompletionStatus.completedAtEnd
-        : _controller.state == ActivityTimerState.arrived
+    final completionStatus = _controller.state == ActivityTimerState.arrived
         ? ActivityCompletionStatus.completedAfterEnd
         : ActivityCompletionStatus.completedBeforeEnd;
     final result = _controller.complete(completionStatus: completionStatus);
@@ -719,6 +705,65 @@ class _TimerScreenState extends State<TimerScreen>
       return;
     }
     _openResult(result);
+  }
+
+  Future<void> _acknowledgeArrival() async {
+    if (_isFinishDriving ||
+        _arrivalAcknowledged ||
+        _controller.state != ActivityTimerState.arrived) {
+      return;
+    }
+    await _completeArrivalFromPanel(completed: true);
+  }
+
+  Future<void> _completeArrivalFromPanel({required bool completed}) async {
+    if (_isFinishDriving ||
+        _arrivalAcknowledged ||
+        _controller.state != ActivityTimerState.arrived) {
+      return;
+    }
+
+    _arrivalPromptTimer?.cancel();
+    _captureArrivalSnapshot();
+    setState(() {
+      _arrivalAcknowledged = true;
+      _arrivalPanelVisible = false;
+    });
+
+    final completionStatus =
+        _activity.completionMode == ActivityCompletionMode.timeEndsAutomatically
+        ? ActivityCompletionStatus.timeEnded
+        : completed
+        ? ActivityCompletionStatus.completedAtEnd
+        : ActivityCompletionStatus.needsMoreTime;
+    final result = _completeArrival(completionStatus: completionStatus);
+    unawaited(_clearActiveSession());
+    _openResult(result);
+  }
+
+  void _captureArrivalSnapshot() {
+    if (_arrivalCompletedAt != null && _arrivalActualDuration != null) {
+      return;
+    }
+
+    final startedAt = _controller.startedAt;
+    _arrivalActualDuration = _timerConfig.duration;
+    _arrivalCompletedAt = startedAt == null
+        ? (widget.now ?? DateTime.now)()
+        : startedAt
+              .add(_controller.totalPausedDuration)
+              .add(_timerConfig.duration);
+  }
+
+  ActivitySessionResult _completeArrival({
+    required ActivityCompletionStatus completionStatus,
+  }) {
+    _captureArrivalSnapshot();
+    return _controller.complete(
+      completionStatus: completionStatus,
+      endedAt: _arrivalCompletedAt,
+      actualDuration: _arrivalActualDuration,
+    );
   }
 
   void _startFinishDrive(ActivitySessionResult result) {
@@ -897,7 +942,7 @@ class _TimerScreenState extends State<TimerScreen>
 
     return AnimatedBuilder(
       animation: Listenable.merge([
-        _controller, 
+        _controller,
         _finishDriveController,
         if (_previewController != null) _previewController!,
       ]),
@@ -921,7 +966,7 @@ class _TimerScreenState extends State<TimerScreen>
                   .clamp(0.0, 1.0)
                   .toDouble()
             : timerProgress;
-            
+
         final cameraDisplayProgress = _isPreviewing
             ? (_previewController?.value ?? 0.0).clamp(0.0, 1.0).toDouble()
             : displayProgress;
@@ -956,6 +1001,62 @@ class _TimerScreenState extends State<TimerScreen>
           }
           unawaited(_persistActiveSession());
         }
+
+        final isAwaitingArrivalAcknowledgement =
+            _isAwaitingArrivalAcknowledgement;
+        final shouldShowArrivalPanel =
+            isAwaitingArrivalAcknowledgement && _arrivalPanelVisible;
+        final languageCode = Localizations.localeOf(context).languageCode;
+        final activityLabel = activity.labelForLanguage(languageCode);
+        final vehicleLabel = vehicle.labelForLanguage(languageCode);
+        final arrivalPanel = shouldShowArrivalPanel
+            ? _ArrivalActionPanel(
+                title: texts.timer.arrivedProgressMessage,
+                message:
+                    _activity.completionMode ==
+                        ActivityCompletionMode.timeEndsAutomatically
+                    ? texts.timer.arrivalReachedMessage(vehicleLabel)
+                    : timerArrivalDialogMessage(
+                        texts: texts.timer,
+                        vehicleId: _timerConfig.vehicleId,
+                        languageCode: languageCode,
+                        activityLabel: activityLabel,
+                      ),
+                primaryLabel:
+                    _activity.completionMode ==
+                        ActivityCompletionMode.timeEndsAutomatically
+                    ? texts.timer.arrivalResultButton
+                    : texts.common.complete,
+                secondaryLabel:
+                    _activity.completionMode ==
+                        ActivityCompletionMode.timeEndsAutomatically
+                    ? null
+                    : texts.common.notYet,
+                onPrimary: _acknowledgeArrival,
+                onSecondary:
+                    _activity.completionMode ==
+                        ActivityCompletionMode.timeEndsAutomatically
+                    ? null
+                    : () => _completeArrivalFromPanel(completed: false),
+              )
+            : null;
+        final completeLabel = isAwaitingArrivalAcknowledgement
+            ? texts.timer.arrivalConfirmButton
+            : texts.timer.completeActivityButton(activity.id);
+        final handleComplete = _isFinishDriving
+            ? null
+            : isAwaitingArrivalAcknowledgement
+            ? () {
+                _arrivalPromptTimer?.cancel();
+                setState(() {
+                  _arrivalPanelVisible = true;
+                });
+              }
+            : _confirmComplete;
+        final handlePauseResumeAction =
+            _isFinishDriving || isAwaitingArrivalAcknowledgement
+            ? null
+            : handlePauseResume;
 
         final isScreenLandscape =
             MediaQuery.orientationOf(context) == Orientation.landscape;
@@ -1018,7 +1119,7 @@ class _TimerScreenState extends State<TimerScreen>
                         _controller.state == ActivityTimerState.running,
                     courseDuration: _timerConfig.duration,
                   );
-                  
+
                   final roadView = Stack(
                     fit: StackFit.expand,
                     children: [
@@ -1031,10 +1132,14 @@ class _TimerScreenState extends State<TimerScreen>
                             alignment: Alignment.center,
                             child: AnimatedSwitcher(
                               duration: const Duration(milliseconds: 300),
-                              transitionBuilder: (child, animation) => FadeTransition(
-                                opacity: animation,
-                                child: ScaleTransition(scale: animation, child: child),
-                              ),
+                              transitionBuilder: (child, animation) =>
+                                  FadeTransition(
+                                    opacity: animation,
+                                    child: ScaleTransition(
+                                      scale: animation,
+                                      child: child,
+                                    ),
+                                  ),
                               child: Text(
                                 previewMessageText,
                                 key: ValueKey(previewMessageText),
@@ -1117,28 +1222,23 @@ class _TimerScreenState extends State<TimerScreen>
                       roadView: roadView,
                       vehicleLayer: landscapeVehicleLayer,
                       motivationVideoLayer: landscapeMotivationVideoLayer,
+                      arrivalPanel: arrivalPanel,
                       onBack: _confirmExit,
                       onMotivationSettings: _openMotivationSettings,
-                      controls: TimerControlBar(
-                        isPaused: _controller.isPaused,
-                        completeLabel: texts.timer.completeActivityButton(
-                          activity.id,
-                        ),
-                        onPauseResume: _isFinishDriving
-                            ? null
-                            : handlePauseResume,
-                        onComplete: _isFinishDriving ? null : _confirmComplete,
-                      ),
+                      controls:
+                          arrivalPanel ??
+                          TimerControlBar(
+                            isPaused: _controller.isPaused,
+                            completeLabel: completeLabel,
+                            onPauseResume: handlePauseResumeAction,
+                            onComplete: handleComplete,
+                          ),
                       compactControls: _CompactLandscapeControls(
                         isPaused: _controller.isPaused,
-                        completeLabel: texts.timer.completeActivityButton(
-                          activity.id,
-                        ),
+                        completeLabel: completeLabel,
                         onMotivationSettings: _openMotivationSettings,
-                        onPauseResume: _isFinishDriving
-                            ? null
-                            : handlePauseResume,
-                        onComplete: _isFinishDriving ? null : _confirmComplete,
+                        onPauseResume: handlePauseResumeAction,
+                        onComplete: handleComplete,
                       ),
                     );
                   }
@@ -1163,18 +1263,13 @@ class _TimerScreenState extends State<TimerScreen>
                           remainingTimeCard,
                         ],
                         const SizedBox(height: AppSpacing.md),
-                        TimerControlBar(
-                          isPaused: _controller.isPaused,
-                          completeLabel: texts.timer.completeActivityButton(
-                            activity.id,
-                          ),
-                          onPauseResume: _isFinishDriving
-                              ? null
-                              : handlePauseResume,
-                          onComplete: _isFinishDriving
-                              ? null
-                              : _confirmComplete,
-                        ),
+                        arrivalPanel ??
+                            TimerControlBar(
+                              isPaused: _controller.isPaused,
+                              completeLabel: completeLabel,
+                              onPauseResume: handlePauseResumeAction,
+                              onComplete: handleComplete,
+                            ),
                       ],
                     ),
                   );
@@ -1195,6 +1290,7 @@ class _LandscapeTimerLayout extends StatelessWidget {
     required this.roadView,
     required this.vehicleLayer,
     required this.motivationVideoLayer,
+    required this.arrivalPanel,
     required this.onBack,
     required this.onMotivationSettings,
     required this.controls,
@@ -1206,6 +1302,7 @@ class _LandscapeTimerLayout extends StatelessWidget {
   final Widget roadView;
   final Widget? vehicleLayer;
   final Widget? motivationVideoLayer;
+  final Widget? arrivalPanel;
   final VoidCallback onBack;
   final VoidCallback onMotivationSettings;
   final Widget controls;
@@ -1232,6 +1329,7 @@ class _LandscapeTimerLayout extends StatelessWidget {
             roadView: roadView,
             vehicleLayer: vehicleLayer,
             motivationVideoLayer: motivationVideoLayer,
+            arrivalPanel: isCompactLandscape ? arrivalPanel : null,
             onBack: onBack,
             onMotivationSettings: onMotivationSettings,
             compactControls: isCompactLandscape ? compactControls : null,
@@ -1310,6 +1408,93 @@ class _CompactLandscapeControls extends StatelessWidget {
   }
 }
 
+class _ArrivalActionPanel extends StatelessWidget {
+  const _ArrivalActionPanel({
+    required this.title,
+    required this.message,
+    required this.primaryLabel,
+    required this.onPrimary,
+    this.secondaryLabel,
+    this.onSecondary,
+  });
+
+  final String title;
+  final String message;
+  final String primaryLabel;
+  final VoidCallback onPrimary;
+  final String? secondaryLabel;
+  final VoidCallback? onSecondary;
+
+  @override
+  Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
+
+    return DecoratedBox(
+      key: const ValueKey('arrivalActionPanel'),
+      decoration: BoxDecoration(
+        color: AppColors.white.withValues(alpha: 0.96),
+        borderRadius: AppRadius.card,
+        border: Border.all(color: AppColors.borderWarm, width: 1.3),
+        boxShadow: AppShadows.surface,
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(AppSpacing.md),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                const Icon(Icons.flag_rounded, color: AppColors.primary),
+                const SizedBox(width: AppSpacing.sm),
+                Expanded(
+                  child: Text(
+                    title,
+                    style: textTheme.titleMedium?.copyWith(
+                      color: AppColors.brown900,
+                      fontWeight: FontWeight.w900,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: AppSpacing.xs),
+            Text(
+              message,
+              style: textTheme.bodyMedium?.copyWith(
+                color: AppColors.brown700,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+            const SizedBox(height: AppSpacing.md),
+            Row(
+              children: [
+                if (secondaryLabel != null && onSecondary != null) ...[
+                  Expanded(
+                    child: OutlinedButton(
+                      key: const ValueKey('arrivalSecondaryButton'),
+                      onPressed: onSecondary,
+                      child: Text(secondaryLabel!),
+                    ),
+                  ),
+                  const SizedBox(width: AppSpacing.sm),
+                ],
+                Expanded(
+                  child: FilledButton(
+                    key: const ValueKey('arrivalPrimaryButton'),
+                    onPressed: onPrimary,
+                    child: Text(primaryLabel),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 enum _CompactLandscapeButtonVariant { primary, outline }
 
 class _CompactLandscapeButton extends StatelessWidget {
@@ -1381,6 +1566,7 @@ class _LandscapeCourseCanvas extends StatelessWidget {
     required this.roadView,
     required this.vehicleLayer,
     required this.motivationVideoLayer,
+    required this.arrivalPanel,
     required this.onBack,
     required this.onMotivationSettings,
     this.compactControls,
@@ -1391,6 +1577,7 @@ class _LandscapeCourseCanvas extends StatelessWidget {
   final Widget roadView;
   final Widget? vehicleLayer;
   final Widget? motivationVideoLayer;
+  final Widget? arrivalPanel;
   final VoidCallback onBack;
   final VoidCallback onMotivationSettings;
   final Widget? compactControls;
@@ -1469,6 +1656,16 @@ class _LandscapeCourseCanvas extends StatelessWidget {
             if (vehicleLayer != null) Positioned.fill(child: vehicleLayer!),
             if (motivationVideoLayer != null)
               Positioned.fill(child: motivationVideoLayer!),
+            if (arrivalPanel != null)
+              Positioned(
+                left: roadBounds.left + 180,
+                right:
+                    _landscapeCourseCanvasSize.width -
+                    roadBounds.right +
+                    _compactLandscapeControlsRightInset,
+                bottom: AppSpacing.md,
+                child: arrivalPanel!,
+              ),
             if (compactControls != null)
               Positioned(
                 right: AppSpacing.xl,
@@ -2112,8 +2309,4 @@ class _RemainingTimeCard extends StatelessWidget {
   }
 }
 
-enum _PreviewMessageState {
-  none,
-  ready,
-  go,
-}
+enum _PreviewMessageState { none, ready, go }

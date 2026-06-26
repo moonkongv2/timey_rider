@@ -40,9 +40,15 @@ class TimerTexts implements TimerTextSet {
   String get finishDriveTimeLabel => '마무리 중';
   String get previewReady => '준비... 🚦';
   String get previewGo => '출발! 🌟';
+  String get arrivalConfirmButton => '도착 확인';
+  String get arrivalResultButton => '결과 보기';
 
   String arrivalDialogMessage(String vehicleLabel, String activityLabel) {
-    return '$vehicleLabel${_subjectParticle(vehicleLabel)} 도착했어. $activityLabel 미션을 마쳤어?';
+    return '$vehicleLabel${_subjectParticle(vehicleLabel)} 도착했어. 미션을 마쳤어?';
+  }
+
+  String arrivalReachedMessage(String vehicleLabel) {
+    return '$vehicleLabel${_subjectParticle(vehicleLabel)} 도착했어.';
   }
 
   String remainingTime(String remaining) => '남은 시간 $remaining';
