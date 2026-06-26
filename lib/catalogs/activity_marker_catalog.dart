@@ -60,7 +60,7 @@ abstract final class ActivityMarkerCatalog {
     id: 'favorite_scene',
     labelKo: '재미있는 장면',
     labelEn: 'Favorite scene',
-    emoji: '🌟',
+    emoji: '🎬',
     activityIds: ['reading'],
   );
 
@@ -76,7 +76,7 @@ abstract final class ActivityMarkerCatalog {
     id: 'finish',
     labelKo: '다 읽음',
     labelEn: 'All read',
-    emoji: '✅',
+    emoji: '📕',
     activityIds: ['reading'],
   );
 
@@ -180,15 +180,15 @@ abstract final class ActivityMarkerCatalog {
     id: 'all_done',
     labelKo: '잘 먹었어요',
     labelEn: 'All done',
-    emoji: '✅',
+    emoji: '😋',
     activityIds: ['meal'],
   );
 
   static const star = ActivityMarkerDefinition(
     id: 'star',
-    labelKo: '별',
-    labelEn: 'Star',
-    emoji: '⭐',
+    labelKo: '목표',
+    labelEn: 'Goal',
+    emoji: '🎯',
   );
 
   static const flag = ActivityMarkerDefinition(

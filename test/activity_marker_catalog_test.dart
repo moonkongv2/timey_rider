@@ -52,6 +52,14 @@ void main() {
     expect(ActivityMarkerCatalog.findById('finish')?.labelKo, '다 읽음');
   });
 
+  test('course marker emoji avoid stars and check marks', () {
+    final emoji = ActivityMarkerCatalog.all.map((marker) => marker.emoji);
+
+    expect(emoji, isNot(contains('⭐')));
+    expect(emoji, isNot(contains('🌟')));
+    expect(emoji, isNot(contains('✅')));
+  });
+
   test('cleanup markers use put-away labels', () {
     expect(ActivityMarkerCatalog.findById('blocks')?.labelKo, '블록 자리');
     expect(ActivityMarkerCatalog.findById('books')?.labelEn, 'Books');
