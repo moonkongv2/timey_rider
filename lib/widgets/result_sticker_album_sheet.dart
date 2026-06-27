@@ -58,7 +58,7 @@ class _ResultStickerAlbumSheet extends StatelessWidget {
                 .clamp(0.0, maxContentWidth)
                 .toDouble();
             final crossAxisCount = isLandscape ? 3 : 2;
-            final childAspectRatio = isLandscape ? 0.92 : 0.88;
+            final childAspectRatio = isLandscape ? 0.92 : 0.78;
 
             return Column(
               children: [
