@@ -11,10 +11,10 @@
 - Add new dependencies only when clearly necessary.
 
 ## Review Loop Shortcuts
-- If the user says `code-review-loop`, read `CODEX_REVIEW_LOOP.md` and follow that protocol for a code review loop.
-- If the user says `agy-code-review-loop` or `codex-code-review-loop`, read `CODEX_REVIEW_LOOP.md` and follow that protocol for a code review loop with the selected reviewer.
-- If the user says `plan-review-loop`, read `CODEX_REVIEW_LOOP.md` and follow that protocol for a plan review loop.
-- If the user says `agy-plan-review-loop` or `codex-plan-review-loop`, read `CODEX_REVIEW_LOOP.md` and follow that protocol for a plan review loop with the selected reviewer.
+- Default review-loop shortcuts use compact mode: `code-review-loop`, `agy-code-review-loop`, `codex-code-review-loop`, `plan-review-loop`, `agy-plan-review-loop`, `codex-plan-review-loop`.
+- Audit review-loop shortcuts preserve detailed artifacts: `audit-code-review-loop`, `agy-audit-code-review-loop`, `codex-audit-code-review-loop`, `audit-plan-review-loop`, `agy-audit-plan-review-loop`, `codex-audit-plan-review-loop`.
+- If the loop count is omitted, default to 1 loop.
+- Detailed review-loop behavior lives in `CODEX_REVIEW_LOOP.md`.
 - Do not read or apply `CODEX_REVIEW_LOOP.md` for unrelated implementation, debugging, explanation, or commit requests.
 
 ## Communication
