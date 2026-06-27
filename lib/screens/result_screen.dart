@@ -20,7 +20,6 @@ import '../widgets/app/app_help_sheet.dart';
 import '../widgets/flying_sticker_animation.dart';
 import '../widgets/result_sticker_album_button.dart';
 import '../widgets/result_sticker_album_sheet.dart';
-import '../widgets/reward_sticker_image.dart';
 import 'reward_goal_screen.dart';
 import 'timer_screen.dart';
 

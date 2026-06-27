@@ -79,7 +79,7 @@ class _ResultStickerAlbumButtonState extends State<ResultStickerAlbumButton>
                 shape: BoxShape.circle,
                 boxShadow: [
                   BoxShadow(
-                    color: AppColors.black.withOpacity(0.1),
+                    color: AppColors.black.withValues(alpha: 0.1),
                     blurRadius: 8,
                     offset: const Offset(0, 4),
                   ),
