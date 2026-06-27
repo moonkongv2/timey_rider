@@ -48,57 +48,81 @@ class _ResultStickerAlbumSheet extends StatelessWidget {
       maxChildSize: 0.95,
       expand: false,
       builder: (context, scrollController) {
-        return Column(
-          children: [
-            const SizedBox(height: AppSpacing.md),
-            Container(
-              width: 40,
-              height: 4,
-              decoration: BoxDecoration(
-                color: AppColors.borderSoft,
-                borderRadius: AppRadius.pill,
-              ),
-            ),
-            const SizedBox(height: AppSpacing.md),
-            Text(
-              texts.rewards.collectionTitle,
-              style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                    fontWeight: FontWeight.w900,
-                    color: AppColors.textStrong,
-                  ),
-            ),
-            const SizedBox(height: AppSpacing.md),
-            Expanded(
-              child: GridView.builder(
-                controller: scrollController,
-                padding: const EdgeInsets.fromLTRB(
-                  AppSpacing.xl,
-                  AppSpacing.md,
-                  AppSpacing.xl,
-                  AppSpacing.xxl,
-                ),
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2,
-                  mainAxisSpacing: AppSpacing.md,
-                  crossAxisSpacing: AppSpacing.md,
-                  childAspectRatio: 0.88,
-                ),
-                itemCount: VehicleCatalog.all.length,
-                itemBuilder: (context, index) {
-                  final vehicle = VehicleCatalog.all[index];
-                  final sticker = RewardCatalog.findVehicleStickerByVehicleId(
-                    vehicle.id,
-                  )!;
-                  final item = _inventoryItemFor(sticker.id);
+        return LayoutBuilder(
+          builder: (context, constraints) {
+            final isLandscape = constraints.maxWidth > constraints.maxHeight;
+            final maxContentWidth = isLandscape
+                ? (constraints.maxWidth >= 1000 ? 840.0 : 720.0)
+                : constraints.maxWidth;
+            final contentWidth = constraints.maxWidth
+                .clamp(0.0, maxContentWidth)
+                .toDouble();
+            final crossAxisCount = isLandscape ? 3 : 2;
+            final childAspectRatio = isLandscape ? 0.92 : 0.88;
 
-                  return _AlbumStickerCard(
-                    sticker: sticker,
-                    count: item?.count ?? 0,
-                  );
-                },
-              ),
-            ),
-          ],
+            return Column(
+              children: [
+                const SizedBox(height: AppSpacing.md),
+                Container(
+                  width: 40,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: AppColors.borderSoft,
+                    borderRadius: AppRadius.pill,
+                  ),
+                ),
+                const SizedBox(height: AppSpacing.md),
+                SizedBox(
+                  width: contentWidth,
+                  child: Text(
+                    texts.rewards.collectionTitle,
+                    textAlign: TextAlign.center,
+                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                      fontWeight: FontWeight.w900,
+                      color: AppColors.textStrong,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: AppSpacing.md),
+                Expanded(
+                  child: Center(
+                    child: SizedBox(
+                      width: contentWidth,
+                      child: GridView.builder(
+                        controller: scrollController,
+                        padding: const EdgeInsets.fromLTRB(
+                          AppSpacing.xl,
+                          AppSpacing.md,
+                          AppSpacing.xl,
+                          AppSpacing.xxl,
+                        ),
+                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: crossAxisCount,
+                          mainAxisSpacing: AppSpacing.md,
+                          crossAxisSpacing: AppSpacing.md,
+                          childAspectRatio: childAspectRatio,
+                        ),
+                        itemCount: VehicleCatalog.all.length,
+                        itemBuilder: (context, index) {
+                          final vehicle = VehicleCatalog.all[index];
+                          final sticker =
+                              RewardCatalog.findVehicleStickerByVehicleId(
+                                vehicle.id,
+                              )!;
+                          final item = _inventoryItemFor(sticker.id);
+
+                          return _AlbumStickerCard(
+                            sticker: sticker,
+                            count: item?.count ?? 0,
+                          );
+                        },
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            );
+          },
         );
       },
     );
@@ -138,10 +162,7 @@ class _AlbumStickerCard extends StatelessWidget {
               top: 4,
               child: Transform.rotate(
                 angle: -0.25,
-                child: Opacity(
-                  opacity: 0.6,
-                  child: stickerImage,
-                ),
+                child: Opacity(opacity: 0.6, child: stickerImage),
               ),
             ),
           if (count >= 2)
@@ -150,10 +171,7 @@ class _AlbumStickerCard extends StatelessWidget {
               top: -6,
               child: Transform.rotate(
                 angle: 0.18,
-                child: Opacity(
-                  opacity: 0.8,
-                  child: stickerImage,
-                ),
+                child: Opacity(opacity: 0.8, child: stickerImage),
               ),
             ),
           stickerImage,
@@ -186,53 +204,54 @@ class _AlbumStickerCard extends StatelessWidget {
         child: Padding(
           padding: const EdgeInsets.all(AppSpacing.lg),
           child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            _buildStickerStack(
-              _isCollected
-                  ? stickerName
-                  : texts.rewards.uncollectedSemanticLabel,
-            ),
-            const SizedBox(height: AppSpacing.md),
-            Text(
-              _isCollected ? stickerName : texts.rewards.lockedSticker,
-              textAlign: TextAlign.center,
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-              style: textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.w900,
-                color: _isCollected
-                    ? AppColors.textStrong
-                    : AppColors.textSecondary,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              _buildStickerStack(
+                _isCollected
+                    ? stickerName
+                    : texts.rewards.uncollectedSemanticLabel,
               ),
-            ),
-            const SizedBox(height: AppSpacing.sm),
-            DecoratedBox(
-              decoration: BoxDecoration(
-                color: _isCollected
-                    ? AppColors.surfaceYellow
-                    : AppColors.borderSoft,
-                borderRadius: AppRadius.pill,
-              ),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: AppSpacing.md,
-                  vertical: AppSpacing.xs,
+              const SizedBox(height: AppSpacing.md),
+              Text(
+                _isCollected ? stickerName : texts.rewards.lockedSticker,
+                textAlign: TextAlign.center,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.w900,
+                  color: _isCollected
+                      ? AppColors.textStrong
+                      : AppColors.textSecondary,
                 ),
-                child: Text(
-                  _isCollected
-                      ? texts.rewards.stickerCount(count)
-                      : texts.rewards.lockedStatus,
-                  style: textTheme.labelLarge?.copyWith(
-                    fontWeight: FontWeight.w900,
-                    color: AppColors.textPrimary,
+              ),
+              const SizedBox(height: AppSpacing.sm),
+              DecoratedBox(
+                decoration: BoxDecoration(
+                  color: _isCollected
+                      ? AppColors.surfaceYellow
+                      : AppColors.borderSoft,
+                  borderRadius: AppRadius.pill,
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppSpacing.md,
+                    vertical: AppSpacing.xs,
+                  ),
+                  child: Text(
+                    _isCollected
+                        ? texts.rewards.stickerCount(count)
+                        : texts.rewards.lockedStatus,
+                    style: textTheme.labelLarge?.copyWith(
+                      fontWeight: FontWeight.w900,
+                      color: AppColors.textPrimary,
+                    ),
                   ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
-    ));
+    );
   }
 }
