@@ -14,6 +14,7 @@ import '../theme/app_colors.dart';
 import '../theme/app_radius.dart';
 import '../theme/app_shadows.dart';
 import '../theme/app_spacing.dart';
+import 'goal_star_pulse.dart';
 import 'road_painter.dart';
 import 'vehicle_widget.dart';
 
@@ -119,6 +120,7 @@ class RoadView extends StatelessWidget {
         final visualStyle = RoadCourseVisualStyle.forCourseKind(
           vehicle.courseKind,
         );
+        final goalStarSize = isLandscape ? 68.0 : 56.0;
 
         return DecoratedBox(
           decoration: BoxDecoration(
@@ -160,6 +162,7 @@ class RoadView extends StatelessWidget {
                           clearProgress: clearProgress,
                           geometry: geometry,
                           markerSize: isLandscape ? 50 : 33,
+                          goalStarSize: goalStarSize,
                         ),
                       _RoadMarker(
                         position: roadPointForGeometryProgress(geometry, 0),
@@ -168,12 +171,14 @@ class RoadView extends StatelessWidget {
                         isActive: true,
                         size: isLandscape ? 42 : 36,
                       ),
-                      _RoadMarker(
-                        position: roadPointForGeometryProgress(geometry, 1),
-                        icon: Icons.flag_rounded,
-                        label: texts.common.complete,
-                        isActive: clampedVehicleProgress >= 1,
-                        size: isLandscape ? 42 : 36,
+                      _GoalStarMarker(
+                        position: _goalStarCenterForGeometry(
+                          geometry: geometry,
+                          size: goalStarSize,
+                        ),
+                        size: goalStarSize,
+                        isPulsing: isRoadMotionActive,
+                        semanticLabel: _finishPointSemanticLabel(context),
                       ),
                       if (showVehicle)
                         _PositionedRoadVehicle(
@@ -211,6 +216,59 @@ class RoadView extends StatelessWidget {
           ),
         );
       },
+    );
+  }
+}
+
+String _finishPointSemanticLabel(BuildContext context) {
+  return Localizations.localeOf(context).languageCode == 'ko'
+      ? '도착 지점'
+      : 'finish point';
+}
+
+Offset _goalStarCenterForGeometry({
+  required RoadCourseGeometry geometry,
+  required double size,
+}) {
+  final endpoint = roadPointForGeometryProgress(geometry, 1);
+  final opticalCenterOffsetY = size * 0.08;
+  final margin = size / 2 + 6;
+
+  return Offset(
+    endpoint.dx.clamp(margin, geometry.canvasSize.width - margin).toDouble(),
+    (endpoint.dy - opticalCenterOffsetY)
+        .clamp(margin, geometry.canvasSize.height - margin)
+        .toDouble(),
+  );
+}
+
+class _GoalStarMarker extends StatelessWidget {
+  const _GoalStarMarker({
+    required this.position,
+    required this.size,
+    required this.isPulsing,
+    required this.semanticLabel,
+  });
+
+  final Offset position;
+  final double size;
+  final bool isPulsing;
+  final String semanticLabel;
+
+  @override
+  Widget build(BuildContext context) {
+    return Positioned(
+      left: position.dx - (size / 2),
+      top: position.dy - (size / 2),
+      width: size,
+      height: size,
+      child: IgnorePointer(
+        child: GoalStarPulse(
+          size: size,
+          isPulsing: isPulsing,
+          semanticLabel: semanticLabel,
+        ),
+      ),
     );
   }
 }
@@ -410,12 +468,14 @@ class _RoadMarkerLayer extends StatelessWidget {
     required this.clearProgress,
     required this.geometry,
     required this.markerSize,
+    required this.goalStarSize,
   });
 
   final List<ActivityMarkerDefinition> markers;
   final double clearProgress;
   final RoadCourseGeometry geometry;
   final double markerSize;
+  final double goalStarSize;
 
   @override
   Widget build(BuildContext context) {
@@ -428,7 +488,13 @@ class _RoadMarkerLayer extends StatelessWidget {
               marker: markers[index],
               index: index,
               markerSize: markerSize,
-              progress: (index + 1) / (markers.length + 1),
+              progress: _markerSlotProgress(
+                index: index,
+                slotCount: markers.length,
+                geometry: geometry,
+                markerSize: markerSize,
+                goalStarSize: goalStarSize,
+              ),
               clearProgress: clearProgress,
               geometry: geometry,
             ),
@@ -436,6 +502,30 @@ class _RoadMarkerLayer extends StatelessWidget {
       ),
     );
   }
+}
+
+double _markerSlotProgress({
+  required int index,
+  required int slotCount,
+  required RoadCourseGeometry geometry,
+  required double markerSize,
+  required double goalStarSize,
+}) {
+  final roadLength = roadMetricForGeometry(geometry).length;
+  if (roadLength <= 0 || slotCount <= 0) {
+    return 0;
+  }
+
+  final startReserve = markerSize * 0.8;
+  final finishReserve = goalStarSize + (markerSize * 1.6);
+  final availableLength = math.max(
+    0.0,
+    roadLength - startReserve - finishReserve,
+  );
+  final slotDistance =
+      startReserve + (availableLength * (index + 1) / (slotCount + 1));
+
+  return (slotDistance / roadLength).clamp(0.0, 1.0).toDouble();
 }
 
 class _RoadActivityMarker extends StatelessWidget {

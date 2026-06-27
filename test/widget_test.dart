@@ -51,6 +51,7 @@ import 'package:timey_rider/utils/motivation_video_schedule.dart'
     as motivation_schedule;
 import 'package:timey_rider/widgets/app/app_bouncy_button.dart';
 import 'package:timey_rider/widgets/avatar/avatar_composite_preview.dart';
+import 'package:timey_rider/widgets/goal_star_pulse.dart';
 import 'package:timey_rider/widgets/road_painter.dart';
 import 'package:timey_rider/widgets/road_view.dart';
 import 'package:timey_rider/widgets/reward_sticker_image.dart';
@@ -5184,7 +5185,8 @@ void main() {
     expect(find.byIcon(Icons.star_rounded), findsNothing);
     expect(find.byIcon(Icons.restaurant_rounded), findsNothing);
     expect(find.byIcon(Icons.emoji_events_rounded), findsNothing);
-    expect(find.byIcon(Icons.flag_rounded), findsOneWidget);
+    expect(find.byIcon(Icons.flag_rounded), findsNothing);
+    expect(find.byType(GoalStarPulse), findsOneWidget);
 
     const roadSize = Size(420, 640);
     final roadBounds = createRoadBounds(roadSize);
@@ -5220,6 +5222,126 @@ void main() {
       isTrue,
     );
   });
+
+  testWidgets('Road view anchors finish star near the route endpoint', (
+    tester,
+  ) async {
+    Future<void> expectStarNearEndpoint({
+      required Size roadSize,
+      required Duration courseDuration,
+      required double cameraProgress,
+    }) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: SizedBox(
+              width: roadSize.width,
+              height: roadSize.height,
+              child: RoadView(
+                cameraProgress: cameraProgress,
+                vehicleProgress: 0.35,
+                vehicle: VehicleCatalog.fireTruck,
+                showVehicle: false,
+                courseDuration: courseDuration,
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.pump();
+
+      final roadRect = tester.getRect(find.byType(RoadView));
+      final geometry = createRoadCourseGeometry(
+        viewportSize: roadRect.size,
+        duration: courseDuration,
+      );
+      final cameraOffsetY = roadCameraOffsetForGeometryProgress(
+        geometry: geometry,
+        progress: cameraProgress,
+      );
+      final starCenter =
+          tester.getCenter(find.byType(GoalStarPulse)) -
+          roadRect.topLeft +
+          Offset(0, cameraOffsetY);
+      final starRect = tester.getRect(find.byType(GoalStarPulse));
+      final endpoint = roadPointForGeometryProgress(geometry, 1);
+      final endpointInViewport =
+          roadRect.topLeft + endpoint - Offset(0, cameraOffsetY);
+      final starSize = roadRect.width > roadRect.height ? 68.0 : 56.0;
+      final expectedStarCenter = endpoint - Offset(0, starSize * 0.08);
+
+      expect((starCenter - expectedStarCenter).distance, lessThan(1));
+      expect(starRect.inflate(2).contains(endpointInViewport), isTrue);
+    }
+
+    await expectStarNearEndpoint(
+      roadSize: const Size(420, 640),
+      courseDuration: const Duration(minutes: 5),
+      cameraProgress: 0,
+    );
+    await expectStarNearEndpoint(
+      roadSize: const Size(800, 400),
+      courseDuration: const Duration(minutes: 5),
+      cameraProgress: 0,
+    );
+    await expectStarNearEndpoint(
+      roadSize: const Size(420, 640),
+      courseDuration: const Duration(minutes: 60),
+      cameraProgress: 1,
+    );
+
+    await tester.pumpWidget(const SizedBox.shrink());
+    await tester.pump();
+  });
+
+  testWidgets(
+    'GoalStarPulse has a stronger pulse and respects reduced motion',
+    (tester) async {
+      double maxTransformScale() {
+        var maxScale = 0.0;
+        final transforms = tester.widgetList<Transform>(
+          find.descendant(
+            of: find.byType(GoalStarPulse),
+            matching: find.byType(Transform),
+          ),
+        );
+
+        for (final transform in transforms) {
+          final scale = transform.transform.storage[0];
+          if (scale > maxScale) {
+            maxScale = scale;
+          }
+        }
+
+        return maxScale;
+      }
+
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: Scaffold(body: Center(child: GoalStarPulse(size: 100))),
+        ),
+      );
+      await tester.pump();
+      expect(maxTransformScale(), closeTo(1, 0.001));
+
+      await tester.pump(const Duration(milliseconds: 1200));
+      expect(maxTransformScale(), greaterThan(1.55));
+
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: Scaffold(
+            body: MediaQuery(
+              data: MediaQueryData(disableAnimations: true),
+              child: Center(child: GoalStarPulse(size: 100)),
+            ),
+          ),
+        ),
+      );
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 1200));
+      expect(maxTransformScale(), closeTo(1, 0.001));
+    },
+  );
 
   testWidgets('Road view passes each vehicle course kind to the road painter', (
     tester,
@@ -5362,6 +5484,42 @@ void main() {
 
     for (var index = 0; index < markers.length; index += 1) {
       expect(find.byKey(ValueKey('roadActivityMarker_$index')), findsOneWidget);
+    }
+  });
+
+  testWidgets('RoadView keeps dense activity markers clear of finish star', (
+    tester,
+  ) async {
+    final markers = ActivityMarkerCatalog.courseSlotsFor([
+      'top_teeth',
+      'bottom_teeth',
+    ]);
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: SizedBox(
+            width: 420,
+            height: 640,
+            child: RoadView(
+              progress: 0,
+              vehicle: VehicleCatalog.fireTruck,
+              showVehicle: false,
+              markers: markers,
+              markerClearProgress: 0,
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.pump();
+
+    final starRect = tester.getRect(find.byType(GoalStarPulse));
+    for (var index = 0; index < markers.length; index += 1) {
+      final markerRect = tester.getRect(
+        find.byKey(ValueKey('roadActivityMarker_$index')),
+      );
+      expect(markerRect.overlaps(starRect), isFalse);
     }
   });
 
@@ -7498,7 +7656,7 @@ void main() {
       isTrue,
     );
     expect(
-      roadRect.contains(tester.getCenter(find.byIcon(Icons.flag_rounded))),
+      roadRect.contains(tester.getCenter(find.byType(GoalStarPulse))),
       isTrue,
     );
     expect(
