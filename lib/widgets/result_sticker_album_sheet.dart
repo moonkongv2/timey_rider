@@ -114,6 +114,7 @@ class _ResultStickerAlbumSheet extends StatelessWidget {
                           return _AlbumStickerCard(
                             sticker: sticker,
                             count: item?.count ?? 0,
+                            compact: isLandscape,
                           );
                         },
                       ),
@@ -130,18 +131,42 @@ class _ResultStickerAlbumSheet extends StatelessWidget {
 }
 
 class _AlbumStickerCard extends StatelessWidget {
-  const _AlbumStickerCard({required this.sticker, required this.count});
+  const _AlbumStickerCard({
+    required this.sticker,
+    required this.count,
+    required this.compact,
+  });
 
   final RewardDefinition sticker;
   final int count;
+  final bool compact;
 
   bool get _isCollected => count > 0;
 
-  Widget _buildStickerStack(String semanticLabel) {
+  double _compactStickerSizeFor(
+    BoxConstraints constraints,
+    double cardPadding,
+  ) {
+    final widthSpace = constraints.maxWidth.isFinite
+        ? constraints.maxWidth - cardPadding * 2
+        : 85.0;
+    final heightSpace = constraints.maxHeight.isFinite
+        ? constraints.maxHeight -
+              cardPadding * 2 -
+              AppSpacing.sm -
+              AppSpacing.xs -
+              64
+        : 85.0;
+    final targetByWidth = widthSpace * 0.56;
+    final target = targetByWidth < heightSpace ? targetByWidth : heightSpace;
+    return target.clamp(72.0, 96.0).toDouble();
+  }
+
+  Widget _buildStickerStack(String semanticLabel, double size) {
     final stickerImage = RewardStickerImage(
       reward: sticker,
       semanticLabel: semanticLabel,
-      size: 85,
+      size: size,
       locked: !_isCollected,
     );
 
@@ -149,17 +174,19 @@ class _AlbumStickerCard extends StatelessWidget {
       return stickerImage;
     }
 
+    final offsetScale = size / 85;
+
     return SizedBox(
-      width: 85,
-      height: 85,
+      width: size,
+      height: size,
       child: Stack(
         clipBehavior: Clip.none,
         alignment: Alignment.center,
         children: [
           if (count >= 5)
             Positioned(
-              left: -12,
-              top: 4,
+              left: -12 * offsetScale,
+              top: 4 * offsetScale,
               child: Transform.rotate(
                 angle: -0.25,
                 child: Opacity(opacity: 0.6, child: stickerImage),
@@ -167,8 +194,8 @@ class _AlbumStickerCard extends StatelessWidget {
             ),
           if (count >= 2)
             Positioned(
-              right: -10,
-              top: -6,
+              right: -10 * offsetScale,
+              top: -6 * offsetScale,
               child: Transform.rotate(
                 angle: 0.18,
                 child: Opacity(opacity: 0.8, child: stickerImage),
@@ -201,55 +228,67 @@ class _AlbumStickerCard extends StatelessWidget {
           : null,
       child: Card(
         color: _isCollected ? AppColors.white : AppColors.cream,
-        child: Padding(
-          padding: const EdgeInsets.all(AppSpacing.lg),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              _buildStickerStack(
-                _isCollected
-                    ? stickerName
-                    : texts.rewards.uncollectedSemanticLabel,
-              ),
-              const SizedBox(height: AppSpacing.md),
-              Text(
-                _isCollected ? stickerName : texts.rewards.lockedSticker,
-                textAlign: TextAlign.center,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-                style: textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.w900,
-                  color: _isCollected
-                      ? AppColors.textStrong
-                      : AppColors.textSecondary,
-                ),
-              ),
-              const SizedBox(height: AppSpacing.sm),
-              DecoratedBox(
-                decoration: BoxDecoration(
-                  color: _isCollected
-                      ? AppColors.surfaceYellow
-                      : AppColors.borderSoft,
-                  borderRadius: AppRadius.pill,
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: AppSpacing.md,
-                    vertical: AppSpacing.xs,
-                  ),
-                  child: Text(
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            final cardPadding = compact ? AppSpacing.md : AppSpacing.lg;
+            final stickerSize = compact
+                ? _compactStickerSizeFor(constraints, cardPadding)
+                : 85.0;
+            final stickerGap = compact ? AppSpacing.sm : AppSpacing.md;
+            final statusGap = compact ? AppSpacing.xs : AppSpacing.sm;
+
+            return Padding(
+              padding: EdgeInsets.all(cardPadding),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  _buildStickerStack(
                     _isCollected
-                        ? texts.rewards.stickerCount(count)
-                        : texts.rewards.lockedStatus,
-                    style: textTheme.labelLarge?.copyWith(
+                        ? stickerName
+                        : texts.rewards.uncollectedSemanticLabel,
+                    stickerSize,
+                  ),
+                  SizedBox(height: stickerGap),
+                  Text(
+                    _isCollected ? stickerName : texts.rewards.lockedSticker,
+                    textAlign: TextAlign.center,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.w900,
-                      color: AppColors.textPrimary,
+                      color: _isCollected
+                          ? AppColors.textStrong
+                          : AppColors.textSecondary,
                     ),
                   ),
-                ),
+                  SizedBox(height: statusGap),
+                  DecoratedBox(
+                    decoration: BoxDecoration(
+                      color: _isCollected
+                          ? AppColors.surfaceYellow
+                          : AppColors.borderSoft,
+                      borderRadius: AppRadius.pill,
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: AppSpacing.md,
+                        vertical: AppSpacing.xs,
+                      ),
+                      child: Text(
+                        _isCollected
+                            ? texts.rewards.stickerCount(count)
+                            : texts.rewards.lockedStatus,
+                        style: textTheme.labelLarge?.copyWith(
+                          fontWeight: FontWeight.w900,
+                          color: AppColors.textPrimary,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
               ),
-            ],
-          ),
+            );
+          },
         ),
       ),
     );
