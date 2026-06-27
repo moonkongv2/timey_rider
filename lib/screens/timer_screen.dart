@@ -1428,6 +1428,28 @@ class _ArrivalActionPanel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
+    final isLandscape =
+        MediaQuery.orientationOf(context) == Orientation.landscape;
+    final titleStyle = textTheme.titleMedium?.copyWith(
+      color: AppColors.brown900,
+      fontSize: isLandscape ? 22 : null,
+      fontWeight: FontWeight.w900,
+    );
+    final messageStyle = textTheme.bodyMedium?.copyWith(
+      color: AppColors.brown700,
+      fontSize: isLandscape ? 18 : null,
+      fontWeight: FontWeight.w700,
+      height: 1.35,
+    );
+    final buttonTextStyle = textTheme.titleMedium?.copyWith(
+      fontSize: isLandscape ? 18 : null,
+      fontWeight: FontWeight.w900,
+    );
+    final buttonStyle = isLandscape
+        ? const ButtonStyle(
+            minimumSize: WidgetStatePropertyAll(Size.fromHeight(56)),
+          )
+        : null;
 
     return DecoratedBox(
       key: const ValueKey('arrivalActionPanel'),
@@ -1445,27 +1467,17 @@ class _ArrivalActionPanel extends StatelessWidget {
           children: [
             Row(
               children: [
-                const Icon(Icons.flag_rounded, color: AppColors.primary),
-                const SizedBox(width: AppSpacing.sm),
-                Expanded(
-                  child: Text(
-                    title,
-                    style: textTheme.titleMedium?.copyWith(
-                      color: AppColors.brown900,
-                      fontWeight: FontWeight.w900,
-                    ),
-                  ),
+                Icon(
+                  Icons.flag_rounded,
+                  color: AppColors.primary,
+                  size: isLandscape ? 30 : null,
                 ),
+                const SizedBox(width: AppSpacing.sm),
+                Expanded(child: Text(title, style: titleStyle)),
               ],
             ),
             const SizedBox(height: AppSpacing.xs),
-            Text(
-              message,
-              style: textTheme.bodyMedium?.copyWith(
-                color: AppColors.brown700,
-                fontWeight: FontWeight.w700,
-              ),
-            ),
+            Text(message, style: messageStyle),
             const SizedBox(height: AppSpacing.md),
             Row(
               children: [
@@ -1473,8 +1485,9 @@ class _ArrivalActionPanel extends StatelessWidget {
                   Expanded(
                     child: OutlinedButton(
                       key: const ValueKey('arrivalSecondaryButton'),
+                      style: buttonStyle,
                       onPressed: onSecondary,
-                      child: Text(secondaryLabel!),
+                      child: Text(secondaryLabel!, style: buttonTextStyle),
                     ),
                   ),
                   const SizedBox(width: AppSpacing.sm),
@@ -1482,8 +1495,9 @@ class _ArrivalActionPanel extends StatelessWidget {
                 Expanded(
                   child: FilledButton(
                     key: const ValueKey('arrivalPrimaryButton'),
+                    style: buttonStyle,
                     onPressed: onPrimary,
-                    child: Text(primaryLabel),
+                    child: Text(primaryLabel, style: buttonTextStyle),
                   ),
                 ),
               ],
