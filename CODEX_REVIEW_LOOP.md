@@ -163,6 +163,8 @@ Do not create these files by default:
 
 If a temporary file is required to invoke a reviewer command:
 - Keep it compact.
+- For `agy` compact reviews, prefer a short temporary prompt under `/private/tmp` and pass it with `$(cat /private/tmp/...)` to avoid shell quoting and argument parsing issues.
+- Delete temporary compact-review prompt files after the review unless audit mode is requested.
 - Do not preserve it unless needed.
 - Do not create long prompt, review, decision, or summary artifacts.
 - Only audit shortcuts should preserve artifacts under `codex_reviews/`.
@@ -200,10 +202,12 @@ codex exec --ephemeral -s read-only -C /Users/moonkong/dev/timey_rider -o codex_
 Antigravity reviewer:
 
 ```sh
-/Users/moonkong/.local/bin/agy --print --sandbox --print-timeout 10m "$(cat codex_reviews/loop_N_prompt.md)" > codex_reviews/loop_N_review.md
+/Users/moonkong/.local/bin/agy --sandbox --print "$(cat codex_reviews/loop_N_prompt.md)" --print-timeout 10m > codex_reviews/loop_N_review.md
 ```
 
 For compact mode, the same command shape may be used with temporary prompt or output files instead of persistent `codex_reviews/` files. Keep hardcoded command paths unchanged unless the user explicitly asks.
+
+If `agy` fails with log-file creation, language-server startup, localhost bind, or `operation not permitted` errors, rerun the same review command with escalated permissions. These failures can happen during normal `agy` CLI startup inside the sandbox and are not a reason to skip the requested review loop.
 
 ## Reviewer Prompt Template
 The primary Codex should fill in the placeholders before each loop. Compact mode may keep the prompt in memory or a temporary file.
