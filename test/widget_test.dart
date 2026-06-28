@@ -1002,7 +1002,7 @@ void main() {
     await tester.tap(find.byKey(const ValueKey('resultSkipStickerButton')));
     await tester.pumpAndSettle();
 
-    expect(find.text('미션 완료!'), findsOneWidget);
+    expect(find.text('오늘 활동을 기록했어!'), findsOneWidget);
     expect(find.byType(RewardStickerImage), findsNothing);
     final snapshot = await service.loadSnapshot();
     expect(snapshot.history, hasLength(1));
@@ -1084,7 +1084,7 @@ void main() {
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 100));
 
-    expect(find.text('미션 완료!'), findsOneWidget);
+    expect(find.text('오늘 활동을 기록했어!'), findsOneWidget);
     expect(
       _assetImage('assets/images/result_success_bg_portrait.png'),
       findsOneWidget,
@@ -1148,7 +1148,7 @@ void main() {
 
     expect(find.byKey(const ValueKey('appHelpSheet')), findsOneWidget);
     expect(find.text('아이에게 이렇게 말해보세요'), findsWidgets);
-    expect(find.text('끝까지 해보려고 한 게 정말 좋았어.'), findsOneWidget);
+    expect(find.text('오늘 활동을 같이 해본 게 좋았어.'), findsOneWidget);
     expect(find.text('빨리 해서 잘했어.'), findsOneWidget);
     expect(find.textContaining('차량 스티커 1장'), findsOneWidget);
   });
@@ -1333,7 +1333,9 @@ void main() {
       find.byKey(const ValueKey('incompleteResultGuardianTipButton')),
       findsOneWidget,
     );
-    expect(find.text('버스가 먼저 도착했어.'), findsOneWidget);
+    expect(find.widgetWithText(FilledButton, '다시 출발'), findsOneWidget);
+    expect(find.widgetWithText(OutlinedButton, '홈으로'), findsOneWidget);
+    expect(find.text('이번 활동에는 시간이 조금 더 필요했어.'), findsOneWidget);
     expect(
       _assetImage('assets/images/result_failed_bg_landscape.png'),
       findsOneWidget,
@@ -1384,12 +1386,16 @@ void main() {
     );
     final restartButton = find.widgetWithText(FilledButton, '다시 출발');
     final homeButton = find.widgetWithText(OutlinedButton, '홈으로');
-
-    expect(find.text('미션 완료!'), findsOneWidget);
-    expect(
-      find.byKey(const ValueKey('completedResultGuardianTipButton')),
-      findsOneWidget,
+    final guardianTipButton = find.byKey(
+      const ValueKey('completedResultGuardianTipButton'),
     );
+    final rewardBox = find.byKey(const ValueKey('compactLandscapeRewardBox'));
+    final messageBox = find.byKey(const ValueKey('compactLandscapeMessageBox'));
+
+    expect(find.text('오늘 활동을 기록했어!'), findsOneWidget);
+    expect(guardianTipButton, findsOneWidget);
+    expect(rewardBox, findsOneWidget);
+    expect(messageBox, findsOneWidget);
     expect(
       _assetImage('assets/images/result_success_bg_landscape.png'),
       findsOneWidget,
@@ -1406,6 +1412,20 @@ void main() {
     );
     expect(restartButton, findsOneWidget);
     expect(homeButton, findsOneWidget);
+    final rewardRect = tester.getRect(rewardBox);
+    final messageRect = tester.getRect(messageBox);
+    final restartRect = tester.getRect(restartButton);
+    final homeRect = tester.getRect(homeButton);
+    final tipRect = tester.getRect(guardianTipButton);
+
+    expect(restartRect.left, closeTo(rewardRect.left, 0.1));
+    expect(homeRect.right, closeTo(messageRect.right, 0.1));
+    expect(
+      tester.getSize(restartButton).width,
+      closeTo(tester.getSize(homeButton).width, 0.1),
+    );
+    expect(tipRect.left, closeTo(messageRect.left, 0.1));
+    expect(tipRect.right, closeTo(messageRect.right, 0.1));
     expect(cardRect.contains(tester.getCenter(restartButton)), isTrue);
     expect(cardRect.contains(tester.getCenter(homeButton)), isTrue);
     expect(

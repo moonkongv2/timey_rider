@@ -33,6 +33,8 @@ const _successResultBackgroundLandscapePath =
 const _successResultBackgroundPortraitPath =
     'assets/images/result_success_bg_portrait.png';
 const _failureRiderImageBasePath = 'assets/images/riders';
+const _compactLandscapeRewardWidth = 252.0;
+const _compactLandscapeMessageWidth = 420.0;
 const _resultVideoPathsByVehicle = {
   'motorcycle': 'assets/videos/result_motorcycle_success.mp4',
   'fire_truck': 'assets/videos/result_fire_truck_success.mp4',
@@ -497,7 +499,8 @@ class _ResultScreenState extends State<ResultScreen> {
                       isNewSticker = item != null && item.count == 1;
                     }
 
-                    int displayCount = recordedSession.collectedStickerTypeCount;
+                    int displayCount =
+                        recordedSession.collectedStickerTypeCount;
                     bool badgeJustUpdated = false;
                     if (hasAward && !_flyingAnimationFinished) {
                       if (isNewSticker) {
@@ -659,8 +662,8 @@ class _ResultGuardianTipCard extends StatelessWidget {
   }
 }
 
-class _ResultGuardianTipButton extends StatelessWidget {
-  const _ResultGuardianTipButton({
+class _CompactLandscapeResultTipCard extends StatelessWidget {
+  const _CompactLandscapeResultTipCard({
     required this.completionStatus,
     required this.onPressed,
   });
@@ -686,34 +689,66 @@ class _ResultGuardianTipButton extends StatelessWidget {
           message: texts.parentTipSemanticLabel(completionStatus),
           child: Material(
             key: key,
-            color: AppColors.white.withValues(alpha: 0.78),
-            borderRadius: AppRadius.pill,
+            color: AppColors.surfaceWarm.withValues(alpha: 0.9),
+            shape: RoundedRectangleBorder(
+              borderRadius: AppRadius.compactCard,
+              side: const BorderSide(color: AppColors.borderWarm),
+            ),
             child: InkWell(
               onTap: onPressed,
-              borderRadius: AppRadius.pill,
+              borderRadius: AppRadius.compactCard,
               child: Container(
-                height: 40,
-                constraints: const BoxConstraints(maxWidth: 142),
-                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
+                constraints: const BoxConstraints(minHeight: 68),
+                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
                 child: Row(
-                  mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(
-                      isPositive ? Icons.favorite_rounded : Icons.spa_rounded,
-                      size: 18,
-                      color: AppColors.primary,
-                    ),
-                    const SizedBox(width: AppSpacing.xs),
-                    Flexible(
-                      child: Text(
-                        texts.parentTipLabel,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                          color: AppColors.brown700,
-                          fontWeight: FontWeight.w900,
-                        ),
+                    Container(
+                      width: 40,
+                      height: 40,
+                      decoration: const BoxDecoration(
+                        color: AppColors.primarySoft,
+                        shape: BoxShape.circle,
                       ),
+                      child: Icon(
+                        isPositive ? Icons.favorite_rounded : Icons.spa_rounded,
+                        size: 20,
+                        color: AppColors.primary,
+                      ),
+                    ),
+                    const SizedBox(width: AppSpacing.md),
+                    Expanded(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            texts.parentTipLabel,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: Theme.of(context).textTheme.labelLarge
+                                ?.copyWith(
+                                  color: AppColors.primary,
+                                  fontWeight: FontWeight.w900,
+                                ),
+                          ),
+                          const SizedBox(height: AppSpacing.xs),
+                          Text(
+                            texts.parentTipTitle(completionStatus),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: Theme.of(context).textTheme.titleSmall
+                                ?.copyWith(
+                                  color: AppColors.textStrong,
+                                  fontWeight: FontWeight.w900,
+                                ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(width: AppSpacing.sm),
+                    const Icon(
+                      Icons.chevron_right_rounded,
+                      color: AppColors.brown500,
                     ),
                   ],
                 ),
@@ -722,6 +757,297 @@ class _ResultGuardianTipButton extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+class _CompactLandscapeResultActions extends StatelessWidget {
+  const _CompactLandscapeResultActions({
+    required this.onRestart,
+    required this.onHome,
+  });
+
+  final VoidCallback onRestart;
+  final VoidCallback onHome;
+
+  @override
+  Widget build(BuildContext context) {
+    final texts = AppTexts.of(context);
+
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        const leftFlex = 5;
+        const rightFlex = 6;
+        const columnGap = AppSpacing.xxl;
+        const buttonGap = AppSpacing.xxl;
+        const maxButtonWidth = 340.0;
+        final contentWidth = constraints.maxWidth - columnGap;
+        final leftColumnWidth =
+            contentWidth * leftFlex / (leftFlex + rightFlex);
+        final rightColumnWidth =
+            contentWidth * rightFlex / (leftFlex + rightFlex);
+        final rewardWidth = [
+          leftColumnWidth,
+          _compactLandscapeRewardWidth,
+        ].reduce((a, b) => a < b ? a : b);
+        final messageWidth = [
+          rightColumnWidth,
+          _compactLandscapeMessageWidth,
+        ].reduce((a, b) => a < b ? a : b);
+        final leftInset = (leftColumnWidth - rewardWidth) / 2;
+        final rightInset = (rightColumnWidth - messageWidth) / 2;
+        final actionWidth =
+            constraints.maxWidth - leftInset - rightInset - buttonGap;
+        final buttonWidth = [
+          maxButtonWidth,
+          actionWidth > 0 ? actionWidth / 2 : 0.0,
+        ].reduce((a, b) => a < b ? a : b);
+
+        return Row(
+          children: [
+            SizedBox(width: leftInset),
+            SizedBox(
+              width: buttonWidth,
+              height: 54,
+              child: FilledButton.icon(
+                onPressed: onRestart,
+                icon: const Icon(Icons.two_wheeler_rounded),
+                label: Text(texts.common.restartRide),
+              ),
+            ),
+            const Spacer(),
+            SizedBox(
+              width: buttonWidth,
+              height: 54,
+              child: OutlinedButton.icon(
+                onPressed: onHome,
+                style: OutlinedButton.styleFrom(
+                  backgroundColor: AppColors.white,
+                  side: BorderSide.none,
+                ),
+                icon: const Icon(Icons.home_rounded),
+                label: Text(texts.common.home),
+              ),
+            ),
+            SizedBox(width: rightInset),
+          ],
+        );
+      },
+    );
+  }
+}
+
+class _CompactLandscapeFailureRewardBox extends StatelessWidget {
+  const _CompactLandscapeFailureRewardBox({required this.assetPath});
+
+  final String assetPath;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      key: const ValueKey('compactLandscapeFailureRewardBox'),
+      width: _compactLandscapeRewardWidth,
+      child: Center(
+        child: _FailureRiderImage(
+          assetPath: assetPath,
+          maxSize: 220,
+          fallbackIconSize: 88,
+        ),
+      ),
+    );
+  }
+}
+
+class _CompactLandscapeNeutralResultBox extends StatelessWidget {
+  const _CompactLandscapeNeutralResultBox();
+
+  @override
+  Widget build(BuildContext context) {
+    return const SizedBox(
+      key: ValueKey('compactLandscapeNeutralRewardBox'),
+      width: _compactLandscapeRewardWidth,
+      child: Center(child: _NeutralResultIcon()),
+    );
+  }
+}
+
+class _CompactLandscapeRewardResult extends StatelessWidget {
+  const _CompactLandscapeRewardResult({
+    required this.recordedSession,
+    required this.activityProgressService,
+    required this.orientationService,
+  });
+
+  final RecordedActivitySession? recordedSession;
+  final LocalActivityProgressService activityProgressService;
+  final OrientationService orientationService;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      key: const ValueKey('compactLandscapeRewardBox'),
+      width: _compactLandscapeRewardWidth,
+      child: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            _RewardResultBox(
+              rewards: recordedSession?.awardedRewards,
+              isCompact: true,
+            ),
+            if (recordedSession != null &&
+                (recordedSession!.updatedRewardGoals.isNotEmpty ||
+                    recordedSession!.earnedRewardGoals.isNotEmpty)) ...[
+              const SizedBox(height: AppSpacing.sm),
+              _RewardGoalResultBox(
+                updatedGoals: recordedSession!.updatedRewardGoals,
+                earnedGoals: recordedSession!.earnedRewardGoals,
+                activityProgressService: activityProgressService,
+                orientationService: orientationService,
+                isCompact: true,
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _CompactLandscapeResultMessage extends StatelessWidget {
+  const _CompactLandscapeResultMessage({
+    required this.completionStatus,
+    required this.vehicleId,
+  });
+
+  final ActivityCompletionStatus completionStatus;
+  final String vehicleId;
+
+  @override
+  Widget build(BuildContext context) {
+    final texts = AppTexts.of(context);
+    final theme = Theme.of(context);
+
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        return SingleChildScrollView(
+          child: ConstrainedBox(
+            constraints: BoxConstraints(minHeight: constraints.maxHeight),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Text(
+                  texts.result.title(completionStatus),
+                  textAlign: TextAlign.left,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: theme.textTheme.headlineSmall?.copyWith(
+                    fontWeight: FontWeight.w900,
+                    color: AppColors.textStrong,
+                  ),
+                ),
+                const SizedBox(height: AppSpacing.md),
+                Text(
+                  texts.result.primaryMessage(
+                    completionStatus,
+                    vehicleId: vehicleId,
+                  ),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: theme.textTheme.titleMedium?.copyWith(height: 1.3),
+                ),
+                const SizedBox(height: AppSpacing.sm),
+                Text(
+                  texts.result.secondaryMessage(completionStatus),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    height: 1.3,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+                const SizedBox(height: AppSpacing.md),
+                _CompactLandscapeResultTipCard(
+                  completionStatus: completionStatus,
+                  onPressed: () =>
+                      _showResultHelpSheet(context, status: completionStatus),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+}
+
+class _CompactLandscapeResultContent extends StatelessWidget {
+  const _CompactLandscapeResultContent({
+    required this.completionStatus,
+    required this.recordedSession,
+    required this.showReward,
+    required this.activityProgressService,
+    required this.orientationService,
+    required this.failureRiderAssetPath,
+    required this.vehicleId,
+  });
+
+  final ActivityCompletionStatus completionStatus;
+  final Future<RecordedActivitySession> recordedSession;
+  final bool showReward;
+  final LocalActivityProgressService activityProgressService;
+  final OrientationService orientationService;
+  final String failureRiderAssetPath;
+  final String vehicleId;
+
+  @override
+  Widget build(BuildContext context) {
+    final isPositive = isPositiveResult(completionStatus);
+
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Expanded(
+          flex: 5,
+          child: showReward
+              ? FutureBuilder<RecordedActivitySession>(
+                  future: recordedSession,
+                  builder: (context, snapshot) {
+                    return Center(
+                      child: _CompactLandscapeRewardResult(
+                        recordedSession: snapshot.data,
+                        activityProgressService: activityProgressService,
+                        orientationService: orientationService,
+                      ),
+                    );
+                  },
+                )
+              : !isPositive
+              ? Center(
+                  child: _CompactLandscapeFailureRewardBox(
+                    assetPath: failureRiderAssetPath,
+                  ),
+                )
+              : const Center(child: _CompactLandscapeNeutralResultBox()),
+        ),
+        const SizedBox(width: AppSpacing.xxl),
+        Expanded(
+          flex: 6,
+          child: Center(
+            child: ConstrainedBox(
+              key: const ValueKey('compactLandscapeMessageBox'),
+              constraints: const BoxConstraints(
+                maxWidth: _compactLandscapeMessageWidth,
+              ),
+              child: _CompactLandscapeResultMessage(
+                completionStatus: completionStatus,
+                vehicleId: vehicleId,
+              ),
+            ),
+          ),
+        ),
+      ],
     );
   }
 }
@@ -873,10 +1199,6 @@ class _CompactLandscapeResultLayout extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final texts = AppTexts.of(context);
-    final theme = Theme.of(context);
-    final isPositive = isPositiveResult(completionStatus);
-
     return SizedBox.expand(
       child: Card(
         key: const ValueKey('compactLandscapeResultCard'),
@@ -885,150 +1207,23 @@ class _CompactLandscapeResultLayout extends StatelessWidget {
         shape: RoundedRectangleBorder(borderRadius: AppRadius.card),
         child: Padding(
           padding: const EdgeInsets.all(AppSpacing.xl),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
+          child: Column(
             children: [
               Expanded(
-                flex: 5,
-                child: showReward
-                    ? FutureBuilder<RecordedActivitySession>(
-                        future: recordedSession,
-                        builder: (context, snapshot) {
-                          final recordedSession = snapshot.data;
-
-                          return Center(
-                            child: SingleChildScrollView(
-                              child: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  _RewardResultBox(
-                                    rewards: recordedSession?.awardedRewards,
-                                    isCompact: true,
-                                  ),
-                                  if (recordedSession != null &&
-                                      (recordedSession
-                                              .updatedRewardGoals
-                                              .isNotEmpty ||
-                                          recordedSession
-                                              .earnedRewardGoals
-                                              .isNotEmpty)) ...[
-                                    const SizedBox(height: AppSpacing.sm),
-                                    _RewardGoalResultBox(
-                                      updatedGoals:
-                                          recordedSession.updatedRewardGoals,
-                                      earnedGoals:
-                                          recordedSession.earnedRewardGoals,
-                                      activityProgressService:
-                                          activityProgressService,
-                                      orientationService: orientationService,
-                                      isCompact: true,
-                                    ),
-                                  ],
-                                ],
-                              ),
-                            ),
-                          );
-                        },
-                      )
-                    : !isPositive
-                    ? Center(
-                        child: _FailureRiderImage(
-                          assetPath: failureRiderAssetPath,
-                          maxSize: 220,
-                          fallbackIconSize: 88,
-                        ),
-                      )
-                    : const Center(child: _NeutralResultIcon()),
-              ),
-              const SizedBox(width: AppSpacing.xxl),
-              Expanded(
-                flex: 6,
-                child: Center(
-                  child: ConstrainedBox(
-                    constraints: const BoxConstraints(maxWidth: 420),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        Row(
-                          children: [
-                            Expanded(
-                              child: Text(
-                                texts.result.title(completionStatus),
-                                textAlign: TextAlign.left,
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                                style: theme.textTheme.headlineSmall?.copyWith(
-                                  fontWeight: FontWeight.w900,
-                                  color: AppColors.textStrong,
-                                ),
-                              ),
-                            ),
-                            _ResultGuardianTipButton(
-                              completionStatus: completionStatus,
-                              onPressed: () => _showResultHelpSheet(
-                                context,
-                                status: completionStatus,
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: AppSpacing.md),
-                        Text(
-                          texts.result.primaryMessage(
-                            completionStatus,
-                            vehicleId: vehicleId,
-                          ),
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                          style: theme.textTheme.titleMedium?.copyWith(
-                            height: 1.3,
-                          ),
-                        ),
-                        const SizedBox(height: AppSpacing.sm),
-                        Text(
-                          texts.result.secondaryMessage(completionStatus),
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                          style: theme.textTheme.titleMedium?.copyWith(
-                            height: 1.3,
-                            fontWeight: FontWeight.w800,
-                          ),
-                        ),
-                        const SizedBox(height: AppSpacing.xxxl),
-                        Row(
-                          children: [
-                            Expanded(
-                              child: SizedBox(
-                                height: 54,
-                                child: FilledButton.icon(
-                                  onPressed: onRestart,
-                                  icon: const Icon(Icons.two_wheeler_rounded),
-                                  label: Text(texts.common.restartRide),
-                                ),
-                              ),
-                            ),
-                            const SizedBox(width: AppSpacing.md),
-                            Expanded(
-                              child: SizedBox(
-                                height: 54,
-                                child: OutlinedButton.icon(
-                                  onPressed: onHome,
-                                  style: OutlinedButton.styleFrom(
-                                    backgroundColor: AppColors.white,
-                                    side: BorderSide.none,
-                                  ),
-                                  icon: const Icon(Icons.home_rounded),
-                                  label: Text(texts.common.home),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
+                child: _CompactLandscapeResultContent(
+                  completionStatus: completionStatus,
+                  recordedSession: recordedSession,
+                  showReward: showReward,
+                  activityProgressService: activityProgressService,
+                  orientationService: orientationService,
+                  failureRiderAssetPath: failureRiderAssetPath,
+                  vehicleId: vehicleId,
                 ),
+              ),
+              const SizedBox(height: AppSpacing.md),
+              _CompactLandscapeResultActions(
+                onRestart: onRestart,
+                onHome: onHome,
               ),
             ],
           ),
