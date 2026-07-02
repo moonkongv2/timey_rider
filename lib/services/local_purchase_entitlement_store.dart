@@ -2,13 +2,20 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../models/purchase_entitlement.dart';
 
-class LocalPurchaseEntitlementStore {
+abstract interface class PurchaseEntitlementStore {
+  Future<PurchaseEntitlement> load();
+
+  Future<void> save(PurchaseEntitlement entitlement);
+}
+
+class LocalPurchaseEntitlementStore implements PurchaseEntitlementStore {
   const LocalPurchaseEntitlementStore();
 
   static const _vehiclePackUnlockedKey = 'purchase.vehiclePackUnlocked';
   static const _vehiclePackUpdatedAtKey = 'purchase.vehiclePackUpdatedAt';
   static const _vehiclePackSourceKey = 'purchase.vehiclePackSource';
 
+  @override
   Future<PurchaseEntitlement> load() async {
     final preferences = await SharedPreferences.getInstance();
     final unlockedValue = preferences.get(_vehiclePackUnlockedKey);
@@ -28,6 +35,7 @@ class LocalPurchaseEntitlementStore {
     );
   }
 
+  @override
   Future<void> save(PurchaseEntitlement entitlement) async {
     final preferences = await SharedPreferences.getInstance();
     await preferences.setBool(
