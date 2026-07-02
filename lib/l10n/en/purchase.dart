@@ -23,4 +23,22 @@ class EnPurchaseTexts implements PurchaseTextSet {
   String get parentGateAnswerLabel => 'Answer';
   String get parentGateContinueButton => 'Continue';
   String get parentGateErrorMessage => 'Check the answer and try again.';
+  String get vehiclePackPurchaseTitle => 'Unlock the vehicle pack';
+  String get vehiclePackPurchaseSubtitle =>
+      'A one-time purchase unlocks all locked vehicles.';
+  String get vehiclePackPurchaseLoadingMessage =>
+      'Loading vehicle pack details.';
+  String get vehiclePackPurchaseUnavailableMessage =>
+      'Vehicle pack details are not available right now. Try again later.';
+  String get vehiclePackPurchaseButton => 'Unlock vehicle pack';
+  String get vehiclePackRestoreButton => 'Restore purchase';
+  String get vehiclePackPurchaseInProgressMessage =>
+      'The store purchase is in progress.';
+  String get vehiclePackPendingMessage => 'Waiting for purchase approval.';
+  String get vehiclePackPurchasedMessage => 'Vehicle pack unlocked.';
+  String get vehiclePackRestoredMessage => 'Vehicle pack purchase restored.';
+  String get vehiclePackCanceledMessage => 'Purchase canceled.';
+  String get vehiclePackErrorMessage =>
+      'The purchase could not be completed. Try again.';
+  String vehiclePackPriceLabel(String price) => 'Price $price';
 }

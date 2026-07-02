@@ -21,6 +21,7 @@ import '../widgets/avatar/avatar_composite_preview.dart';
 import '../widgets/avatar/rider_guide_bottom_sheet.dart';
 import '../widgets/purchase/parent_gate_sheet.dart';
 import '../widgets/purchase/vehicle_pack_info_sheet.dart';
+import '../widgets/purchase/vehicle_pack_purchase_sheet.dart';
 import '../widgets/vehicle_selection_card.dart';
 
 class AvatarSetupScreen extends StatefulWidget {
@@ -34,6 +35,7 @@ class AvatarSetupScreen extends StatefulWidget {
     this.purchaseState = const VehiclePackPurchaseState.initial(),
     this.vehiclePackInfoPresenter,
     this.parentGatePresenter,
+    this.vehiclePackPurchasePresenter,
   });
 
   final ActivityTimerConfig config;
@@ -44,6 +46,7 @@ class AvatarSetupScreen extends StatefulWidget {
   final VehiclePackPurchaseState purchaseState;
   final VehiclePackInfoPresenter? vehiclePackInfoPresenter;
   final ParentGatePresenter? parentGatePresenter;
+  final VehiclePackPurchasePresenter? vehiclePackPurchasePresenter;
 
   @override
   State<AvatarSetupScreen> createState() => _AvatarSetupScreenState();
@@ -363,7 +366,18 @@ class _AvatarSetupScreenState extends State<AvatarSetupScreen> {
       return;
     }
 
-    // Vehicle pack purchase UI is wired in the next commit.
+    final purchaseController = widget.purchaseController;
+    if (purchaseController == null) {
+      return;
+    }
+
+    final vehiclePackPurchasePresenter =
+        widget.vehiclePackPurchasePresenter ?? showVehiclePackPurchaseSheet;
+    await vehiclePackPurchasePresenter(
+      context,
+      controller: purchaseController,
+      vehicleId: vehicleId,
+    );
   }
 
   @override

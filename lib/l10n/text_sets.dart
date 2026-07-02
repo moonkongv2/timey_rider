@@ -28,6 +28,19 @@ abstract interface class PurchaseTextSet {
   String get parentGateAnswerLabel;
   String get parentGateContinueButton;
   String get parentGateErrorMessage;
+  String get vehiclePackPurchaseTitle;
+  String get vehiclePackPurchaseSubtitle;
+  String get vehiclePackPurchaseLoadingMessage;
+  String get vehiclePackPurchaseUnavailableMessage;
+  String get vehiclePackPurchaseButton;
+  String get vehiclePackRestoreButton;
+  String get vehiclePackPurchaseInProgressMessage;
+  String get vehiclePackPendingMessage;
+  String get vehiclePackPurchasedMessage;
+  String get vehiclePackRestoredMessage;
+  String get vehiclePackCanceledMessage;
+  String get vehiclePackErrorMessage;
+  String vehiclePackPriceLabel(String price);
 }
 
 @immutable

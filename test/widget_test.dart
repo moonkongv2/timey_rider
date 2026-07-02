@@ -60,6 +60,7 @@ import 'package:timey_rider/widgets/avatar/avatar_composite_preview.dart';
 import 'package:timey_rider/widgets/goal_star_pulse.dart';
 import 'package:timey_rider/widgets/purchase/parent_gate_sheet.dart';
 import 'package:timey_rider/widgets/purchase/vehicle_pack_info_sheet.dart';
+import 'package:timey_rider/widgets/purchase/vehicle_pack_purchase_sheet.dart';
 import 'package:timey_rider/widgets/road_painter.dart';
 import 'package:timey_rider/widgets/road_view.dart';
 import 'package:timey_rider/widgets/reward_sticker_image.dart';
@@ -4054,6 +4055,7 @@ void main() {
     ActivityTimerConfig? changedConfig;
     final infoSheetVehicleIds = <String>[];
     var parentGateCallCount = 0;
+    final purchaseSheetVehicleIds = <String>[];
     final purchaseController = VehiclePackPurchaseController(
       purchaseClient: _FakeIapPurchaseClient(),
       entitlementStore: _FakePurchaseEntitlementStore(),
@@ -4072,8 +4074,12 @@ void main() {
       },
       parentGatePresenter: (_) async {
         parentGateCallCount += 1;
-        return false;
+        return true;
       },
+      vehiclePackPurchasePresenter:
+          (_, {required controller, required vehicleId}) async {
+            purchaseSheetVehicleIds.add(vehicleId);
+          },
     );
     await _dismissAvatarGuideIfVisible(tester);
 
@@ -4087,6 +4093,7 @@ void main() {
     expect(changedConfig, isNull);
     expect(infoSheetVehicleIds, ['fire_truck']);
     expect(parentGateCallCount, 0);
+    expect(purchaseSheetVehicleIds, isEmpty);
 
     await _tapVisible(tester, _vehicleChoiceFinder('supercar'));
     await tester.pump();
@@ -5261,6 +5268,7 @@ void main() {
     ActivityTimerConfig? changedConfig;
     final infoSheetVehicleIds = <String>[];
     var parentGateCallCount = 0;
+    final purchaseSheetVehicleIds = <String>[];
     final purchaseController = VehiclePackPurchaseController(
       purchaseClient: _FakeIapPurchaseClient(),
       entitlementStore: _FakePurchaseEntitlementStore(),
@@ -5288,8 +5296,12 @@ void main() {
           },
           parentGatePresenter: (_) async {
             parentGateCallCount += 1;
-            return false;
+            return true;
           },
+          vehiclePackPurchasePresenter:
+              (_, {required controller, required vehicleId}) async {
+                purchaseSheetVehicleIds.add(vehicleId);
+              },
           onConfigChanged: (config) {
             changedConfig = config;
           },
@@ -5309,6 +5321,7 @@ void main() {
     expect(changedConfig, isNull);
     expect(infoSheetVehicleIds, ['fire_truck']);
     expect(parentGateCallCount, 1);
+    expect(purchaseSheetVehicleIds, ['fire_truck']);
     expect(_vehicleChoiceFinder('fire_truck'), findsOneWidget);
 
     await tester.tap(_vehicleChoiceFinder('supercar'));
@@ -9773,6 +9786,7 @@ Future<void> _pumpAvatarSetupScreen(
       const VehiclePackPurchaseState.initial(),
   VehiclePackInfoPresenter? vehiclePackInfoPresenter,
   ParentGatePresenter? parentGatePresenter,
+  VehiclePackPurchasePresenter? vehiclePackPurchasePresenter,
 }) async {
   await tester.pumpWidget(
     MaterialApp(
@@ -9792,6 +9806,7 @@ Future<void> _pumpAvatarSetupScreen(
         purchaseState: purchaseState,
         vehiclePackInfoPresenter: vehiclePackInfoPresenter,
         parentGatePresenter: parentGatePresenter,
+        vehiclePackPurchasePresenter: vehiclePackPurchasePresenter,
       ),
     ),
   );

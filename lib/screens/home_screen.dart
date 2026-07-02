@@ -35,6 +35,7 @@ import '../widgets/app/app_help_sheet.dart';
 import '../widgets/app/app_metric_tile.dart';
 import '../widgets/purchase/parent_gate_sheet.dart';
 import '../widgets/purchase/vehicle_pack_info_sheet.dart';
+import '../widgets/purchase/vehicle_pack_purchase_sheet.dart';
 import '../widgets/reward_sticker_image.dart';
 import '../widgets/vehicle_selection_card.dart';
 import 'avatar_setup_screen.dart';
@@ -65,6 +66,7 @@ class HomeScreen extends StatefulWidget {
     this.purchaseState = const VehiclePackPurchaseState.initial(),
     this.vehiclePackInfoPresenter,
     this.parentGatePresenter,
+    this.vehiclePackPurchasePresenter,
     this.avatarImageBuilder,
     this.now,
   });
@@ -79,6 +81,7 @@ class HomeScreen extends StatefulWidget {
   final VehiclePackPurchaseState purchaseState;
   final VehiclePackInfoPresenter? vehiclePackInfoPresenter;
   final ParentGatePresenter? parentGatePresenter;
+  final VehiclePackPurchasePresenter? vehiclePackPurchasePresenter;
   final Widget Function(BuildContext context, String imagePath)?
   avatarImageBuilder;
   final DateTime Function()? now;
@@ -522,7 +525,18 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
       return;
     }
 
-    // Vehicle pack purchase UI is wired in the next commit.
+    final purchaseController = widget.purchaseController;
+    if (purchaseController == null) {
+      return;
+    }
+
+    final vehiclePackPurchasePresenter =
+        widget.vehiclePackPurchasePresenter ?? showVehiclePackPurchaseSheet;
+    await vehiclePackPurchasePresenter(
+      context,
+      controller: purchaseController,
+      vehicleId: vehicleId,
+    );
   }
 
   Future<void> _openSettings() async {
@@ -544,6 +558,7 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
           purchaseState: widget.purchaseState,
           vehiclePackInfoPresenter: widget.vehiclePackInfoPresenter,
           parentGatePresenter: widget.parentGatePresenter,
+          vehiclePackPurchasePresenter: widget.vehiclePackPurchasePresenter,
         ),
       ),
     );
