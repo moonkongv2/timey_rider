@@ -5,12 +5,14 @@ import 'package:flutter/services.dart';
 
 import '../catalogs/avatar_prompt_catalog.dart';
 import '../catalogs/vehicle_catalog.dart';
+import '../catalogs/vehicle_unlock_catalog.dart';
 import '../l10n/app_texts.dart';
 import '../models/activity_timer_config.dart';
 import '../models/vehicle.dart';
 import '../models/vehicle_avatar_presentation.dart';
 import '../services/avatar_image_picker.dart';
 import '../services/local_avatar_image_service.dart';
+import '../services/vehicle_pack_purchase_controller.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_radius.dart';
 import '../theme/app_shadows.dart';
@@ -26,12 +28,16 @@ class AvatarSetupScreen extends StatefulWidget {
     required this.onConfigChanged,
     this.imagePicker,
     this.avatarImageService,
+    this.purchaseController,
+    this.purchaseState = const VehiclePackPurchaseState.initial(),
   });
 
   final ActivityTimerConfig config;
   final ValueChanged<ActivityTimerConfig> onConfigChanged;
   final AvatarImagePicker? imagePicker;
   final LocalAvatarImageService? avatarImageService;
+  final VehiclePackPurchaseController? purchaseController;
+  final VehiclePackPurchaseState purchaseState;
 
   @override
   State<AvatarSetupScreen> createState() => _AvatarSetupScreenState();
@@ -149,6 +155,18 @@ class _AvatarSetupScreenState extends State<AvatarSetupScreen> {
     }
 
     return _config.avatarPresentationForVehicle(vehicleId);
+  }
+
+  bool get _shouldApplyVehicleLocks {
+    return widget.purchaseController != null;
+  }
+
+  bool _isVehicleLocked(String vehicleId) {
+    return _shouldApplyVehicleLocks &&
+        !VehicleUnlockCatalog.isVehicleUnlocked(
+          vehicleId,
+          widget.purchaseState.entitlement,
+        );
   }
 
   String _avatarModeLabel(BuildContext context) {
@@ -300,6 +318,10 @@ class _AvatarSetupScreenState extends State<AvatarSetupScreen> {
   }
 
   void _handleVehicleSelected(String vehicleId) {
+    if (_isVehicleLocked(vehicleId)) {
+      return;
+    }
+
     final nextConfig = _config.copyWith(vehicleId: vehicleId);
     final nextAvatarConfig = _avatarConfigForVehicle(nextConfig);
     final nextAvatarMode = _avatarMode == AvatarImageMode.custom
@@ -315,6 +337,10 @@ class _AvatarSetupScreenState extends State<AvatarSetupScreen> {
       _avatarRotationDegrees = nextAvatarConfig.rotationDegrees;
     });
     widget.onConfigChanged(nextConfig);
+  }
+
+  void _handleLockedVehiclePressed(String _) {
+    // Guardian gate and purchase UI are wired in the next commits.
   }
 
   @override
@@ -410,6 +436,12 @@ class _AvatarSetupScreenState extends State<AvatarSetupScreen> {
                 subtitle: texts.vehicleSelectionSubtitle,
                 selectedVehicleId: _config.vehicleId,
                 onVehicleSelected: _handleVehicleSelected,
+                isVehicleLocked: _shouldApplyVehicleLocks
+                    ? _isVehicleLocked
+                    : null,
+                onLockedVehiclePressed: _shouldApplyVehicleLocks
+                    ? _handleLockedVehiclePressed
+                    : null,
                 avatar: currentEditingAvatar,
                 avatarForVehicle: _avatarPresentationForVehicleChoice,
               ),
@@ -474,6 +506,12 @@ class _AvatarSetupScreenState extends State<AvatarSetupScreen> {
                 subtitle: texts.vehicleSelectionSubtitle,
                 selectedVehicleId: _config.vehicleId,
                 onVehicleSelected: _handleVehicleSelected,
+                isVehicleLocked: _shouldApplyVehicleLocks
+                    ? _isVehicleLocked
+                    : null,
+                onLockedVehiclePressed: _shouldApplyVehicleLocks
+                    ? _handleLockedVehiclePressed
+                    : null,
                 avatar: currentEditingAvatar,
                 avatarForVehicle: _avatarPresentationForVehicleChoice,
               ),

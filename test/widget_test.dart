@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
@@ -23,6 +24,7 @@ import 'package:timey_rider/models/activity_progress_snapshot.dart';
 import 'package:timey_rider/models/activity_session_result.dart';
 import 'package:timey_rider/models/activity_timer_config.dart';
 import 'package:timey_rider/models/activity_timer_preset.dart';
+import 'package:timey_rider/models/purchase_entitlement.dart';
 import 'package:timey_rider/models/reward_goal.dart';
 import 'package:timey_rider/models/reward_item.dart';
 import 'package:timey_rider/models/vehicle.dart';
@@ -38,14 +40,17 @@ import 'package:timey_rider/screens/timer_screen.dart';
 import 'package:timey_rider/screens/user_guide_screen.dart';
 import 'package:timey_rider/services/active_activity_timer_session_store.dart';
 import 'package:timey_rider/services/avatar_image_picker.dart';
+import 'package:timey_rider/services/iap_purchase_client.dart';
 import 'package:timey_rider/services/local_avatar_image_service.dart';
 import 'package:timey_rider/services/local_activity_progress_service.dart';
+import 'package:timey_rider/services/local_purchase_entitlement_store.dart';
 import 'package:timey_rider/services/local_recent_timer_service.dart';
 import 'package:timey_rider/services/local_saved_timer_preset_service.dart';
 import 'package:timey_rider/services/local_settings_service.dart';
 import 'package:timey_rider/services/motivation_audio_service.dart';
 import 'package:timey_rider/services/orientation_service.dart';
 import 'package:timey_rider/services/screen_awake_service.dart';
+import 'package:timey_rider/services/vehicle_pack_purchase_controller.dart';
 import 'package:timey_rider/theme/app_colors.dart';
 import 'package:timey_rider/theme/app_theme.dart';
 import 'package:timey_rider/utils/motivation_video_schedule.dart'
@@ -4041,6 +4046,40 @@ void main() {
     expect(_avatarPromptText(tester), contains('소방관'));
   });
 
+  testWidgets('Avatar setup does not select locked premium vehicles', (
+    tester,
+  ) async {
+    ActivityTimerConfig? changedConfig;
+    final purchaseController = VehiclePackPurchaseController(
+      purchaseClient: _FakeIapPurchaseClient(),
+      entitlementStore: _FakePurchaseEntitlementStore(),
+    );
+    addTearDown(purchaseController.dispose);
+
+    await _pumpAvatarSetupScreen(
+      tester,
+      ActivityTimerConfig.defaults(),
+      onConfigChanged: (config) => changedConfig = config,
+      purchaseController: purchaseController,
+      purchaseState: const VehiclePackPurchaseState.initial(),
+    );
+    await _dismissAvatarGuideIfVisible(tester);
+
+    await tester.tap(find.text('직접 만든 라이더 사용'));
+    await tester.pump();
+    await _scrollAvatarVehicleSelectionIntoView(tester);
+
+    await _tapVisible(tester, _vehicleChoiceFinder('fire_truck'));
+    await tester.pump();
+
+    expect(changedConfig, isNull);
+
+    await _tapVisible(tester, _vehicleChoiceFinder('supercar'));
+    await tester.pump();
+
+    expect(changedConfig?.vehicleId, 'supercar');
+  });
+
   testWidgets('Avatar setup shows upload button in custom mode', (
     tester,
   ) async {
@@ -5131,7 +5170,7 @@ void main() {
       ),
     );
 
-    expect(find.text('Pack'), findsOneWidget);
+    expect(find.text('Pack'), findsNothing);
     expect(find.byIcon(Icons.lock_rounded), findsOneWidget);
   });
 
@@ -5199,6 +5238,58 @@ void main() {
       _assetImage(VehicleCatalog.motorcycle.selectionImagePath),
       findsNothing,
     );
+  });
+
+  testWidgets('Home vehicle picker does not select locked premium vehicles', (
+    tester,
+  ) async {
+    SharedPreferences.setMockInitialValues({});
+    ActivityTimerConfig? changedConfig;
+    final purchaseController = VehiclePackPurchaseController(
+      purchaseClient: _FakeIapPurchaseClient(),
+      entitlementStore: _FakePurchaseEntitlementStore(),
+    );
+    addTearDown(purchaseController.dispose);
+
+    await tester.pumpWidget(
+      MaterialApp(
+        locale: const Locale('en'),
+        supportedLocales: AppTexts.supportedLocales,
+        localizationsDelegates: const [
+          GlobalMaterialLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+        ],
+        theme: AppTheme.light(),
+        home: HomeScreen(
+          config: ActivityTimerConfig.defaults().copyWith(childName: 'Haru'),
+          activityProgressService: LocalActivityProgressService(),
+          purchaseController: purchaseController,
+          purchaseState: const VehiclePackPurchaseState.initial(),
+          onConfigChanged: (config) {
+            changedConfig = config;
+          },
+        ),
+      ),
+    );
+    await tester.pump();
+
+    await tester.tap(find.byKey(const ValueKey('vehiclePickerOpenButton')));
+    await tester.pumpAndSettle();
+
+    expect(find.byIcon(Icons.lock_rounded), findsWidgets);
+
+    await tester.tap(_vehicleChoiceFinder('fire_truck'));
+    await tester.pump();
+
+    expect(changedConfig, isNull);
+    expect(_vehicleChoiceFinder('fire_truck'), findsOneWidget);
+
+    await tester.tap(_vehicleChoiceFinder('supercar'));
+    await tester.pumpAndSettle();
+
+    expect(changedConfig?.vehicleId, 'supercar');
+    expect(_vehicleChoiceFinder('fire_truck'), findsNothing);
   });
 
   testWidgets('Vehicle selection updates even without parent rebuild', (
@@ -9651,6 +9742,9 @@ Future<void> _pumpAvatarSetupScreen(
   ValueChanged<ActivityTimerConfig>? onConfigChanged,
   AvatarImagePicker? imagePicker,
   LocalAvatarImageService? avatarImageService,
+  VehiclePackPurchaseController? purchaseController,
+  VehiclePackPurchaseState purchaseState =
+      const VehiclePackPurchaseState.initial(),
 }) async {
   await tester.pumpWidget(
     MaterialApp(
@@ -9666,6 +9760,8 @@ Future<void> _pumpAvatarSetupScreen(
         onConfigChanged: onConfigChanged ?? (_) {},
         imagePicker: imagePicker,
         avatarImageService: avatarImageService,
+        purchaseController: purchaseController,
+        purchaseState: purchaseState,
       ),
     ),
   );
@@ -9689,6 +9785,16 @@ Future<void> _scrollAvatarPromptToggleIntoView(WidgetTester tester) async {
 Future<void> _expandAvatarPrompt(WidgetTester tester) async {
   await _scrollAvatarPromptToggleIntoView(tester);
   await tester.tap(find.byKey(const ValueKey('avatarPromptToggle')));
+  await tester.pumpAndSettle();
+}
+
+Future<void> _dismissAvatarGuideIfVisible(WidgetTester tester) async {
+  final guideTitle = find.text('우리 아이 라이더 만들기 안내');
+  if (guideTitle.evaluate().isEmpty) {
+    return;
+  }
+
+  Navigator.of(tester.element(guideTitle)).pop();
   await tester.pumpAndSettle();
 }
 
@@ -9949,4 +10055,45 @@ class _FakeLocalAvatarImageService extends LocalAvatarImageService {
   Future<String> savePickedAvatarImage(XFile pickedFile) async {
     return savedPath;
   }
+}
+
+class _FakePurchaseEntitlementStore implements PurchaseEntitlementStore {
+  @override
+  Future<PurchaseEntitlement> load() async {
+    return const PurchaseEntitlement.locked();
+  }
+
+  @override
+  Future<void> save(PurchaseEntitlement entitlement) async {}
+}
+
+class _FakeIapPurchaseClient implements IapPurchaseClient {
+  final _purchaseStreamController =
+      StreamController<List<IapPurchaseUpdate>>.broadcast();
+
+  @override
+  Stream<List<IapPurchaseUpdate>> get purchaseStream {
+    return _purchaseStreamController.stream;
+  }
+
+  @override
+  Future<bool> buyNonConsumable(IapProductDetails product) async {
+    return true;
+  }
+
+  @override
+  Future<void> completePurchase(IapPurchaseUpdate purchase) async {}
+
+  @override
+  Future<bool> isAvailable() async {
+    return true;
+  }
+
+  @override
+  Future<IapProductQueryResult> queryProducts(Set<String> productIds) async {
+    return const IapProductQueryResult(products: []);
+  }
+
+  @override
+  Future<void> restorePurchases() async {}
 }

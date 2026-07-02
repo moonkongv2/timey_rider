@@ -8,6 +8,7 @@ import 'package:flutter/services.dart';
 import '../catalogs/activity_catalog.dart';
 import '../catalogs/activity_marker_catalog.dart';
 import '../catalogs/vehicle_catalog.dart';
+import '../catalogs/vehicle_unlock_catalog.dart';
 import '../l10n/app_texts.dart';
 import '../models/active_activity_timer_session.dart';
 import '../models/activity.dart';
@@ -469,6 +470,7 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
     final selectedVehicleAvatar = _config.avatarPresentationForVehicle(
       selectedVehicle.id,
     );
+    final shouldApplyVehicleLocks = widget.purchaseController != null;
 
     await showModalBottomSheet<void>(
       context: context,
@@ -480,6 +482,17 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
         avatar: selectedVehicleAvatar,
         avatarForVehicle: _config.avatarPresentationForVehicle,
         avatarImageBuilder: widget.avatarImageBuilder,
+        isVehicleLocked: shouldApplyVehicleLocks
+            ? (vehicleId) => !VehicleUnlockCatalog.isVehicleUnlocked(
+                vehicleId,
+                widget.purchaseState.entitlement,
+              )
+            : null,
+        onLockedVehiclePressed: shouldApplyVehicleLocks
+            ? (vehicleId) {
+                // Guardian gate and purchase UI are wired in the next commits.
+              }
+            : null,
         onVehicleSelected: (vehicleId) {
           _updateConfig(_config.copyWith(vehicleId: vehicleId));
         },
@@ -499,8 +512,12 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
   Future<void> _openAvatarSetup() async {
     await Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (_) =>
-            AvatarSetupScreen(config: _config, onConfigChanged: _updateConfig),
+        builder: (_) => AvatarSetupScreen(
+          config: _config,
+          onConfigChanged: _updateConfig,
+          purchaseController: widget.purchaseController,
+          purchaseState: widget.purchaseState,
+        ),
       ),
     );
   }
@@ -730,6 +747,8 @@ class _VehiclePickerSheet extends StatelessWidget {
     required this.avatar,
     required this.avatarForVehicle,
     required this.onVehicleSelected,
+    this.isVehicleLocked,
+    this.onLockedVehiclePressed,
     this.avatarImageBuilder,
   });
 
@@ -738,6 +757,8 @@ class _VehiclePickerSheet extends StatelessWidget {
   final VehicleAvatarPresentation avatar;
   final VehicleAvatarPresentationResolver avatarForVehicle;
   final ValueChanged<String> onVehicleSelected;
+  final VehicleLockResolver? isVehicleLocked;
+  final ValueChanged<String>? onLockedVehiclePressed;
   final Widget Function(BuildContext context, String imagePath)?
   avatarImageBuilder;
 
@@ -783,6 +804,8 @@ class _VehiclePickerSheet extends StatelessWidget {
                 avatar: avatar,
                 avatarForVehicle: avatarForVehicle,
                 avatarImageBuilder: avatarImageBuilder,
+                isVehicleLocked: isVehicleLocked,
+                onLockedVehiclePressed: onLockedVehiclePressed,
                 showSelectedPreview: false,
               ),
             ],

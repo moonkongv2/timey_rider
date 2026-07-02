@@ -327,30 +327,11 @@ class _VehicleChoiceButton extends StatelessWidget {
                         boxShadow: AppShadows.buttonSoft,
                       ),
                       child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 6,
-                          vertical: 4,
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            const Icon(
-                              Icons.lock_rounded,
-                              color: AppColors.white,
-                              size: 12,
-                            ),
-                            const SizedBox(width: 3),
-                            Text(
-                              lockedLabel,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: Theme.of(context).textTheme.labelSmall
-                                  ?.copyWith(
-                                    color: AppColors.white,
-                                    fontWeight: FontWeight.w900,
-                                  ),
-                            ),
-                          ],
+                        padding: const EdgeInsets.all(4),
+                        child: const Icon(
+                          Icons.lock_rounded,
+                          color: AppColors.white,
+                          size: 13,
                         ),
                       ),
                     ),
