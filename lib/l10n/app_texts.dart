@@ -6,6 +6,7 @@ import 'en/home.dart';
 import 'en/activity_marker.dart';
 import 'en/activity_history.dart';
 import 'en/onboarding.dart';
+import 'en/purchase.dart';
 import 'en/result.dart';
 import 'en/rewards.dart';
 import 'en/settings.dart';
@@ -17,6 +18,7 @@ import 'ko/home.dart';
 import 'ko/activity_marker.dart';
 import 'ko/activity_history.dart';
 import 'ko/onboarding.dart';
+import 'ko/purchase.dart';
 import 'ko/result.dart';
 import 'ko/rewards.dart';
 import 'ko/settings.dart';
@@ -32,6 +34,7 @@ class AppTextBundle {
     required this.activityMarker,
     required this.activityHistory,
     required this.onboarding,
+    required this.purchase,
     required this.result,
     required this.rewards,
     required this.settings,
@@ -45,6 +48,7 @@ class AppTextBundle {
   final ActivityMarkerTextSet activityMarker;
   final ActivityHistoryTextSet activityHistory;
   final OnboardingTextSet onboarding;
+  final PurchaseTextSet purchase;
   final ResultTextSet result;
   final RewardTextSet rewards;
   final SettingsTextSet settings;
@@ -62,6 +66,7 @@ abstract final class AppTexts {
     activityMarker: ActivityMarkerTexts(),
     activityHistory: ActivityHistoryTexts(),
     onboarding: OnboardingTexts(),
+    purchase: PurchaseTexts(),
     result: ResultTexts(),
     rewards: RewardTexts(),
     settings: SettingsTexts(),
@@ -76,6 +81,7 @@ abstract final class AppTexts {
     activityMarker: EnActivityMarkerTexts(),
     activityHistory: EnActivityHistoryTexts(),
     onboarding: EnOnboardingTexts(),
+    purchase: EnPurchaseTexts(),
     result: EnResultTexts(),
     rewards: EnRewardTexts(),
     settings: EnSettingsTexts(),

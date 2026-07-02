@@ -33,6 +33,8 @@ import '../utils/duration_format.dart';
 import '../widgets/app/app_bouncy_button.dart';
 import '../widgets/app/app_help_sheet.dart';
 import '../widgets/app/app_metric_tile.dart';
+import '../widgets/purchase/parent_gate_sheet.dart';
+import '../widgets/purchase/vehicle_pack_info_sheet.dart';
 import '../widgets/reward_sticker_image.dart';
 import '../widgets/vehicle_selection_card.dart';
 import 'avatar_setup_screen.dart';
@@ -61,6 +63,8 @@ class HomeScreen extends StatefulWidget {
     this.savedTimerPresetService = const LocalSavedTimerPresetService(),
     this.purchaseController,
     this.purchaseState = const VehiclePackPurchaseState.initial(),
+    this.vehiclePackInfoPresenter,
+    this.parentGatePresenter,
     this.avatarImageBuilder,
     this.now,
   });
@@ -73,6 +77,8 @@ class HomeScreen extends StatefulWidget {
   final LocalSavedTimerPresetService savedTimerPresetService;
   final VehiclePackPurchaseController? purchaseController;
   final VehiclePackPurchaseState purchaseState;
+  final VehiclePackInfoPresenter? vehiclePackInfoPresenter;
+  final ParentGatePresenter? parentGatePresenter;
   final Widget Function(BuildContext context, String imagePath)?
   avatarImageBuilder;
   final DateTime Function()? now;
@@ -489,15 +495,34 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
               )
             : null,
         onLockedVehiclePressed: shouldApplyVehicleLocks
-            ? (vehicleId) {
-                // Guardian gate and purchase UI are wired in the next commits.
-              }
+            ? _handleLockedVehiclePressed
             : null,
         onVehicleSelected: (vehicleId) {
           _updateConfig(_config.copyWith(vehicleId: vehicleId));
         },
       ),
     );
+  }
+
+  Future<void> _handleLockedVehiclePressed(String vehicleId) async {
+    final vehiclePackInfoPresenter =
+        widget.vehiclePackInfoPresenter ?? showVehiclePackInfoSheet;
+    final wantsToContinue = await vehiclePackInfoPresenter(
+      context,
+      vehicleId: vehicleId,
+    );
+    if (!mounted || !wantsToContinue) {
+      return;
+    }
+
+    final parentGatePresenter =
+        widget.parentGatePresenter ?? showParentGateSheet;
+    final didPassGate = await parentGatePresenter(context);
+    if (!mounted || !didPassGate) {
+      return;
+    }
+
+    // Vehicle pack purchase UI is wired in the next commit.
   }
 
   Future<void> _openSettings() async {
@@ -517,6 +542,8 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
           onConfigChanged: _updateConfig,
           purchaseController: widget.purchaseController,
           purchaseState: widget.purchaseState,
+          vehiclePackInfoPresenter: widget.vehiclePackInfoPresenter,
+          parentGatePresenter: widget.parentGatePresenter,
         ),
       ),
     );

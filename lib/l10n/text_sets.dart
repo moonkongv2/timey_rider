@@ -15,6 +15,21 @@ abstract interface class CommonTextSet {
   String get start;
 }
 
+abstract interface class PurchaseTextSet {
+  String get vehiclePackInfoTitle;
+  String vehiclePackInfoSubtitle(String vehicleLabel);
+  String get vehiclePackInfoUnlockAllMessage;
+  String get vehiclePackInfoGuardianNote;
+  String get vehiclePackInfoContinueButton;
+  String get vehiclePackInfoCloseButton;
+  String get parentGateTitle;
+  String get parentGateSubtitle;
+  String parentGateQuestion(int left, int right);
+  String get parentGateAnswerLabel;
+  String get parentGateContinueButton;
+  String get parentGateErrorMessage;
+}
+
 @immutable
 class OnboardingCardText {
   const OnboardingCardText({

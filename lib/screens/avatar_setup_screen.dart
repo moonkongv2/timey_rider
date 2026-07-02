@@ -19,6 +19,8 @@ import '../theme/app_shadows.dart';
 import '../theme/app_spacing.dart';
 import '../widgets/avatar/avatar_composite_preview.dart';
 import '../widgets/avatar/rider_guide_bottom_sheet.dart';
+import '../widgets/purchase/parent_gate_sheet.dart';
+import '../widgets/purchase/vehicle_pack_info_sheet.dart';
 import '../widgets/vehicle_selection_card.dart';
 
 class AvatarSetupScreen extends StatefulWidget {
@@ -30,6 +32,8 @@ class AvatarSetupScreen extends StatefulWidget {
     this.avatarImageService,
     this.purchaseController,
     this.purchaseState = const VehiclePackPurchaseState.initial(),
+    this.vehiclePackInfoPresenter,
+    this.parentGatePresenter,
   });
 
   final ActivityTimerConfig config;
@@ -38,6 +42,8 @@ class AvatarSetupScreen extends StatefulWidget {
   final LocalAvatarImageService? avatarImageService;
   final VehiclePackPurchaseController? purchaseController;
   final VehiclePackPurchaseState purchaseState;
+  final VehiclePackInfoPresenter? vehiclePackInfoPresenter;
+  final ParentGatePresenter? parentGatePresenter;
 
   @override
   State<AvatarSetupScreen> createState() => _AvatarSetupScreenState();
@@ -339,8 +345,25 @@ class _AvatarSetupScreenState extends State<AvatarSetupScreen> {
     widget.onConfigChanged(nextConfig);
   }
 
-  void _handleLockedVehiclePressed(String _) {
-    // Guardian gate and purchase UI are wired in the next commits.
+  Future<void> _handleLockedVehiclePressed(String vehicleId) async {
+    final vehiclePackInfoPresenter =
+        widget.vehiclePackInfoPresenter ?? showVehiclePackInfoSheet;
+    final wantsToContinue = await vehiclePackInfoPresenter(
+      context,
+      vehicleId: vehicleId,
+    );
+    if (!mounted || !wantsToContinue) {
+      return;
+    }
+
+    final parentGatePresenter =
+        widget.parentGatePresenter ?? showParentGateSheet;
+    final didPassGate = await parentGatePresenter(context);
+    if (!mounted || !didPassGate) {
+      return;
+    }
+
+    // Vehicle pack purchase UI is wired in the next commit.
   }
 
   @override
