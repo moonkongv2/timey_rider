@@ -11,6 +11,7 @@ import 'avatar/avatar_composite_preview.dart';
 
 typedef VehicleAvatarPresentationResolver =
     VehicleAvatarPresentation? Function(String vehicleId);
+typedef VehicleLockResolver = bool Function(String vehicleId);
 
 class VehicleSelectionCard extends StatelessWidget {
   const VehicleSelectionCard({
@@ -22,6 +23,9 @@ class VehicleSelectionCard extends StatelessWidget {
     this.avatar = VehicleAvatarPresentation.defaultImage,
     this.avatarForVehicle,
     this.avatarImageBuilder,
+    this.isVehicleLocked,
+    this.lockedVehicleLabel = 'Locked',
+    this.onLockedVehiclePressed,
     this.showSelectedPreview = false,
     this.showChoices = true,
     this.actionLabel,
@@ -38,6 +42,9 @@ class VehicleSelectionCard extends StatelessWidget {
   final VehicleAvatarPresentationResolver? avatarForVehicle;
   final Widget Function(BuildContext context, String imagePath)?
   avatarImageBuilder;
+  final VehicleLockResolver? isVehicleLocked;
+  final String lockedVehicleLabel;
+  final ValueChanged<String>? onLockedVehiclePressed;
   final bool showSelectedPreview;
   final bool showChoices;
   final String? actionLabel;
@@ -138,7 +145,15 @@ class VehicleSelectionCard extends StatelessWidget {
                           size: itemSize,
                           vehicle: vehicle,
                           isSelected: selectedVehicle.id == vehicle.id,
-                          onTap: () => onVehicleSelected(vehicle.id),
+                          isLocked: isVehicleLocked?.call(vehicle.id) ?? false,
+                          lockedLabel: lockedVehicleLabel,
+                          onTap: () {
+                            if (isVehicleLocked?.call(vehicle.id) ?? false) {
+                              onLockedVehiclePressed?.call(vehicle.id);
+                              return;
+                            }
+                            onVehicleSelected(vehicle.id);
+                          },
                           avatar: avatar,
                           resolvedAvatar: avatarForVehicle?.call(vehicle.id),
                           avatarImageBuilder: avatarImageBuilder,
@@ -219,6 +234,8 @@ class _VehicleChoiceButton extends StatelessWidget {
     required this.size,
     required this.vehicle,
     required this.isSelected,
+    required this.isLocked,
+    required this.lockedLabel,
     required this.onTap,
     required this.avatar,
     required this.resolvedAvatar,
@@ -228,6 +245,8 @@ class _VehicleChoiceButton extends StatelessWidget {
   final double size;
   final VehicleDefinition vehicle;
   final bool isSelected;
+  final bool isLocked;
+  final String lockedLabel;
   final VoidCallback onTap;
   final VehicleAvatarPresentation avatar;
   final VehicleAvatarPresentation? resolvedAvatar;
@@ -255,9 +274,11 @@ class _VehicleChoiceButton extends StatelessWidget {
       width: size,
       height: size,
       child: Semantics(
-        label: vehicle.labelForLanguage(
-          Localizations.localeOf(context).languageCode,
-        ),
+        label: isLocked
+            ? '${vehicle.labelForLanguage(Localizations.localeOf(context).languageCode)}, $lockedLabel'
+            : vehicle.labelForLanguage(
+                Localizations.localeOf(context).languageCode,
+              ),
         button: true,
         selected: isSelected,
         child: Material(
@@ -272,18 +293,68 @@ class _VehicleChoiceButton extends StatelessWidget {
             onTap: onTap,
             child: Stack(
               children: [
-                Center(
-                  child: SizedBox(
-                    width: size - 20,
-                    height: size - 24,
-                    child: _VehicleChoiceImage(
-                      vehicle: vehicle,
-                      size: size - 20,
-                      avatar: choiceAvatar,
-                      avatarImageBuilder: avatarImageBuilder,
+                Opacity(
+                  opacity: isLocked ? 0.54 : 1.0,
+                  child: Center(
+                    child: SizedBox(
+                      width: size - 20,
+                      height: size - 24,
+                      child: _VehicleChoiceImage(
+                        vehicle: vehicle,
+                        size: size - 20,
+                        avatar: choiceAvatar,
+                        avatarImageBuilder: avatarImageBuilder,
+                      ),
                     ),
                   ),
                 ),
+                if (isLocked)
+                  Positioned.fill(
+                    child: DecoratedBox(
+                      decoration: BoxDecoration(
+                        color: AppColors.white.withValues(alpha: 0.32),
+                      ),
+                    ),
+                  ),
+                if (isLocked)
+                  Positioned(
+                    right: 6,
+                    top: 6,
+                    child: DecoratedBox(
+                      decoration: BoxDecoration(
+                        color: AppColors.brown700.withValues(alpha: 0.88),
+                        borderRadius: AppRadius.pill,
+                        boxShadow: AppShadows.buttonSoft,
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 6,
+                          vertical: 4,
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(
+                              Icons.lock_rounded,
+                              color: AppColors.white,
+                              size: 12,
+                            ),
+                            const SizedBox(width: 3),
+                            Text(
+                              lockedLabel,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: Theme.of(context).textTheme.labelSmall
+                                  ?.copyWith(
+                                    color: AppColors.white,
+                                    fontWeight: FontWeight.w900,
+                                  ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
                 if (isSelected)
                   Positioned(
                     right: 6,

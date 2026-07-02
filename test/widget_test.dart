@@ -5111,6 +5111,72 @@ void main() {
     },
   );
 
+  testWidgets('Vehicle selection card shows locked choices', (tester) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        locale: const Locale('en'),
+        home: Scaffold(
+          body: SizedBox(
+            width: 420,
+            child: VehicleSelectionCard(
+              title: 'Choose vehicle',
+              selectedVehicleId: 'motorcycle',
+              onVehicleSelected: (_) {},
+              isVehicleLocked: (vehicleId) => vehicleId == 'fire_truck',
+              lockedVehicleLabel: 'Pack',
+              onLockedVehiclePressed: (_) {},
+            ),
+          ),
+        ),
+      ),
+    );
+
+    expect(find.text('Pack'), findsOneWidget);
+    expect(find.byIcon(Icons.lock_rounded), findsOneWidget);
+  });
+
+  testWidgets(
+    'Vehicle selection card sends locked taps to locked callback only',
+    (tester) async {
+      String? selectedVehicleId;
+      String? lockedVehicleId;
+
+      await tester.pumpWidget(
+        MaterialApp(
+          locale: const Locale('en'),
+          home: Scaffold(
+            body: SizedBox(
+              width: 420,
+              child: VehicleSelectionCard(
+                title: 'Choose vehicle',
+                selectedVehicleId: 'motorcycle',
+                onVehicleSelected: (vehicleId) {
+                  selectedVehicleId = vehicleId;
+                },
+                isVehicleLocked: (vehicleId) => vehicleId == 'fire_truck',
+                lockedVehicleLabel: 'Pack',
+                onLockedVehiclePressed: (vehicleId) {
+                  lockedVehicleId = vehicleId;
+                },
+              ),
+            ),
+          ),
+        ),
+      );
+
+      await tester.tap(_vehicleChoiceFinder('fire_truck'));
+      await tester.pump();
+
+      expect(selectedVehicleId, isNull);
+      expect(lockedVehicleId, 'fire_truck');
+
+      await tester.tap(_vehicleChoiceFinder('supercar'));
+      await tester.pump();
+
+      expect(selectedVehicleId, 'supercar');
+    },
+  );
+
   testWidgets('Selected vehicle on home is saved to preferences', (
     tester,
   ) async {
