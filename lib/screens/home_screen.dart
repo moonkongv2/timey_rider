@@ -23,6 +23,7 @@ import '../services/active_activity_timer_session_store.dart';
 import '../services/local_activity_progress_service.dart';
 import '../services/local_recent_timer_service.dart';
 import '../services/local_saved_timer_preset_service.dart';
+import '../services/vehicle_pack_purchase_controller.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_radius.dart';
 import '../theme/app_shadows.dart';
@@ -57,6 +58,8 @@ class HomeScreen extends StatefulWidget {
     this.activeSessionStore = const ActiveActivityTimerSessionStore(),
     this.recentTimerService = const LocalRecentTimerService(),
     this.savedTimerPresetService = const LocalSavedTimerPresetService(),
+    this.purchaseController,
+    this.purchaseState = const VehiclePackPurchaseState.initial(),
     this.avatarImageBuilder,
     this.now,
   });
@@ -67,6 +70,8 @@ class HomeScreen extends StatefulWidget {
   final ActiveActivityTimerSessionStore activeSessionStore;
   final LocalRecentTimerService recentTimerService;
   final LocalSavedTimerPresetService savedTimerPresetService;
+  final VehiclePackPurchaseController? purchaseController;
+  final VehiclePackPurchaseState purchaseState;
   final Widget Function(BuildContext context, String imagePath)?
   avatarImageBuilder;
   final DateTime Function()? now;
