@@ -3,8 +3,11 @@ import 'package:flutter/material.dart';
 import '../l10n/app_texts.dart';
 import '../l10n/text_sets.dart';
 import '../models/activity_timer_config.dart';
+import '../services/vehicle_pack_purchase_controller.dart';
 import '../theme/app_colors.dart';
 import '../widgets/app/app_help_sheet.dart';
+import '../widgets/purchase/parent_gate_sheet.dart';
+import '../widgets/purchase/vehicle_pack_purchase_sheet.dart';
 import 'user_guide_screen.dart';
 
 const _courseMarkerGuideImageAssetPath =
@@ -42,10 +45,18 @@ class SettingsScreen extends StatefulWidget {
     super.key,
     required this.config,
     required this.onConfigChanged,
+    this.purchaseController,
+    this.purchaseState = const VehiclePackPurchaseState.initial(),
+    this.parentGatePresenter,
+    this.vehiclePackPurchasePresenter,
   });
 
   final ActivityTimerConfig config;
   final ValueChanged<ActivityTimerConfig> onConfigChanged;
+  final VehiclePackPurchaseController? purchaseController;
+  final VehiclePackPurchaseState purchaseState;
+  final ParentGatePresenter? parentGatePresenter;
+  final VehiclePackPurchasePresenter? vehiclePackPurchasePresenter;
 
   @override
   State<SettingsScreen> createState() => _SettingsScreenState();
@@ -58,8 +69,18 @@ class _SettingsScreenState extends State<SettingsScreen> {
   );
 
   @override
+  void initState() {
+    super.initState();
+    widget.purchaseController?.addListener(_handlePurchaseStateChanged);
+  }
+
+  @override
   void didUpdateWidget(covariant SettingsScreen oldWidget) {
     super.didUpdateWidget(oldWidget);
+    if (oldWidget.purchaseController != widget.purchaseController) {
+      oldWidget.purchaseController?.removeListener(_handlePurchaseStateChanged);
+      widget.purchaseController?.addListener(_handlePurchaseStateChanged);
+    }
     if (oldWidget.config.childName != widget.config.childName &&
         _childNameController.text != widget.config.childName) {
       _childNameController.text = widget.config.childName;
@@ -68,8 +89,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   @override
   void dispose() {
+    widget.purchaseController?.removeListener(_handlePurchaseStateChanged);
     _childNameController.dispose();
     super.dispose();
+  }
+
+  void _handlePurchaseStateChanged() {
+    if (!mounted) {
+      return;
+    }
+    setState(() {});
   }
 
   void _update(ActivityTimerConfig config) {
@@ -113,6 +142,28 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
+  Future<void> _openVehiclePackPurchase() async {
+    final purchaseController = widget.purchaseController;
+    if (purchaseController == null) {
+      return;
+    }
+
+    final parentGatePresenter =
+        widget.parentGatePresenter ?? showParentGateSheet;
+    final didPassGate = await parentGatePresenter(context);
+    if (!mounted || !didPassGate) {
+      return;
+    }
+
+    final vehiclePackPurchasePresenter =
+        widget.vehiclePackPurchasePresenter ?? showVehiclePackPurchaseSheet;
+    await vehiclePackPurchasePresenter(
+      context,
+      controller: purchaseController,
+      vehicleId: _config.vehicleId,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final texts = AppTexts.of(context);
@@ -124,6 +175,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
       fontSize: 20,
       fontWeight: FontWeight.w700,
     );
+    final purchaseState =
+        widget.purchaseController?.state ?? widget.purchaseState;
 
     return Scaffold(
       appBar: AppBar(title: Text(texts.settings.title)),
@@ -260,6 +313,70 @@ class _SettingsScreenState extends State<SettingsScreen> {
               ),
             ),
           ),
+          const SizedBox(height: 20),
+          if (widget.purchaseController != null) ...[
+            Card(
+              child: Padding(
+                padding: const EdgeInsets.all(20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Row(
+                      children: [
+                        const Icon(
+                          Icons.local_taxi_rounded,
+                          color: AppColors.primary,
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Text(
+                            texts.settings.vehiclePackSettingsTitle,
+                            style: sectionTitleStyle,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      purchaseState.vehiclePackUnlocked
+                          ? texts.settings.vehiclePackUnlockedState
+                          : texts.settings.vehiclePackLockedState,
+                      style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                        color: AppColors.textPrimary,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      texts.settings.vehiclePackSettingsDescription,
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        color: AppColors.textSecondary,
+                        fontWeight: FontWeight.w700,
+                        height: 1.35,
+                      ),
+                    ),
+                    if (!purchaseState.vehiclePackUnlocked) ...[
+                      const SizedBox(height: 16),
+                      FilledButton.icon(
+                        key: const ValueKey('vehiclePackSettingsManageButton'),
+                        onPressed: _openVehiclePackPurchase,
+                        icon: const Icon(Icons.lock_open_rounded),
+                        label: Text(texts.settings.vehiclePackManageButton),
+                      ),
+                      const SizedBox(height: 8),
+                      OutlinedButton.icon(
+                        key: const ValueKey('vehiclePackSettingsRestoreButton'),
+                        onPressed: _openVehiclePackPurchase,
+                        icon: const Icon(Icons.restore_rounded),
+                        label: Text(texts.settings.vehiclePackRestoreButton),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(height: 20),
+          ],
           const SizedBox(height: 20),
           Card(
             child: Column(

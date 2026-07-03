@@ -267,6 +267,12 @@ abstract interface class SettingsTextSet {
   String get avatarDefaultState;
   String get avatarCustomState;
   String get avatarSettingsButton;
+  String get vehiclePackSettingsTitle;
+  String get vehiclePackLockedState;
+  String get vehiclePackUnlockedState;
+  String get vehiclePackSettingsDescription;
+  String get vehiclePackManageButton;
+  String get vehiclePackRestoreButton;
 
   String motivationVideoIntervalSegmentLabel(int minutes);
 }

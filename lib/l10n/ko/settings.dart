@@ -45,6 +45,13 @@ class SettingsTexts implements SettingsTextSet {
   String get avatarDefaultState => '기본 이미지 사용 중';
   String get avatarCustomState => '직접 만든 라이더 사용 중';
   String get avatarSettingsButton => '라이더 설정하기';
+  String get vehiclePackSettingsTitle => '차량팩';
+  String get vehiclePackLockedState => '잠긴 빠방이 있어요';
+  String get vehiclePackUnlockedState => '차량팩 열림';
+  String get vehiclePackSettingsDescription =>
+      '차량팩을 열면 잠긴 빠방을 모두 사용할 수 있어요. 구매와 복원은 보호자 확인 후 진행돼요.';
+  String get vehiclePackManageButton => '차량팩 보기';
+  String get vehiclePackRestoreButton => '구매 복원';
 
   String motivationVideoIntervalSegmentLabel(int minutes) => '$minutes분';
 }

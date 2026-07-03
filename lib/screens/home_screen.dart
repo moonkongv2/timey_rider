@@ -553,8 +553,14 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
   Future<void> _openSettings() async {
     await Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (_) =>
-            SettingsScreen(config: _config, onConfigChanged: _updateConfig),
+        builder: (_) => SettingsScreen(
+          config: _config,
+          onConfigChanged: _updateConfig,
+          purchaseController: widget.purchaseController,
+          purchaseState: widget.purchaseState,
+          parentGatePresenter: widget.parentGatePresenter,
+          vehiclePackPurchasePresenter: widget.vehiclePackPurchasePresenter,
+        ),
       ),
     );
   }

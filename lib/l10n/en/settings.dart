@@ -46,6 +46,13 @@ class EnSettingsTexts implements SettingsTextSet {
   String get avatarDefaultState => 'Using default image';
   String get avatarCustomState => 'Using custom rider';
   String get avatarSettingsButton => 'Open rider image settings';
+  String get vehiclePackSettingsTitle => 'Vehicle pack';
+  String get vehiclePackLockedState => 'Locked vehicles available';
+  String get vehiclePackUnlockedState => 'Vehicle pack unlocked';
+  String get vehiclePackSettingsDescription =>
+      'The vehicle pack unlocks all locked vehicles. Purchase and restore options open after a parent check.';
+  String get vehiclePackManageButton => 'View vehicle pack';
+  String get vehiclePackRestoreButton => 'Restore purchase';
 
   String motivationVideoIntervalSegmentLabel(int minutes) => '$minutes min';
 }

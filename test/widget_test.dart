@@ -4612,6 +4612,112 @@ void main() {
     );
   });
 
+  testWidgets('Settings screen opens vehicle pack purchase after parent gate', (
+    tester,
+  ) async {
+    var parentGateCallCount = 0;
+    final purchaseSheetVehicleIds = <String>[];
+    final purchaseController = VehiclePackPurchaseController(
+      purchaseClient: _FakeIapPurchaseClient(),
+      entitlementStore: _FakePurchaseEntitlementStore(),
+    );
+    addTearDown(purchaseController.dispose);
+
+    await tester.pumpWidget(
+      MaterialApp(
+        locale: const Locale('ko'),
+        supportedLocales: const [Locale('ko'), Locale('en')],
+        localizationsDelegates: const [
+          GlobalMaterialLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+        ],
+        home: SettingsScreen(
+          config: ActivityTimerConfig.defaults().copyWith(
+            vehicleId: 'fire_truck',
+          ),
+          onConfigChanged: (_) {},
+          purchaseController: purchaseController,
+          purchaseState: const VehiclePackPurchaseState.initial(),
+          parentGatePresenter: (_) async {
+            parentGateCallCount += 1;
+            return true;
+          },
+          vehiclePackPurchasePresenter:
+              (_, {required controller, required vehicleId}) async {
+                purchaseSheetVehicleIds.add(vehicleId);
+              },
+        ),
+      ),
+    );
+
+    await tester.scrollUntilVisible(
+      find.byKey(const ValueKey('vehiclePackSettingsManageButton')),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('차량팩'), findsOneWidget);
+    expect(find.text('잠긴 빠방이 있어요'), findsOneWidget);
+
+    await tester.tap(
+      find.byKey(const ValueKey('vehiclePackSettingsManageButton')),
+    );
+    await tester.pump();
+
+    expect(parentGateCallCount, 1);
+    expect(purchaseSheetVehicleIds, ['fire_truck']);
+  });
+
+  testWidgets('Settings screen shows unlocked vehicle pack state', (
+    tester,
+  ) async {
+    final purchaseController = VehiclePackPurchaseController(
+      purchaseClient: _FakeIapPurchaseClient(),
+      entitlementStore: _FakePurchaseEntitlementStore(
+        const PurchaseEntitlement(vehiclePackUnlocked: true),
+      ),
+    );
+    addTearDown(purchaseController.dispose);
+    await purchaseController.loadCachedEntitlement();
+
+    await tester.pumpWidget(
+      MaterialApp(
+        locale: const Locale('en'),
+        supportedLocales: const [Locale('ko'), Locale('en')],
+        localizationsDelegates: const [
+          GlobalMaterialLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+        ],
+        home: SettingsScreen(
+          config: ActivityTimerConfig.defaults(),
+          onConfigChanged: (_) {},
+          purchaseController: purchaseController,
+        ),
+      ),
+    );
+
+    await tester.scrollUntilVisible(
+      find.text('Vehicle pack unlocked'),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('Vehicle pack'), findsOneWidget);
+    expect(find.text('Vehicle pack unlocked'), findsOneWidget);
+    expect(
+      find.byKey(const ValueKey('vehiclePackSettingsManageButton')),
+      findsNothing,
+    );
+    expect(
+      find.byKey(const ValueKey('vehiclePackSettingsRestoreButton')),
+      findsNothing,
+    );
+  });
+
   testWidgets('User guide uses English localization', (tester) async {
     await tester.pumpWidget(
       const MaterialApp(
@@ -10175,13 +10281,21 @@ class _FakeLocalAvatarImageService extends LocalAvatarImageService {
 }
 
 class _FakePurchaseEntitlementStore implements PurchaseEntitlementStore {
+  _FakePurchaseEntitlementStore([
+    this.entitlement = const PurchaseEntitlement.locked(),
+  ]);
+
+  PurchaseEntitlement entitlement;
+
   @override
   Future<PurchaseEntitlement> load() async {
-    return const PurchaseEntitlement.locked();
+    return entitlement;
   }
 
   @override
-  Future<void> save(PurchaseEntitlement entitlement) async {}
+  Future<void> save(PurchaseEntitlement entitlement) async {
+    this.entitlement = entitlement;
+  }
 }
 
 class _FakeIapPurchaseClient implements IapPurchaseClient {
