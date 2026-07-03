@@ -171,11 +171,11 @@ class _AvatarSetupScreenState extends State<AvatarSetupScreen> {
   }
 
   bool _isVehicleLocked(String vehicleId) {
+    final entitlement =
+        widget.purchaseController?.state.entitlement ??
+        widget.purchaseState.entitlement;
     return _shouldApplyVehicleLocks &&
-        !VehicleUnlockCatalog.isVehicleUnlocked(
-          vehicleId,
-          widget.purchaseState.entitlement,
-        );
+        !VehicleUnlockCatalog.isVehicleUnlocked(vehicleId, entitlement);
   }
 
   String _avatarModeLabel(BuildContext context) {
@@ -378,6 +378,15 @@ class _AvatarSetupScreenState extends State<AvatarSetupScreen> {
       controller: purchaseController,
       vehicleId: vehicleId,
     );
+    if (!mounted ||
+        !VehicleUnlockCatalog.isVehicleUnlocked(
+          vehicleId,
+          purchaseController.state.entitlement,
+        )) {
+      return;
+    }
+
+    _handleVehicleSelected(vehicleId);
   }
 
   @override

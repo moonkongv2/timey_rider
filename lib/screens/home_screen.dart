@@ -481,7 +481,7 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
     );
     final shouldApplyVehicleLocks = widget.purchaseController != null;
 
-    await showModalBottomSheet<void>(
+    final selectedVehicleId = await showModalBottomSheet<String>(
       context: context,
       isScrollControlled: true,
       backgroundColor: AppColors.transparent,
@@ -491,23 +491,27 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
         avatar: selectedVehicleAvatar,
         avatarForVehicle: _config.avatarPresentationForVehicle,
         avatarImageBuilder: widget.avatarImageBuilder,
-        isVehicleLocked: shouldApplyVehicleLocks
-            ? (vehicleId) => !VehicleUnlockCatalog.isVehicleUnlocked(
-                vehicleId,
-                widget.purchaseState.entitlement,
-              )
-            : null,
+        isVehicleLocked: shouldApplyVehicleLocks ? _isVehicleLocked : null,
         onLockedVehiclePressed: shouldApplyVehicleLocks
             ? _handleLockedVehiclePressed
             : null,
-        onVehicleSelected: (vehicleId) {
-          _updateConfig(_config.copyWith(vehicleId: vehicleId));
-        },
       ),
     );
+
+    if (!mounted || selectedVehicleId == null) {
+      return;
+    }
+    _updateConfig(_config.copyWith(vehicleId: selectedVehicleId));
   }
 
-  Future<void> _handleLockedVehiclePressed(String vehicleId) async {
+  bool _isVehicleLocked(String vehicleId) {
+    final entitlement =
+        widget.purchaseController?.state.entitlement ??
+        widget.purchaseState.entitlement;
+    return !VehicleUnlockCatalog.isVehicleUnlocked(vehicleId, entitlement);
+  }
+
+  Future<bool> _handleLockedVehiclePressed(String vehicleId) async {
     final vehiclePackInfoPresenter =
         widget.vehiclePackInfoPresenter ?? showVehiclePackInfoSheet;
     final wantsToContinue = await vehiclePackInfoPresenter(
@@ -515,19 +519,19 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
       vehicleId: vehicleId,
     );
     if (!mounted || !wantsToContinue) {
-      return;
+      return false;
     }
 
     final parentGatePresenter =
         widget.parentGatePresenter ?? showParentGateSheet;
     final didPassGate = await parentGatePresenter(context);
     if (!mounted || !didPassGate) {
-      return;
+      return false;
     }
 
     final purchaseController = widget.purchaseController;
     if (purchaseController == null) {
-      return;
+      return false;
     }
 
     final vehiclePackPurchasePresenter =
@@ -536,6 +540,13 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
       context,
       controller: purchaseController,
       vehicleId: vehicleId,
+    );
+    if (!mounted) {
+      return false;
+    }
+    return VehicleUnlockCatalog.isVehicleUnlocked(
+      vehicleId,
+      purchaseController.state.entitlement,
     );
   }
 
@@ -788,7 +799,6 @@ class _VehiclePickerSheet extends StatelessWidget {
     required this.selectedVehicleId,
     required this.avatar,
     required this.avatarForVehicle,
-    required this.onVehicleSelected,
     this.isVehicleLocked,
     this.onLockedVehiclePressed,
     this.avatarImageBuilder,
@@ -798,9 +808,8 @@ class _VehiclePickerSheet extends StatelessWidget {
   final String selectedVehicleId;
   final VehicleAvatarPresentation avatar;
   final VehicleAvatarPresentationResolver avatarForVehicle;
-  final ValueChanged<String> onVehicleSelected;
   final VehicleLockResolver? isVehicleLocked;
-  final ValueChanged<String>? onLockedVehiclePressed;
+  final Future<bool> Function(String vehicleId)? onLockedVehiclePressed;
   final Widget Function(BuildContext context, String imagePath)?
   avatarImageBuilder;
 
@@ -840,14 +849,19 @@ class _VehiclePickerSheet extends StatelessWidget {
                 title: title,
                 selectedVehicleId: selectedVehicleId,
                 onVehicleSelected: (vehicleId) {
-                  onVehicleSelected(vehicleId);
-                  Navigator.of(context).pop();
+                  Navigator.of(context).pop(vehicleId);
                 },
                 avatar: avatar,
                 avatarForVehicle: avatarForVehicle,
                 avatarImageBuilder: avatarImageBuilder,
                 isVehicleLocked: isVehicleLocked,
-                onLockedVehiclePressed: onLockedVehiclePressed,
+                onLockedVehiclePressed: onLockedVehiclePressed == null
+                    ? null
+                    : (vehicleId) {
+                        unawaited(
+                          _handleLockedVehiclePressed(context, vehicleId),
+                        );
+                      },
                 showSelectedPreview: false,
               ),
             ],
@@ -855,6 +869,17 @@ class _VehiclePickerSheet extends StatelessWidget {
         );
       },
     );
+  }
+
+  Future<void> _handleLockedVehiclePressed(
+    BuildContext context,
+    String vehicleId,
+  ) async {
+    final didUnlock = await onLockedVehiclePressed?.call(vehicleId) ?? false;
+    if (!context.mounted || !didUnlock) {
+      return;
+    }
+    Navigator.of(context).pop(vehicleId);
   }
 }
 

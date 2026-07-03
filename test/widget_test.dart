@@ -4101,6 +4101,53 @@ void main() {
     expect(changedConfig?.vehicleId, 'supercar');
   });
 
+  testWidgets('Avatar setup selects locked vehicle after successful purchase', (
+    tester,
+  ) async {
+    ActivityTimerConfig? changedConfig;
+    final purchaseClient = _FakeIapPurchaseClient();
+    final purchaseController = VehiclePackPurchaseController(
+      purchaseClient: purchaseClient,
+      entitlementStore: _FakePurchaseEntitlementStore(),
+    );
+    addTearDown(purchaseController.dispose);
+
+    await _pumpAvatarSetupScreen(
+      tester,
+      ActivityTimerConfig.defaults(),
+      onConfigChanged: (config) => changedConfig = config,
+      purchaseController: purchaseController,
+      purchaseState: const VehiclePackPurchaseState.initial(),
+      vehiclePackInfoPresenter: (_, {required vehicleId}) async {
+        return true;
+      },
+      parentGatePresenter: (_) async {
+        return true;
+      },
+      vehiclePackPurchasePresenter:
+          (_, {required controller, required vehicleId}) async {
+            purchaseClient.emitPurchase(
+              const IapPurchaseUpdate(
+                productId: 'vehicle_pack',
+                status: IapPurchaseStatus.purchased,
+                purchaseId: 'avatar-purchase',
+              ),
+            );
+            await _pumpPurchaseControllerUnlock(controller);
+          },
+    );
+    await _dismissAvatarGuideIfVisible(tester);
+
+    await tester.tap(find.text('직접 만든 라이더 사용'));
+    await tester.pump();
+    await _scrollAvatarVehicleSelectionIntoView(tester);
+
+    await _tapVisible(tester, _vehicleChoiceFinder('fire_truck'));
+    await tester.pump();
+
+    expect(changedConfig?.vehicleId, 'fire_truck');
+  });
+
   testWidgets('Avatar setup shows upload button in custom mode', (
     tester,
   ) async {
@@ -5269,8 +5316,9 @@ void main() {
     final infoSheetVehicleIds = <String>[];
     var parentGateCallCount = 0;
     final purchaseSheetVehicleIds = <String>[];
+    final purchaseClient = _FakeIapPurchaseClient();
     final purchaseController = VehiclePackPurchaseController(
-      purchaseClient: _FakeIapPurchaseClient(),
+      purchaseClient: purchaseClient,
       entitlementStore: _FakePurchaseEntitlementStore(),
     );
     addTearDown(purchaseController.dispose);
@@ -5301,6 +5349,14 @@ void main() {
           vehiclePackPurchasePresenter:
               (_, {required controller, required vehicleId}) async {
                 purchaseSheetVehicleIds.add(vehicleId);
+                purchaseClient.emitPurchase(
+                  const IapPurchaseUpdate(
+                    productId: 'vehicle_pack',
+                    status: IapPurchaseStatus.purchased,
+                    purchaseId: 'home-purchase',
+                  ),
+                );
+                await _pumpPurchaseControllerUnlock(controller);
               },
           onConfigChanged: (config) {
             changedConfig = config;
@@ -5316,18 +5372,12 @@ void main() {
     expect(find.byIcon(Icons.lock_rounded), findsWidgets);
 
     await tester.tap(_vehicleChoiceFinder('fire_truck'));
-    await tester.pump();
+    await tester.pumpAndSettle();
 
-    expect(changedConfig, isNull);
+    expect(changedConfig?.vehicleId, 'fire_truck');
     expect(infoSheetVehicleIds, ['fire_truck']);
     expect(parentGateCallCount, 1);
     expect(purchaseSheetVehicleIds, ['fire_truck']);
-    expect(_vehicleChoiceFinder('fire_truck'), findsOneWidget);
-
-    await tester.tap(_vehicleChoiceFinder('supercar'));
-    await tester.pumpAndSettle();
-
-    expect(changedConfig?.vehicleId, 'supercar');
     expect(_vehicleChoiceFinder('fire_truck'), findsNothing);
   });
 
@@ -9843,6 +9893,28 @@ Future<void> _dismissAvatarGuideIfVisible(WidgetTester tester) async {
   await tester.pumpAndSettle();
 }
 
+Future<void> _pumpPurchaseControllerUnlock(
+  VehiclePackPurchaseController controller,
+) async {
+  if (controller.state.vehiclePackUnlocked) {
+    return;
+  }
+
+  final completer = Completer<void>();
+  void listener() {
+    if (controller.state.vehiclePackUnlocked && !completer.isCompleted) {
+      completer.complete();
+    }
+  }
+
+  controller.addListener(listener);
+  try {
+    await completer.future.timeout(const Duration(seconds: 1));
+  } finally {
+    controller.removeListener(listener);
+  }
+}
+
 Future<void> _scrollAvatarVehicleSelectionIntoView(WidgetTester tester) async {
   for (var index = 0; index < 4; index += 1) {
     if (find.text('라이더를 태울 차량').evaluate().isNotEmpty) {
@@ -10141,4 +10213,8 @@ class _FakeIapPurchaseClient implements IapPurchaseClient {
 
   @override
   Future<void> restorePurchases() async {}
+
+  void emitPurchase(IapPurchaseUpdate purchase) {
+    _purchaseStreamController.add([purchase]);
+  }
 }
