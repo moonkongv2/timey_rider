@@ -9,6 +9,7 @@ import 'package:timey_rider/models/purchase_entitlement.dart';
 import 'package:timey_rider/services/iap_purchase_client.dart';
 import 'package:timey_rider/services/local_purchase_entitlement_store.dart';
 import 'package:timey_rider/services/vehicle_pack_purchase_controller.dart';
+import 'package:timey_rider/widgets/app/app_bouncy_button.dart';
 import 'package:timey_rider/widgets/purchase/vehicle_pack_purchase_sheet.dart';
 
 void main() {
@@ -55,6 +56,86 @@ void main() {
     await tester.pump();
 
     expect(client.restoreCount, 1);
+    expect(find.text('복원할 차량팩 구매 내역을 찾지 못했어요.'), findsOneWidget);
+  });
+
+  testWidgets('vehicle pack purchase sheet disables actions while pending', (
+    tester,
+  ) async {
+    final client = _FakeIapPurchaseClient();
+    final controller = VehiclePackPurchaseController(
+      purchaseClient: client,
+      entitlementStore: _FakePurchaseEntitlementStore(),
+    );
+    addTearDown(controller.dispose);
+
+    await _pumpPurchaseSheetHost(tester, controller: controller);
+    await tester.tap(find.byKey(const ValueKey('openPurchaseSheetButton')));
+    await tester.pumpAndSettle();
+
+    client.emitPurchase(
+      const IapPurchaseUpdate(
+        productId: 'vehicle_pack',
+        status: IapPurchaseStatus.pending,
+      ),
+    );
+    await tester.pump();
+    await tester.pump();
+
+    expect(find.text('Waiting for purchase approval.'), findsOneWidget);
+    expect(
+      tester
+          .widget<AppBouncyButton>(
+            find.byKey(const ValueKey('vehiclePackPurchaseButton')),
+          )
+          .onPressed,
+      isNull,
+    );
+    expect(
+      tester
+          .widget<AppBouncyButton>(
+            find.byKey(const ValueKey('vehiclePackRestoreButton')),
+          )
+          .onPressed,
+      isNull,
+    );
+  });
+
+  testWidgets('vehicle pack purchase sheet can retry product loading', (
+    tester,
+  ) async {
+    final client = _FakeIapPurchaseClient(
+      queryResults: [
+        const IapProductQueryResult(
+          products: [],
+          notFoundIds: ['vehicle_pack'],
+        ),
+        _FakeIapPurchaseClient.successfulQueryResult,
+      ],
+    );
+    final controller = VehiclePackPurchaseController(
+      purchaseClient: client,
+      entitlementStore: _FakePurchaseEntitlementStore(),
+    );
+    addTearDown(controller.dispose);
+
+    await _pumpPurchaseSheetHost(tester, controller: controller);
+    await tester.tap(find.byKey(const ValueKey('openPurchaseSheetButton')));
+    await tester.pumpAndSettle();
+
+    expect(
+      find.text(
+        'Vehicle pack details are not available right now. Try again later.',
+      ),
+      findsOneWidget,
+    );
+
+    await tester.tap(find.byKey(const ValueKey('vehiclePackPurchaseButton')));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Price \$2.99'), findsOneWidget);
+    expect(client.queryCount, 2);
+    expect(client.buyCount, 0);
   });
 
   testWidgets(
@@ -146,11 +227,30 @@ class _FakePurchaseEntitlementStore implements PurchaseEntitlementStore {
 }
 
 class _FakeIapPurchaseClient implements IapPurchaseClient {
+  _FakeIapPurchaseClient({List<IapProductQueryResult>? queryResults})
+    : queryResults = queryResults ?? const [successfulQueryResult];
+
+  static const successfulQueryResult = IapProductQueryResult(
+    products: [
+      IapProductDetails(
+        id: 'vehicle_pack',
+        title: 'Vehicle Pack',
+        description: 'Unlock all vehicles',
+        price: '\$2.99',
+        rawPrice: 2.99,
+        currencyCode: 'USD',
+        currencySymbol: r'$',
+      ),
+    ],
+  );
+
+  final List<IapProductQueryResult> queryResults;
   final _purchaseStreamController =
       StreamController<List<IapPurchaseUpdate>>.broadcast();
   var buyCount = 0;
   var restoreCount = 0;
   var completeCount = 0;
+  var queryCount = 0;
 
   @override
   Stream<List<IapPurchaseUpdate>> get purchaseStream {
@@ -175,19 +275,9 @@ class _FakeIapPurchaseClient implements IapPurchaseClient {
 
   @override
   Future<IapProductQueryResult> queryProducts(Set<String> productIds) async {
-    return const IapProductQueryResult(
-      products: [
-        IapProductDetails(
-          id: 'vehicle_pack',
-          title: 'Vehicle Pack',
-          description: 'Unlock all vehicles',
-          price: '\$2.99',
-          rawPrice: 2.99,
-          currencyCode: 'USD',
-          currencySymbol: r'$',
-        ),
-      ],
-    );
+    final index = queryCount.clamp(0, queryResults.length - 1);
+    queryCount += 1;
+    return queryResults[index];
   }
 
   @override

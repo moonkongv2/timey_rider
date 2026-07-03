@@ -35,6 +35,9 @@ class EnPurchaseTexts implements PurchaseTextSet {
   String get vehiclePackPurchaseInProgressMessage =>
       'The store purchase is in progress.';
   String get vehiclePackPendingMessage => 'Waiting for purchase approval.';
+  String get vehiclePackRestoringMessage => 'Checking purchase history.';
+  String get vehiclePackRestoreNotFoundMessage =>
+      'No vehicle pack purchase was found to restore.';
   String get vehiclePackPurchasedMessage => 'Vehicle pack unlocked.';
   String get vehiclePackRestoredMessage => 'Vehicle pack purchase restored.';
   String get vehiclePackCanceledMessage => 'Purchase canceled.';

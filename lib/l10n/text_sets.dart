@@ -36,6 +36,8 @@ abstract interface class PurchaseTextSet {
   String get vehiclePackRestoreButton;
   String get vehiclePackPurchaseInProgressMessage;
   String get vehiclePackPendingMessage;
+  String get vehiclePackRestoringMessage;
+  String get vehiclePackRestoreNotFoundMessage;
   String get vehiclePackPurchasedMessage;
   String get vehiclePackRestoredMessage;
   String get vehiclePackCanceledMessage;

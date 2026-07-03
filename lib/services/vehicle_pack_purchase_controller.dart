@@ -14,6 +14,7 @@ enum VehiclePackPurchaseStatus {
   purchaseInProgress,
   pending,
   restoring,
+  restoreNotFound,
   purchased,
   restored,
   canceled,
@@ -225,6 +226,15 @@ class VehiclePackPurchaseController extends ChangeNotifier {
     );
     try {
       await _purchaseClient.restorePurchases();
+      if (_state.status == VehiclePackPurchaseStatus.restoring &&
+          !_state.vehiclePackUnlocked) {
+        _setState(
+          _state.copyWith(
+            status: VehiclePackPurchaseStatus.restoreNotFound,
+            error: null,
+          ),
+        );
+      }
     } catch (error) {
       _setState(
         _state.copyWith(

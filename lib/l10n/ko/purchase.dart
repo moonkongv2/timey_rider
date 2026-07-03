@@ -30,6 +30,8 @@ class PurchaseTexts implements PurchaseTextSet {
   String get vehiclePackRestoreButton => '구매 복원';
   String get vehiclePackPurchaseInProgressMessage => '스토어에서 구매를 진행하고 있어요.';
   String get vehiclePackPendingMessage => '구매 승인을 기다리고 있어요.';
+  String get vehiclePackRestoringMessage => '구매 내역을 확인하고 있어요.';
+  String get vehiclePackRestoreNotFoundMessage => '복원할 차량팩 구매 내역을 찾지 못했어요.';
   String get vehiclePackPurchasedMessage => '차량팩이 열렸어요.';
   String get vehiclePackRestoredMessage => '차량팩 구매를 복원했어요.';
   String get vehiclePackCanceledMessage => '구매가 취소되었어요.';

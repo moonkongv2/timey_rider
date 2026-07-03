@@ -87,8 +87,11 @@ class _VehiclePackPurchaseSheetState extends State<VehiclePackPurchaseSheet> {
 
   Future<void> _buyVehiclePack() async {
     var product = _purchaseState.product;
-    product ??= await widget.controller.loadVehiclePackProduct();
-    if (!mounted || product == null) {
+    if (product == null) {
+      await widget.controller.loadVehiclePackProduct();
+      return;
+    }
+    if (!mounted) {
       return;
     }
     await widget.controller.buyVehiclePack(product: product);
@@ -102,15 +105,14 @@ class _VehiclePackPurchaseSheetState extends State<VehiclePackPurchaseSheet> {
     return switch (_purchaseState.status) {
       VehiclePackPurchaseStatus.loadingProduct ||
       VehiclePackPurchaseStatus.purchaseInProgress ||
+      VehiclePackPurchaseStatus.pending ||
       VehiclePackPurchaseStatus.restoring => true,
       _ => false,
     };
   }
 
   bool get _canBuy {
-    return !_isBusy &&
-        !_purchaseState.vehiclePackUnlocked &&
-        _purchaseState.product != null;
+    return !_isBusy && !_purchaseState.vehiclePackUnlocked;
   }
 
   bool get _canRestore {
@@ -134,8 +136,9 @@ class _VehiclePackPurchaseSheetState extends State<VehiclePackPurchaseSheet> {
       VehiclePackPurchaseStatus.purchaseInProgress =>
         texts.vehiclePackPurchaseInProgressMessage,
       VehiclePackPurchaseStatus.pending => texts.vehiclePackPendingMessage,
-      VehiclePackPurchaseStatus.restoring =>
-        texts.vehiclePackPurchaseInProgressMessage,
+      VehiclePackPurchaseStatus.restoring => texts.vehiclePackRestoringMessage,
+      VehiclePackPurchaseStatus.restoreNotFound =>
+        texts.vehiclePackRestoreNotFoundMessage,
       VehiclePackPurchaseStatus.canceled => texts.vehiclePackCanceledMessage,
       VehiclePackPurchaseStatus.error => texts.vehiclePackErrorMessage,
       _ => texts.vehiclePackPurchaseSubtitle,

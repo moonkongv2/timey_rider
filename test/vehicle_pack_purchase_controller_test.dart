@@ -119,6 +119,21 @@ void main() {
     controller.dispose();
   });
 
+  test('restore without purchase updates finishes as not found', () async {
+    final client = _FakeIapPurchaseClient();
+    final store = _FakePurchaseEntitlementStore();
+    final controller = _controller(client: client, store: store);
+
+    await controller.restoreVehiclePack();
+
+    expect(controller.state.vehiclePackUnlocked, isFalse);
+    expect(controller.state.status, VehiclePackPurchaseStatus.restoreNotFound);
+    expect(client.restoreCallCount, 1);
+    expect(store.savedEntitlements, isEmpty);
+
+    controller.dispose();
+  });
+
   test('unknown product purchase update is ignored', () async {
     final client = _FakeIapPurchaseClient();
     final store = _FakePurchaseEntitlementStore();
