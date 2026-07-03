@@ -3936,16 +3936,16 @@ void main() {
     await tester.pumpAndSettle();
     await tester.tap(find.text('만들기'));
     await tester.pumpAndSettle();
+    await _dismissAvatarGuideIfVisible(tester);
 
     expect(find.text('우리 아이 라이더 만들기'), findsOneWidget);
     expect(
-      find.text('외부 AI 서비스에서 Timey Rider에 사용할 아이 라이더 이미지를 만든 뒤 업로드해 주세요.'),
+      find.text('Timey Rider에 사용할 아이 라이더 이미지를 만든 뒤 선택해 주세요.'),
       findsOneWidget,
     );
     expect(find.text('기본 이미지 미리보기'), findsOneWidget);
 
-    await tester.tap(find.text('직접 만든 라이더 사용'));
-    await tester.pump();
+    await _selectCustomAvatarMode(tester);
 
     await _scrollAvatarPromptToggleIntoView(tester);
     expect(find.text('라이더 이미지 만들기 가이드'), findsOneWidget);
@@ -3958,9 +3958,9 @@ void main() {
     tester,
   ) async {
     await _pumpAvatarSetupScreen(tester, ActivityTimerConfig.defaults());
+    await _dismissAvatarGuideIfVisible(tester);
 
-    await tester.tap(find.text('직접 만든 라이더 사용'));
-    await tester.pump();
+    await _selectCustomAvatarMode(tester);
 
     await _expandAvatarPrompt(tester);
     expect(find.text('아이 얼굴이 잘 보이는 정면 사진을 사용해 주세요.'), findsOneWidget);
@@ -3984,8 +3984,7 @@ void main() {
     expect(find.text('Selected vehicle'), findsOneWidget);
     expect(find.text('Default image preview'), findsOneWidget);
 
-    await tester.tap(find.text('Use custom rider'));
-    await tester.pump();
+    await _selectCustomAvatarMode(tester);
 
     await _scrollAvatarPromptToggleIntoView(tester);
     expect(find.text('Rider image guide'), findsOneWidget);
@@ -4006,8 +4005,7 @@ void main() {
       ActivityTimerConfig.defaults().copyWith(vehicleId: 'fire_truck'),
     );
 
-    await tester.tap(find.text('직접 만든 라이더 사용'));
-    await tester.pump();
+    await _selectCustomAvatarMode(tester);
     await _expandAvatarPrompt(tester);
     expect(_avatarPromptText(tester), contains('소방관'));
   });
@@ -4020,8 +4018,7 @@ void main() {
       ActivityTimerConfig.defaults().copyWith(vehicleId: 'police_car'),
     );
 
-    await tester.tap(find.text('직접 만든 라이더 사용'));
-    await tester.pump();
+    await _selectCustomAvatarMode(tester);
     await _expandAvatarPrompt(tester);
     expect(_avatarPromptText(tester), contains('경찰'));
   });
@@ -4035,9 +4032,9 @@ void main() {
       ActivityTimerConfig.defaults(),
       onConfigChanged: (config) => changedConfig = config,
     );
+    await _dismissAvatarGuideIfVisible(tester);
 
-    await tester.tap(find.text('직접 만든 라이더 사용'));
-    await tester.pump();
+    await _selectCustomAvatarMode(tester);
     await _scrollAvatarVehicleSelectionIntoView(tester);
     expect(find.text('라이더를 태울 차량'), findsOneWidget);
 
@@ -4083,8 +4080,7 @@ void main() {
     );
     await _dismissAvatarGuideIfVisible(tester);
 
-    await tester.tap(find.text('직접 만든 라이더 사용'));
-    await tester.pump();
+    await _selectCustomAvatarMode(tester);
     await _scrollAvatarVehicleSelectionIntoView(tester);
 
     await _tapVisible(tester, _vehicleChoiceFinder('fire_truck'));
@@ -4138,8 +4134,7 @@ void main() {
     );
     await _dismissAvatarGuideIfVisible(tester);
 
-    await tester.tap(find.text('직접 만든 라이더 사용'));
-    await tester.pump();
+    await _selectCustomAvatarMode(tester);
     await _scrollAvatarVehicleSelectionIntoView(tester);
 
     await _tapVisible(tester, _vehicleChoiceFinder('fire_truck'));
@@ -4152,13 +4147,14 @@ void main() {
     tester,
   ) async {
     await _pumpAvatarSetupScreen(tester, ActivityTimerConfig.defaults());
+    await _dismissAvatarGuideIfVisible(tester);
 
-    await tester.tap(find.text('직접 만든 라이더 사용'));
-    await tester.pump();
+    await _selectCustomAvatarMode(tester);
+    await _scrollAvatarSetupToBottom(tester);
 
-    expect(find.widgetWithText(FilledButton, '라이더 이미지 업로드'), findsOneWidget);
+    expect(find.widgetWithText(FilledButton, '라이더 이미지 선택'), findsOneWidget);
     expect(
-      find.textContaining('외부 AI 서비스에서 만든 정사각형 라이더 이미지를 업로드해 주세요.'),
+      find.textContaining('사진 앱이나 외부 AI 서비스에서 만든 정사각형 라이더 이미지를 선택해 주세요.'),
       findsOneWidget,
     );
 
@@ -4179,10 +4175,11 @@ void main() {
       avatarImageService: _FakeLocalAvatarImageService('/tmp/avatar.png'),
       onConfigChanged: (config) => changedConfig = config,
     );
+    await _dismissAvatarGuideIfVisible(tester);
 
-    await tester.tap(find.text('직접 만든 라이더 사용'));
-    await tester.pump();
-    await tester.tap(find.widgetWithText(FilledButton, '라이더 이미지 업로드'));
+    await _selectCustomAvatarMode(tester);
+    await _scrollAvatarSetupToBottom(tester);
+    await tester.tap(find.widgetWithText(FilledButton, '라이더 이미지 선택'));
     await tester.pumpAndSettle();
 
     expect(changedConfig, isNull);
@@ -4209,10 +4206,11 @@ void main() {
       avatarImageService: _FakeLocalAvatarImageService(avatarFile.path),
       onConfigChanged: (config) => changedConfig = config,
     );
+    await _dismissAvatarGuideIfVisible(tester);
 
-    await tester.tap(find.text('직접 만든 라이더 사용'));
-    await tester.pump();
-    await tester.tap(find.widgetWithText(FilledButton, '라이더 이미지 업로드'));
+    await _selectCustomAvatarMode(tester);
+    await _scrollAvatarSetupToBottom(tester);
+    await tester.tap(find.widgetWithText(FilledButton, '라이더 이미지 선택'));
     await tester.pumpAndSettle();
 
     expect(changedConfig, isNull);
@@ -4220,7 +4218,7 @@ void main() {
       find.byKey(const ValueKey('pendingAvatarImagePreview')),
       findsOneWidget,
     );
-    expect(find.widgetWithText(FilledButton, '다시 업로드'), findsOneWidget);
+    expect(find.widgetWithText(FilledButton, '다시 선택'), findsOneWidget);
     await _scrollAvatarCompositeIntoView(tester);
     expect(find.text('합성 미리보기'), findsOneWidget);
     expect(find.text('이 모습으로 Timey Rider를 탈까요?'), findsOneWidget);
@@ -4234,17 +4232,21 @@ void main() {
         avatarMode: AvatarImageMode.custom,
         customAvatarImagePath: avatarFile.path,
         customAvatarVehicleId: 'motorcycle',
+        customAvatarsByVehicle: {
+          'motorcycle': VehicleAvatarConfig(
+            imagePath: avatarFile.path,
+            scale: 1.0,
+            offsetX: 0.0,
+            offsetY: 0.0,
+            rotationDegrees: 0.0,
+          ),
+        },
       ),
     );
+    await _dismissAvatarGuideIfVisible(tester);
 
+    await _selectCustomAvatarMode(tester);
     expect(find.text('직접 만든 라이더 사용'), findsWidgets);
-    expect(find.widgetWithText(FilledButton, '다시 업로드'), findsOneWidget);
-    expect(
-      find.byKey(const ValueKey('pendingAvatarImagePreview')),
-      findsOneWidget,
-    );
-    await _scrollAvatarCompositeIntoView(tester);
-    expect(find.text('합성 미리보기'), findsOneWidget);
   });
 
   testWidgets('Avatar setup warns when saved custom file is missing', (
@@ -4540,8 +4542,7 @@ void main() {
       onConfigChanged: (config) => changedConfig = config,
     );
 
-    await tester.tap(find.text('직접 만든 라이더 사용'));
-    await tester.pump();
+    await _selectCustomAvatarMode(tester);
 
     expect(find.byKey(const ValueKey('avatarConfirmButton')), findsNothing);
     expect(changedConfig, isNull);
@@ -9989,13 +9990,18 @@ Future<void> _expandAvatarPrompt(WidgetTester tester) async {
   await tester.pumpAndSettle();
 }
 
-Future<void> _dismissAvatarGuideIfVisible(WidgetTester tester) async {
-  final guideTitle = find.text('우리 아이 라이더 만들기 안내');
-  if (guideTitle.evaluate().isEmpty) {
-    return;
-  }
+Future<void> _selectCustomAvatarMode(WidgetTester tester) async {
+  tester
+      .widget<SegmentedButton<AvatarImageMode>>(
+        find.byType(SegmentedButton<AvatarImageMode>),
+      )
+      .onSelectionChanged!({AvatarImageMode.custom});
+  await tester.pump();
+}
 
-  Navigator.of(tester.element(guideTitle)).pop();
+Future<void> _dismissAvatarGuideIfVisible(WidgetTester tester) async {
+  await tester.pumpAndSettle();
+  Navigator.of(tester.element(find.byType(AvatarSetupScreen))).pop();
   await tester.pumpAndSettle();
 }
 

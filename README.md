@@ -98,12 +98,22 @@ assets/
 - Material 3
 - Custom local text bundles for Korean and English
 - `shared_preferences` for local settings, progress, history, stickers, and rewards
+- `in_app_purchase` for the optional one-time vehicle pack purchase
 - `video_player` for splash, motivation, and result videos
 - `audioplayers` for motivation voice playback
 - `image_picker`, `path_provider`, and `image` for custom avatar image import and normalization
 - `wakelock_plus` for the keep-screen-awake timer setting
 - `flutter_launcher_icons` for launcher icon generation
 - Cal Sans bundled font
+
+## Purchase and Privacy Direction
+
+- Timey Rider has no ads, analytics, account login, backend server, or remote config.
+- Normal app settings, timer progress, activity history, stickers, rewards, avatar settings, and the purchase entitlement cache are local-first.
+- The vehicle pack uses the non-consumable product ID `vehicle_pack` and unlocks all locked vehicles after a successful purchase or restore.
+- Purchase and restore entry points are shown only after a parent/guardian check.
+- Custom rider image selection is optional and user-initiated. The selected image is imported from the device and stored locally by Timey Rider; the app does not upload rider images or child photos to a server.
+- Because there is no backend receipt validation, the app relies on the app store purchase result and local entitlement cache. Store restore is required for cross-device or reinstall recovery.
 
 ## Project Structure
 

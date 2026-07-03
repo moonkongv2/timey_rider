@@ -6,7 +6,7 @@ class AvatarSetupTexts implements AvatarSetupTextSet {
   const AvatarSetupTexts();
 
   String get title => '우리 아이 라이더 만들기';
-  String get intro => 'Timey Rider에 사용할 아이 라이더 이미지를 만든 뒤 업로드해 주세요.';
+  String get intro => 'Timey Rider에 사용할 아이 라이더 이미지를 만든 뒤 선택해 주세요.';
   String get selectedVehicleTitle => '현재 선택한 차량';
   String get currentAvatarModeTitle => '현재 라이더 모드';
   String get defaultImageMode => '기본 이미지 사용';
@@ -40,17 +40,17 @@ class AvatarSetupTexts implements AvatarSetupTextSet {
   String get promptCollapseLabel => '프롬프트 접기';
   String get promptToggleSemanticLabel => '라이더 이미지 프롬프트 열고 닫기';
   String get copyPromptButton => '프롬프트 복사하기';
-  String get uploadTitle => '라이더 이미지 업로드';
+  String get uploadTitle => '라이더 이미지 가져오기';
   String get uploadInstructions =>
-      '외부 AI 서비스에서 만든 정사각형 라이더 이미지를 업로드해 주세요.\n'
+      '사진 앱이나 외부 AI 서비스에서 만든 정사각형 라이더 이미지를 선택해 주세요.\n'
       '아이 얼굴이 중앙에 있고 투명 배경이면 가장 자연스러워요.';
-  String get uploadingButton => '업로드 중';
-  String get reuploadButton => '다시 업로드';
-  String get uploadButton => '라이더 이미지 업로드';
+  String get uploadingButton => '가져오는 중';
+  String get reuploadButton => '다시 선택';
+  String get uploadButton => '라이더 이미지 선택';
   String get selectedImageFallback => '선택한 라이더 이미지';
   String get privacyNote =>
       '앱이 직접 AI 이미지를 만들거나 아이 사진을 업로드하지는 않아요.\n'
-      '사용자가 선택한 외부 AI 서비스에서 이미지를 만든 뒤, 완성된 라이더 이미지만 Timey Rider에 업로드해 주세요.\n'
+      '이 기기에서 완성된 라이더 이미지를 선택하면 Timey Rider가 로컬에만 저장하고 서버로 보내지 않아요.\n'
       '외부 서비스 이용 전 사진/개인정보 처리 방침을 확인해 주세요.';
 
   String get guidePopupTitle => '우리 아이 라이더 만들기 안내';
@@ -62,8 +62,7 @@ class AvatarSetupTexts implements AvatarSetupTextSet {
   String get guidePopupMethod1Body =>
       '갤럭시나 아이폰의 기본 사진 앱에서 제공하는 \'피사체 오려내기(배경 지우기)\' 기능을 사용해 아이의 얼굴 부분만 정사각형에 가깝게 잘라내어 저장해 주세요.';
   String get guidePopupMethod2Title => '2. AI 서비스 활용하기';
-  String get guidePopupMethod2Body =>
-      '“외부 AI 서비스에서 만든 정사각형 라이더 이미지를 업로드해 주세요.”';
+  String get guidePopupMethod2Body => '“외부 AI 서비스에서 만든 정사각형 라이더 이미지를 선택해 주세요.”';
   String get guidePopupPrivacyTitle => '🔒 왜 앱에서 자동으로 이미지를 처리하지 않나요?';
   String get guidePopupPrivacyBody =>
       '앱 내에서 사진을 정교하게 오려내거나 변환하려면, 기술적으로 원본 사진을 외부 서버로 전송해 처리해야 합니다. 저희는 소중한 아이의 사진과 프라이버시를 철저하게 보호하기 위해, 서버 전송을 완전히 차단하고 부모님께서 직접 라이더 이미지를 준비해 주시도록 안내하고 있습니다.';

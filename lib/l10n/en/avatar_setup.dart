@@ -7,7 +7,7 @@ class EnAvatarSetupTexts implements AvatarSetupTextSet {
 
   String get title => "Create Your Child's Rider";
   String get intro =>
-      "Create a rider image for Timey Rider, then upload the finished image here.";
+      "Create a rider image for Timey Rider, then choose the finished image here.";
   String get selectedVehicleTitle => 'Selected vehicle';
   String get currentAvatarModeTitle => 'Rider image mode';
   String get defaultImageMode => 'Use default image';
@@ -45,17 +45,17 @@ class EnAvatarSetupTexts implements AvatarSetupTextSet {
   String get promptToggleSemanticLabel =>
       'Open or close the rider image prompt';
   String get copyPromptButton => 'Copy prompt';
-  String get uploadTitle => 'Upload rider image';
+  String get uploadTitle => 'Import rider image';
   String get uploadInstructions =>
-      'Upload a square rider image made with an external AI service.\n'
+      'Choose a square rider image made with a photo app or external AI service.\n'
       "It works best when your child's face is centered on a transparent background.";
-  String get uploadingButton => 'Uploading';
-  String get reuploadButton => 'Upload again';
-  String get uploadButton => 'Upload rider image';
+  String get uploadingButton => 'Importing';
+  String get reuploadButton => 'Choose again';
+  String get uploadButton => 'Choose rider image';
   String get selectedImageFallback => 'Selected rider image';
   String get privacyNote =>
       "This app does not create AI images or upload your child's photo itself.\n"
-      'Create the image with an external AI service you choose, then upload only the finished rider image to Timey Rider.\n'
+      'Choose a finished rider image from this device. Timey Rider stores it locally and does not send it to a server.\n'
       'Check the photo and privacy policies before using an external service.';
 
   String get guidePopupTitle => "Create Your Child's Rider";
@@ -68,7 +68,7 @@ class EnAvatarSetupTexts implements AvatarSetupTextSet {
       'Use the "Remove Background" or "Cutout" feature in your Galaxy or iPhone\'s default photo app to crop just your child\'s face and save it in a nearly square shape.';
   String get guidePopupMethod2Title => '2. Use an AI Service';
   String get guidePopupMethod2Body =>
-      '“Please upload a square rider image created using an external AI service.”';
+      '“Please choose a square rider image created using an external AI service.”';
   String get guidePopupPrivacyTitle =>
       '🔒 Why doesn\'t the app process images automatically?';
   String get guidePopupPrivacyBody =>
