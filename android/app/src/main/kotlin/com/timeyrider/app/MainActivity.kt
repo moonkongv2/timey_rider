@@ -1,4 +1,4 @@
-package com.moonkong.timeyrider
+package com.timeyrider.app
 
 import io.flutter.embedding.android.FlutterActivity
 
