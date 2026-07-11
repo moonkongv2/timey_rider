@@ -206,6 +206,18 @@ void main() {
       motorcycleSticker.labelForLanguage('en'),
       '${VehicleCatalog.motorcycle.labelEn} Sticker',
     );
+    expect(
+      motorcycleSticker.labelForLanguage('ja'),
+      '${VehicleCatalog.motorcycle.labelJa}ステッカー',
+    );
+    expect(
+      motorcycleSticker.labelForLanguage('es'),
+      'Pegatina de ${VehicleCatalog.motorcycle.labelEs}',
+    );
+    expect(
+      motorcycleSticker.labelForLanguage('pt'),
+      'Adesivo de ${VehicleCatalog.motorcycle.labelPtBr}',
+    );
     expect(motorcycleSticker.vehicleId, VehicleCatalog.motorcycle.id);
 
     for (final vehicle in VehicleCatalog.all) {
@@ -234,6 +246,9 @@ void main() {
       imageAssetPath: 'assets/images/missing_reward_asset.png',
       labelKo: '없는 스티커',
       labelEn: 'Missing Sticker',
+      labelJa: 'ないステッカー',
+      labelEs: 'Pegatina faltante',
+      labelPtBr: 'Adesivo ausente',
     );
 
     await tester.pumpWidget(
@@ -252,6 +267,9 @@ void main() {
       imageAssetPath: 'assets/images/missing_reward_asset.png',
       labelKo: '없는 스티커',
       labelEn: 'Missing Sticker',
+      labelJa: 'ないステッカー',
+      labelEs: 'Pegatina faltante',
+      labelPtBr: 'Adesivo ausente',
     );
 
     await tester.pumpWidget(
@@ -1971,8 +1989,8 @@ void main() {
       excavatorPrompt.contains('안전모') || excavatorPrompt.contains('포크레인'),
       isTrue,
     );
-    expect(airplanePrompt, contains('조종사'));
-    expect(busPrompt, contains('버스 기사'));
+    expect(airplanePrompt, contains('파일럿'));
+    expect(busPrompt, contains('운전기사'));
     expect(supercarPrompt, contains('레이서'));
     expect(trainPrompt, contains('기관사'));
     expect(brachioPrompt, contains('브라키오'));
@@ -5584,6 +5602,9 @@ void main() {
               id: 'missing_vehicle',
               labelKo: '없는 차',
               labelEn: 'Missing vehicle',
+              labelJa: 'ないのりもの',
+              labelEs: 'Vehículo faltante',
+              labelPtBr: 'Veículo ausente',
               emoji: '🚒',
               assetPath: 'assets/images/missing_vehicle.png',
             ),
@@ -8528,7 +8549,7 @@ void main() {
   testWidgets('Unsupported locale falls back to English', (tester) async {
     SharedPreferences.setMockInitialValues({});
 
-    await _startApp(tester, const Locale('ja'));
+    await _startApp(tester, const Locale('fr'));
 
     expect(find.byKey(const ValueKey('homeLogo')), findsOneWidget);
     expect(find.textContaining('Create Timer'), findsWidgets);

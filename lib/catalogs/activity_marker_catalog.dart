@@ -12,6 +12,9 @@ abstract final class ActivityMarkerCatalog {
     id: 'top_teeth',
     labelKo: '위쪽 반짝',
     labelEn: 'Top sparkle',
+    labelJa: '上の歯ぴかぴか',
+    labelEs: 'Brillo arriba',
+    labelPtBr: 'Brilho em cima',
     emoji: '😁',
     activityIds: ['brushing'],
   );
@@ -20,6 +23,9 @@ abstract final class ActivityMarkerCatalog {
     id: 'bottom_teeth',
     labelKo: '아래쪽 반짝',
     labelEn: 'Bottom sparkle',
+    labelJa: '下の歯ぴかぴか',
+    labelEs: 'Brillo abajo',
+    labelPtBr: 'Brilho embaixo',
     emoji: '🫧',
     activityIds: ['brushing'],
   );
@@ -28,6 +34,9 @@ abstract final class ActivityMarkerCatalog {
     id: 'molars',
     labelKo: '안쪽 꼼꼼',
     labelEn: 'Back brush',
+    labelJa: '奥までしっかり',
+    labelEs: 'Cepillar atrás',
+    labelPtBr: 'Escovar atrás',
     emoji: '✨',
     activityIds: ['brushing'],
   );
@@ -36,6 +45,9 @@ abstract final class ActivityMarkerCatalog {
     id: 'tongue',
     labelKo: '마무리 헹굼',
     labelEn: 'Final rinse',
+    labelJa: '最後のすすぎ',
+    labelEs: 'Enjuague final',
+    labelPtBr: 'Enxágue final',
     emoji: '💧',
     activityIds: ['brushing'],
   );
@@ -44,6 +56,9 @@ abstract final class ActivityMarkerCatalog {
     id: 'cover',
     labelKo: '표지',
     labelEn: 'Cover',
+    labelJa: '表紙',
+    labelEs: 'Portada',
+    labelPtBr: 'Capa',
     emoji: '📘',
     activityIds: ['reading'],
   );
@@ -52,6 +67,9 @@ abstract final class ActivityMarkerCatalog {
     id: 'first_pages',
     labelKo: '첫 장',
     labelEn: 'First pages',
+    labelJa: '最初のページ',
+    labelEs: 'Primeras páginas',
+    labelPtBr: 'Primeiras páginas',
     emoji: '📖',
     activityIds: ['reading'],
   );
@@ -60,6 +78,9 @@ abstract final class ActivityMarkerCatalog {
     id: 'favorite_scene',
     labelKo: '재미있는 장면',
     labelEn: 'Favorite scene',
+    labelJa: '好きな場面',
+    labelEs: 'Escena favorita',
+    labelPtBr: 'Cena favorita',
     emoji: '🎬',
     activityIds: ['reading'],
   );
@@ -68,6 +89,9 @@ abstract final class ActivityMarkerCatalog {
     id: 'bookmark',
     labelKo: '책갈피',
     labelEn: 'Bookmark',
+    labelJa: 'しおり',
+    labelEs: 'Marcapáginas',
+    labelPtBr: 'Marcador',
     emoji: '🔖',
     activityIds: ['reading'],
   );
@@ -76,6 +100,9 @@ abstract final class ActivityMarkerCatalog {
     id: 'finish',
     labelKo: '다 읽음',
     labelEn: 'All read',
+    labelJa: '読み終わり',
+    labelEs: 'Leído',
+    labelPtBr: 'Tudo lido',
     emoji: '📕',
     activityIds: ['reading'],
   );
@@ -84,6 +111,9 @@ abstract final class ActivityMarkerCatalog {
     id: 'blocks',
     labelKo: '블록 자리',
     labelEn: 'Blocks',
+    labelJa: 'ブロックの場所',
+    labelEs: 'Bloques',
+    labelPtBr: 'Blocos',
     emoji: '🧱',
     activityIds: ['cleanup'],
   );
@@ -92,6 +122,9 @@ abstract final class ActivityMarkerCatalog {
     id: 'books',
     labelKo: '책 자리',
     labelEn: 'Books',
+    labelJa: '本の場所',
+    labelEs: 'Libros',
+    labelPtBr: 'Livros',
     emoji: '📚',
     activityIds: ['cleanup'],
   );
@@ -100,6 +133,9 @@ abstract final class ActivityMarkerCatalog {
     id: 'cars',
     labelKo: '자동차 자리',
     labelEn: 'Cars',
+    labelJa: '車のおもちゃ',
+    labelEs: 'Coches',
+    labelPtBr: 'Carrinhos',
     emoji: '🚗',
     activityIds: ['cleanup', 'play'],
   );
@@ -108,6 +144,9 @@ abstract final class ActivityMarkerCatalog {
     id: 'dolls',
     labelKo: '인형 자리',
     labelEn: 'Dolls',
+    labelJa: 'ぬいぐるみ',
+    labelEs: 'Muñecos',
+    labelPtBr: 'Bonecos',
     emoji: '🧸',
     activityIds: ['cleanup', 'play'],
   );
@@ -116,6 +155,9 @@ abstract final class ActivityMarkerCatalog {
     id: 'box',
     labelKo: '정리 상자',
     labelEn: 'Toy box',
+    labelJa: 'おもちゃ箱',
+    labelEs: 'Caja de juguetes',
+    labelPtBr: 'Caixa de brinquedos',
     emoji: '📦',
     activityIds: ['cleanup'],
   );
@@ -124,6 +166,9 @@ abstract final class ActivityMarkerCatalog {
     id: 'balloon',
     labelKo: '풍선',
     labelEn: 'Balloon',
+    labelJa: '風船',
+    labelEs: 'Globo',
+    labelPtBr: 'Balão',
     emoji: '🎈',
     activityIds: ['play'],
   );
@@ -132,6 +177,9 @@ abstract final class ActivityMarkerCatalog {
     id: 'ball',
     labelKo: '공',
     labelEn: 'Ball',
+    labelJa: 'ボール',
+    labelEs: 'Pelota',
+    labelPtBr: 'Bola',
     emoji: '⚽',
     activityIds: ['play'],
   );
@@ -140,6 +188,9 @@ abstract final class ActivityMarkerCatalog {
     id: 'music',
     labelKo: '음악',
     labelEn: 'Music',
+    labelJa: '音楽',
+    labelEs: 'Música',
+    labelPtBr: 'Música',
     emoji: '🎵',
     activityIds: ['play'],
   );
@@ -148,6 +199,9 @@ abstract final class ActivityMarkerCatalog {
     id: 'spoon',
     labelKo: '숟가락',
     labelEn: 'Spoon',
+    labelJa: 'スプーン',
+    labelEs: 'Cuchara',
+    labelPtBr: 'Colher',
     emoji: '🥄',
     activityIds: ['meal'],
   );
@@ -156,6 +210,9 @@ abstract final class ActivityMarkerCatalog {
     id: 'sip_water',
     labelKo: '물 한 모금',
     labelEn: 'Sip of water',
+    labelJa: 'お水をひとくち',
+    labelEs: 'Sorbo de agua',
+    labelPtBr: 'Gole de água',
     emoji: '🥤',
     activityIds: ['meal'],
   );
@@ -164,6 +221,9 @@ abstract final class ActivityMarkerCatalog {
     id: 'rice',
     labelKo: '밥',
     labelEn: 'Rice',
+    labelJa: 'ごはん',
+    labelEs: 'Arroz',
+    labelPtBr: 'Arroz',
     emoji: '🍚',
     activityIds: ['meal'],
   );
@@ -172,6 +232,9 @@ abstract final class ActivityMarkerCatalog {
     id: 'soup',
     labelKo: '국',
     labelEn: 'Soup',
+    labelJa: 'スープ',
+    labelEs: 'Sopa',
+    labelPtBr: 'Sopa',
     emoji: '🥣',
     activityIds: ['meal'],
   );
@@ -180,6 +243,9 @@ abstract final class ActivityMarkerCatalog {
     id: 'plate',
     labelKo: '식기',
     labelEn: 'Plate and fork',
+    labelJa: 'お皿とフォーク',
+    labelEs: 'Plato y tenedor',
+    labelPtBr: 'Prato e garfo',
     emoji: '🍽️',
     activityIds: ['meal'],
   );
@@ -188,6 +254,9 @@ abstract final class ActivityMarkerCatalog {
     id: 'apple',
     labelKo: '사과',
     labelEn: 'Apple',
+    labelJa: 'りんご',
+    labelEs: 'Manzana',
+    labelPtBr: 'Maçã',
     emoji: '🍎',
     activityIds: ['meal'],
   );
@@ -196,6 +265,9 @@ abstract final class ActivityMarkerCatalog {
     id: 'banana',
     labelKo: '바나나',
     labelEn: 'Banana',
+    labelJa: 'バナナ',
+    labelEs: 'Banana',
+    labelPtBr: 'Banana',
     emoji: '🍌',
     activityIds: ['meal'],
   );
@@ -204,6 +276,9 @@ abstract final class ActivityMarkerCatalog {
     id: 'all_done',
     labelKo: '잘 먹었어요',
     labelEn: 'All done',
+    labelJa: 'ごちそうさま',
+    labelEs: 'Todo listo',
+    labelPtBr: 'Tudo pronto',
     emoji: '😋',
   );
 
@@ -211,6 +286,9 @@ abstract final class ActivityMarkerCatalog {
     id: 'smile',
     labelKo: '웃는 얼굴',
     labelEn: 'Smile',
+    labelJa: 'にこにこ',
+    labelEs: 'Sonrisa',
+    labelPtBr: 'Sorriso',
     emoji: '🙂',
   );
 
@@ -218,6 +296,9 @@ abstract final class ActivityMarkerCatalog {
     id: 'star',
     labelKo: '목표',
     labelEn: 'Goal',
+    labelJa: 'ゴール',
+    labelEs: 'Meta',
+    labelPtBr: 'Meta',
     emoji: '🎯',
   );
 
@@ -225,6 +306,9 @@ abstract final class ActivityMarkerCatalog {
     id: 'flag',
     labelKo: '깃발',
     labelEn: 'Flag',
+    labelJa: '旗',
+    labelEs: 'Bandera',
+    labelPtBr: 'Bandeira',
     emoji: '🏁',
   );
 
@@ -232,6 +316,9 @@ abstract final class ActivityMarkerCatalog {
     id: 'heart',
     labelKo: '하트',
     labelEn: 'Heart',
+    labelJa: 'ハート',
+    labelEs: 'Corazón',
+    labelPtBr: 'Coração',
     emoji: '💛',
   );
 
@@ -239,6 +326,9 @@ abstract final class ActivityMarkerCatalog {
     id: 'rainbow',
     labelKo: '무지개',
     labelEn: 'Rainbow',
+    labelJa: '虹',
+    labelEs: 'Arcoíris',
+    labelPtBr: 'Arco-íris',
     emoji: '🌈',
   );
 
@@ -246,6 +336,9 @@ abstract final class ActivityMarkerCatalog {
     id: 'rocket',
     labelKo: '로켓',
     labelEn: 'Rocket',
+    labelJa: 'ロケット',
+    labelEs: 'Cohete',
+    labelPtBr: 'Foguete',
     emoji: '🚀',
   );
 

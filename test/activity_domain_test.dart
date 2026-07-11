@@ -24,7 +24,10 @@ void main() {
 
     expect(activity.labelForLanguage('ko'), '정리');
     expect(activity.labelForLanguage('en'), 'Cleanup');
-    expect(activity.labelForLanguage('ja'), 'Cleanup');
+    expect(activity.labelForLanguage('ja'), 'お片づけ');
+    expect(activity.labelForLanguage('es'), 'Ordenar');
+    expect(activity.labelForLanguage('pt'), 'Arrumar');
+    expect(activity.labelForLanguage('fr'), 'Cleanup');
   });
 
   test('play and meal activities define default marker ids', () {

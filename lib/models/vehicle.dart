@@ -35,6 +35,9 @@ class VehicleDefinition {
     required this.id,
     required this.labelKo,
     required this.labelEn,
+    required this.labelJa,
+    required this.labelEs,
+    required this.labelPtBr,
     required this.emoji,
     required this.assetPath,
     this.selectionAssetPath,
@@ -46,6 +49,9 @@ class VehicleDefinition {
   final String id;
   final String labelKo;
   final String labelEn;
+  final String labelJa;
+  final String labelEs;
+  final String labelPtBr;
   final String emoji;
   final String assetPath;
   final String? selectionAssetPath;
@@ -56,6 +62,12 @@ class VehicleDefinition {
   String get selectionImagePath => selectionAssetPath ?? assetPath;
 
   String labelForLanguage(String languageCode) {
-    return languageCode == 'ko' ? labelKo : labelEn;
+    return switch (languageCode) {
+      'ko' => labelKo,
+      'ja' => labelJa,
+      'es' => labelEs,
+      'pt' => labelPtBr,
+      _ => labelEn,
+    };
   }
 }

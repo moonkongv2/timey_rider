@@ -8,6 +8,7 @@ abstract interface class CommonTextSet {
   String get cancel;
   String get defaultChildName;
   String get complete;
+  String get finishPointSemanticLabel;
   String get home;
   String get notYet;
   String get restartRide;

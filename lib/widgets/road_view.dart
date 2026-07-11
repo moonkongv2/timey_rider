@@ -221,9 +221,7 @@ class RoadView extends StatelessWidget {
 }
 
 String _finishPointSemanticLabel(BuildContext context) {
-  return Localizations.localeOf(context).languageCode == 'ko'
-      ? '도착 지점'
-      : 'finish point';
+  return AppTexts.of(context).common.finishPointSemanticLabel;
 }
 
 Offset _goalStarCenterForGeometry({

@@ -10,6 +10,9 @@ class RewardDefinition {
     required this.imageAssetPath,
     required this.labelKo,
     required this.labelEn,
+    required this.labelJa,
+    required this.labelEs,
+    required this.labelPtBr,
     this.vehicleId,
   });
 
@@ -19,10 +22,19 @@ class RewardDefinition {
   final String imageAssetPath;
   final String labelKo;
   final String labelEn;
+  final String labelJa;
+  final String labelEs;
+  final String labelPtBr;
   final String? vehicleId;
 
   String labelForLanguage(String languageCode) {
-    return languageCode == 'ko' ? labelKo : labelEn;
+    return switch (languageCode) {
+      'ko' => labelKo,
+      'ja' => labelJa,
+      'es' => labelEs,
+      'pt' => labelPtBr,
+      _ => labelEn,
+    };
   }
 }
 
@@ -72,6 +84,9 @@ class RewardCatalog {
         imageAssetPath: vehicle.assetPath,
         labelKo: '${vehicle.labelKo} 스티커',
         labelEn: '${vehicle.labelEn} Sticker',
+        labelJa: '${vehicle.labelJa}ステッカー',
+        labelEs: 'Pegatina de ${vehicle.labelEs}',
+        labelPtBr: 'Adesivo de ${vehicle.labelPtBr}',
         vehicleId: vehicle.id,
       ),
     ),

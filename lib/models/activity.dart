@@ -7,6 +7,9 @@ class ActivityDefinition {
     required this.id,
     required this.labelKo,
     required this.labelEn,
+    required this.labelJa,
+    required this.labelEs,
+    required this.labelPtBr,
     required this.emoji,
     required this.defaultDuration,
     required this.presetDurations,
@@ -18,6 +21,9 @@ class ActivityDefinition {
   final String id;
   final String labelKo;
   final String labelEn;
+  final String labelJa;
+  final String labelEs;
+  final String labelPtBr;
   final String emoji;
   final Duration defaultDuration;
   final List<Duration> presetDurations;
@@ -26,6 +32,12 @@ class ActivityDefinition {
   final List<String> markerIds;
 
   String labelForLanguage(String languageCode) {
-    return languageCode == 'ko' ? labelKo : labelEn;
+    return switch (languageCode) {
+      'ko' => labelKo,
+      'ja' => labelJa,
+      'es' => labelEs,
+      'pt' => labelPtBr,
+      _ => labelEn,
+    };
   }
 }

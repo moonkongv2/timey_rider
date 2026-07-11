@@ -10,6 +10,7 @@ class EnCommonTexts implements CommonTextSet {
   String get cancel => 'Cancel';
   String get defaultChildName => 'Jiyul';
   String get complete => 'Done';
+  String get finishPointSemanticLabel => 'finish point';
   String get home => 'Home';
   String get notYet => 'Not yet';
   String get restartRide => 'Start again';

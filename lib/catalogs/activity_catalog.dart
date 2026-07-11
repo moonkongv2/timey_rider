@@ -5,6 +5,9 @@ abstract final class ActivityCatalog {
     id: 'brushing',
     labelKo: '양치',
     labelEn: 'Brush Teeth',
+    labelJa: '歯みがき',
+    labelEs: 'Cepillarse los dientes',
+    labelPtBr: 'Escovar os dentes',
     emoji: '🪥',
     defaultDuration: Duration(minutes: 2),
     presetDurations: [
@@ -21,6 +24,9 @@ abstract final class ActivityCatalog {
     id: 'reading',
     labelKo: '책 읽기',
     labelEn: 'Reading',
+    labelJa: '読書',
+    labelEs: 'Leer',
+    labelPtBr: 'Leitura',
     emoji: '📚',
     defaultDuration: Duration(minutes: 15),
     presetDurations: [
@@ -37,6 +43,9 @@ abstract final class ActivityCatalog {
     id: 'cleanup',
     labelKo: '정리',
     labelEn: 'Cleanup',
+    labelJa: 'お片づけ',
+    labelEs: 'Ordenar',
+    labelPtBr: 'Arrumar',
     emoji: '🧸',
     defaultDuration: Duration(minutes: 5),
     presetDurations: [
@@ -53,6 +62,9 @@ abstract final class ActivityCatalog {
     id: 'play',
     labelKo: '놀이',
     labelEn: 'Play Time',
+    labelJa: '遊び',
+    labelEs: 'Jugar',
+    labelPtBr: 'Brincar',
     emoji: '🎈',
     defaultDuration: Duration(minutes: 20),
     presetDurations: [
@@ -69,6 +81,9 @@ abstract final class ActivityCatalog {
     id: 'meal',
     labelKo: '식사',
     labelEn: 'Meal',
+    labelJa: 'ごはん',
+    labelEs: 'Comida',
+    labelPtBr: 'Refeição',
     emoji: '🍽️',
     defaultDuration: Duration(minutes: 20),
     presetDurations: [
@@ -93,6 +108,9 @@ abstract final class ActivityCatalog {
     id: 'custom',
     labelKo: '기타',
     labelEn: 'Other',
+    labelJa: 'その他',
+    labelEs: 'Otra',
+    labelPtBr: 'Outra',
     emoji: '⭐',
     defaultDuration: Duration(minutes: 10),
     presetDurations: [
