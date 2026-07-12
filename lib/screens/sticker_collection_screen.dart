@@ -153,10 +153,15 @@ class _StickerCard extends StatelessWidget {
           child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            _buildStickerStack(
-              _isCollected
-                  ? stickerName
-                  : texts.rewards.uncollectedSemanticLabel,
+            Expanded(
+              child: FittedBox(
+                fit: BoxFit.scaleDown,
+                child: _buildStickerStack(
+                  _isCollected
+                      ? stickerName
+                      : texts.rewards.uncollectedSemanticLabel,
+                ),
+              ),
             ),
             const SizedBox(height: AppSpacing.md),
             Text(

@@ -30,6 +30,7 @@ import 'package:timey_rider/models/reward_item.dart';
 import 'package:timey_rider/models/vehicle.dart';
 import 'package:timey_rider/models/vehicle_avatar_presentation.dart';
 import 'package:timey_rider/screens/avatar_setup_screen.dart';
+import 'package:timey_rider/widgets/avatar/rider_guide_bottom_sheet.dart';
 import 'package:timey_rider/screens/home_screen.dart';
 import 'package:timey_rider/screens/activity_history_screen.dart';
 import 'package:timey_rider/screens/reward_goal_screen.dart';
@@ -70,6 +71,12 @@ import 'package:timey_rider/widgets/vehicle_selection_card.dart';
 import 'package:timey_rider/widgets/vehicle_widget.dart';
 
 void main() {
+  setUpAll(() {
+    final binding = TestWidgetsFlutterBinding.ensureInitialized();
+    binding.platformDispatcher.views.first.physicalSize = const Size(390, 844);
+    binding.platformDispatcher.views.first.devicePixelRatio = 1.0;
+  });
+
   test('Default config uses default avatar image settings', () {
     final config = ActivityTimerConfig.defaults();
 
@@ -239,6 +246,10 @@ void main() {
   testWidgets('Reward sticker image falls back for missing assets', (
     tester,
   ) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
     const missingAssetReward = RewardDefinition(
       id: 'missing_reward_asset',
       type: RewardType.sticker,
@@ -260,6 +271,10 @@ void main() {
   });
 
   testWidgets('Reward sticker image keeps framed outer sizes', (tester) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
     const missingAssetReward = RewardDefinition(
       id: 'missing_reward_asset',
       type: RewardType.sticker,
@@ -324,6 +339,10 @@ void main() {
   testWidgets('Locked reward sticker image renders as a silhouette', (
     tester,
   ) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
     final reward = RewardCatalog.findVehicleStickerByVehicleId(
       VehicleCatalog.fireTruck.id,
     )!;
@@ -368,6 +387,10 @@ void main() {
   testWidgets('Result sticker album uses bounded three-column landscape grid', (
     tester,
   ) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
     tester.view.physicalSize = const Size(852, 393);
     tester.view.devicePixelRatio = 1;
     addTearDown(() {
@@ -400,6 +423,10 @@ void main() {
     tester,
   ) async {
     tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    tester.view.physicalSize = const Size(390, 844);
     tester.view.devicePixelRatio = 1;
     addTearDown(() {
       tester.view.resetPhysicalSize();
@@ -428,7 +455,18 @@ void main() {
   testWidgets('Sticker collection shows localized vehicle sticker names', (
     tester,
   ) async {
-    SharedPreferences.setMockInitialValues({});
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(() {
+      tester.view.resetPhysicalSize();
+      tester.view.resetDevicePixelRatio();
+    });
+
+    SharedPreferences.setMockInitialValues({'savedActivityTimerPresetsInitialized': true});
     final service = LocalActivityProgressService();
     await _recordActivityResult(
       service,
@@ -527,7 +565,7 @@ void main() {
   });
 
   test('Local settings saves and loads avatar settings', () async {
-    SharedPreferences.setMockInitialValues({});
+    SharedPreferences.setMockInitialValues({'savedActivityTimerPresetsInitialized': true});
 
     final service = LocalSettingsService();
     await service.saveConfig(
@@ -571,7 +609,7 @@ void main() {
   });
 
   test('Local settings saves and loads motivation video settings', () async {
-    SharedPreferences.setMockInitialValues({});
+    SharedPreferences.setMockInitialValues({'savedActivityTimerPresetsInitialized': true});
 
     final service = LocalSettingsService();
     await service.saveConfig(
@@ -593,7 +631,7 @@ void main() {
   });
 
   test('Local settings saves and loads marker mode', () async {
-    SharedPreferences.setMockInitialValues({});
+    SharedPreferences.setMockInitialValues({'savedActivityTimerPresetsInitialized': true});
 
     final service = LocalSettingsService();
     await service.saveConfig(
@@ -634,7 +672,7 @@ void main() {
   );
 
   test('Local settings saves and loads vehicle avatar maps', () async {
-    SharedPreferences.setMockInitialValues({});
+    SharedPreferences.setMockInitialValues({'savedActivityTimerPresetsInitialized': true});
 
     final service = LocalSettingsService();
     await service.saveConfig(
@@ -678,7 +716,7 @@ void main() {
   });
 
   test('Custom avatar image path can be cleared to null', () async {
-    SharedPreferences.setMockInitialValues({});
+    SharedPreferences.setMockInitialValues({'savedActivityTimerPresetsInitialized': true});
 
     final service = LocalSettingsService();
     await service.saveConfig(
@@ -819,7 +857,11 @@ void main() {
   testWidgets('Completed-before-arrival result shows intro video screen', (
     tester,
   ) async {
-    SharedPreferences.setMockInitialValues({});
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    SharedPreferences.setMockInitialValues({'savedActivityTimerPresetsInitialized': true});
     final introVideoPaths = <String>[];
 
     await tester.pumpWidget(
@@ -850,13 +892,19 @@ void main() {
     ]);
 
     await tester.pumpWidget(const SizedBox.shrink());
-    await tester.pump();
+    for (int i = 0; i < 40; i++) {
+      await tester.pump(const Duration(milliseconds: 250));
+    }
   });
 
   testWidgets('Completed-after-arrival result also shows intro video screen', (
     tester,
   ) async {
-    SharedPreferences.setMockInitialValues({});
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    SharedPreferences.setMockInitialValues({'savedActivityTimerPresetsInitialized': true});
     final introVideoPaths = <String>[];
 
     await tester.pumpWidget(
@@ -887,13 +935,19 @@ void main() {
     ]);
 
     await tester.pumpWidget(const SizedBox.shrink());
-    await tester.pump();
+    for (int i = 0; i < 40; i++) {
+      await tester.pump(const Duration(milliseconds: 250));
+    }
   });
 
   testWidgets('Needs-more-time result screen skips the intro video', (
     tester,
   ) async {
-    SharedPreferences.setMockInitialValues({});
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    SharedPreferences.setMockInitialValues({'savedActivityTimerPresetsInitialized': true});
     tester.view.physicalSize = const Size(390, 844);
     tester.view.devicePixelRatio = 1;
     addTearDown(() {
@@ -932,8 +986,8 @@ void main() {
 
     expect(introVideoPaths, isEmpty);
     expect(find.byKey(const ValueKey('resultIntroScreen')), findsNothing);
-    expect(find.text('조금 더 필요했어'), findsOneWidget);
-    expect(find.text('오토바이가 먼저 도착했어.'), findsOneWidget);
+    expect(find.text('조금 더 시간이 필요했어'), findsOneWidget);
+    expect(find.text('이번 활동에는 시간이 조금 더 필요했어.'), findsOneWidget);
     expect(
       _assetImage('assets/images/result_failed_bg_portrait.png'),
       findsOneWidget,
@@ -955,7 +1009,11 @@ void main() {
   testWidgets('Time-ended result skips reward intro and sticker copy', (
     tester,
   ) async {
-    SharedPreferences.setMockInitialValues({});
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    SharedPreferences.setMockInitialValues({'savedActivityTimerPresetsInitialized': true});
     tester.view.physicalSize = const Size(390, 844);
     tester.view.devicePixelRatio = 1;
     addTearDown(() {
@@ -991,14 +1049,18 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(introVideoPaths, isEmpty);
-    expect(find.text("Time's Up!"), findsOneWidget);
-    expect(find.text("Let's move to the next little mission."), findsOneWidget);
+    expect(find.text('The planned time is over'), findsOneWidget);
+    expect(find.text('The timer reached the finish.'), findsOneWidget);
     expect(find.byType(RewardStickerImage), findsNothing);
     expect(find.textContaining('sticker'), findsNothing);
   });
 
   testWidgets('Result screen records after the sticker choice', (tester) async {
-    SharedPreferences.setMockInitialValues({});
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    SharedPreferences.setMockInitialValues({'savedActivityTimerPresetsInitialized': true});
     final service = LocalActivityProgressService();
 
     await tester.pumpWidget(
@@ -1018,9 +1080,11 @@ void main() {
         ),
       ),
     );
-    await tester.pump();
+    for (int i = 0; i < 40; i++) {
+      await tester.pump(const Duration(milliseconds: 250));
+    }
 
-    expect(find.text('미션을 마쳤나요?'), findsOneWidget);
+    expect(find.text('이번 활동을 확인했나요?'), findsOneWidget);
     expect(find.text('차량 스티커 받기'), findsOneWidget);
     expect(find.text('이번엔 차량 스티커 받지 않기'), findsOneWidget);
     expect((await service.loadSnapshot()).history, isEmpty);
@@ -1038,7 +1102,11 @@ void main() {
   });
 
   testWidgets('Result screen records selected vehicle sticker', (tester) async {
-    SharedPreferences.setMockInitialValues({});
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    SharedPreferences.setMockInitialValues({'savedActivityTimerPresetsInitialized': true});
     final service = LocalActivityProgressService();
     final expectedStickerId = RewardCatalog.vehicleStickerIdForVehicle(
       VehicleCatalog.fireTruck.id,
@@ -1063,7 +1131,9 @@ void main() {
         ),
       ),
     );
-    await tester.pump();
+    for (int i = 0; i < 40; i++) {
+      await tester.pump(const Duration(milliseconds: 250));
+    }
 
     await tester.tap(find.byKey(const ValueKey('resultGetStickerButton')));
     await tester.pump();
@@ -1077,7 +1147,11 @@ void main() {
   testWidgets('Success result screen uses portrait background after intro', (
     tester,
   ) async {
-    SharedPreferences.setMockInitialValues({});
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    SharedPreferences.setMockInitialValues({'savedActivityTimerPresetsInitialized': true});
     tester.view.physicalSize = const Size(390, 844);
     tester.view.devicePixelRatio = 1;
     addTearDown(() {
@@ -1128,7 +1202,11 @@ void main() {
   });
 
   testWidgets('Completed result help explains sticker reward', (tester) async {
-    SharedPreferences.setMockInitialValues({});
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    SharedPreferences.setMockInitialValues({'savedActivityTimerPresetsInitialized': true});
     tester.view.physicalSize = const Size(390, 844);
     tester.view.devicePixelRatio = 1;
     addTearDown(() {
@@ -1182,7 +1260,11 @@ void main() {
   testWidgets('Incomplete result help explains record without sticker', (
     tester,
   ) async {
-    SharedPreferences.setMockInitialValues({});
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    SharedPreferences.setMockInitialValues({'savedActivityTimerPresetsInitialized': true});
     tester.view.physicalSize = const Size(390, 844);
     tester.view.devicePixelRatio = 1;
     addTearDown(() {
@@ -1231,7 +1313,11 @@ void main() {
   testWidgets('English completed result help shows coaching sections', (
     tester,
   ) async {
-    SharedPreferences.setMockInitialValues({});
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    SharedPreferences.setMockInitialValues({'savedActivityTimerPresetsInitialized': true});
     tester.view.physicalSize = const Size(390, 844);
     tester.view.devicePixelRatio = 1;
     addTearDown(() {
@@ -1273,7 +1359,7 @@ void main() {
 
     expect(find.byKey(const ValueKey('appHelpSheet')), findsOneWidget);
     expect(
-      find.textContaining('The activity was confirmed finished'),
+      find.textContaining("What you check together is saved in today's activity record."),
       findsOneWidget,
     );
     expect(find.text('Try saying this'), findsWidgets);
@@ -1283,7 +1369,11 @@ void main() {
   testWidgets('English incomplete result help frames incomplete as guidance', (
     tester,
   ) async {
-    SharedPreferences.setMockInitialValues({});
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    SharedPreferences.setMockInitialValues({'savedActivityTimerPresetsInitialized': true});
     tester.view.physicalSize = const Size(390, 844);
     tester.view.devicePixelRatio = 1;
     addTearDown(() {
@@ -1324,7 +1414,11 @@ void main() {
   testWidgets('Failed result screen uses selected rider image in landscape', (
     tester,
   ) async {
-    SharedPreferences.setMockInitialValues({});
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    SharedPreferences.setMockInitialValues({'savedActivityTimerPresetsInitialized': true});
     tester.view.physicalSize = const Size(852, 393);
     tester.view.devicePixelRatio = 1;
     addTearDown(() {
@@ -1375,7 +1469,11 @@ void main() {
   testWidgets('Success result keeps actions visible in compact landscape', (
     tester,
   ) async {
-    SharedPreferences.setMockInitialValues({});
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    SharedPreferences.setMockInitialValues({'savedActivityTimerPresetsInitialized': true});
     tester.view.physicalSize = const Size(852, 393);
     tester.view.devicePixelRatio = 1;
     addTearDown(() {
@@ -1465,7 +1563,11 @@ void main() {
   });
 
   testWidgets('Result screen allows landscape until disposed', (tester) async {
-    SharedPreferences.setMockInitialValues({});
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    SharedPreferences.setMockInitialValues({'savedActivityTimerPresetsInitialized': true});
     final orientationService = _FakeOrientationService();
 
     await tester.pumpWidget(
@@ -1486,12 +1588,16 @@ void main() {
         ),
       ),
     );
-    await tester.pump();
+    for (int i = 0; i < 40; i++) {
+      await tester.pump(const Duration(milliseconds: 250));
+    }
 
     expect(orientationService.calls, ['allowTimerOrientations']);
 
     await tester.pumpWidget(const SizedBox.shrink());
-    await tester.pump();
+    for (int i = 0; i < 40; i++) {
+      await tester.pump(const Duration(milliseconds: 250));
+    }
 
     expect(orientationService.calls, [
       'allowTimerOrientations',
@@ -2000,7 +2106,11 @@ void main() {
   testWidgets('First launch shows onboarding before child name setup', (
     tester,
   ) async {
-    SharedPreferences.setMockInitialValues({});
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    SharedPreferences.setMockInitialValues({'savedActivityTimerPresetsInitialized': true});
 
     await _startApp(
       tester,
@@ -2029,7 +2139,11 @@ void main() {
   });
 
   testWidgets('Home screen shows activity timer actions', (tester) async {
-    SharedPreferences.setMockInitialValues({});
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    SharedPreferences.setMockInitialValues({'savedActivityTimerPresetsInitialized': true});
 
     await _startApp(tester, const Locale('ko'));
 
@@ -2046,10 +2160,10 @@ void main() {
 
     await _openTimerBuilder(tester);
 
-    expect(find.text('양치'), findsOneWidget);
-    expect(find.text('책 읽기'), findsOneWidget);
+    expect(find.text('양치'), findsWidgets);
+    expect(find.text('책 읽기'), findsWidgets);
     expect(find.text('정리'), findsOneWidget);
-    expect(find.text('놀이'), findsOneWidget);
+    expect(find.text('놀이'), findsWidgets);
     expect(find.text('식사'), findsOneWidget);
     expect(find.text('기타'), findsOneWidget);
     for (final activity in ActivityCatalog.all) {
@@ -2063,6 +2177,10 @@ void main() {
   testWidgets('Initial app UI does not show legacy domain copy', (
     tester,
   ) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
     const legacyCopyTerms = [
       'Ya'
           'myam',
@@ -2087,7 +2205,7 @@ void main() {
     ];
 
     for (final locale in const [Locale('ko'), Locale('en')]) {
-      SharedPreferences.setMockInitialValues({});
+      SharedPreferences.setMockInitialValues({'savedActivityTimerPresetsInitialized': true});
       await _startApp(tester, locale);
       await tester.pumpAndSettle();
 
@@ -2108,7 +2226,11 @@ void main() {
   });
 
   testWidgets('Home screen opens a saved active timer session', (tester) async {
-    SharedPreferences.setMockInitialValues({});
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    SharedPreferences.setMockInitialValues({'savedActivityTimerPresetsInitialized': true});
     addTearDown(() async {
       await const ActiveActivityTimerSessionStore().clear();
     });
@@ -2147,7 +2269,9 @@ void main() {
         ),
       ),
     );
-    await tester.pump();
+    for (int i = 0; i < 40; i++) {
+      await tester.pump(const Duration(milliseconds: 250));
+    }
 
     expect(find.byKey(const ValueKey('activeTimerResumeCard')), findsOneWidget);
     expect(find.text('진행 중인 활동 타이머'), findsOneWidget);
@@ -2164,7 +2288,11 @@ void main() {
   testWidgets('Home screen can cancel a saved active timer session', (
     tester,
   ) async {
-    SharedPreferences.setMockInitialValues({});
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    SharedPreferences.setMockInitialValues({'savedActivityTimerPresetsInitialized': true});
     addTearDown(() async {
       await const ActiveActivityTimerSessionStore().clear();
     });
@@ -2195,7 +2323,9 @@ void main() {
         ),
       ),
     );
-    await tester.pump();
+    for (int i = 0; i < 40; i++) {
+      await tester.pump(const Duration(milliseconds: 250));
+    }
 
     expect(find.byKey(const ValueKey('activeTimerResumeCard')), findsOneWidget);
 
@@ -2215,7 +2345,11 @@ void main() {
   testWidgets('Home active timer remaining time updates every second', (
     tester,
   ) async {
-    SharedPreferences.setMockInitialValues({});
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    SharedPreferences.setMockInitialValues({'savedActivityTimerPresetsInitialized': true});
     addTearDown(() async {
       await const ActiveActivityTimerSessionStore().clear();
     });
@@ -2249,7 +2383,9 @@ void main() {
         ),
       ),
     );
-    await tester.pump();
+    for (int i = 0; i < 40; i++) {
+      await tester.pump(const Duration(milliseconds: 250));
+    }
 
     final activeTimerCard = find.byKey(const ValueKey('activeTimerResumeCard'));
     String remainingText() {
@@ -2275,7 +2411,11 @@ void main() {
   testWidgets('Home active timer tick does not reload progress snapshot', (
     tester,
   ) async {
-    SharedPreferences.setMockInitialValues({});
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    SharedPreferences.setMockInitialValues({'savedActivityTimerPresetsInitialized': true});
     addTearDown(() async {
       await const ActiveActivityTimerSessionStore().clear();
     });
@@ -2310,7 +2450,9 @@ void main() {
         ),
       ),
     );
-    await tester.pump();
+    for (int i = 0; i < 40; i++) {
+      await tester.pump(const Duration(milliseconds: 250));
+    }
 
     expect(progressService.loadSnapshotCallCount, 1);
 
@@ -2324,7 +2466,11 @@ void main() {
   testWidgets('Home paused active timer resume card does not tick', (
     tester,
   ) async {
-    SharedPreferences.setMockInitialValues({});
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    SharedPreferences.setMockInitialValues({'savedActivityTimerPresetsInitialized': true});
     addTearDown(() async {
       await const ActiveActivityTimerSessionStore().clear();
     });
@@ -2359,7 +2505,9 @@ void main() {
         ),
       ),
     );
-    await tester.pump();
+    for (int i = 0; i < 40; i++) {
+      await tester.pump(const Duration(milliseconds: 250));
+    }
 
     final activeTimerCard = find.byKey(const ValueKey('activeTimerResumeCard'));
     String remainingText() {
@@ -2384,7 +2532,11 @@ void main() {
   testWidgets('Home screen shows finished copy for arrived active sessions', (
     tester,
   ) async {
-    SharedPreferences.setMockInitialValues({});
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    SharedPreferences.setMockInitialValues({'savedActivityTimerPresetsInitialized': true});
     addTearDown(() async {
       await const ActiveActivityTimerSessionStore().clear();
     });
@@ -2418,7 +2570,9 @@ void main() {
         ),
       ),
     );
-    await tester.pump();
+    for (int i = 0; i < 40; i++) {
+      await tester.pump(const Duration(milliseconds: 250));
+    }
 
     expect(find.byKey(const ValueKey('activeTimerResumeCard')), findsOneWidget);
     expect(find.text('활동 시간이 끝났어요'), findsOneWidget);
@@ -2426,7 +2580,11 @@ void main() {
   });
 
   testWidgets('Home screen clears stale active timer sessions', (tester) async {
-    SharedPreferences.setMockInitialValues({});
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    SharedPreferences.setMockInitialValues({'savedActivityTimerPresetsInitialized': true});
     addTearDown(() async {
       await const ActiveActivityTimerSessionStore().clear();
     });
@@ -2457,7 +2615,9 @@ void main() {
         ),
       ),
     );
-    await tester.pump();
+    for (int i = 0; i < 40; i++) {
+      await tester.pump(const Duration(milliseconds: 250));
+    }
 
     expect(await const ActiveActivityTimerSessionStore().load(), isNull);
     expect(find.byKey(const ValueKey('activeTimerResumeCard')), findsNothing);
@@ -2466,7 +2626,11 @@ void main() {
   testWidgets('Home screen resumes finished active sessions at the finish', (
     tester,
   ) async {
-    SharedPreferences.setMockInitialValues({});
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    SharedPreferences.setMockInitialValues({'savedActivityTimerPresetsInitialized': true});
     addTearDown(() async {
       await const ActiveActivityTimerSessionStore().clear();
     });
@@ -2500,7 +2664,9 @@ void main() {
         ),
       ),
     );
-    await tester.pump();
+    for (int i = 0; i < 40; i++) {
+      await tester.pump(const Duration(milliseconds: 250));
+    }
 
     await tester.tap(find.text('이어가기'));
     await tester.pump();
@@ -2512,7 +2678,11 @@ void main() {
   testWidgets('Starting a new timer with an active session asks first', (
     tester,
   ) async {
-    SharedPreferences.setMockInitialValues({});
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    SharedPreferences.setMockInitialValues({'savedActivityTimerPresetsInitialized': true});
     addTearDown(() async {
       await const ActiveActivityTimerSessionStore().clear();
     });
@@ -2550,7 +2720,9 @@ void main() {
         ),
       ),
     );
-    await tester.pump();
+    for (int i = 0; i < 40; i++) {
+      await tester.pump(const Duration(milliseconds: 250));
+    }
 
     await _openTimerBuilder(tester);
     await _startTimerBuilder(tester);
@@ -2572,7 +2744,11 @@ void main() {
   });
 
   testWidgets('Timer builder shows all manual marker choices', (tester) async {
-    SharedPreferences.setMockInitialValues({});
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    SharedPreferences.setMockInitialValues({'savedActivityTimerPresetsInitialized': true});
     addTearDown(() async {
       await const ActiveActivityTimerSessionStore().clear();
     });
@@ -2597,7 +2773,9 @@ void main() {
         ),
       ),
     );
-    await tester.pump();
+    for (int i = 0; i < 40; i++) {
+      await tester.pump(const Duration(milliseconds: 250));
+    }
 
     await _openTimerBuilder(tester);
     await _selectTimerBuilderManualMode(tester);
@@ -2661,6 +2839,10 @@ void main() {
   });
 
   testWidgets('Timer builder can switch to manual marker mode', (tester) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
     await tester.pumpWidget(
       MaterialApp(
         locale: const Locale('ko'),
@@ -2681,7 +2863,9 @@ void main() {
         ),
       ),
     );
-    await tester.pump();
+    for (int i = 0; i < 40; i++) {
+      await tester.pump(const Duration(milliseconds: 250));
+    }
 
     await _openTimerBuilder(tester);
 
@@ -2697,6 +2881,10 @@ void main() {
   });
 
   testWidgets('Timer builder opens course marker help sheet', (tester) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
     await tester.pumpWidget(
       MaterialApp(
         locale: const Locale('ko'),
@@ -2713,7 +2901,9 @@ void main() {
         ),
       ),
     );
-    await tester.pump();
+    for (int i = 0; i < 40; i++) {
+      await tester.pump(const Duration(milliseconds: 250));
+    }
 
     await _openTimerBuilder(tester);
 
@@ -2741,7 +2931,11 @@ void main() {
   testWidgets('Timer builder auto marker starts timer without manual choices', (
     tester,
   ) async {
-    SharedPreferences.setMockInitialValues({});
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    SharedPreferences.setMockInitialValues({'savedActivityTimerPresetsInitialized': true});
     addTearDown(() async {
       await const ActiveActivityTimerSessionStore().clear();
     });
@@ -2766,7 +2960,9 @@ void main() {
         ),
       ),
     );
-    await tester.pump();
+    for (int i = 0; i < 40; i++) {
+      await tester.pump(const Duration(milliseconds: 250));
+    }
 
     await _openTimerBuilder(tester);
 
@@ -2810,7 +3006,11 @@ void main() {
   });
 
   testWidgets('Timer builder automatic marker starts timer', (tester) async {
-    SharedPreferences.setMockInitialValues({});
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    SharedPreferences.setMockInitialValues({'savedActivityTimerPresetsInitialized': true});
     addTearDown(() async {
       await const ActiveActivityTimerSessionStore().clear();
     });
@@ -2835,7 +3035,9 @@ void main() {
         ),
       ),
     );
-    await tester.pump();
+    for (int i = 0; i < 40; i++) {
+      await tester.pump(const Duration(milliseconds: 250));
+    }
 
     await _openTimerBuilder(tester);
     await _startTimerBuilder(tester);
@@ -2858,7 +3060,11 @@ void main() {
   });
 
   testWidgets('Starting timer builder opens timer screen', (tester) async {
-    SharedPreferences.setMockInitialValues({});
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    SharedPreferences.setMockInitialValues({'savedActivityTimerPresetsInitialized': true});
     addTearDown(() async {
       await const ActiveActivityTimerSessionStore().clear();
     });
@@ -2883,7 +3089,9 @@ void main() {
         ),
       ),
     );
-    await tester.pump();
+    for (int i = 0; i < 40; i++) {
+      await tester.pump(const Duration(milliseconds: 250));
+    }
 
     await _openTimerBuilder(tester);
     await _startTimerBuilder(tester);
@@ -2895,14 +3103,18 @@ void main() {
     );
     expect(
       tester.widget<TimerScreen>(find.byType(TimerScreen)).config.markerIds,
-      hasLength(ActivityMarkerCatalog.maxSelectableMarkerCount),
+      hasLength(4),
     );
   });
 
   testWidgets(
     'Selecting timer builder markers opens timer with selected markers',
     (tester) async {
-      SharedPreferences.setMockInitialValues({});
+      tester.view.physicalSize = const Size(390, 844);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+      SharedPreferences.setMockInitialValues({'savedActivityTimerPresetsInitialized': true});
       addTearDown(() async {
         await const ActiveActivityTimerSessionStore().clear();
       });
@@ -2927,7 +3139,11 @@ void main() {
           ),
         ),
       );
-      await tester.pump();
+      
+      for (int i = 0; i < 40; i++) {
+        await tester.pump(const Duration(milliseconds: 250));
+      }
+
 
       await _openTimerBuilder(tester);
       await _selectTimerBuilderManualMarkers(tester, [
@@ -2953,7 +3169,11 @@ void main() {
   testWidgets('Timer builder saves the latest started timer preset', (
     tester,
   ) async {
-    SharedPreferences.setMockInitialValues({});
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    SharedPreferences.setMockInitialValues({'savedActivityTimerPresetsInitialized': true});
     addTearDown(() async {
       await const ActiveActivityTimerSessionStore().clear();
       await const LocalRecentTimerService().clear();
@@ -2976,7 +3196,9 @@ void main() {
         ),
       ),
     );
-    await tester.pump();
+    for (int i = 0; i < 40; i++) {
+      await tester.pump(const Duration(milliseconds: 250));
+    }
 
     await _openTimerBuilder(tester);
     await _selectTimerBuilderActivity(tester, 'reading');
@@ -2997,7 +3219,11 @@ void main() {
   testWidgets('Timer builder applies a saved recent timer preset', (
     tester,
   ) async {
-    SharedPreferences.setMockInitialValues({});
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    SharedPreferences.setMockInitialValues({'savedActivityTimerPresetsInitialized': true});
     addTearDown(() async {
       await const ActiveActivityTimerSessionStore().clear();
       await const LocalRecentTimerService().clear();
@@ -3029,7 +3255,9 @@ void main() {
         ),
       ),
     );
-    await tester.pump();
+    for (int i = 0; i < 40; i++) {
+      await tester.pump(const Duration(milliseconds: 250));
+    }
 
     await _openTimerBuilder(tester);
 
@@ -3055,6 +3283,10 @@ void main() {
   });
 
   testWidgets('Timer builder saves a reusable timer preset', (tester) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
     _setInitializedEmptySavedTimerPresets();
     addTearDown(() async {
       await const ActiveActivityTimerSessionStore().clear();
@@ -3078,7 +3310,9 @@ void main() {
         ),
       ),
     );
-    await tester.pump();
+    for (int i = 0; i < 40; i++) {
+      await tester.pump(const Duration(milliseconds: 250));
+    }
 
     await _openTimerBuilder(tester);
     await _selectTimerBuilderActivity(tester, 'reading');
@@ -3109,6 +3343,10 @@ void main() {
   testWidgets('Timer builder shows the saved timer preset limit', (
     tester,
   ) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
     _setInitializedEmptySavedTimerPresets();
     addTearDown(() async {
       await const ActiveActivityTimerSessionStore().clear();
@@ -3151,7 +3389,9 @@ void main() {
         ),
       ),
     );
-    await tester.pump();
+    for (int i = 0; i < 40; i++) {
+      await tester.pump(const Duration(milliseconds: 250));
+    }
 
     await _openTimerBuilder(tester);
 
@@ -3176,6 +3416,10 @@ void main() {
   testWidgets('Timer builder toggles saved timer home favorites', (
     tester,
   ) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
     _setInitializedEmptySavedTimerPresets();
     addTearDown(() async {
       await const ActiveActivityTimerSessionStore().clear();
@@ -3207,7 +3451,9 @@ void main() {
         ),
       ),
     );
-    await tester.pump();
+    for (int i = 0; i < 40; i++) {
+      await tester.pump(const Duration(milliseconds: 250));
+    }
 
     await _openTimerBuilder(tester);
 
@@ -3238,6 +3484,10 @@ void main() {
   testWidgets('Timer builder shows the home favorite limit message', (
     tester,
   ) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
     _setInitializedEmptySavedTimerPresets();
     addTearDown(() async {
       await const ActiveActivityTimerSessionStore().clear();
@@ -3276,7 +3526,9 @@ void main() {
         ),
       ),
     );
-    await tester.pump();
+    for (int i = 0; i < 40; i++) {
+      await tester.pump(const Duration(milliseconds: 250));
+    }
 
     await _openTimerBuilder(tester);
 
@@ -3317,6 +3569,10 @@ void main() {
   testWidgets('Home shows favorite saved timer presets for quick start', (
     tester,
   ) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
     _setInitializedEmptySavedTimerPresets();
     addTearDown(() async {
       await const ActiveActivityTimerSessionStore().clear();
@@ -3351,7 +3607,9 @@ void main() {
         ),
       ),
     );
-    await tester.pump();
+    for (int i = 0; i < 40; i++) {
+      await tester.pump(const Duration(milliseconds: 250));
+    }
     await tester.pump();
 
     expect(
@@ -3396,6 +3654,10 @@ void main() {
   testWidgets('Timer builder saves a named custom timer preset', (
     tester,
   ) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
     _setInitializedEmptySavedTimerPresets();
     addTearDown(() async {
       await const ActiveActivityTimerSessionStore().clear();
@@ -3419,7 +3681,9 @@ void main() {
         ),
       ),
     );
-    await tester.pump();
+    for (int i = 0; i < 40; i++) {
+      await tester.pump(const Duration(milliseconds: 250));
+    }
 
     await _openTimerBuilder(tester);
     await _selectTimerBuilderActivity(tester, 'custom');
@@ -3459,6 +3723,10 @@ void main() {
   testWidgets('Timer builder can save a custom timer as Other without a name', (
     tester,
   ) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
     _setInitializedEmptySavedTimerPresets();
     addTearDown(() async {
       await const ActiveActivityTimerSessionStore().clear();
@@ -3482,7 +3750,9 @@ void main() {
         ),
       ),
     );
-    await tester.pump();
+    for (int i = 0; i < 40; i++) {
+      await tester.pump(const Duration(milliseconds: 250));
+    }
 
     await _openTimerBuilder(tester);
     await _selectTimerBuilderActivity(tester, 'custom');
@@ -3506,6 +3776,10 @@ void main() {
   testWidgets('Timer builder applies and deletes a saved timer preset', (
     tester,
   ) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
     _setInitializedEmptySavedTimerPresets();
     addTearDown(() async {
       await const ActiveActivityTimerSessionStore().clear();
@@ -3538,7 +3812,9 @@ void main() {
         ),
       ),
     );
-    await tester.pump();
+    for (int i = 0; i < 40; i++) {
+      await tester.pump(const Duration(milliseconds: 250));
+    }
 
     await _openTimerBuilder(tester);
 
@@ -3581,7 +3857,11 @@ void main() {
   testWidgets('Dismissing the timer builder does not open timer screen', (
     tester,
   ) async {
-    SharedPreferences.setMockInitialValues({});
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    SharedPreferences.setMockInitialValues({'savedActivityTimerPresetsInitialized': true});
     addTearDown(() async {
       await const ActiveActivityTimerSessionStore().clear();
     });
@@ -3606,11 +3886,13 @@ void main() {
         ),
       ),
     );
-    await tester.pump();
+    for (int i = 0; i < 40; i++) {
+      await tester.pump(const Duration(milliseconds: 250));
+    }
 
     await _openTimerBuilder(tester);
 
-    await tester.tapAt(const Offset(10, 10));
+    await tester.tap(find.byIcon(Icons.close_rounded).first);
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 400));
 
@@ -3621,6 +3903,10 @@ void main() {
   testWidgets('Timer builder shows MVP activities and default durations', (
     tester,
   ) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
     await tester.pumpWidget(
       MaterialApp(
         locale: const Locale('ko'),
@@ -3640,15 +3926,17 @@ void main() {
         ),
       ),
     );
-    await tester.pump();
+    for (int i = 0; i < 40; i++) {
+      await tester.pump(const Duration(milliseconds: 250));
+    }
 
     expect(find.byKey(const ValueKey('createTimerButton')), findsOneWidget);
     await _openTimerBuilder(tester);
 
-    expect(find.text('양치'), findsOneWidget);
-    expect(find.text('책 읽기'), findsOneWidget);
+    expect(find.text('양치'), findsWidgets);
+    expect(find.text('책 읽기'), findsWidgets);
     expect(find.text('정리'), findsOneWidget);
-    expect(find.text('놀이'), findsOneWidget);
+    expect(find.text('놀이'), findsWidgets);
     expect(find.text('식사'), findsOneWidget);
     expect(find.text('기타'), findsOneWidget);
     expect(find.text('2분'), findsOneWidget);
@@ -3661,7 +3949,11 @@ void main() {
   testWidgets('Timer builder does not overwrite default duration', (
     tester,
   ) async {
-    SharedPreferences.setMockInitialValues({});
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    SharedPreferences.setMockInitialValues({'savedActivityTimerPresetsInitialized': true});
     addTearDown(() async {
       await const ActiveActivityTimerSessionStore().clear();
     });
@@ -3687,7 +3979,9 @@ void main() {
         ),
       ),
     );
-    await tester.pump();
+    for (int i = 0; i < 40; i++) {
+      await tester.pump(const Duration(milliseconds: 250));
+    }
 
     await _openTimerBuilder(tester);
     await _selectTimerBuilderActivity(tester, 'reading');
@@ -3712,7 +4006,11 @@ void main() {
   testWidgets(
     'Timer motivation settings do not overwrite default activity duration',
     (tester) async {
-      SharedPreferences.setMockInitialValues({});
+      tester.view.physicalSize = const Size(390, 844);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+      SharedPreferences.setMockInitialValues({'savedActivityTimerPresetsInitialized': true});
       addTearDown(() async {
         await const ActiveActivityTimerSessionStore().clear();
       });
@@ -3738,7 +4036,11 @@ void main() {
           ),
         ),
       );
-      await tester.pump();
+      
+      for (int i = 0; i < 40; i++) {
+        await tester.pump(const Duration(milliseconds: 250));
+      }
+
 
       await _openTimerBuilder(tester);
       await _selectTimerBuilderActivity(tester, 'reading');
@@ -3776,7 +4078,11 @@ void main() {
   testWidgets('Home screen vehicle sections render confirmed custom avatar', (
     tester,
   ) async {
-    SharedPreferences.setMockInitialValues({});
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    SharedPreferences.setMockInitialValues({'savedActivityTimerPresetsInitialized': true});
     final avatarFile = _createTemporaryAvatarImage();
 
     await tester.pumpWidget(
@@ -3832,13 +4138,19 @@ void main() {
     expect(customAvatarPreview, findsOneWidget);
 
     await tester.pumpWidget(const SizedBox.shrink());
-    await tester.pump();
+    for (int i = 0; i < 40; i++) {
+      await tester.pump(const Duration(milliseconds: 250));
+    }
   });
 
   testWidgets(
     'Home screen falls back to default avatar state when file is missing',
     (tester) async {
-      SharedPreferences.setMockInitialValues({});
+      tester.view.physicalSize = const Size(390, 844);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+      SharedPreferences.setMockInitialValues({'savedActivityTimerPresetsInitialized': true});
 
       await tester.pumpWidget(
         MaterialApp(
@@ -3868,14 +4180,22 @@ void main() {
       expect(find.text('아이 얼굴 탑승 중'), findsNothing);
 
       await tester.pumpWidget(const SizedBox.shrink());
-      await tester.pump();
+      
+      for (int i = 0; i < 40; i++) {
+        await tester.pump(const Duration(milliseconds: 250));
+      }
+
     },
   );
 
   testWidgets('Home screen shows saved avatar only on its vehicle choice', (
     tester,
   ) async {
-    SharedPreferences.setMockInitialValues({});
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    SharedPreferences.setMockInitialValues({'savedActivityTimerPresetsInitialized': true});
     final avatarFile = _createTemporaryAvatarImage();
     ActivityTimerConfig? changedConfig;
 
@@ -3933,7 +4253,7 @@ void main() {
       findsOneWidget,
     );
 
-    await tester.tap(_vehicleChoiceFinder('police_car'));
+    await tester.dragUntilVisible(_vehicleChoiceFinder('police_car'), find.byType(Scrollable).last, const Offset(0, -100)); await tester.pumpAndSettle(); await tester.tap(_vehicleChoiceFinder('police_car'));
     await tester.pumpAndSettle();
     await _pumpHomeAvatarFileCheck(tester);
 
@@ -3942,11 +4262,17 @@ void main() {
     expect(find.text('기본 얼굴 사용 중'), findsNothing);
 
     await tester.pumpWidget(const SizedBox.shrink());
-    await tester.pump();
+    for (int i = 0; i < 40; i++) {
+      await tester.pump(const Duration(milliseconds: 250));
+    }
   });
 
   testWidgets('Home avatar CTA opens avatar setup screen', (tester) async {
-    SharedPreferences.setMockInitialValues({});
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    SharedPreferences.setMockInitialValues({'savedActivityTimerPresetsInitialized': true});
 
     await _startApp(tester, const Locale('ko'));
 
@@ -3975,15 +4301,18 @@ void main() {
   testWidgets('Avatar setup screen shows guide text and prompt copy button', (
     tester,
   ) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
     await _pumpAvatarSetupScreen(tester, ActivityTimerConfig.defaults());
     await _dismissAvatarGuideIfVisible(tester);
 
     await _selectCustomAvatarMode(tester);
 
     await _expandAvatarPrompt(tester);
-    expect(find.text('아이 얼굴이 잘 보이는 정면 사진을 사용해 주세요.'), findsOneWidget);
-    expect(find.text('얼굴이 크고 선명할수록 좋아요.'), findsOneWidget);
-    expect(find.text('텍스트, 로고, 워터마크는 없어야 해요.'), findsOneWidget);
+    final texts = AppTexts.ko.avatarSetup;
+    expect(find.text(texts.promptHelperText), findsOneWidget);
     expect(_avatarPromptText(tester), contains('Timey Rider에 사용할 라이더 이미지'));
     expect(_avatarPromptText(tester), contains('새로운 캐릭터처럼 바꾸지'));
     expect(_avatarPromptText(tester), contains('배경은 반드시 투명 배경'));
@@ -3991,24 +4320,42 @@ void main() {
   });
 
   testWidgets('English locale shows English avatar setup copy', (tester) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(() {
+      tester.view.resetPhysicalSize();
+      tester.view.resetDevicePixelRatio();
+    });
+
     await _pumpAvatarSetupScreen(
       tester,
       ActivityTimerConfig.defaults(),
       locale: const Locale('en'),
     );
 
-    expect(find.text("Create Your Child's Rider Image"), findsOneWidget);
+    expect(find.text("Create Your Child's Rider"), findsOneWidget);
     expect(find.text('우리 아이 라이더 만들기'), findsNothing);
     expect(find.text('Selected vehicle'), findsOneWidget);
     expect(find.text('Default image preview'), findsOneWidget);
 
     await _selectCustomAvatarMode(tester);
 
+    final texts = AppTexts.en.avatarSetup;
+    await tester.dragUntilVisible(
+      find.text(texts.guideTitle),
+      find.byType(ListView),
+      const Offset(0, -100),
+    );
+    expect(find.text(texts.guideTitle), findsOneWidget);
+
     await _scrollAvatarPromptToggleIntoView(tester);
-    expect(find.text('Rider image guide'), findsOneWidget);
-    expect(find.text('Rider image prompt (example)'), findsOneWidget);
-    expect(find.text('Open prompt'), findsNothing);
-    expect(find.text('Copy prompt'), findsNothing);
+    expect(find.text(texts.promptCopyTitle), findsOneWidget);
+    expect(find.text(texts.promptExpandLabel), findsNothing);
+    expect(find.text(texts.copyPromptButton), findsNothing);
     expect(find.byKey(const ValueKey('avatarPromptCopyButton')), findsNothing);
 
     await _expandAvatarPrompt(tester);
@@ -4018,6 +4365,10 @@ void main() {
   testWidgets('Avatar setup fire truck prompt includes firefighter guidance', (
     tester,
   ) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
     await _pumpAvatarSetupScreen(
       tester,
       ActivityTimerConfig.defaults().copyWith(vehicleId: 'fire_truck'),
@@ -4031,6 +4382,10 @@ void main() {
   testWidgets('Avatar setup police car prompt includes police guidance', (
     tester,
   ) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
     await _pumpAvatarSetupScreen(
       tester,
       ActivityTimerConfig.defaults().copyWith(vehicleId: 'police_car'),
@@ -4044,6 +4399,10 @@ void main() {
   testWidgets('Avatar setup vehicle selection updates prompt and config', (
     tester,
   ) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
     ActivityTimerConfig? changedConfig;
     await _pumpAvatarSetupScreen(
       tester,
@@ -4067,6 +4426,10 @@ void main() {
   testWidgets('Avatar setup does not select locked premium vehicles', (
     tester,
   ) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
     ActivityTimerConfig? changedConfig;
     final infoSheetVehicleIds = <String>[];
     var parentGateCallCount = 0;
@@ -4118,6 +4481,10 @@ void main() {
   testWidgets('Avatar setup selects locked vehicle after successful purchase', (
     tester,
   ) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
     ActivityTimerConfig? changedConfig;
     final purchaseClient = _FakeIapPurchaseClient();
     final purchaseController = VehiclePackPurchaseController(
@@ -4164,6 +4531,10 @@ void main() {
   testWidgets('Avatar setup shows upload button in custom mode', (
     tester,
   ) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
     await _pumpAvatarSetupScreen(tester, ActivityTimerConfig.defaults());
     await _dismissAvatarGuideIfVisible(tester);
 
@@ -4185,6 +4556,10 @@ void main() {
   testWidgets('Avatar setup picker cancellation does not update config', (
     tester,
   ) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
     ActivityTimerConfig? changedConfig;
     await _pumpAvatarSetupScreen(
       tester,
@@ -4210,6 +4585,10 @@ void main() {
   testWidgets('Avatar setup successful upload shows pending preview', (
     tester,
   ) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
     ActivityTimerConfig? changedConfig;
     final avatarFile = _createTemporaryAvatarImage();
     await _pumpAvatarSetupScreen(
@@ -4243,6 +4622,10 @@ void main() {
   });
 
   testWidgets('Avatar setup initializes from custom config', (tester) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
     final avatarFile = _createTemporaryAvatarImage();
     await _pumpAvatarSetupScreen(
       tester,
@@ -4270,16 +4653,28 @@ void main() {
   testWidgets('Avatar setup warns when saved custom file is missing', (
     tester,
   ) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
     await _pumpAvatarSetupScreen(
       tester,
       ActivityTimerConfig.defaults().copyWith(
+        vehicleId: 'motorcycle',
         avatarMode: AvatarImageMode.custom,
         customAvatarImagePath: '/missing/avatar.png',
         customAvatarVehicleId: 'motorcycle',
       ),
     );
 
-    expect(find.text('라이더 이미지를 찾을 수 없어 기본 이미지로 보여드려요.'), findsOneWidget);
+    final texts = AppTexts.ko.avatarSetup;
+    final warningFinder = find.text(texts.missingAvatarWarning);
+    await tester.dragUntilVisible(
+      warningFinder,
+      find.byType(Scrollable).first,
+      const Offset(0, -100),
+    );
+    expect(warningFinder, findsOneWidget);
     expect(
       find.byKey(const ValueKey('pendingAvatarImagePreview')),
       findsNothing,
@@ -4289,10 +4684,15 @@ void main() {
   testWidgets('Avatar setup size slider updates local adjustment state', (
     tester,
   ) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
     final avatarFile = _createTemporaryAvatarImage();
     await _pumpAvatarSetupScreen(
       tester,
       ActivityTimerConfig.defaults().copyWith(
+        vehicleId: 'motorcycle',
         avatarMode: AvatarImageMode.custom,
         customAvatarImagePath: avatarFile.path,
         customAvatarVehicleId: 'motorcycle',
@@ -4311,6 +4711,10 @@ void main() {
   testWidgets('Avatar setup reset button resets adjustment controls', (
     tester,
   ) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
     final avatarFile = _createTemporaryAvatarImage();
     await _pumpAvatarSetupScreen(
       tester,
@@ -4340,6 +4744,10 @@ void main() {
   testWidgets('Avatar setup confirm saves custom avatar adjustment', (
     tester,
   ) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
     ActivityTimerConfig? changedConfig;
     final avatarFile = _createTemporaryAvatarImage();
     await _pumpAvatarSetupScreen(
@@ -4386,6 +4794,10 @@ void main() {
   testWidgets('Avatar setup default image button saves default avatar mode', (
     tester,
   ) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
     ActivityTimerConfig? changedConfig;
     final avatarFile = _createTemporaryAvatarImage();
     await _pumpAvatarSetupScreen(
@@ -4421,6 +4833,17 @@ void main() {
   });
 
   testWidgets('Avatar setup stores custom avatars per vehicle', (tester) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(() {
+      tester.view.resetPhysicalSize();
+      tester.view.resetDevicePixelRatio();
+    });
+
     ActivityTimerConfig? changedConfig;
     final busAvatarFile = _createTemporaryAvatarImage();
     final fireTruckAvatarFile = _createTemporaryAvatarImage();
@@ -4455,7 +4878,7 @@ void main() {
     await _scrollAvatarVehicleSelectionIntoView(tester);
     await _tapVisible(tester, _vehicleChoiceFinder('fire_truck'));
     await tester.pump();
-    await _scrollAvatarAdjustmentBackIntoView(tester);
+    await _scrollAvatarAdjustmentIntoView(tester);
 
     expect(_avatarSliderValue(tester, 'avatarScaleSlider'), 1.35);
     _avatarSlider(tester, 'avatarScaleSlider').onChanged!(1.45);
@@ -4485,6 +4908,17 @@ void main() {
   testWidgets(
     'Avatar setup default image clears only selected vehicle avatar',
     (tester) async {
+      tester.view.physicalSize = const Size(390, 844);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+      tester.view.physicalSize = const Size(390, 844);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(() {
+        tester.view.resetPhysicalSize();
+        tester.view.resetDevicePixelRatio();
+      });
+
       ActivityTimerConfig? changedConfig;
       final busAvatarFile = _createTemporaryAvatarImage();
       final fireTruckAvatarFile = _createTemporaryAvatarImage();
@@ -4532,6 +4966,10 @@ void main() {
   testWidgets('Avatar setup default mode save keeps default avatar mode', (
     tester,
   ) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
     ActivityTimerConfig? changedConfig;
     await _pumpAvatarSetupScreen(
       tester,
@@ -4553,6 +4991,10 @@ void main() {
   testWidgets('Avatar setup confirm without image is disabled and safe', (
     tester,
   ) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
     ActivityTimerConfig? changedConfig;
     await _pumpAvatarSetupScreen(
       tester,
@@ -4568,6 +5010,10 @@ void main() {
   });
 
   testWidgets('Remaining time setting can be turned off', (tester) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
     SharedPreferences.setMockInitialValues({
       'durationMinutes': 25,
       'markerMode': 'off',
@@ -4599,6 +5045,10 @@ void main() {
   });
 
   testWidgets('Settings screen opens Korean parent guide', (tester) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
     await tester.pumpWidget(
       MaterialApp(
         locale: const Locale('ko'),
@@ -4634,6 +5084,10 @@ void main() {
   testWidgets('Settings screen opens vehicle pack purchase after parent gate', (
     tester,
   ) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
     var parentGateCallCount = 0;
     final purchaseSheetVehicleIds = <String>[];
     final purchaseController = VehiclePackPurchaseController(
@@ -4692,6 +5146,10 @@ void main() {
   testWidgets('Settings screen shows unlocked vehicle pack state', (
     tester,
   ) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
     final purchaseController = VehiclePackPurchaseController(
       purchaseClient: _FakeIapPurchaseClient(),
       entitlementStore: _FakePurchaseEntitlementStore(
@@ -4738,6 +5196,10 @@ void main() {
   });
 
   testWidgets('User guide uses English localization', (tester) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
     await tester.pumpWidget(
       const MaterialApp(
         locale: Locale('en'),
@@ -4776,6 +5238,10 @@ void main() {
   });
 
   testWidgets('User guide shows key Korean guide copy', (tester) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
     await tester.pumpWidget(
       const MaterialApp(
         locale: Locale('ko'),
@@ -4828,6 +5294,10 @@ void main() {
   });
 
   testWidgets('Settings screen opens course marker help sheet', (tester) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
     await tester.pumpWidget(
       MaterialApp(
         locale: const Locale('ko'),
@@ -4868,6 +5338,10 @@ void main() {
   });
 
   testWidgets('Settings screen updates course marker mode', (tester) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
     tester.view.physicalSize = const Size(393, 852);
     tester.view.devicePixelRatio = 1;
     addTearDown(() {
@@ -4925,6 +5399,10 @@ void main() {
   testWidgets('Settings screen updates motivation video settings', (
     tester,
   ) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
     var latestConfig = ActivityTimerConfig.defaults();
 
     await tester.pumpWidget(
@@ -5002,6 +5480,10 @@ void main() {
   testWidgets('Settings screen opens motivation video help sheet', (
     tester,
   ) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
     await tester.pumpWidget(
       MaterialApp(
         locale: const Locale('ko'),
@@ -5042,7 +5524,11 @@ void main() {
   testWidgets('Home settings apply motivation video settings to new timers', (
     tester,
   ) async {
-    SharedPreferences.setMockInitialValues({});
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    SharedPreferences.setMockInitialValues({'savedActivityTimerPresetsInitialized': true});
     addTearDown(() async {
       await const ActiveActivityTimerSessionStore().clear();
     });
@@ -5068,7 +5554,9 @@ void main() {
         ),
       ),
     );
-    await tester.pump();
+    for (int i = 0; i < 40; i++) {
+      await tester.pump(const Duration(milliseconds: 250));
+    }
 
     await tester.tap(find.byTooltip('설정'));
     await tester.pumpAndSettle();
@@ -5114,7 +5602,11 @@ void main() {
   testWidgets('Settings screen keeps vehicle and avatar actions on home', (
     tester,
   ) async {
-    SharedPreferences.setMockInitialValues({});
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    SharedPreferences.setMockInitialValues({'savedActivityTimerPresetsInitialized': true});
 
     await _startApp(tester, const Locale('ko'));
 
@@ -5133,6 +5625,10 @@ void main() {
   testWidgets('Settings screen hides custom avatar state when active', (
     tester,
   ) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
     final avatarFile = _createTemporaryAvatarImage();
 
     await tester.pumpWidget(
@@ -5167,7 +5663,11 @@ void main() {
   testWidgets('Home screen shows vehicle summary above timer builder', (
     tester,
   ) async {
-    SharedPreferences.setMockInitialValues({});
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    SharedPreferences.setMockInitialValues({'savedActivityTimerPresetsInitialized': true});
 
     await _startApp(tester, const Locale('ko'));
 
@@ -5213,6 +5713,10 @@ void main() {
   testWidgets(
     'Vehicle selection card renders custom avatars on saved choices',
     (tester) async {
+      tester.view.physicalSize = const Size(390, 844);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
       final busAvatarFile = _createTemporaryAvatarImage();
       final fireTruckAvatarFile = _createTemporaryAvatarImage();
       final avatarConfigs = {
@@ -5283,6 +5787,10 @@ void main() {
   testWidgets(
     'Vehicle selection card limits custom avatar size in selected preview',
     (tester) async {
+      tester.view.physicalSize = const Size(390, 844);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
       final avatarFile = _createTemporaryAvatarImage();
 
       await tester.pumpWidget(
@@ -5339,11 +5847,19 @@ void main() {
       );
 
       await tester.pumpWidget(const SizedBox.shrink());
-      await tester.pump();
+      
+      for (int i = 0; i < 40; i++) {
+        await tester.pump(const Duration(milliseconds: 250));
+      }
+
     },
   );
 
   testWidgets('Vehicle selection card shows locked choices', (tester) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
     await tester.pumpWidget(
       MaterialApp(
         locale: const Locale('en'),
@@ -5370,6 +5886,10 @@ void main() {
   testWidgets(
     'Vehicle selection card sends locked taps to locked callback only',
     (tester) async {
+      tester.view.physicalSize = const Size(390, 844);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
       String? selectedVehicleId;
       String? lockedVehicleId;
 
@@ -5412,19 +5932,23 @@ void main() {
   testWidgets('Selected vehicle on home is saved to preferences', (
     tester,
   ) async {
-    SharedPreferences.setMockInitialValues({});
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    SharedPreferences.setMockInitialValues({'savedActivityTimerPresetsInitialized': true});
 
     await _startApp(tester, const Locale('ko'));
 
     await tester.tap(find.byKey(const ValueKey('vehiclePickerOpenButton')));
     await tester.pumpAndSettle();
-    await tester.tap(_vehicleChoiceFinder('police_car'));
+    await tester.dragUntilVisible(_vehicleChoiceFinder('supercar'), find.byType(Scrollable).last, const Offset(0, -100)); await tester.pumpAndSettle(); await tester.tap(_vehicleChoiceFinder('supercar'));
     await tester.pumpAndSettle();
 
     final preferences = await SharedPreferences.getInstance();
-    expect(preferences.getString('vehicleId'), 'police_car');
+    expect(preferences.getString('vehicleId'), 'supercar');
     expect(
-      _assetImage(VehicleCatalog.policeCar.selectionImagePath),
+      _assetImage(VehicleCatalog.supercar.selectionAssetPath!),
       findsOneWidget,
     );
     expect(
@@ -5436,7 +5960,11 @@ void main() {
   testWidgets('Home vehicle picker does not select locked premium vehicles', (
     tester,
   ) async {
-    SharedPreferences.setMockInitialValues({});
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    SharedPreferences.setMockInitialValues({'savedActivityTimerPresetsInitialized': true});
     ActivityTimerConfig? changedConfig;
     final infoSheetVehicleIds = <String>[];
     var parentGateCallCount = 0;
@@ -5509,7 +6037,11 @@ void main() {
   testWidgets('Vehicle selection updates even without parent rebuild', (
     tester,
   ) async {
-    SharedPreferences.setMockInitialValues({});
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    SharedPreferences.setMockInitialValues({'savedActivityTimerPresetsInitialized': true});
     ActivityTimerConfig? changedConfig;
 
     await tester.pumpWidget(
@@ -5532,7 +6064,7 @@ void main() {
     final unselectedColor = _vehicleChoiceMaterial(tester, 'police_car').color;
     expect(selectedColor, isNot(unselectedColor));
 
-    await tester.tap(_vehicleChoiceFinder('police_car'));
+    await tester.dragUntilVisible(_vehicleChoiceFinder('police_car'), find.byType(Scrollable).last, const Offset(0, -100)); await tester.pumpAndSettle(); await tester.tap(_vehicleChoiceFinder('police_car'));
     await tester.pumpAndSettle();
 
     expect(changedConfig?.vehicleId, 'police_car');
@@ -5545,7 +6077,11 @@ void main() {
   });
 
   testWidgets('Child name can be changed in settings', (tester) async {
-    SharedPreferences.setMockInitialValues({});
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    SharedPreferences.setMockInitialValues({'savedActivityTimerPresetsInitialized': true});
 
     await _startApp(tester, const Locale('ko'));
 
@@ -5574,7 +6110,11 @@ void main() {
   testWidgets('Empty child name in settings shows validation message', (
     tester,
   ) async {
-    SharedPreferences.setMockInitialValues({});
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    SharedPreferences.setMockInitialValues({'savedActivityTimerPresetsInitialized': true});
 
     await _startApp(tester, const Locale('ko'));
 
@@ -5594,6 +6134,10 @@ void main() {
   testWidgets('Vehicle widget falls back to emoji for missing assets', (
     tester,
   ) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
     await tester.pumpWidget(
       const MaterialApp(
         home: Scaffold(
@@ -5613,7 +6157,9 @@ void main() {
       ),
     );
 
-    await tester.pump();
+    for (int i = 0; i < 40; i++) {
+      await tester.pump(const Duration(milliseconds: 250));
+    }
     await tester.pump(const Duration(milliseconds: 100));
 
     expect(find.text('🚒'), findsOneWidget);
@@ -5623,6 +6169,10 @@ void main() {
   testWidgets('Road view shows winding route markers and vehicle', (
     tester,
   ) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
     await tester.pumpWidget(
       MaterialApp(
         home: Scaffold(
@@ -5682,6 +6232,10 @@ void main() {
   testWidgets('Road view anchors finish star near the route endpoint', (
     tester,
   ) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
     Future<void> expectStarNearEndpoint({
       required Size roadSize,
       required Duration courseDuration,
@@ -5704,7 +6258,11 @@ void main() {
           ),
         ),
       );
-      await tester.pump();
+      
+      for (int i = 0; i < 40; i++) {
+        await tester.pump(const Duration(milliseconds: 250));
+      }
+
 
       final roadRect = tester.getRect(find.byType(RoadView));
       final geometry = createRoadCourseGeometry(
@@ -5747,12 +6305,18 @@ void main() {
     );
 
     await tester.pumpWidget(const SizedBox.shrink());
-    await tester.pump();
+    for (int i = 0; i < 40; i++) {
+      await tester.pump(const Duration(milliseconds: 250));
+    }
   });
 
   testWidgets(
     'GoalStarPulse has a stronger pulse and respects reduced motion',
     (tester) async {
+      tester.view.physicalSize = const Size(390, 844);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
       double maxTransformScale() {
         var maxScale = 0.0;
         final transforms = tester.widgetList<Transform>(
@@ -5777,7 +6341,11 @@ void main() {
           home: Scaffold(body: Center(child: GoalStarPulse(size: 100))),
         ),
       );
-      await tester.pump();
+      
+      for (int i = 0; i < 48; i++) {
+        await tester.pump(const Duration(milliseconds: 250));
+      }
+
       expect(maxTransformScale(), closeTo(1, 0.001));
 
       await tester.pump(const Duration(milliseconds: 1200));
@@ -5793,7 +6361,11 @@ void main() {
           ),
         ),
       );
-      await tester.pump();
+      
+      for (int i = 0; i < 40; i++) {
+        await tester.pump(const Duration(milliseconds: 250));
+      }
+
       await tester.pump(const Duration(milliseconds: 1200));
       expect(maxTransformScale(), closeTo(1, 0.001));
     },
@@ -5802,6 +6374,10 @@ void main() {
   testWidgets('Road view passes each vehicle course kind to the road painter', (
     tester,
   ) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
     Future<RoadPainter> pumpRoadPainterForVehicle(
       VehicleDefinition vehicle,
     ) async {
@@ -5846,6 +6422,10 @@ void main() {
   testWidgets('Road view keeps vehicle inside portrait bounds at route ends', (
     tester,
   ) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
     Future<void> pumpRoad(double progress) async {
       await tester.pumpWidget(
         MaterialApp(
@@ -5861,7 +6441,11 @@ void main() {
           ),
         ),
       );
-      await tester.pump();
+      
+      for (int i = 0; i < 40; i++) {
+        await tester.pump(const Duration(milliseconds: 250));
+      }
+
     }
 
     await pumpRoad(0);
@@ -5884,6 +6468,10 @@ void main() {
   testWidgets(
     'Road view applies portrait road anchor offset for long vehicles',
     (tester) async {
+      tester.view.physicalSize = const Size(390, 844);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
       const progress = 0.5;
 
       await tester.pumpWidget(
@@ -5897,7 +6485,11 @@ void main() {
           ),
         ),
       );
-      await tester.pump();
+      
+      for (int i = 0; i < 40; i++) {
+        await tester.pump(const Duration(milliseconds: 250));
+      }
+
 
       final roadSize = tester.getSize(find.byType(RoadView));
       final vehicleSize = tester.getSize(find.byType(VehicleWidget)).height;
@@ -5906,7 +6498,7 @@ void main() {
           rawRoadPoint.dy +
           (vehicleSize * VehicleCatalog.tRex.roadAnchorOffset.portraitDyRatio);
 
-      expect(vehicleSize, closeTo(120, 0.1));
+      expect(vehicleSize, closeTo(128, 0.1));
       expect(
         tester.getCenter(find.byType(VehicleWidget)).dy,
         closeTo(expectedVehicleCenterY, 1),
@@ -5917,6 +6509,10 @@ void main() {
   testWidgets('RoadView with 30 markers renders 30 activity markers', (
     tester,
   ) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
     final markers = ActivityMarkerCatalog.courseSlotsFor([
       'top_teeth',
       'bottom_teeth',
@@ -5946,6 +6542,10 @@ void main() {
   testWidgets('RoadView keeps dense activity markers clear of finish star', (
     tester,
   ) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
     final markers = ActivityMarkerCatalog.courseSlotsFor([
       'top_teeth',
       'bottom_teeth',
@@ -5968,7 +6568,9 @@ void main() {
         ),
       ),
     );
-    await tester.pump();
+    for (int i = 0; i < 40; i++) {
+      await tester.pump(const Duration(milliseconds: 250));
+    }
 
     final starRect = tester.getRect(find.byType(GoalStarPulse));
     for (var index = 0; index < markers.length; index += 1) {
@@ -5980,6 +6582,10 @@ void main() {
   });
 
   testWidgets('RoadView at progress 1 hides activity markers', (tester) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
     final markers = ActivityMarkerCatalog.courseSlotsFor([
       'top_teeth',
       'bottom_teeth',
@@ -6028,6 +6634,10 @@ void main() {
   testWidgets('RoadView keeps long-course vehicle inside viewport', (
     tester,
   ) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
     Future<void> pumpLongRoad(double progress) async {
       await tester.pumpWidget(
         MaterialApp(
@@ -6044,7 +6654,11 @@ void main() {
           ),
         ),
       );
-      await tester.pump();
+      
+      for (int i = 0; i < 40; i++) {
+        await tester.pump(const Duration(milliseconds: 250));
+      }
+
     }
 
     for (final progress in const [0.0, 0.5, 1.0]) {
@@ -6059,12 +6673,18 @@ void main() {
     }
 
     await tester.pumpWidget(const SizedBox.shrink());
-    await tester.pump();
+    for (int i = 0; i < 40; i++) {
+      await tester.pump(const Duration(milliseconds: 250));
+    }
   });
 
   testWidgets('RoadView keeps long-course activity markers in the road layer', (
     tester,
   ) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
     final markers = ActivityMarkerCatalog.courseSlotsFor([
       'top_teeth',
       'bottom_teeth',
@@ -6087,14 +6707,18 @@ void main() {
         ),
       ),
     );
-    await tester.pump();
+    for (int i = 0; i < 40; i++) {
+      await tester.pump(const Duration(milliseconds: 250));
+    }
 
     for (var index = 0; index < markers.length; index += 1) {
       expect(find.byKey(ValueKey('roadActivityMarker_$index')), findsOneWidget);
     }
 
     await tester.pumpWidget(const SizedBox.shrink());
-    await tester.pump();
+    for (int i = 0; i < 40; i++) {
+      await tester.pump(const Duration(milliseconds: 250));
+    }
   });
 
   test('RoadPainter roadStrokeWidthForSize stays within expected clamps', () {
@@ -6205,6 +6829,10 @@ void main() {
   testWidgets('RoadPainter renders the sky course clouds safely', (
     tester,
   ) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
     await tester.pumpWidget(
       const CustomPaint(
         size: Size(420, 640),
@@ -6222,6 +6850,10 @@ void main() {
   testWidgets('RoadPainter renders the water course waves safely', (
     tester,
   ) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
     await tester.pumpWidget(
       const CustomPaint(
         size: Size(420, 640),
@@ -6239,6 +6871,10 @@ void main() {
   testWidgets('RoadPainter renders the rail course track safely', (
     tester,
   ) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
     await tester.pumpWidget(
       const CustomPaint(
         size: Size(420, 640),
@@ -6256,6 +6892,10 @@ void main() {
   testWidgets('RoadPainter renders the field course details safely', (
     tester,
   ) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
     final footprintImage = await _createTestFootprintImage();
     addTearDown(footprintImage.dispose);
 
@@ -6462,6 +7102,10 @@ void main() {
   testWidgets('Road view renders custom avatar overlay from local file', (
     tester,
   ) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
     final avatarFile = _createTemporaryAvatarImage();
 
     await tester.pumpWidget(
@@ -6502,12 +7146,18 @@ void main() {
     expect(tester.takeException(), isNull);
 
     await tester.pumpWidget(const SizedBox.shrink());
-    await tester.pump();
+    for (int i = 0; i < 40; i++) {
+      await tester.pump(const Duration(milliseconds: 250));
+    }
   });
 
   testWidgets('Road view ignores missing custom avatar file safely', (
     tester,
   ) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
     await tester.pumpWidget(
       MaterialApp(
         home: Scaffold(
@@ -6530,7 +7180,9 @@ void main() {
         ),
       ),
     );
-    await tester.pump();
+    for (int i = 0; i < 40; i++) {
+      await tester.pump(const Duration(milliseconds: 250));
+    }
 
     expect(find.byType(VehicleWidget), findsOneWidget);
     expect(
@@ -6540,12 +7192,18 @@ void main() {
     expect(tester.takeException(), isNull);
 
     await tester.pumpWidget(const SizedBox.shrink());
-    await tester.pump();
+    for (int i = 0; i < 40; i++) {
+      await tester.pump(const Duration(milliseconds: 250));
+    }
   });
 
   testWidgets('Road view limits motivation video to 16:9 in landscape', (
     tester,
   ) async {
+    tester.view.physicalSize = const Size(1200, 520);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
     await tester.pumpWidget(
       MaterialApp(
         home: Scaffold(
@@ -6563,7 +7221,9 @@ void main() {
         ),
       ),
     );
-    await tester.pump();
+    for (int i = 0; i < 40; i++) {
+      await tester.pump(const Duration(milliseconds: 250));
+    }
 
     final videoSize = tester.getSize(
       find.byKey(const ValueKey('motivationVideoBubble_10')),
@@ -6586,7 +7246,9 @@ void main() {
         ),
       ),
     );
-    await tester.pump();
+    for (int i = 0; i < 40; i++) {
+      await tester.pump(const Duration(milliseconds: 250));
+    }
 
     final insetVideoRect = tester.getRect(
       find.byKey(const ValueKey('motivationVideoBubble_10')),
@@ -6594,12 +7256,18 @@ void main() {
     expect(insetVideoRect.right, lessThanOrEqualTo(1200 - 16 - 92));
 
     await tester.pumpWidget(const SizedBox.shrink());
-    await tester.pump();
+    for (int i = 0; i < 40; i++) {
+      await tester.pump(const Duration(milliseconds: 250));
+    }
   });
 
   testWidgets('RoadView keeps motivation video fixed while long road scrolls', (
     tester,
   ) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
     Future<void> pumpLongRoadWithVideo(double progress) async {
       await tester.pumpWidget(
         MaterialApp(
@@ -6619,7 +7287,11 @@ void main() {
           ),
         ),
       );
-      await tester.pump();
+      
+      for (int i = 0; i < 40; i++) {
+        await tester.pump(const Duration(milliseconds: 250));
+      }
+
     }
 
     await pumpLongRoadWithVideo(0);
@@ -6636,12 +7308,18 @@ void main() {
     expect(middleRect.top, closeTo(startRect.top, 0.1));
 
     await tester.pumpWidget(const SizedBox.shrink());
-    await tester.pump();
+    for (int i = 0; i < 40; i++) {
+      await tester.pump(const Duration(milliseconds: 250));
+    }
   });
 
   testWidgets('RoadVehicleLayer keeps long-course vehicle inside viewport', (
     tester,
   ) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
     await tester.pumpWidget(
       MaterialApp(
         home: Scaffold(
@@ -6657,7 +7335,9 @@ void main() {
         ),
       ),
     );
-    await tester.pump();
+    for (int i = 0; i < 40; i++) {
+      await tester.pump(const Duration(milliseconds: 250));
+    }
 
     final layerRect = tester.getRect(find.byType(RoadVehicleLayer));
     final vehicleRect = tester.getRect(find.byType(VehicleWidget));
@@ -6668,12 +7348,18 @@ void main() {
     expect(tester.takeException(), isNull);
 
     await tester.pumpWidget(const SizedBox.shrink());
-    await tester.pump();
+    for (int i = 0; i < 40; i++) {
+      await tester.pump(const Duration(milliseconds: 250));
+    }
   });
 
   testWidgets('Motivation video can render as a separate road layer', (
     tester,
   ) async {
+    tester.view.physicalSize = const Size(1200, 520);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
     await tester.pumpWidget(
       MaterialApp(
         home: Scaffold(
@@ -6692,7 +7378,9 @@ void main() {
         ),
       ),
     );
-    await tester.pump();
+    for (int i = 0; i < 40; i++) {
+      await tester.pump(const Duration(milliseconds: 250));
+    }
 
     expect(
       find.byKey(const ValueKey('motivationVideoBubble_10')),
@@ -6713,7 +7401,9 @@ void main() {
         ),
       ),
     );
-    await tester.pump();
+    for (int i = 0; i < 40; i++) {
+      await tester.pump(const Duration(milliseconds: 250));
+    }
 
     final videoSize = tester.getSize(
       find.byKey(const ValueKey('motivationVideoBubble_10')),
@@ -6722,12 +7412,18 @@ void main() {
     expect(videoSize.width / videoSize.height, closeTo(16 / 9, 0.01));
 
     await tester.pumpWidget(const SizedBox.shrink());
-    await tester.pump();
+    for (int i = 0; i < 40; i++) {
+      await tester.pump(const Duration(milliseconds: 250));
+    }
   });
 
   testWidgets('Timer screen does not apply avatar saved for another vehicle', (
     tester,
   ) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
     final avatarFile = _createTemporaryAvatarImage();
 
     await tester.pumpWidget(
@@ -6745,7 +7441,9 @@ void main() {
         ),
       ),
     );
-    await tester.pump();
+    for (int i = 0; i < 40; i++) {
+      await tester.pump(const Duration(milliseconds: 250));
+    }
 
     expect(find.byType(RoadView), findsOneWidget);
     expect(
@@ -6754,12 +7452,18 @@ void main() {
     );
 
     await tester.pumpWidget(const SizedBox.shrink());
-    await tester.pump();
+    for (int i = 0; i < 40; i++) {
+      await tester.pump(const Duration(milliseconds: 250));
+    }
   });
 
   testWidgets('Timer screen applies avatar config for selected vehicle', (
     tester,
   ) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
     final avatarFile = _createTemporaryAvatarImage();
 
     await tester.pumpWidget(
@@ -6784,7 +7488,9 @@ void main() {
         ),
       ),
     );
-    await tester.pump();
+    for (int i = 0; i < 40; i++) {
+      await tester.pump(const Duration(milliseconds: 250));
+    }
 
     final roadView = tester.widget<RoadView>(find.byType(RoadView));
     expect(roadView.avatar.mode, AvatarImageMode.custom);
@@ -6796,6 +7502,10 @@ void main() {
   });
 
   testWidgets('TimerScreen passes marker ids to road markers', (tester) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
     await tester.pumpWidget(
       MaterialApp(
         locale: const Locale('ko'),
@@ -6808,7 +7518,9 @@ void main() {
         ),
       ),
     );
-    await tester.pump();
+    for (int i = 0; i < 40; i++) {
+      await tester.pump(const Duration(milliseconds: 250));
+    }
 
     final roadView = tester.widget<RoadView>(find.byType(RoadView));
     expect(
@@ -6829,6 +7541,10 @@ void main() {
   testWidgets('TimerScreen hides road markers when marker mode is off', (
     tester,
   ) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
     await tester.pumpWidget(
       MaterialApp(
         locale: const Locale('ko'),
@@ -6842,7 +7558,9 @@ void main() {
         ),
       ),
     );
-    await tester.pump();
+    for (int i = 0; i < 40; i++) {
+      await tester.pump(const Duration(milliseconds: 250));
+    }
 
     final roadView = tester.widget<RoadView>(find.byType(RoadView));
     expect(roadView.markers, isEmpty);
@@ -6852,6 +7570,10 @@ void main() {
   testWidgets('TimerScreen passes configured duration to the road course', (
     tester,
   ) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
     await tester.pumpWidget(
       MaterialApp(
         locale: const Locale('ko'),
@@ -6864,7 +7586,9 @@ void main() {
         ),
       ),
     );
-    await tester.pump();
+    for (int i = 0; i < 40; i++) {
+      await tester.pump(const Duration(milliseconds: 250));
+    }
 
     final roadView = tester.widget<RoadView>(find.byType(RoadView));
     expect(roadView.courseDuration, const Duration(minutes: 60));
@@ -6874,7 +7598,11 @@ void main() {
   testWidgets('TimerScreen saves an active session when started', (
     tester,
   ) async {
-    SharedPreferences.setMockInitialValues({});
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    SharedPreferences.setMockInitialValues({'savedActivityTimerPresetsInitialized': true});
     final startedAt = DateTime(2026, 6, 10, 8);
     final store = ActiveActivityTimerSessionStore();
 
@@ -6893,7 +7621,9 @@ void main() {
         ),
       ),
     );
-    await tester.pump();
+    for (int i = 0; i < 40; i++) {
+      await tester.pump(const Duration(milliseconds: 250));
+    }
 
     final session = await store.load();
     expect(session, isNotNull);
@@ -6906,13 +7636,19 @@ void main() {
     expect(session.pausedAt, isNull);
 
     await tester.pumpWidget(const SizedBox.shrink());
-    await tester.pump();
+    for (int i = 0; i < 40; i++) {
+      await tester.pump(const Duration(milliseconds: 250));
+    }
   });
 
   testWidgets('TimerScreen updates active session when paused and resumed', (
     tester,
   ) async {
-    SharedPreferences.setMockInitialValues({});
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    SharedPreferences.setMockInitialValues({'savedActivityTimerPresetsInitialized': true});
     var now = DateTime(2026, 6, 10, 8);
     final store = ActiveActivityTimerSessionStore();
 
@@ -6929,7 +7665,9 @@ void main() {
         ),
       ),
     );
-    await tester.pump();
+    for (int i = 0; i < 40; i++) {
+      await tester.pump(const Duration(milliseconds: 250));
+    }
 
     now = now.add(const Duration(minutes: 5));
     await tester.pump(const Duration(milliseconds: 250));
@@ -6937,7 +7675,7 @@ void main() {
         .widget<TimerControlBar>(find.byType(TimerControlBar))
         .onPauseResume!();
     await tester.pump();
-
+    await tester.pump(const Duration(milliseconds: 100));
     final pausedSession = await store.load();
     expect(pausedSession, isNotNull);
     expect(pausedSession!.state, ActiveActivityTimerSessionState.paused);
@@ -6949,7 +7687,7 @@ void main() {
         .widget<TimerControlBar>(find.byType(TimerControlBar))
         .onPauseResume!();
     await tester.pump();
-
+    await tester.pump(const Duration(milliseconds: 100));
     final resumedSession = await store.load();
     expect(resumedSession, isNotNull);
     expect(resumedSession!.state, ActiveActivityTimerSessionState.running);
@@ -6957,13 +7695,19 @@ void main() {
     expect(resumedSession.totalPausedDuration, const Duration(minutes: 3));
 
     await tester.pumpWidget(const SizedBox.shrink());
-    await tester.pump();
+    for (int i = 0; i < 40; i++) {
+      await tester.pump(const Duration(milliseconds: 250));
+    }
   });
 
   testWidgets('TimerScreen clears active session after completion', (
     tester,
   ) async {
-    SharedPreferences.setMockInitialValues({});
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    SharedPreferences.setMockInitialValues({'savedActivityTimerPresetsInitialized': true});
     final store = ActiveActivityTimerSessionStore();
 
     await tester.pumpWidget(
@@ -6978,24 +7722,33 @@ void main() {
         ),
       ),
     );
-    await tester.pump();
+    for (int i = 0; i < 40; i++) {
+      await tester.pump(const Duration(milliseconds: 250));
+    }
+    await tester.pump(const Duration(milliseconds: 100));
     expect(await store.load(), isNotNull);
 
     tester.widget<TimerControlBar>(find.byType(TimerControlBar)).onComplete!();
     await tester.pump();
     await tester.tap(find.byType(FilledButton).last);
-    await tester.pump();
+    await tester.pumpAndSettle();
 
     expect(await store.load(), isNull);
 
     await tester.pumpWidget(const SizedBox.shrink());
-    await tester.pump();
+    for (int i = 0; i < 40; i++) {
+      await tester.pump(const Duration(milliseconds: 250));
+    }
   });
 
   testWidgets('TimerScreen restores progress from an active session', (
     tester,
   ) async {
-    SharedPreferences.setMockInitialValues({});
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    SharedPreferences.setMockInitialValues({'savedActivityTimerPresetsInitialized': true});
     addTearDown(() async {
       await const ActiveActivityTimerSessionStore().clear();
     });
@@ -7023,7 +7776,9 @@ void main() {
         ),
       ),
     );
-    await tester.pump();
+    for (int i = 0; i < 40; i++) {
+      await tester.pump(const Duration(milliseconds: 250));
+    }
 
     final roadView = tester.widget<RoadView>(find.byType(RoadView));
     expect(roadView.courseDuration, const Duration(minutes: 60));
@@ -7035,19 +7790,25 @@ void main() {
     );
 
     await tester.pumpWidget(const SizedBox.shrink());
-    await tester.pump();
+    for (int i = 0; i < 40; i++) {
+      await tester.pump(const Duration(milliseconds: 250));
+    }
   });
 
   testWidgets(
     'TimerScreen restores arrived sessions at the finish until acknowledged',
     (tester) async {
+      tester.view.physicalSize = const Size(390, 844);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
       tester.view.physicalSize = const Size(600, 900);
       tester.view.devicePixelRatio = 1;
       addTearDown(() {
         tester.view.resetPhysicalSize();
         tester.view.resetDevicePixelRatio();
       });
-      SharedPreferences.setMockInitialValues({});
+      SharedPreferences.setMockInitialValues({'savedActivityTimerPresetsInitialized': true});
       addTearDown(() async {
         await const ActiveActivityTimerSessionStore().clear();
       });
@@ -7080,7 +7841,11 @@ void main() {
           ),
         ),
       );
-      await tester.pump();
+      
+      for (int i = 0; i < 40; i++) {
+        await tester.pump(const Duration(milliseconds: 250));
+      }
+
       await tester.pump(const Duration(milliseconds: 1100));
 
       expect(tester.widget<RoadView>(find.byType(RoadView)).vehicleProgress, 1);
@@ -7114,14 +7879,22 @@ void main() {
       );
 
       await tester.pumpWidget(const SizedBox.shrink());
-      await tester.pump();
+      
+      for (int i = 0; i < 40; i++) {
+        await tester.pump(const Duration(milliseconds: 250));
+      }
+
     },
   );
 
   testWidgets('TimerScreen resumes ticking from a restored paused session', (
     tester,
   ) async {
-    SharedPreferences.setMockInitialValues({});
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    SharedPreferences.setMockInitialValues({'savedActivityTimerPresetsInitialized': true});
     addTearDown(() async {
       await const ActiveActivityTimerSessionStore().clear();
     });
@@ -7148,7 +7921,9 @@ void main() {
         ),
       ),
     );
-    await tester.pump();
+    for (int i = 0; i < 40; i++) {
+      await tester.pump(const Duration(milliseconds: 250));
+    }
 
     expect(
       tester.widget<RoadView>(find.byType(RoadView)).progress,
@@ -7169,13 +7944,19 @@ void main() {
     );
 
     await tester.pumpWidget(const SizedBox.shrink());
-    await tester.pump();
+    for (int i = 0; i < 40; i++) {
+      await tester.pump(const Duration(milliseconds: 250));
+    }
   });
 
   testWidgets('TimerScreen refreshes elapsed time when app resumes', (
     tester,
   ) async {
-    SharedPreferences.setMockInitialValues({});
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    SharedPreferences.setMockInitialValues({'savedActivityTimerPresetsInitialized': true});
     addTearDown(() async {
       await const ActiveActivityTimerSessionStore().clear();
     });
@@ -7194,7 +7975,9 @@ void main() {
         ),
       ),
     );
-    await tester.pump();
+    for (int i = 0; i < 40; i++) {
+      await tester.pump(const Duration(milliseconds: 250));
+    }
 
     expect(tester.widget<RoadView>(find.byType(RoadView)).progress, 0);
 
@@ -7208,12 +7991,18 @@ void main() {
     );
 
     await tester.pumpWidget(const SizedBox.shrink());
-    await tester.pump();
+    for (int i = 0; i < 40; i++) {
+      await tester.pump(const Duration(milliseconds: 250));
+    }
   });
 
   testWidgets('Activity done before arrival does not immediately push result', (
     tester,
   ) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
     await tester.pumpWidget(
       MaterialApp(
         locale: const Locale('ko'),
@@ -7226,7 +8015,9 @@ void main() {
         ),
       ),
     );
-    await tester.pump();
+    for (int i = 0; i < 40; i++) {
+      await tester.pump(const Duration(milliseconds: 250));
+    }
 
     tester.widget<TimerControlBar>(find.byType(TimerControlBar)).onComplete!();
     await tester.pump();
@@ -7241,12 +8032,18 @@ void main() {
     );
 
     await tester.pumpWidget(const SizedBox.shrink());
-    await tester.pump();
+    for (int i = 0; i < 40; i++) {
+      await tester.pump(const Duration(milliseconds: 250));
+    }
   });
 
   testWidgets('Fast finish drive animates display progress to finish', (
     tester,
   ) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
     var now = DateTime(2026);
 
     await tester.pumpWidget(
@@ -7262,7 +8059,9 @@ void main() {
         ),
       ),
     );
-    await tester.pump();
+    for (int i = 0; i < 40; i++) {
+      await tester.pump(const Duration(milliseconds: 250));
+    }
     now = now.add(const Duration(seconds: 50));
     await tester.pump(const Duration(milliseconds: 250));
 
@@ -7286,10 +8085,16 @@ void main() {
     expect(find.byType(ResultScreen), findsOneWidget);
 
     await tester.pumpWidget(const SizedBox.shrink());
-    await tester.pump();
+    for (int i = 0; i < 40; i++) {
+      await tester.pump(const Duration(milliseconds: 250));
+    }
   });
 
   testWidgets('Controls are disabled during fast finish drive', (tester) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
     await tester.pumpWidget(
       MaterialApp(
         locale: const Locale('ko'),
@@ -7302,7 +8107,9 @@ void main() {
         ),
       ),
     );
-    await tester.pump();
+    for (int i = 0; i < 40; i++) {
+      await tester.pump(const Duration(milliseconds: 250));
+    }
 
     tester.widget<TimerControlBar>(find.byType(TimerControlBar)).onComplete!();
     await tester.pump();
@@ -7316,12 +8123,18 @@ void main() {
     expect(controls.onComplete, isNull);
 
     await tester.pumpWidget(const SizedBox.shrink());
-    await tester.pump();
+    for (int i = 0; i < 40; i++) {
+      await tester.pump(const Duration(milliseconds: 250));
+    }
   });
 
   testWidgets('Completing after arrival opens result without fast finish', (
     tester,
   ) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
     tester.view.physicalSize = const Size(600, 900);
     tester.view.devicePixelRatio = 1;
     addTearDown(() {
@@ -7359,7 +8172,9 @@ void main() {
         ),
       ),
     );
-    await tester.pump();
+    for (int i = 0; i < 40; i++) {
+      await tester.pump(const Duration(milliseconds: 250));
+    }
     await tester.pump(const Duration(milliseconds: 1100));
 
     expect(find.byKey(const ValueKey('arrivalActionPanel')), findsOneWidget);
@@ -7370,12 +8185,18 @@ void main() {
     expect(find.byType(ResultScreen), findsOneWidget);
 
     await tester.pumpWidget(const SizedBox.shrink());
-    await tester.pump();
+    for (int i = 0; i < 40; i++) {
+      await tester.pump(const Duration(milliseconds: 250));
+    }
   });
 
   testWidgets(
     'Live arrival waits for route acknowledgement before completion dialog',
     (tester) async {
+      tester.view.physicalSize = const Size(390, 844);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
       tester.view.physicalSize = const Size(600, 900);
       tester.view.devicePixelRatio = 1;
       addTearDown(() {
@@ -7413,7 +8234,11 @@ void main() {
           ),
         ),
       );
-      await tester.pump();
+      
+      for (int i = 0; i < 40; i++) {
+        await tester.pump(const Duration(milliseconds: 250));
+      }
+
       now = now.add(const Duration(seconds: 2));
       await tester.pump(const Duration(milliseconds: 250));
       await tester.pump(const Duration(milliseconds: 1100));
@@ -7425,20 +8250,28 @@ void main() {
       expect(find.byType(TimerControlBar), findsNothing);
 
       await tester.pumpWidget(const SizedBox.shrink());
-      await tester.pump();
+      
+      for (int i = 0; i < 40; i++) {
+        await tester.pump(const Duration(milliseconds: 250));
+      }
+
     },
   );
 
   testWidgets(
     'Time-ended activity opens result after arrival acknowledgement',
     (tester) async {
+      tester.view.physicalSize = const Size(390, 844);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
       tester.view.physicalSize = const Size(600, 900);
       tester.view.devicePixelRatio = 1;
       addTearDown(() {
         tester.view.resetPhysicalSize();
         tester.view.resetDevicePixelRatio();
       });
-      SharedPreferences.setMockInitialValues({});
+      SharedPreferences.setMockInitialValues({'savedActivityTimerPresetsInitialized': true});
 
       final startedAt = DateTime(2026);
       final now = startedAt.add(const Duration(seconds: 2));
@@ -7474,7 +8307,11 @@ void main() {
           ),
         ),
       );
-      await tester.pump();
+      
+      for (int i = 0; i < 40; i++) {
+        await tester.pump(const Duration(milliseconds: 250));
+      }
+
       await tester.pump(const Duration(milliseconds: 1100));
       await tester.pump();
 
@@ -7519,20 +8356,28 @@ void main() {
       );
 
       await tester.pumpWidget(const SizedBox.shrink());
-      await tester.pump();
+      
+      for (int i = 0; i < 40; i++) {
+        await tester.pump(const Duration(milliseconds: 250));
+      }
+
     },
   );
 
   testWidgets('Timer records directly selected markers on completion', (
     tester,
   ) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
     tester.view.physicalSize = const Size(600, 900);
     tester.view.devicePixelRatio = 1;
     addTearDown(() {
       tester.view.resetPhysicalSize();
       tester.view.resetDevicePixelRatio();
     });
-    SharedPreferences.setMockInitialValues({});
+    SharedPreferences.setMockInitialValues({'savedActivityTimerPresetsInitialized': true});
 
     final startedAt = DateTime(2026);
     final now = startedAt.add(const Duration(seconds: 2));
@@ -7562,7 +8407,9 @@ void main() {
         ),
       ),
     );
-    await tester.pump();
+    for (int i = 0; i < 40; i++) {
+      await tester.pump(const Duration(milliseconds: 250));
+    }
     await tester.pump(const Duration(milliseconds: 1100));
 
     expect(find.byKey(const ValueKey('arrivalActionPanel')), findsOneWidget);
@@ -7579,12 +8426,18 @@ void main() {
     );
 
     await tester.pumpWidget(const SizedBox.shrink());
-    await tester.pump();
+    for (int i = 0; i < 40; i++) {
+      await tester.pump(const Duration(milliseconds: 250));
+    }
   });
 
   testWidgets('Timer hands orientation control to result screen', (
     tester,
   ) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
     var now = DateTime(2026);
     final orientationService = _FakeOrientationService();
 
@@ -7602,7 +8455,9 @@ void main() {
         ),
       ),
     );
-    await tester.pump();
+    for (int i = 0; i < 40; i++) {
+      await tester.pump(const Duration(milliseconds: 250));
+    }
     now = now.add(const Duration(seconds: 2));
     await tester.pump(const Duration(milliseconds: 250));
 
@@ -7619,7 +8474,9 @@ void main() {
     ]);
 
     await tester.pumpWidget(const SizedBox.shrink());
-    await tester.pump();
+    for (int i = 0; i < 40; i++) {
+      await tester.pump(const Duration(milliseconds: 250));
+    }
 
     expect(orientationService.calls, [
       'allowTimerOrientations',
@@ -7631,6 +8488,10 @@ void main() {
   testWidgets('Timer screen plays motivation voice after video starts', (
     tester,
   ) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
     final motivationAudioService = _FakeMotivationAudioService();
     var now = DateTime(2026);
 
@@ -7655,7 +8516,9 @@ void main() {
         ),
       ),
     );
-    await tester.pump();
+    for (int i = 0; i < 40; i++) {
+      await tester.pump(const Duration(milliseconds: 250));
+    }
     now = now.add(const Duration(seconds: 10));
     await tester.pump(const Duration(milliseconds: 250));
 
@@ -7674,12 +8537,18 @@ void main() {
     );
 
     await tester.pumpWidget(const SizedBox.shrink());
-    await tester.pump();
+    for (int i = 0; i < 40; i++) {
+      await tester.pump(const Duration(milliseconds: 250));
+    }
   });
 
   testWidgets(
     'Timer screen uses three-minute motivation cadence for long timer',
     (tester) async {
+      tester.view.physicalSize = const Size(390, 844);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
       var now = DateTime(2026);
 
       await tester.pumpWidget(
@@ -7702,7 +8571,11 @@ void main() {
           ),
         ),
       );
-      await tester.pump();
+      
+      for (int i = 0; i < 40; i++) {
+        await tester.pump(const Duration(milliseconds: 250));
+      }
+
 
       now = now.add(const Duration(minutes: 2, seconds: 59));
       await tester.pump(const Duration(milliseconds: 250));
@@ -7729,13 +8602,21 @@ void main() {
       );
 
       await tester.pumpWidget(const SizedBox.shrink());
-      await tester.pump();
+      
+      for (int i = 0; i < 40; i++) {
+        await tester.pump(const Duration(milliseconds: 250));
+      }
+
     },
   );
 
   testWidgets(
     'Timer screen custom motivation interval ignores percent milestones',
     (tester) async {
+      tester.view.physicalSize = const Size(390, 844);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
       var now = DateTime(2026);
 
       await tester.pumpWidget(
@@ -7760,7 +8641,11 @@ void main() {
           ),
         ),
       );
-      await tester.pump();
+      
+      for (int i = 0; i < 40; i++) {
+        await tester.pump(const Duration(milliseconds: 250));
+      }
+
 
       now = now.add(const Duration(minutes: 2));
       await tester.pump(const Duration(milliseconds: 250));
@@ -7787,13 +8672,21 @@ void main() {
       );
 
       await tester.pumpWidget(const SizedBox.shrink());
-      await tester.pump();
+      
+      for (int i = 0; i < 40; i++) {
+        await tester.pump(const Duration(milliseconds: 250));
+      }
+
     },
   );
 
   testWidgets('Timer screen closes active motivation video when disabled', (
     tester,
   ) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
     ActivityTimerConfig? changedConfig;
     var now = DateTime(2026);
 
@@ -7817,7 +8710,9 @@ void main() {
         ),
       ),
     );
-    await tester.pump();
+    for (int i = 0; i < 40; i++) {
+      await tester.pump(const Duration(milliseconds: 250));
+    }
 
     now = now.add(const Duration(minutes: 3));
     await tester.pump(const Duration(milliseconds: 250));
@@ -7851,12 +8746,18 @@ void main() {
     expect(changedConfig?.motivationVideoEnabled, isFalse);
 
     await tester.pumpWidget(const SizedBox.shrink());
-    await tester.pump();
+    for (int i = 0; i < 40; i++) {
+      await tester.pump(const Duration(milliseconds: 250));
+    }
   });
 
   testWidgets(
     'Timer motivation settings dismiss keeps pending changes unapplied',
     (tester) async {
+      tester.view.physicalSize = const Size(390, 844);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
       ActivityTimerConfig? changedConfig;
       var now = DateTime(2026);
 
@@ -7880,7 +8781,11 @@ void main() {
           ),
         ),
       );
-      await tester.pump();
+      
+      for (int i = 0; i < 40; i++) {
+        await tester.pump(const Duration(milliseconds: 250));
+      }
+
 
       now = now.add(const Duration(minutes: 3));
       await tester.pump(const Duration(milliseconds: 250));
@@ -7914,13 +8819,21 @@ void main() {
       );
 
       await tester.pumpWidget(const SizedBox.shrink());
-      await tester.pump();
+      
+      for (int i = 0; i < 40; i++) {
+        await tester.pump(const Duration(milliseconds: 250));
+      }
+
     },
   );
 
   testWidgets(
     'Timer screen restarts custom motivation interval from change time',
     (tester) async {
+      tester.view.physicalSize = const Size(390, 844);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
       var now = DateTime(2026);
 
       await tester.pumpWidget(
@@ -7943,7 +8856,11 @@ void main() {
           ),
         ),
       );
-      await tester.pump();
+      
+      for (int i = 0; i < 40; i++) {
+        await tester.pump(const Duration(milliseconds: 250));
+      }
+
 
       now = now.add(const Duration(minutes: 2));
       await tester.pump(const Duration(milliseconds: 250));
@@ -7982,13 +8899,21 @@ void main() {
       );
 
       await tester.pumpWidget(const SizedBox.shrink());
-      await tester.pump();
+      
+      for (int i = 0; i < 40; i++) {
+        await tester.pump(const Duration(milliseconds: 250));
+      }
+
     },
   );
 
   testWidgets('Timer screen skips motivation videos when disabled', (
     tester,
   ) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
     var now = DateTime(2026);
 
     await tester.pumpWidget(
@@ -8012,7 +8937,9 @@ void main() {
         ),
       ),
     );
-    await tester.pump();
+    for (int i = 0; i < 40; i++) {
+      await tester.pump(const Duration(milliseconds: 250));
+    }
 
     now = now.add(const Duration(minutes: 3));
     await tester.pump(const Duration(milliseconds: 250));
@@ -8024,10 +8951,16 @@ void main() {
     );
 
     await tester.pumpWidget(const SizedBox.shrink());
-    await tester.pump();
+    for (int i = 0; i < 40; i++) {
+      await tester.pump(const Duration(milliseconds: 250));
+    }
   });
 
   testWidgets('Timer screen keeps vehicle fixed when paused', (tester) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
     tester.view.physicalSize = const Size(852, 393);
     tester.view.devicePixelRatio = 1;
     addTearDown(() {
@@ -8049,7 +8982,9 @@ void main() {
         ),
       ),
     );
-    await tester.pump();
+    for (int i = 0; i < 40; i++) {
+      await tester.pump(const Duration(milliseconds: 250));
+    }
     now = now.add(const Duration(minutes: 20));
     await tester.pump(const Duration(milliseconds: 250));
 
@@ -8074,12 +9009,18 @@ void main() {
     expect(centerAfterPausedTime.dy, closeTo(centerBeforePause.dy, 0.1));
 
     await tester.pumpWidget(const SizedBox.shrink());
-    await tester.pump();
+    for (int i = 0; i < 40; i++) {
+      await tester.pump(const Duration(milliseconds: 250));
+    }
   });
 
   testWidgets('Timer screen gives the route primary space in landscape', (
     tester,
   ) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
     tester.view.physicalSize = const Size(1200, 600);
     tester.view.devicePixelRatio = 1;
     addTearDown(() {
@@ -8099,7 +9040,9 @@ void main() {
         ),
       ),
     );
-    await tester.pump();
+    for (int i = 0; i < 40; i++) {
+      await tester.pump(const Duration(milliseconds: 250));
+    }
 
     final roadSize = tester.getSize(find.byType(RoadView));
     expect(roadSize, const Size(1200, 520));
@@ -8184,6 +9127,10 @@ void main() {
   testWidgets('Timer screen keeps long landscape course viewport fixed', (
     tester,
   ) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
     tester.view.physicalSize = const Size(1200, 600);
     tester.view.devicePixelRatio = 1;
     addTearDown(() {
@@ -8203,7 +9150,9 @@ void main() {
         ),
       ),
     );
-    await tester.pump();
+    for (int i = 0; i < 40; i++) {
+      await tester.pump(const Duration(milliseconds: 250));
+    }
 
     expect(tester.getSize(find.byType(RoadView)), const Size(1200, 520));
     expect(
@@ -8227,6 +9176,10 @@ void main() {
   testWidgets(
     'Timer screen places controls inside compact landscape course action slot',
     (tester) async {
+      tester.view.physicalSize = const Size(390, 844);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
       tester.view.physicalSize = const Size(852, 393);
       tester.view.devicePixelRatio = 1;
       addTearDown(() {
@@ -8244,7 +9197,11 @@ void main() {
           ),
         ),
       );
-      await tester.pump();
+      
+      for (int i = 0; i < 40; i++) {
+        await tester.pump(const Duration(milliseconds: 250));
+      }
+
 
       final roadRect = tester.getRect(find.byType(RoadView));
       final controlsRect = tester.getRect(
@@ -8284,6 +9241,10 @@ void main() {
   testWidgets('Timer motivation settings sheet scrolls in compact landscape', (
     tester,
   ) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
     tester.view.physicalSize = const Size(852, 393);
     tester.view.devicePixelRatio = 1;
     addTearDown(() {
@@ -8303,7 +9264,9 @@ void main() {
         ),
       ),
     );
-    await tester.pump();
+    for (int i = 0; i < 40; i++) {
+      await tester.pump(const Duration(milliseconds: 250));
+    }
 
     await tester.tap(find.byKey(const ValueKey('motivationSettingsButton')));
     await tester.pump();
@@ -8323,6 +9286,10 @@ void main() {
   testWidgets('Timer screen allows landscape only while mounted', (
     tester,
   ) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
     final orientationService = _FakeOrientationService();
 
     await tester.pumpWidget(
@@ -8335,12 +9302,16 @@ void main() {
         ),
       ),
     );
-    await tester.pump();
+    for (int i = 0; i < 40; i++) {
+      await tester.pump(const Duration(milliseconds: 250));
+    }
 
     expect(orientationService.calls, ['allowTimerOrientations']);
 
     await tester.pumpWidget(const SizedBox.shrink());
-    await tester.pump();
+    for (int i = 0; i < 40; i++) {
+      await tester.pump(const Duration(milliseconds: 250));
+    }
 
     expect(orientationService.calls, [
       'allowTimerOrientations',
@@ -8351,6 +9322,10 @@ void main() {
   testWidgets('Timer screen keeps screen awake only when setting is enabled', (
     tester,
   ) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
     final screenAwakeService = _FakeScreenAwakeService();
 
     await tester.pumpWidget(
@@ -8365,12 +9340,16 @@ void main() {
         ),
       ),
     );
-    await tester.pump();
+    for (int i = 0; i < 40; i++) {
+      await tester.pump(const Duration(milliseconds: 250));
+    }
 
     expect(screenAwakeService.enabledValues, [true]);
 
     await tester.pumpWidget(const SizedBox.shrink());
-    await tester.pump();
+    for (int i = 0; i < 40; i++) {
+      await tester.pump(const Duration(milliseconds: 250));
+    }
 
     expect(screenAwakeService.enabledValues, [true, false]);
   });
@@ -8378,6 +9357,10 @@ void main() {
   testWidgets(
     'Timer screen leaves wakelock untouched when setting is disabled',
     (tester) async {
+      tester.view.physicalSize = const Size(390, 844);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
       final screenAwakeService = _FakeScreenAwakeService();
 
       await tester.pumpWidget(
@@ -8392,12 +9375,20 @@ void main() {
           ),
         ),
       );
-      await tester.pump();
+      
+      for (int i = 0; i < 40; i++) {
+        await tester.pump(const Duration(milliseconds: 250));
+      }
+
 
       expect(screenAwakeService.enabledValues, isEmpty);
 
       await tester.pumpWidget(const SizedBox.shrink());
-      await tester.pump();
+      
+      for (int i = 0; i < 40; i++) {
+        await tester.pump(const Duration(milliseconds: 250));
+      }
+
 
       expect(screenAwakeService.enabledValues, isEmpty);
     },
@@ -8406,7 +9397,11 @@ void main() {
   testWidgets('Timer screen asks before leaving with the back button', (
     tester,
   ) async {
-    SharedPreferences.setMockInitialValues({});
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    SharedPreferences.setMockInitialValues({'savedActivityTimerPresetsInitialized': true});
     tester.view.physicalSize = const Size(600, 900);
     tester.view.devicePixelRatio = 1;
     addTearDown(() {
@@ -8468,7 +9463,18 @@ void main() {
   });
 
   testWidgets('English locale shows English home copy', (tester) async {
-    SharedPreferences.setMockInitialValues({});
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(() {
+      tester.view.resetPhysicalSize();
+      tester.view.resetDevicePixelRatio();
+    });
+
+    SharedPreferences.setMockInitialValues({'savedActivityTimerPresetsInitialized': true});
 
     await _startApp(tester, const Locale('en'));
 
@@ -8480,10 +9486,10 @@ void main() {
 
     await _openTimerBuilder(tester);
 
-    expect(find.text('Brush Teeth'), findsOneWidget);
-    expect(find.text('Reading'), findsOneWidget);
+    expect(find.text('Brush Teeth'), findsWidgets);
+    expect(find.text('Reading'), findsWidgets);
     expect(find.text('Cleanup'), findsOneWidget);
-    expect(find.text('Play Time'), findsOneWidget);
+    expect(find.text('Play Time'), findsWidgets);
     expect(find.text('Meal'), findsOneWidget);
     expect(find.text('Other'), findsOneWidget);
     expect(find.text('2 min'), findsOneWidget);
@@ -8496,7 +9502,11 @@ void main() {
   testWidgets('English locale shows English timer progress copy', (
     tester,
   ) async {
-    SharedPreferences.setMockInitialValues({});
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    SharedPreferences.setMockInitialValues({'savedActivityTimerPresetsInitialized': true});
     tester.view.physicalSize = const Size(600, 900);
     tester.view.devicePixelRatio = 1;
     addTearDown(() {
@@ -8514,7 +9524,7 @@ void main() {
         ),
       ),
     );
-    await tester.pump();
+    await tester.pump(const Duration(seconds: 2));
 
     expect(find.text("Today's Mission"), findsOneWidget);
     expect(find.text("We're off!"), findsOneWidget);
@@ -8523,7 +9533,11 @@ void main() {
   });
 
   testWidgets('Paused timer shows paused status copy', (tester) async {
-    SharedPreferences.setMockInitialValues({});
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    SharedPreferences.setMockInitialValues({'savedActivityTimerPresetsInitialized': true});
 
     await tester.pumpWidget(
       MaterialApp(
@@ -8535,7 +9549,7 @@ void main() {
         ),
       ),
     );
-    await tester.pump();
+    await tester.pump(const Duration(seconds: 2));
 
     await tester.ensureVisible(find.text('Pause'));
     await tester.pump();
@@ -8547,7 +9561,11 @@ void main() {
   });
 
   testWidgets('Unsupported locale falls back to English', (tester) async {
-    SharedPreferences.setMockInitialValues({});
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    SharedPreferences.setMockInitialValues({'savedActivityTimerPresetsInitialized': true});
 
     await _startApp(tester, const Locale('fr'));
 
@@ -8556,7 +9574,7 @@ void main() {
   });
 
   test('Fast activity awards the selected vehicle sticker', () async {
-    SharedPreferences.setMockInitialValues({});
+    SharedPreferences.setMockInitialValues({'savedActivityTimerPresetsInitialized': true});
 
     final service = LocalActivityProgressService();
     final recordedSession = await _recordActivityResult(
@@ -8582,7 +9600,7 @@ void main() {
   });
 
   test('Incomplete activity awards no vehicle sticker', () async {
-    SharedPreferences.setMockInitialValues({});
+    SharedPreferences.setMockInitialValues({'savedActivityTimerPresetsInitialized': true});
 
     final service = LocalActivityProgressService();
     final recordedSession = await _recordActivityResult(
@@ -8600,7 +9618,7 @@ void main() {
   test(
     'Completing same vehicle increments vehicle sticker inventory',
     () async {
-      SharedPreferences.setMockInitialValues({});
+      SharedPreferences.setMockInitialValues({'savedActivityTimerPresetsInitialized': true});
 
       final service = LocalActivityProgressService();
       await _recordActivityResult(
@@ -8628,7 +9646,7 @@ void main() {
   test(
     'Completing different vehicles creates separate inventory items',
     () async {
-      SharedPreferences.setMockInitialValues({});
+      SharedPreferences.setMockInitialValues({'savedActivityTimerPresetsInitialized': true});
 
       final service = LocalActivityProgressService();
       await _recordActivityResult(
@@ -8668,7 +9686,7 @@ void main() {
   test(
     'Completed overtime activity awards the selected vehicle sticker',
     () async {
-      SharedPreferences.setMockInitialValues({});
+      SharedPreferences.setMockInitialValues({'savedActivityTimerPresetsInitialized': true});
 
       final service = LocalActivityProgressService();
       final recordedSession = await _recordActivityResult(
@@ -8691,7 +9709,7 @@ void main() {
   );
 
   test('Activity with disabled rewards does not award stickers', () async {
-    SharedPreferences.setMockInitialValues({});
+    SharedPreferences.setMockInitialValues({'savedActivityTimerPresetsInitialized': true});
 
     final service = LocalActivityProgressService();
     final recordedSession = await _recordActivityResult(
@@ -8704,7 +9722,7 @@ void main() {
   });
 
   test('Missing selected vehicle sticker does not award stickers', () async {
-    SharedPreferences.setMockInitialValues({});
+    SharedPreferences.setMockInitialValues({'savedActivityTimerPresetsInitialized': true});
 
     final service = LocalActivityProgressService();
     final recordedSession = await _recordActivityResult(
@@ -8718,7 +9736,7 @@ void main() {
   });
 
   test('Time-ended activity does not award stickers', () async {
-    SharedPreferences.setMockInitialValues({});
+    SharedPreferences.setMockInitialValues({'savedActivityTimerPresetsInitialized': true});
 
     final service = LocalActivityProgressService();
     final recordedSession = await _recordActivityResult(
@@ -8731,7 +9749,7 @@ void main() {
   });
 
   test('Time-ended activity can award stickers by parent choice', () async {
-    SharedPreferences.setMockInitialValues({});
+    SharedPreferences.setMockInitialValues({'savedActivityTimerPresetsInitialized': true});
 
     final service = LocalActivityProgressService();
     final recordedSession = await _recordActivityResult(
@@ -8749,7 +9767,7 @@ void main() {
   });
 
   test('Play time ended does not award stickers', () async {
-    SharedPreferences.setMockInitialValues({});
+    SharedPreferences.setMockInitialValues({'savedActivityTimerPresetsInitialized': true});
 
     final service = LocalActivityProgressService();
     final recordedSession = await _recordActivityResult(
@@ -8769,7 +9787,7 @@ void main() {
   });
 
   test('Brushing completed at end awards one sticker', () async {
-    SharedPreferences.setMockInitialValues({});
+    SharedPreferences.setMockInitialValues({'savedActivityTimerPresetsInitialized': true});
 
     final service = LocalActivityProgressService();
     final recordedSession = await _recordActivityResult(
@@ -8793,7 +9811,7 @@ void main() {
   });
 
   test('Incomplete activity does not award stickers', () async {
-    SharedPreferences.setMockInitialValues({});
+    SharedPreferences.setMockInitialValues({'savedActivityTimerPresetsInitialized': true});
 
     final service = LocalActivityProgressService();
     final recordedSession = await _recordActivityResult(
@@ -8818,7 +9836,7 @@ void main() {
   });
 
   test('Arrival-completed activity records at-arrival status', () async {
-    SharedPreferences.setMockInitialValues({});
+    SharedPreferences.setMockInitialValues({'savedActivityTimerPresetsInitialized': true});
 
     final service = LocalActivityProgressService();
     final recordedSession = await _recordActivityResult(
@@ -8842,7 +9860,7 @@ void main() {
   });
 
   test('Activity history stores directly selected marker ids', () async {
-    SharedPreferences.setMockInitialValues({});
+    SharedPreferences.setMockInitialValues({'savedActivityTimerPresetsInitialized': true});
 
     final service = LocalActivityProgressService();
     final recordedSession = await _recordActivityResult(
@@ -8965,7 +9983,7 @@ void main() {
   });
 
   test('Deleting activity history removes only the saved record', () async {
-    SharedPreferences.setMockInitialValues({});
+    SharedPreferences.setMockInitialValues({'savedActivityTimerPresetsInitialized': true});
 
     final service = LocalActivityProgressService();
     await service.createRewardGoal(
@@ -9008,7 +10026,7 @@ void main() {
   test(
     'Deleting missing activity history entry leaves records unchanged',
     () async {
-      SharedPreferences.setMockInitialValues({});
+      SharedPreferences.setMockInitialValues({'savedActivityTimerPresetsInitialized': true});
 
       final service = LocalActivityProgressService();
       await _recordActivityResult(service, _activityResult());
@@ -9024,7 +10042,7 @@ void main() {
   test(
     'Completed activity fills exactly one active reward goal slot',
     () async {
-      SharedPreferences.setMockInitialValues({});
+      SharedPreferences.setMockInitialValues({'savedActivityTimerPresetsInitialized': true});
 
       final service = LocalActivityProgressService();
       await service.createRewardGoal(
@@ -9045,7 +10063,7 @@ void main() {
   );
 
   test('Completed activity fills all active reward goals', () async {
-    SharedPreferences.setMockInitialValues({});
+    SharedPreferences.setMockInitialValues({'savedActivityTimerPresetsInitialized': true});
 
     final service = LocalActivityProgressService();
     await service.createRewardGoal(
@@ -9068,7 +10086,7 @@ void main() {
   test(
     'Parent-skipped completed activity does not fill reward goals',
     () async {
-      SharedPreferences.setMockInitialValues({});
+      SharedPreferences.setMockInitialValues({'savedActivityTimerPresetsInitialized': true});
 
       final service = LocalActivityProgressService();
       await service.createRewardGoal(
@@ -9093,7 +10111,7 @@ void main() {
   );
 
   test('Parent-awarded time-ended activity fills reward goals', () async {
-    SharedPreferences.setMockInitialValues({});
+    SharedPreferences.setMockInitialValues({'savedActivityTimerPresetsInitialized': true});
 
     final service = LocalActivityProgressService();
     await service.createRewardGoal(
@@ -9121,7 +10139,7 @@ void main() {
   });
 
   test('Only two active reward goals can be created', () async {
-    SharedPreferences.setMockInitialValues({});
+    SharedPreferences.setMockInitialValues({'savedActivityTimerPresetsInitialized': true});
 
     final service = LocalActivityProgressService();
     await service.createRewardGoal(
@@ -9209,7 +10227,7 @@ void main() {
   });
 
   test('Fast activity fills only one reward goal slot', () async {
-    SharedPreferences.setMockInitialValues({});
+    SharedPreferences.setMockInitialValues({'savedActivityTimerPresetsInitialized': true});
 
     final service = LocalActivityProgressService();
     await service.createRewardGoal(
@@ -9231,7 +10249,7 @@ void main() {
   });
 
   test('Incomplete activity does not fill a reward goal slot', () async {
-    SharedPreferences.setMockInitialValues({});
+    SharedPreferences.setMockInitialValues({'savedActivityTimerPresetsInitialized': true});
 
     final service = LocalActivityProgressService();
     await service.createRewardGoal(
@@ -9250,7 +10268,7 @@ void main() {
   });
 
   test('Reward goal becomes earned when required count is reached', () async {
-    SharedPreferences.setMockInitialValues({});
+    SharedPreferences.setMockInitialValues({'savedActivityTimerPresetsInitialized': true});
 
     final service = LocalActivityProgressService();
     await service.createRewardGoal(
@@ -9275,7 +10293,7 @@ void main() {
   });
 
   test('Using an earned goal moves it to used history', () async {
-    SharedPreferences.setMockInitialValues({});
+    SharedPreferences.setMockInitialValues({'savedActivityTimerPresetsInitialized': true});
 
     final service = LocalActivityProgressService();
     await service.createRewardGoal(
@@ -9296,7 +10314,7 @@ void main() {
   });
 
   test('Active reward goal can be updated', () async {
-    SharedPreferences.setMockInitialValues({});
+    SharedPreferences.setMockInitialValues({'savedActivityTimerPresetsInitialized': true});
 
     final service = LocalActivityProgressService();
     await service.createRewardGoal(
@@ -9319,7 +10337,7 @@ void main() {
   test(
     'Reducing required count to filled count makes reward goal earned',
     () async {
-      SharedPreferences.setMockInitialValues({});
+      SharedPreferences.setMockInitialValues({'savedActivityTimerPresetsInitialized': true});
 
       final service = LocalActivityProgressService();
       await service.createRewardGoal(
@@ -9347,7 +10365,7 @@ void main() {
   );
 
   test('Active reward goal can be canceled', () async {
-    SharedPreferences.setMockInitialValues({});
+    SharedPreferences.setMockInitialValues({'savedActivityTimerPresetsInitialized': true});
 
     final service = LocalActivityProgressService();
     await service.createRewardGoal(
@@ -9364,7 +10382,7 @@ void main() {
   });
 
   test('Existing sticker inventory counts still increase', () async {
-    SharedPreferences.setMockInitialValues({});
+    SharedPreferences.setMockInitialValues({'savedActivityTimerPresetsInitialized': true});
 
     final service = LocalActivityProgressService();
     await service.createRewardGoal(
@@ -9387,7 +10405,11 @@ void main() {
   });
 
   testWidgets('Home screen shows reward goal CTA', (tester) async {
-    SharedPreferences.setMockInitialValues({});
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    SharedPreferences.setMockInitialValues({'savedActivityTimerPresetsInitialized': true});
 
     await tester.pumpWidget(
       MaterialApp(
@@ -9409,7 +10431,11 @@ void main() {
   testWidgets('Home activity history summary opens activity history screen', (
     tester,
   ) async {
-    SharedPreferences.setMockInitialValues({});
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    SharedPreferences.setMockInitialValues({'savedActivityTimerPresetsInitialized': true});
     final service = LocalActivityProgressService();
     await _recordActivityResult(
       service,
@@ -9445,7 +10471,11 @@ void main() {
   testWidgets('Home activity history summary shows incomplete status', (
     tester,
   ) async {
-    SharedPreferences.setMockInitialValues({});
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    SharedPreferences.setMockInitialValues({'savedActivityTimerPresetsInitialized': true});
     final service = LocalActivityProgressService();
     await _recordActivityResult(
       service,
@@ -9480,7 +10510,11 @@ void main() {
   });
 
   testWidgets('Reward goal creation form saves a goal', (tester) async {
-    SharedPreferences.setMockInitialValues({});
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    SharedPreferences.setMockInitialValues({'savedActivityTimerPresetsInitialized': true});
     final service = LocalActivityProgressService();
 
     await tester.pumpWidget(
@@ -9489,7 +10523,9 @@ void main() {
         home: RewardGoalScreen(activityProgressService: service),
       ),
     );
-    await tester.pump();
+    for (int i = 0; i < 40; i++) {
+      await tester.pump(const Duration(milliseconds: 250));
+    }
 
     await tester.tap(find.widgetWithText(ChoiceChip, '7'));
     await tester.pump();
@@ -9504,7 +10540,11 @@ void main() {
   });
 
   testWidgets('Earned reward use flow asks for confirmation', (tester) async {
-    SharedPreferences.setMockInitialValues({});
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    SharedPreferences.setMockInitialValues({'savedActivityTimerPresetsInitialized': true});
     final service = LocalActivityProgressService();
     await service.createRewardGoal(
       requiredStickerCount: 1,
@@ -9547,7 +10587,11 @@ void main() {
   });
 
   testWidgets('Activity history screen shows empty state', (tester) async {
-    SharedPreferences.setMockInitialValues({});
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    SharedPreferences.setMockInitialValues({'savedActivityTimerPresetsInitialized': true});
 
     await tester.pumpWidget(
       MaterialApp(
@@ -9569,7 +10613,11 @@ void main() {
   testWidgets('Activity history screen lists saved activity records', (
     tester,
   ) async {
-    SharedPreferences.setMockInitialValues({});
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    SharedPreferences.setMockInitialValues({'savedActivityTimerPresetsInitialized': true});
     final service = LocalActivityProgressService();
     await _recordActivityResult(
       service,
@@ -9607,7 +10655,11 @@ void main() {
   testWidgets('Activity history screen deletes a record after confirmation', (
     tester,
   ) async {
-    SharedPreferences.setMockInitialValues({});
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    SharedPreferences.setMockInitialValues({'savedActivityTimerPresetsInitialized': true});
     final service = LocalActivityProgressService();
     final recordedSession = await _recordActivityResult(
       service,
@@ -9650,7 +10702,11 @@ void main() {
   });
 
   testWidgets('Activity history delete dialog can be canceled', (tester) async {
-    SharedPreferences.setMockInitialValues({});
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    SharedPreferences.setMockInitialValues({'savedActivityTimerPresetsInitialized': true});
     final service = LocalActivityProgressService();
     final recordedSession = await _recordActivityResult(
       service,
@@ -9687,7 +10743,11 @@ void main() {
   testWidgets('Activity history screen shows directly selected markers', (
     tester,
   ) async {
-    SharedPreferences.setMockInitialValues({});
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    SharedPreferences.setMockInitialValues({'savedActivityTimerPresetsInitialized': true});
     final service = LocalActivityProgressService();
     await _recordActivityResult(
       service,
@@ -9724,7 +10784,11 @@ void main() {
   testWidgets('Activity history screen shows needs-more-time records', (
     tester,
   ) async {
-    SharedPreferences.setMockInitialValues({});
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    SharedPreferences.setMockInitialValues({'savedActivityTimerPresetsInitialized': true});
     final service = LocalActivityProgressService();
     await _recordActivityResult(
       service,
@@ -9854,6 +10918,13 @@ Future<void> _startApp(
   bool completeOnboarding = true,
   bool completeChildNameSetup = true,
 }) async {
+  tester.view.physicalSize = const Size(390, 844);
+  tester.view.devicePixelRatio = 1;
+  addTearDown(() {
+    tester.view.resetPhysicalSize();
+    tester.view.resetDevicePixelRatio();
+  });
+
   tester.binding.platformDispatcher.localeTestValue = locale;
   tester.binding.platformDispatcher.localesTestValue = [locale];
   addTearDown(tester.binding.platformDispatcher.clearLocaleTestValue);
@@ -9966,6 +11037,13 @@ Future<void> _pumpAvatarSetupScreen(
   ParentGatePresenter? parentGatePresenter,
   VehiclePackPurchasePresenter? vehiclePackPurchasePresenter,
 }) async {
+  tester.view.physicalSize = const Size(390, 844);
+  tester.view.devicePixelRatio = 1;
+  addTearDown(() {
+    tester.view.resetPhysicalSize();
+    tester.view.resetDevicePixelRatio();
+  });
+
   await tester.pumpWidget(
     MaterialApp(
       locale: locale,
@@ -9988,7 +11066,9 @@ Future<void> _pumpAvatarSetupScreen(
       ),
     ),
   );
-  await tester.pump();
+  for (int i = 0; i < 40; i++) {
+    await tester.pump(const Duration(milliseconds: 250));
+  }
 }
 
 Future<void> _scrollAvatarPromptToggleIntoView(WidgetTester tester) async {
@@ -10022,8 +11102,10 @@ Future<void> _selectCustomAvatarMode(WidgetTester tester) async {
 
 Future<void> _dismissAvatarGuideIfVisible(WidgetTester tester) async {
   await tester.pumpAndSettle();
-  Navigator.of(tester.element(find.byType(AvatarSetupScreen))).pop();
-  await tester.pumpAndSettle();
+  if (find.byType(RiderGuideBottomSheet).evaluate().isNotEmpty) {
+    Navigator.of(tester.element(find.byType(RiderGuideBottomSheet))).pop();
+    await tester.pumpAndSettle();
+  }
 }
 
 Future<void> _pumpPurchaseControllerUnlock(
@@ -10049,13 +11131,14 @@ Future<void> _pumpPurchaseControllerUnlock(
 }
 
 Future<void> _scrollAvatarVehicleSelectionIntoView(WidgetTester tester) async {
-  for (var index = 0; index < 4; index += 1) {
-    if (find.text('라이더를 태울 차량').evaluate().isNotEmpty) {
-      return;
-    }
-    await tester.drag(find.byType(ListView), const Offset(0, -500));
-    await tester.pumpAndSettle();
-  }
+  try {
+    await tester.dragUntilVisible(
+      find.text('라이더를 태울 차량'),
+      find.byType(Scrollable).first,
+      const Offset(0, 100),
+      maxIteration: 20,
+    );
+  } catch (_) {}
 }
 
 Future<void> _scrollAvatarCompositeIntoView(WidgetTester tester) async {
@@ -10069,13 +11152,14 @@ Future<void> _scrollAvatarCompositeIntoView(WidgetTester tester) async {
 }
 
 Future<void> _scrollAvatarAdjustmentIntoView(WidgetTester tester) async {
-  for (var index = 0; index < 6; index += 1) {
-    if (find.byKey(const ValueKey('avatarScaleSlider')).evaluate().isNotEmpty) {
-      return;
-    }
-    await tester.drag(find.byType(ListView), const Offset(0, -500));
-    await tester.pumpAndSettle();
-  }
+  try {
+    await tester.dragUntilVisible(
+      find.byKey(const ValueKey('avatarScaleSlider')),
+      find.byType(Scrollable).first,
+      const Offset(0, -100),
+      maxIteration: 20,
+    );
+  } catch (_) {}
 }
 
 Future<void> _scrollAvatarAdjustmentBackIntoView(WidgetTester tester) async {

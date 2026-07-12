@@ -221,6 +221,7 @@ class _TimerScreenState extends State<TimerScreen>
   Duration _motivationScheduleStartedAt = Duration.zero;
   Timer? _motivationVoiceTimer;
   Timer? _arrivalPromptTimer;
+  Timer? _previewTimer;
   bool _isFinishDriving = false;
   Animation<double>? _finishDriveAnimation;
   ActivitySessionResult? _pendingFinishDriveResult;
@@ -300,13 +301,13 @@ class _TimerScreenState extends State<TimerScreen>
       );
       _previewController!.addListener(() => setState(() {}));
 
-      await Future.delayed(const Duration(milliseconds: 500));
+      await _safeDelay(const Duration(milliseconds: 500));
       if (!mounted) return;
 
       await _previewController!.forward();
 
       if (!mounted) return;
-      await Future.delayed(const Duration(milliseconds: 1200));
+      await _safeDelay(const Duration(milliseconds: 1200));
 
       if (!mounted) return;
       _previewController!.duration = const Duration(milliseconds: 1000);
@@ -317,13 +318,13 @@ class _TimerScreenState extends State<TimerScreen>
     setState(() {
       _previewMessageState = _PreviewMessageState.ready;
     });
-    await Future.delayed(const Duration(milliseconds: 700));
+    await _safeDelay(const Duration(milliseconds: 700));
 
     if (!mounted) return;
     setState(() {
       _previewMessageState = _PreviewMessageState.go;
     });
-    await Future.delayed(const Duration(milliseconds: 700));
+    await _safeDelay(const Duration(milliseconds: 700));
 
     if (!mounted) return;
     setState(() {
@@ -331,6 +332,14 @@ class _TimerScreenState extends State<TimerScreen>
       _previewMessageState = _PreviewMessageState.none;
     });
     _controller.start();
+    unawaited(_persistActiveSession());
+  }
+
+  Future<void> _safeDelay(Duration duration) async {
+    final completer = Completer<void>();
+    _previewTimer = Timer(duration, completer.complete);
+    await completer.future;
+    _previewTimer = null;
   }
 
   @override
@@ -351,6 +360,7 @@ class _TimerScreenState extends State<TimerScreen>
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
+    _previewTimer?.cancel();
     _motivationVoiceTimer?.cancel();
     _arrivalPromptTimer?.cancel();
     unawaited(_disposeMotivationAudioService());
