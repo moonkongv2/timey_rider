@@ -223,6 +223,7 @@ class _TimerScreenState extends State<TimerScreen>
   Timer? _arrivalPromptTimer;
   Timer? _previewTimer;
   bool _isFinishDriving = false;
+  bool _activeSessionFinalized = false;
   Animation<double>? _finishDriveAnimation;
   ActivitySessionResult? _pendingFinishDriveResult;
   double _finishDriveStartProgress = 0;
@@ -661,7 +662,7 @@ class _TimerScreenState extends State<TimerScreen>
   }
 
   Future<void> _confirmComplete() async {
-    if (_isFinishDriving) {
+    if (_controller.startedAt == null || _isPreviewing || _isFinishDriving) {
       return;
     }
     if (_isAwaitingArrivalAcknowledgement) {
@@ -708,8 +709,9 @@ class _TimerScreenState extends State<TimerScreen>
     final completionStatus = _controller.state == ActivityTimerState.arrived
         ? ActivityCompletionStatus.completedAfterEnd
         : ActivityCompletionStatus.completedBeforeEnd;
+    _activeSessionFinalized = true;
     final result = _controller.complete(completionStatus: completionStatus);
-    unawaited(_clearActiveSession());
+    await _clearActiveSession();
     if (result.completedBeforeEnd) {
       _startFinishDrive(result);
       return;
@@ -746,8 +748,9 @@ class _TimerScreenState extends State<TimerScreen>
         : completed
         ? ActivityCompletionStatus.completedAtEnd
         : ActivityCompletionStatus.needsMoreTime;
+    _activeSessionFinalized = true;
     final result = _completeArrival(completionStatus: completionStatus);
-    unawaited(_clearActiveSession());
+    await _clearActiveSession();
     _openResult(result);
   }
 
@@ -842,7 +845,9 @@ class _TimerScreenState extends State<TimerScreen>
 
   ActiveActivityTimerSession? _activeSessionSnapshot() {
     final startedAt = _controller.startedAt;
-    if (startedAt == null ||
+    if (_activeSessionFinalized ||
+        _isFinishDriving ||
+        startedAt == null ||
         _controller.state == ActivityTimerState.completed) {
       return null;
     }
@@ -865,6 +870,10 @@ class _TimerScreenState extends State<TimerScreen>
   }
 
   Future<void> _persistActiveSession() async {
+    if (_activeSessionFinalized) {
+      return;
+    }
+
     final session = _activeSessionSnapshot();
     if (session == null) {
       return;
@@ -1014,6 +1023,9 @@ class _TimerScreenState extends State<TimerScreen>
 
         final isAwaitingArrivalAcknowledgement =
             _isAwaitingArrivalAcknowledgement;
+        final timerHasStarted = _controller.startedAt != null;
+        final canUseTimerControls =
+            timerHasStarted && !_isPreviewing && !_isFinishDriving;
         final shouldShowArrivalPanel =
             isAwaitingArrivalAcknowledgement && _arrivalPanelVisible;
         final languageCode = Localizations.localeOf(context).languageCode;
@@ -1053,7 +1065,7 @@ class _TimerScreenState extends State<TimerScreen>
         final completeLabel = isAwaitingArrivalAcknowledgement
             ? texts.timer.arrivalConfirmButton
             : texts.timer.completeActivityButton(activity.id);
-        final handleComplete = _isFinishDriving
+        final handleComplete = !canUseTimerControls
             ? null
             : isAwaitingArrivalAcknowledgement
             ? () {
@@ -1064,7 +1076,7 @@ class _TimerScreenState extends State<TimerScreen>
               }
             : _confirmComplete;
         final handlePauseResumeAction =
-            _isFinishDriving || isAwaitingArrivalAcknowledgement
+            !canUseTimerControls || isAwaitingArrivalAcknowledgement
             ? null
             : handlePauseResume;
 

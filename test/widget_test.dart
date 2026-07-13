@@ -7641,6 +7641,46 @@ void main() {
     }
   });
 
+  testWidgets('TimerScreen disables controls until the timer starts', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    SharedPreferences.setMockInitialValues({'savedActivityTimerPresetsInitialized': true});
+
+    await tester.pumpWidget(
+      MaterialApp(
+        locale: const Locale('ko'),
+        home: TimerScreen(
+          config: ActivityTimerConfig.defaults().copyWith(
+            duration: const Duration(minutes: 10),
+          ),
+          activityProgressService: LocalActivityProgressService(),
+          onConfigChanged: (_) {},
+        ),
+      ),
+    );
+
+    var controls = tester.widget<TimerControlBar>(find.byType(TimerControlBar));
+    expect(controls.onPauseResume, isNull);
+    expect(controls.onComplete, isNull);
+
+    for (int i = 0; i < 40; i++) {
+      await tester.pump(const Duration(milliseconds: 250));
+    }
+
+    controls = tester.widget<TimerControlBar>(find.byType(TimerControlBar));
+    expect(controls.onPauseResume, isNotNull);
+    expect(controls.onComplete, isNotNull);
+
+    await tester.pumpWidget(const SizedBox.shrink());
+    for (int i = 0; i < 40; i++) {
+      await tester.pump(const Duration(milliseconds: 250));
+    }
+  });
+
   testWidgets('TimerScreen updates active session when paused and resumed', (
     tester,
   ) async {
@@ -7731,6 +7771,10 @@ void main() {
     tester.widget<TimerControlBar>(find.byType(TimerControlBar)).onComplete!();
     await tester.pump();
     await tester.tap(find.byType(FilledButton).last);
+    await tester.pump(const Duration(milliseconds: 100));
+
+    expect(await store.load(), isNull);
+
     await tester.pumpAndSettle();
 
     expect(await store.load(), isNull);
