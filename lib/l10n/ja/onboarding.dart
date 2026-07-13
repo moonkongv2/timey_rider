@@ -13,42 +13,42 @@ class JaOnboardingTexts implements OnboardingTextSet {
 
   List<OnboardingCardText> get cards => const [
     OnboardingCardText(
-      title: '子どもはまだ時間を見えにくいものです',
+      title: '子どもはまだ時間が見えにくいものです',
       body:
-          '“Five more minutes,” “Time to stop,”\n“Let’s get ready.”\nDaily routines can start to feel like\ntiny tug-of-wars.',
+          '「あと5分」「もうおしまい」「早く準備して」\n毎日の習慣がまるで綱引きのように\n感じられることがあります。',
       note:
-          'Your child may not be trying to delay on purpose.\nThey may still be learning what time feels like.',
+          'お子様はわざと先延ばしにしているわけではなく、\nまだ時間の流れを体で学んでいる途中なのです。',
       ctaLabel: '一緒に始める',
     ),
     OnboardingCardText(
-      title: 'いつもの流れを小さなライドに',
+      title: 'いつものルーティンを\n楽しいドライブに',
       body:
-          'Brushing, reading, cleanup, and play\ncan start as playful Timey Rider missions.',
+          '歯磨き、読書、お片付けも\nTimey Riderと一緒にミッションのように楽しめます。',
       note:
-          'Instead of only hearing the time, your child sees a chosen ride move along the course.',
+          '時計を見る代わりに、自分で選んだ乗り物が\nコースを走るのを見守ります。',
       ctaLabel: '次へ',
     ),
     OnboardingCardText(
       title: '今日はどののりもの？',
       body:
-          'A motorcycle, shark, T-rex, and more\ncan become today’s mission buddy.',
-      note: 'Add your child’s face to make the ride feel like their own story.',
-      ctaLabel: 'ライドを選ぶ',
+          'バイク、サメ、ティラノサウルスなど\nたくさんのお友達が今日のミッションの仲間になります。',
+      note: 'お子様の顔を乗せれば、ドライブが\n自分の物語のように感じられます。',
+      ctaLabel: 'のりものを選ぶ',
     ),
     OnboardingCardText(
       title: '小さなマーカーが一歩ずつ知らせます',
       body:
-          'Picture markers that fit the mission\nappear one by one along the course.',
+          'ミッションに合わせたかわいい絵のマーカーが\nコースの上に順番に現れます。',
       note:
-          'Markers are not scorecards. They are visual cues that help the routine flow.',
+          'マーカーは成績表ではありません。\nルーティンをスムーズに進めるための目印です。',
       ctaLabel: 'いいですね',
     ),
     OnboardingCardText(
-      title: '今日いちばん大切なのはやってみること',
+      title: '今日やってみたことが\n一番大切です',
       body:
-          'Finished, time ended,\nor needed a little more time - each result is saved without judgment.',
+          '早く終わった日も、少し時間が必要だった日も、\nありのままの結果を記録します。',
       note:
-          'Stickers are small encouragement gifts. Praise the effort before the reward.',
+          'シールは小さな応援のプレゼントです。\nまずはルーティンに挑戦した気持ちを褒めてあげてください。',
       ctaLabel: 'Timeyを始める',
     ),
   ];

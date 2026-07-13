@@ -13,42 +13,42 @@ class EsOnboardingTexts implements OnboardingTextSet {
 
   List<OnboardingCardText> get cards => const [
     OnboardingCardText(
-      title: "Kids can't see time yet",
+      title: 'Los niños aún no pueden ver el tiempo',
       body:
-          '“Five more minutes,” “Time to stop,”\n“Let’s get ready.”\nDaily routines can start to feel like\ntiny tug-of-wars.',
+          '“Cinco minutos más”, “Es hora de parar”,\n“Vamos a prepararnos”.\nLas rutinas diarias pueden parecer un pequeño tira y afloja.',
       note:
-          'Your child may not be trying to delay on purpose.\nThey may still be learning what time feels like.',
-      ctaLabel: 'Start together',
+          'Puede que tu peque no intente retrasarse a propósito.\nTodavía está aprendiendo a sentir el tiempo.',
+      ctaLabel: 'Empezar juntos',
     ),
     OnboardingCardText(
-      title: 'Turn routines into little rides',
+      title: 'Convierte las rutinas en pequeños paseos',
       body:
-          'Brushing, reading, cleanup, and play\ncan start as playful Timey Rider missions.',
+          'Cepillarse, leer, ordenar y jugar\npueden comenzar como divertidas misiones.',
       note:
-          'Instead of only hearing the time, your child sees a chosen ride move along the course.',
+          'En lugar de solo escuchar la hora, tu peque ve\ncómo avanza el vehículo elegido por la ruta.',
       ctaLabel: 'Siguiente',
     ),
     OnboardingCardText(
-      title: 'Which vehicle today?',
+      title: '¿Qué vehículo elegimos hoy?',
       body:
-          'A motorcycle, shark, T-rex, and more\ncan become today’s mission buddy.',
-      note: 'Add your child’s face to make the ride feel like their own story.',
-      ctaLabel: 'Choose a ride',
+          'Una moto, un tiburón, un T-rex y muchos más\npueden ser los compañeros de misión de hoy.',
+      note: 'Añade la cara de tu peque para que sienta\nque el paseo es su propia historia.',
+      ctaLabel: 'Elegir un vehículo',
     ),
     OnboardingCardText(
-      title: 'Small markers show each step',
+      title: 'Pequeñas marcas muestran cada paso',
       body:
-          'Picture markers that fit the mission\nappear one by one along the course.',
+          'Las imágenes que acompañan la misión\naparecen una a una a lo largo de la ruta.',
       note:
-          'Markers are not scorecards. They are visual cues that help the routine flow.',
-      ctaLabel: 'Sounds good',
+          'No son para evaluar. Son pistas visuales\nque ayudan a seguir la rutina.',
+      ctaLabel: 'Me parece bien',
     ),
     OnboardingCardText(
-      title: 'Trying matters most today',
+      title: 'Lo más importante es intentarlo hoy',
       body:
-          'Finished, time ended,\nor needed a little more time - each result is saved without judgment.',
+          'Tanto si terminó rápido, como si necesitó más tiempo,\ncada resultado se guarda sin juzgar.',
       note:
-          'Stickers are small encouragement gifts. Praise the effort before the reward.',
+          'Las pegatinas son pequeños regalos de ánimo.\nElogia su esfuerzo antes de darle la recompensa.',
       ctaLabel: 'Empezar Timey',
     ),
   ];
