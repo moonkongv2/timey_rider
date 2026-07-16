@@ -222,6 +222,7 @@ class _TimerScreenState extends State<TimerScreen>
   Timer? _motivationVoiceTimer;
   Timer? _arrivalPromptTimer;
   Timer? _previewTimer;
+  Completer<void>? _previewDelayCompleter;
   bool _isFinishDriving = false;
   bool _activeSessionFinalized = false;
   Animation<double>? _finishDriveAnimation;
@@ -288,59 +289,86 @@ class _TimerScreenState extends State<TimerScreen>
   }
 
   Future<void> _startPreviewSequence() async {
-    final needsPreview = _timerConfig.duration.inMinutes > 5;
-
-    if (!mounted) return;
-    setState(() {
-      _isPreviewing = true;
-    });
-
-    if (needsPreview) {
-      _previewController = AnimationController(
-        vsync: this,
-        duration: const Duration(milliseconds: 2000),
-      );
-      _previewController!.addListener(() => setState(() {}));
-
-      await _safeDelay(const Duration(milliseconds: 500));
-      if (!mounted) return;
-
-      await _previewController!.forward();
+    try {
+      final needsPreview = _timerConfig.duration.inMinutes > 5;
 
       if (!mounted) return;
-      await _safeDelay(const Duration(milliseconds: 1200));
+      setState(() {
+        _isPreviewing = true;
+      });
+
+      if (needsPreview) {
+        _previewController = AnimationController(
+          vsync: this,
+          duration: const Duration(milliseconds: 2000),
+        );
+        _previewController!.addListener(() => setState(() {}));
+
+        await _safeDelay(const Duration(milliseconds: 500));
+        if (!mounted) return;
+
+        await _previewController!.forward().orCancel;
+
+        if (!mounted) return;
+        await _safeDelay(const Duration(milliseconds: 1200));
+
+        if (!mounted) return;
+        _previewController!.duration = const Duration(milliseconds: 1000);
+        await _previewController!.reverse().orCancel;
+      }
 
       if (!mounted) return;
-      _previewController!.duration = const Duration(milliseconds: 1000);
-      await _previewController!.reverse();
+      setState(() {
+        _previewMessageState = _PreviewMessageState.ready;
+      });
+      await _safeDelay(const Duration(milliseconds: 700));
+
+      if (!mounted) return;
+      setState(() {
+        _previewMessageState = _PreviewMessageState.go;
+      });
+      await _safeDelay(const Duration(milliseconds: 700));
+
+      if (!mounted) return;
+      setState(() {
+        _isPreviewing = false;
+        _previewMessageState = _PreviewMessageState.none;
+      });
+      _controller.start();
+      unawaited(_persistActiveSession());
+    } on TickerCanceled {
+      return;
     }
-
-    if (!mounted) return;
-    setState(() {
-      _previewMessageState = _PreviewMessageState.ready;
-    });
-    await _safeDelay(const Duration(milliseconds: 700));
-
-    if (!mounted) return;
-    setState(() {
-      _previewMessageState = _PreviewMessageState.go;
-    });
-    await _safeDelay(const Duration(milliseconds: 700));
-
-    if (!mounted) return;
-    setState(() {
-      _isPreviewing = false;
-      _previewMessageState = _PreviewMessageState.none;
-    });
-    _controller.start();
-    unawaited(_persistActiveSession());
   }
 
   Future<void> _safeDelay(Duration duration) async {
+    _cancelPreviewDelay();
     final completer = Completer<void>();
-    _previewTimer = Timer(duration, completer.complete);
+    late final Timer timer;
+    timer = Timer(duration, () {
+      if (!completer.isCompleted) {
+        completer.complete();
+      }
+      if (_previewTimer == timer) {
+        _previewTimer = null;
+      }
+      if (_previewDelayCompleter == completer) {
+        _previewDelayCompleter = null;
+      }
+    });
+    _previewTimer = timer;
+    _previewDelayCompleter = completer;
     await completer.future;
+  }
+
+  void _cancelPreviewDelay() {
+    _previewTimer?.cancel();
     _previewTimer = null;
+    final completer = _previewDelayCompleter;
+    if (completer != null && !completer.isCompleted) {
+      completer.complete();
+    }
+    _previewDelayCompleter = null;
   }
 
   @override
@@ -361,7 +389,7 @@ class _TimerScreenState extends State<TimerScreen>
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
-    _previewTimer?.cancel();
+    _cancelPreviewDelay();
     _motivationVoiceTimer?.cancel();
     _arrivalPromptTimer?.cancel();
     unawaited(_disposeMotivationAudioService());

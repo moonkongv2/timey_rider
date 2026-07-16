@@ -7595,6 +7595,34 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
+  testWidgets('TimerScreen cancels preview safely when disposed', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(
+      MaterialApp(
+        locale: const Locale('ko'),
+        home: TimerScreen(
+          config: ActivityTimerConfig.defaults().copyWith(
+            duration: const Duration(minutes: 60),
+          ),
+          activityProgressService: LocalActivityProgressService(),
+          onConfigChanged: (_) {},
+        ),
+      ),
+    );
+    await tester.pump(const Duration(milliseconds: 600));
+
+    await tester.pumpWidget(const SizedBox.shrink());
+    await tester.pump();
+
+    expect(tester.takeException(), isNull);
+  });
+
   testWidgets('TimerScreen saves an active session when started', (
     tester,
   ) async {
