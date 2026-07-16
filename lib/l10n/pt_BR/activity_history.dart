@@ -11,10 +11,10 @@ class PtBrActivityHistoryTexts implements ActivityHistoryTextSet {
   String get emptyBody => 'As missões concluídas aparecerão aqui.';
   String get helpTitle => 'Guia do histórico';
   List<String> get helpBulletItems => const [
-    'Activity history shows the mission, target time, actual time, completion status, and earned stickers.',
-    'Manually chosen picture markers appear when they were saved with the activity.',
-    'Auto-selected markers appear on the road only and are not saved in history.',
-    'Records without a sticker show No sticker this time.',
+    'O histórico mostra a missão, o tempo previsto, o tempo real, o status de conclusão e os adesivos ganhos.',
+    'Os marcadores com imagens escolhidos manualmente aparecem quando foram salvos com a atividade.',
+    'Os marcadores selecionados automaticamente aparecem apenas na rota e não são salvos no histórico.',
+    'Registros sem adesivo mostram Sem adesivo desta vez.',
   ];
   String get targetTimeLabel => 'Meta';
   String get actualTimeLabel => 'Real';
@@ -25,7 +25,7 @@ class PtBrActivityHistoryTexts implements ActivityHistoryTextSet {
   String get deleteRecordLabel => 'Excluir registro';
   String get deleteRecordDialogTitle => 'Excluir este registro?';
   String get deleteRecordDialogBody =>
-      'Only the record will be removed. Earned stickers will stay.';
+      'Apenas o registro será removido. Os adesivos ganhos serão mantidos.';
   String get deleteRecordConfirmLabel => 'Excluir';
   String get deleteRecordSuccessMessage => 'Registro excluído.';
 
@@ -46,5 +46,5 @@ class PtBrActivityHistoryTexts implements ActivityHistoryTextSet {
     return '${dateTime.month}/${dateTime.day} $hour:$minute';
   }
 
-  String overrunTime(String duration) => 'Over +$duration';
+  String overrunTime(String duration) => 'Extra +$duration';
 }

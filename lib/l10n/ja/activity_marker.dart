@@ -11,17 +11,17 @@ class JaActivityMarkerTexts implements ActivityMarkerTextSet {
   String get helpTitle => 'コースマーカーガイド';
   List<String> get helpBodyParagraphs => const [
     'コースマーカーは、活動中に表示される小さな目印です。',
-    'They do not decide completion or sticker results.',
+    '完了判定やステッカーの結果を決めるものではありません。',
   ];
   List<String> get helpBulletItems => const [
-    'Auto: the app previews and uses picture markers that fit the selected activity.',
-    'Choose: pick up to 5 picture markers before starting.',
-    'Only manually chosen picture markers are saved to activity records.',
+    '自動: 選んだ活動に合う絵マーカーをプレビューして使用します。',
+    '選ぶ: 開始前に絵マーカーを最大5個まで選べます。',
+    '活動記録に保存されるのは、手動で選んだ絵マーカーだけです。',
   ];
   String get automaticStartButton => '自動で始める';
   String get selectedStartButton => 'マーカー付きで始める';
 
   String selectedCount(int selectedCount, int maxCount) {
-    return '$selectedCount/$maxCount selected';
+    return '$selectedCount/$maxCount個選択中';
   }
 }

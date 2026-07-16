@@ -11,10 +11,10 @@ class EsActivityHistoryTexts implements ActivityHistoryTextSet {
   String get emptyBody => 'Aquí aparecerán las misiones completadas.';
   String get helpTitle => 'Guía del historial';
   List<String> get helpBulletItems => const [
-    'Activity history shows the mission, target time, actual time, completion status, and earned stickers.',
-    'Manually chosen picture markers appear when they were saved with the activity.',
-    'Auto-selected markers appear on the road only and are not saved in history.',
-    'Records without a sticker show No sticker this time.',
+    'El historial muestra la misión, el tiempo objetivo, el tiempo real, el estado de finalización y las pegatinas ganadas.',
+    'Los marcadores con imágenes elegidos manualmente aparecen cuando se guardaron con la actividad.',
+    'Los marcadores seleccionados automáticamente solo aparecen en la ruta y no se guardan en el historial.',
+    'Los registros sin pegatina muestran Sin pegatina esta vez.',
   ];
   String get targetTimeLabel => 'Objetivo';
   String get actualTimeLabel => 'Real';
@@ -25,7 +25,7 @@ class EsActivityHistoryTexts implements ActivityHistoryTextSet {
   String get deleteRecordLabel => 'Eliminar registro';
   String get deleteRecordDialogTitle => '¿Eliminar este registro?';
   String get deleteRecordDialogBody =>
-      'Only the record will be removed. Earned stickers will stay.';
+      'Solo se eliminará el registro. Las pegatinas ganadas se conservarán.';
   String get deleteRecordConfirmLabel => 'Eliminar';
   String get deleteRecordSuccessMessage => 'Registro eliminado.';
 
@@ -46,5 +46,5 @@ class EsActivityHistoryTexts implements ActivityHistoryTextSet {
     return '${dateTime.month}/${dateTime.day} $hour:$minute';
   }
 
-  String overrunTime(String duration) => 'Over +$duration';
+  String overrunTime(String duration) => 'Extra +$duration';
 }

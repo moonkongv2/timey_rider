@@ -11,17 +11,17 @@ class PtBrActivityMarkerTexts implements ActivityMarkerTextSet {
   String get helpTitle => 'Guia de marcadores';
   List<String> get helpBodyParagraphs => const [
     'Os marcadores da rota são pequenas metas visuais durante uma atividade.',
-    'They do not decide completion or sticker results.',
+    'Eles não definem a conclusão da atividade nem os adesivos recebidos.',
   ];
   List<String> get helpBulletItems => const [
-    'Auto: the app previews and uses picture markers that fit the selected activity.',
-    'Choose: pick up to 5 picture markers before starting.',
-    'Only manually chosen picture markers are saved to activity records.',
+    'Auto: o app mostra uma prévia e usa marcadores com imagens que combinam com a atividade escolhida.',
+    'Escolher: selecione até 5 marcadores com imagens antes de começar.',
+    'Apenas os marcadores escolhidos manualmente são salvos nos registros de atividade.',
   ];
   String get automaticStartButton => 'Começar automaticamente';
   String get selectedStartButton => 'Começar com marcadores';
 
   String selectedCount(int selectedCount, int maxCount) {
-    return '$selectedCount/$maxCount selected';
+    return '$selectedCount/$maxCount selecionados';
   }
 }

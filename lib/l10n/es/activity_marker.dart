@@ -11,17 +11,17 @@ class EsActivityMarkerTexts implements ActivityMarkerTextSet {
   String get helpTitle => 'Guía de marcadores';
   List<String> get helpBodyParagraphs => const [
     'Los marcadores de ruta son pequeñas metas visuales durante una actividad.',
-    'They do not decide completion or sticker results.',
+    'No determinan si la actividad se completa ni las pegatinas obtenidas.',
   ];
   List<String> get helpBulletItems => const [
-    'Auto: the app previews and uses picture markers that fit the selected activity.',
-    'Choose: pick up to 5 picture markers before starting.',
-    'Only manually chosen picture markers are saved to activity records.',
+    'Auto: la app muestra una vista previa y usa marcadores con imágenes que encajan con la actividad elegida.',
+    'Elegir: selecciona hasta 5 marcadores con imágenes antes de empezar.',
+    'Solo los marcadores elegidos manualmente se guardan en los registros de actividad.',
   ];
   String get automaticStartButton => 'Empezar automáticamente';
   String get selectedStartButton => 'Empezar con marcadores';
 
   String selectedCount(int selectedCount, int maxCount) {
-    return '$selectedCount/$maxCount selected';
+    return '$selectedCount/$maxCount seleccionados';
   }
 }

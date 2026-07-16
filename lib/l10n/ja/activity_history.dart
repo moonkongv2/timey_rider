@@ -11,10 +11,10 @@ class JaActivityHistoryTexts implements ActivityHistoryTextSet {
   String get emptyBody => '完了したミッションタイマーがここに表示されます。';
   String get helpTitle => '活動記録ガイド';
   List<String> get helpBulletItems => const [
-    'Activity history shows the mission, target time, actual time, completion status, and earned stickers.',
-    'Manually chosen picture markers appear when they were saved with the activity.',
-    'Auto-selected markers appear on the road only and are not saved in history.',
-    'Records without a sticker show No sticker this time.',
+    '活動記録には、ミッション、目標時間、実際の時間、完了状況、もらったステッカーが表示されます。',
+    '手動で選んだ絵マーカーは、活動と一緒に保存された場合に表示されます。',
+    '自動で選ばれたマーカーはコース上だけに表示され、活動記録には保存されません。',
+    'ステッカーがない記録には「今回はステッカーなし」と表示されます。',
   ];
   String get targetTimeLabel => '目標';
   String get actualTimeLabel => '実際';
@@ -45,5 +45,5 @@ class JaActivityHistoryTexts implements ActivityHistoryTextSet {
     return '${dateTime.month}/${dateTime.day} $hour:$minute';
   }
 
-  String overrunTime(String duration) => 'Over +$duration';
+  String overrunTime(String duration) => '超過 +$duration';
 }

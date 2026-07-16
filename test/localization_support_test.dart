@@ -135,6 +135,54 @@ void main() {
     );
   });
 
+  test('Marker and activity history help copy is localized', () {
+    const englishCopy = [
+      'They do not decide completion or sticker results.',
+      'Auto: the app previews and uses picture markers that fit the selected activity.',
+      'Choose: pick up to 5 picture markers before starting.',
+      'Only manually chosen picture markers are saved to activity records.',
+      '1/5 selected',
+      'Activity history shows the mission, target time, actual time, completion status, and earned stickers.',
+      'Manually chosen picture markers appear when they were saved with the activity.',
+      'Auto-selected markers appear on the road only and are not saved in history.',
+      'Records without a sticker show No sticker this time.',
+      'Only the record will be removed. Earned stickers will stay.',
+      'Over +5 min',
+    ];
+    final localizedCopies = [
+      for (final locale in const [
+        Locale('es'),
+        Locale('pt', 'BR'),
+        Locale('ja'),
+      ]) ...[
+        ...AppTexts.forLocale(locale).activityMarker.helpBodyParagraphs,
+        ...AppTexts.forLocale(locale).activityMarker.helpBulletItems,
+        AppTexts.forLocale(locale).activityMarker.selectedCount(1, 5),
+        ...AppTexts.forLocale(locale).activityHistory.helpBulletItems,
+        AppTexts.forLocale(locale).activityHistory.deleteRecordDialogBody,
+        AppTexts.forLocale(locale).activityHistory.overrunTime('5 min'),
+      ],
+    ];
+
+    for (final copy in localizedCopies) {
+      expect(englishCopy, isNot(contains(copy)));
+    }
+    expect(
+      AppTexts.forLocale(const Locale('es')).activityMarker.selectedCount(1, 5),
+      '1/5 seleccionados',
+    );
+    expect(
+      AppTexts.forLocale(
+        const Locale('pt', 'BR'),
+      ).activityHistory.deleteRecordDialogBody,
+      'Apenas o registro será removido. Os adesivos ganhos serão mantidos.',
+    );
+    expect(
+      AppTexts.forLocale(const Locale('ja')).activityHistory.overrunTime('5分'),
+      '超過 +5分',
+    );
+  });
+
   test('VehicleDefinition.labelForLanguage returns new locale labels', () {
     final vehicle = VehicleCatalog.motorcycle;
 
