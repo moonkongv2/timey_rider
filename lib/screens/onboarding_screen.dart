@@ -147,6 +147,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 class _OnboardingPage extends StatelessWidget {
   const _OnboardingPage({required this.card, required this.pageIndex});
 
+  static const _maxCardWidth = 760.0;
+
   final OnboardingCardText card;
   final int pageIndex;
 
@@ -161,66 +163,69 @@ class _OnboardingPage extends StatelessWidget {
           child: ConstrainedBox(
             constraints: BoxConstraints(minHeight: constraints.maxHeight),
             child: Center(
-              child: DecoratedBox(
-                decoration: BoxDecoration(
-                  color: pageIndex.isEven
-                      ? AppColors.surfaceWarm
-                      : AppColors.white,
-                  borderRadius: AppRadius.hero,
-                  border: Border.all(color: AppColors.borderWarm, width: 1.2),
-                  boxShadow: AppShadows.surface,
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.all(AppSpacing.xxl),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      _OnboardingIllustration(pageIndex: pageIndex),
-                      const SizedBox(height: AppSpacing.xxl),
-                      Text(
-                        card.title,
-                        textAlign: TextAlign.center,
-                        style: textTheme.headlineSmall?.copyWith(
-                          color: AppColors.textStrong,
-                          fontWeight: FontWeight.w900,
-                          height: 1.15,
-                          letterSpacing: 0,
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: _maxCardWidth),
+                child: DecoratedBox(
+                  decoration: BoxDecoration(
+                    color: pageIndex.isEven
+                        ? AppColors.surfaceWarm
+                        : AppColors.white,
+                    borderRadius: AppRadius.hero,
+                    border: Border.all(color: AppColors.borderWarm, width: 1.2),
+                    boxShadow: AppShadows.surface,
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(AppSpacing.xxl),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        _OnboardingIllustration(pageIndex: pageIndex),
+                        const SizedBox(height: AppSpacing.xxl),
+                        Text(
+                          card.title,
+                          textAlign: TextAlign.center,
+                          style: textTheme.headlineSmall?.copyWith(
+                            color: AppColors.textStrong,
+                            fontWeight: FontWeight.w900,
+                            height: 1.15,
+                            letterSpacing: 0,
+                          ),
                         ),
-                      ),
-                      const SizedBox(height: AppSpacing.lg),
-                      Text(
-                        card.body,
-                        textAlign: TextAlign.center,
-                        style: textTheme.titleMedium?.copyWith(
-                          color: AppColors.textPrimary,
-                          fontWeight: FontWeight.w800,
-                          height: 1.38,
-                          letterSpacing: 0,
+                        const SizedBox(height: AppSpacing.lg),
+                        Text(
+                          card.body,
+                          textAlign: TextAlign.center,
+                          style: textTheme.titleMedium?.copyWith(
+                            color: AppColors.textPrimary,
+                            fontWeight: FontWeight.w800,
+                            height: 1.38,
+                            letterSpacing: 0,
+                          ),
                         ),
-                      ),
-                      const SizedBox(height: AppSpacing.lg),
-                      DecoratedBox(
-                        decoration: BoxDecoration(
-                          color: AppColors.surfaceSoft,
-                          borderRadius: AppRadius.card,
-                          border: Border.all(color: AppColors.borderSoft),
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.all(AppSpacing.lg),
-                          child: Text(
-                            card.note,
-                            textAlign: TextAlign.center,
-                            style: textTheme.bodyMedium?.copyWith(
-                              color: AppColors.textSecondary,
-                              fontWeight: FontWeight.w700,
-                              height: 1.35,
-                              letterSpacing: 0,
+                        const SizedBox(height: AppSpacing.lg),
+                        DecoratedBox(
+                          decoration: BoxDecoration(
+                            color: AppColors.surfaceSoft,
+                            borderRadius: AppRadius.card,
+                            border: Border.all(color: AppColors.borderSoft),
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.all(AppSpacing.lg),
+                            child: Text(
+                              card.note,
+                              textAlign: TextAlign.center,
+                              style: textTheme.bodyMedium?.copyWith(
+                                color: AppColors.textSecondary,
+                                fontWeight: FontWeight.w700,
+                                height: 1.35,
+                                letterSpacing: 0,
+                              ),
                             ),
                           ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
               ),
@@ -278,7 +283,7 @@ class _OnboardingIllustrationSpec {
   static _OnboardingIllustrationSpec forPage(int pageIndex) {
     return switch (pageIndex) {
       0 => const _OnboardingIllustrationSpec(
-        assetPath: 'assets/images/onboarding/onboarding_01_time.png',
+        assetPath: null,
         backgroundColor: AppColors.surfaceBlue,
         fallback: _SoftTimeIllustration(),
       ),
@@ -327,7 +332,7 @@ class _OnboardingIllustrationAsset extends StatelessWidget {
       assetPath,
       width: double.infinity,
       height: double.infinity,
-      fit: BoxFit.cover,
+      fit: BoxFit.contain,
       errorBuilder: (context, error, stackTrace) => fallback,
     );
   }
@@ -338,41 +343,57 @@ class _SoftTimeIllustration extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        const Positioned(top: 8, left: 10, child: _DecorativeDot(size: 10)),
-        const Positioned(top: 28, right: 30, child: _DecorativeDot(size: 8)),
-        const Positioned(bottom: 18, right: 6, child: _DecorativeDot(size: 12)),
-        Align(
-          alignment: Alignment.center,
-          child: Container(
-            width: 112,
-            height: 112,
-            decoration: BoxDecoration(
-              color: AppColors.white.withValues(alpha: 0.82),
-              borderRadius: AppRadius.hero,
-              border: Border.all(color: AppColors.borderSoft, width: 1.4),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final baseSize = constraints.biggest.shortestSide;
+        final clockSize = (baseSize * 0.32).clamp(112.0, 152.0).toDouble();
+        final iconSize = clockSize * 0.52;
+
+        return Stack(
+          children: [
+            const Positioned(top: 8, left: 10, child: _DecorativeDot(size: 10)),
+            const Positioned(
+              top: 28,
+              right: 30,
+              child: _DecorativeDot(size: 8),
             ),
-            child: const Icon(
-              Icons.access_time_rounded,
-              size: 58,
-              color: AppColors.primary,
+            const Positioned(
+              bottom: 18,
+              right: 6,
+              child: _DecorativeDot(size: 12),
             ),
-          ),
-        ),
-        const Align(
-          alignment: Alignment(-0.9, 0.75),
-          child: _EmojiChip(emoji: '🪥'),
-        ),
-        const Align(
-          alignment: Alignment(0.9, 0.72),
-          child: _EmojiChip(emoji: '📚'),
-        ),
-        const Align(
-          alignment: Alignment(-0.72, -0.58),
-          child: _EmojiChip(emoji: '🧸'),
-        ),
-      ],
+            Align(
+              alignment: Alignment.center,
+              child: Container(
+                width: clockSize,
+                height: clockSize,
+                decoration: BoxDecoration(
+                  color: AppColors.white.withValues(alpha: 0.82),
+                  borderRadius: AppRadius.hero,
+                  border: Border.all(color: AppColors.borderSoft, width: 1.4),
+                ),
+                child: Icon(
+                  Icons.access_time_rounded,
+                  size: iconSize,
+                  color: AppColors.primary,
+                ),
+              ),
+            ),
+            const Align(
+              alignment: Alignment(-0.9, 0.75),
+              child: _EmojiChip(emoji: '🪥'),
+            ),
+            const Align(
+              alignment: Alignment(0.9, 0.72),
+              child: _EmojiChip(emoji: '📚'),
+            ),
+            const Align(
+              alignment: Alignment(-0.72, -0.58),
+              child: _EmojiChip(emoji: '🧸'),
+            ),
+          ],
+        );
+      },
     );
   }
 }
@@ -401,55 +422,75 @@ class _VehicleChoiceIllustration extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: const [
-        Positioned(top: 4, left: 18, child: _DecorativeDot(size: 9)),
-        Positioned(top: 12, right: 32, child: _DecorativeDot(size: 12)),
-        Positioned(bottom: 10, left: 74, child: _DecorativeDot(size: 7)),
-        Positioned(bottom: 18, right: 12, child: _DecorativeDot(size: 10)),
-        Align(
-          alignment: Alignment(-0.86, -0.72),
-          child: _VehicleImageChip(
-            assetPath: 'assets/images/vehicle_motorcycle_chip.png',
-            size: 64,
-          ),
-        ),
-        Align(
-          alignment: Alignment(0.0, -0.78),
-          child: _VehicleImageChip(
-            assetPath: 'assets/images/vehicle_shark_chip.png',
-            size: 64,
-          ),
-        ),
-        Align(
-          alignment: Alignment(0.86, -0.72),
-          child: _VehicleImageChip(
-            assetPath: 'assets/images/vehicle_t_rex_chip.png',
-            size: 64,
-          ),
-        ),
-        Align(
-          alignment: Alignment(-0.86, 0.76),
-          child: _VehicleImageChip(
-            assetPath: 'assets/images/vehicle_police_car_chip.png',
-            size: 64,
-          ),
-        ),
-        Align(
-          alignment: Alignment(0.0, 0.82),
-          child: _VehicleImageChip(
-            assetPath: 'assets/images/vehicle_excavator_chip.png',
-            size: 64,
-          ),
-        ),
-        Align(
-          alignment: Alignment(0.86, 0.76),
-          child: _VehicleImageChip(
-            assetPath: 'assets/images/vehicle_airplane_chip.png',
-            size: 64,
-          ),
-        ),
-      ],
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final chipSize = (constraints.biggest.shortestSide * 0.18)
+            .clamp(64.0, 92.0)
+            .toDouble();
+
+        return Stack(
+          children: [
+            const Positioned(top: 4, left: 18, child: _DecorativeDot(size: 9)),
+            const Positioned(
+              top: 12,
+              right: 32,
+              child: _DecorativeDot(size: 12),
+            ),
+            const Positioned(
+              bottom: 10,
+              left: 74,
+              child: _DecorativeDot(size: 7),
+            ),
+            const Positioned(
+              bottom: 18,
+              right: 12,
+              child: _DecorativeDot(size: 10),
+            ),
+            Align(
+              alignment: const Alignment(-0.86, -0.72),
+              child: _VehicleImageChip(
+                assetPath: 'assets/images/vehicle_motorcycle_chip.png',
+                size: chipSize,
+              ),
+            ),
+            Align(
+              alignment: const Alignment(0.0, -0.78),
+              child: _VehicleImageChip(
+                assetPath: 'assets/images/vehicle_shark_chip.png',
+                size: chipSize,
+              ),
+            ),
+            Align(
+              alignment: const Alignment(0.86, -0.72),
+              child: _VehicleImageChip(
+                assetPath: 'assets/images/vehicle_t_rex_chip.png',
+                size: chipSize,
+              ),
+            ),
+            Align(
+              alignment: const Alignment(-0.86, 0.76),
+              child: _VehicleImageChip(
+                assetPath: 'assets/images/vehicle_police_car_chip.png',
+                size: chipSize,
+              ),
+            ),
+            Align(
+              alignment: const Alignment(0.0, 0.82),
+              child: _VehicleImageChip(
+                assetPath: 'assets/images/vehicle_excavator_chip.png',
+                size: chipSize,
+              ),
+            ),
+            Align(
+              alignment: const Alignment(0.86, 0.76),
+              child: _VehicleImageChip(
+                assetPath: 'assets/images/vehicle_airplane_chip.png',
+                size: chipSize,
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 }
@@ -593,24 +634,31 @@ class _EmojiChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final size = large ? 62.0 : 46.0;
-    final fontSize = large ? 30.0 : 23.0;
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final parentSize = constraints.biggest.shortestSide;
+        final size = large
+            ? (parentSize * 0.18).clamp(62.0, 88.0).toDouble()
+            : (parentSize * 0.15).clamp(46.0, 72.0).toDouble();
+        final fontSize = size * (large ? 0.48 : 0.50);
 
-    return Container(
-      width: size,
-      height: size,
-      alignment: Alignment.center,
-      decoration: BoxDecoration(
-        color: AppColors.white,
-        borderRadius: AppRadius.pill,
-        border: Border.all(color: AppColors.borderSoft),
-        boxShadow: AppShadows.surface,
-      ),
-      child: Text(
-        emoji,
-        textAlign: TextAlign.center,
-        style: TextStyle(fontSize: fontSize, height: 1, letterSpacing: 0),
-      ),
+        return Container(
+          width: size,
+          height: size,
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            color: AppColors.white,
+            borderRadius: AppRadius.pill,
+            border: Border.all(color: AppColors.borderSoft),
+            boxShadow: AppShadows.surface,
+          ),
+          child: Text(
+            emoji,
+            textAlign: TextAlign.center,
+            style: TextStyle(fontSize: fontSize, height: 1, letterSpacing: 0),
+          ),
+        );
+      },
     );
   }
 }
