@@ -90,13 +90,10 @@ class JaResultTexts implements ResultTextSet {
     return switch (status) {
       ActivityCompletionStatus.completedBeforeEnd ||
       ActivityCompletionStatus.completedAtEnd ||
-      ActivityCompletionStatus.completedAfterEnd =>
-        'View parent tips for a completed activity',
-      ActivityCompletionStatus.timeEnded =>
-        'View parent tips for a time-ended activity',
+      ActivityCompletionStatus.completedAfterEnd => '完了した活動の保護者向けヒントを見る',
+      ActivityCompletionStatus.timeEnded => '時間終了した活動の保護者向けヒントを見る',
       ActivityCompletionStatus.needsMoreTime ||
-      ActivityCompletionStatus.canceled =>
-        'View parent tips for an incomplete activity',
+      ActivityCompletionStatus.canceled => '未完了の活動の保護者向けヒントを見る',
     };
   }
 
@@ -118,14 +115,14 @@ class JaResultTexts implements ResultTextSet {
       ActivityCompletionStatus.completedBeforeEnd ||
       ActivityCompletionStatus.completedAtEnd ||
       ActivityCompletionStatus.completedAfterEnd => const [
-        "What you check together is saved in today's activity record.",
+        '一緒に確認した内容は、今日の活動記録に保存されます。',
       ],
       ActivityCompletionStatus.timeEnded => const [
-        'After the timer ends, check the mission together and save the record.',
+        'タイマーが終わったら、ミッションを一緒に確認して記録を保存します。',
       ],
       ActivityCompletionStatus.needsMoreTime ||
       ActivityCompletionStatus.canceled => const [
-        'If the activity was not wrapped up, keep the record as guidance for the next try.',
+        '活動を最後まで終えられなかった場合も、次の挑戦の手がかりとして記録を残します。',
       ],
     };
   }
@@ -135,17 +132,17 @@ class JaResultTexts implements ResultTextSet {
       ActivityCompletionStatus.completedBeforeEnd ||
       ActivityCompletionStatus.completedAtEnd ||
       ActivityCompletionStatus.completedAfterEnd => const [
-        'Choose ステッカーをもらう to receive one sticker for the selected vehicle.',
-        'If a reward goal is active, the sticker can fill one goal slot.',
+        '「ステッカーをもらう」を選ぶと、選択中ののりもののステッカーを1枚受け取れます。',
+        '有効なごほうび目標がある場合、ステッカーで目標の枠を1つ埋められます。',
       ],
       ActivityCompletionStatus.timeEnded => const [
-        'A time-ended activity is still recorded as part of the routine.',
-        'Check together, then choose whether to get a sticker.',
+        '時間で終わった活動も、いつもの流れの一部として記録されます。',
+        '一緒に確認してから、ステッカーをもらうか選んでください。',
       ],
       ActivityCompletionStatus.needsMoreTime ||
       ActivityCompletionStatus.canceled => const [
-        'Choose 今回はステッカーなし to save the record without a sticker.',
-        'An incomplete result is a planning clue, not a punishment.',
+        '「今回はステッカーなし」を選ぶと、ステッカーなしで記録を保存します。',
+        '未完了の結果は次の計画の手がかりであり、罰ではありません。',
       ],
     };
   }
@@ -157,20 +154,20 @@ class JaResultTexts implements ResultTextSet {
       ActivityCompletionStatus.completedBeforeEnd ||
       ActivityCompletionStatus.completedAtEnd ||
       ActivityCompletionStatus.completedAfterEnd => const [
-        "What you check together is saved in today's activity record.",
-        'Choose ステッカーをもらう to receive one sticker for the selected vehicle.',
-        'If a reward goal is active, the sticker can fill one goal slot.',
+        '一緒に確認した内容は、今日の活動記録に保存されます。',
+        '「ステッカーをもらう」を選ぶと、選択中ののりもののステッカーを1枚受け取れます。',
+        '有効なごほうび目標がある場合、ステッカーで目標の枠を1つ埋められます。',
       ],
       ActivityCompletionStatus.timeEnded => const [
-        'The timer reached the end and the activity was recorded.',
-        'This is a routine transition, not a pass-or-fail result.',
-        'Check together, then choose whether to get a sticker.',
+        'タイマーが最後まで進み、活動が記録されました。',
+        'これは合否ではなく、ルーティンの切り替わりです。',
+        '一緒に確認してから、ステッカーをもらうか選んでください。',
       ],
       ActivityCompletionStatus.needsMoreTime ||
       ActivityCompletionStatus.canceled => const [
-        'This activity needed a little more time today.',
-        'Choose 今回はステッカーなし to save the record without a sticker.',
-        'Use the record to adjust the next try.',
+        '今日の活動には、もう少し時間が必要でした。',
+        '「今回はステッカーなし」を選ぶと、ステッカーなしで記録を保存します。',
+        '記録を使って、次の挑戦を調整しましょう。',
       ],
     };
   }
@@ -182,46 +179,45 @@ class JaResultTexts implements ResultTextSet {
       ActivityCompletionStatus.completedBeforeEnd ||
       ActivityCompletionStatus.completedAtEnd ||
       ActivityCompletionStatus.completedAfterEnd => const [
-        'I liked doing this activity with you today.',
-        'I saw how hard you tried while the timer was going.',
-        'The sticker is fun, but your effort matters most.',
+        '今日は一緒にこの活動ができてうれしかったよ。',
+        'タイマーが動いている間、がんばっていたのを見ていたよ。',
+        'ステッカーも楽しいけれど、いちばん大切なのはがんばったことだよ。',
       ],
       ActivityCompletionStatus.timeEnded => const [
-        "Time is up. Let's decide the next step.",
-        'I saw how hard you tried while the timer was going.',
-        'What activity should we try next?',
+        '時間になったね。次にどうするか決めよう。',
+        'タイマーが動いている間、がんばっていたのを見ていたよ。',
+        '次はどの活動を試してみようか？',
       ],
       ActivityCompletionStatus.needsMoreTime ||
       ActivityCompletionStatus.canceled => const [
-        'That needed a little more time today. That’s okay.',
-        'Let’s look at how far you got.',
-        'I can give you more time next round.',
+        '今日はもう少し時間が必要だったね。大丈夫だよ。',
+        'どこまでできたか一緒に見てみよう。',
+        '次はもう少し時間を増やせるよ。',
       ],
     };
   }
 
-  String resultHelpAvoidTitle(ActivityCompletionStatus status) =>
-      'Try to avoid';
+  String resultHelpAvoidTitle(ActivityCompletionStatus status) => '避けたい声かけ';
 
   List<String> resultHelpAvoidItems(ActivityCompletionStatus status) {
     return switch (status) {
       ActivityCompletionStatus.completedBeforeEnd ||
       ActivityCompletionStatus.completedAtEnd ||
       ActivityCompletionStatus.completedAfterEnd => const [
-        'Good job being fast.',
-        'You have to succeed every time.',
-        'You have to do better to get a sticker.',
+        '早くできてえらいね。',
+        '毎回成功しないといけないよ。',
+        'ステッカーをもらうには、もっと上手にやらないとね。',
       ],
       ActivityCompletionStatus.timeEnded => const [
-        'Time is up, so you have to stop now.',
-        'Why did you not do more?',
-        'Hurry to the next thing.',
+        '時間切れだから、もうやめないといけないよ。',
+        'どうしてもっとできなかったの？',
+        '急いで次に行こう。',
       ],
       ActivityCompletionStatus.needsMoreTime ||
       ActivityCompletionStatus.canceled => const [
-        'You failed.',
-        'Why did you only do this much?',
-        'You did not get a sticker because you did not do well.',
+        '失敗したね。',
+        'どうしてこれだけしかできなかったの？',
+        'うまくできなかったからステッカーはなしだよ。',
       ],
     };
   }
@@ -234,36 +230,36 @@ class JaResultTexts implements ResultTextSet {
       ActivityCompletionStatus.completedBeforeEnd ||
       ActivityCompletionStatus.completedAtEnd ||
       ActivityCompletionStatus.completedAfterEnd => const [
-        'If the activity flow felt short, try adjusting the timer next time.',
-        'If your child seemed comfortable, repeat the same duration to build confidence.',
-        'Praise the routine flow and effort more than the sticker.',
+        '活動の流れが短く感じた場合は、次回タイマーを調整してみてください。',
+        'お子さまが落ち着いて取り組めていたら、同じ長さを繰り返して自信につなげます。',
+        'ステッカーよりも、ルーティンの流れと努力をほめてください。',
       ],
       ActivityCompletionStatus.timeEnded => const [
-        'For activities that end by time, keeping the same duration may be enough.',
-        'If your child wanted more time, try a slightly longer timer next time.',
-        'Give a short cue before moving to the next activity.',
+        '時間で終える活動では、同じ長さを保つだけで十分な場合があります。',
+        'お子さまがもっと時間をほしがった場合は、次回少し長めのタイマーを試してください。',
+        '次の活動へ移る前に、短い合図を出してください。',
       ],
       ActivityCompletionStatus.needsMoreTime ||
       ActivityCompletionStatus.canceled => const [
-        'If incomplete results happen often, try a longer default duration.',
-        'If the activity feels hard, break it into smaller visible steps.',
-        'Use the record to understand routine patterns, not to grade the child.',
+        '未完了がよく起きる場合は、標準の時間を少し長くしてみてください。',
+        '活動が難しそうな場合は、見える小さなステップに分けてください。',
+        '記録はお子さまを評価するためではなく、ルーティンの傾向を知るために使います。',
       ],
     };
   }
 }
 
 const _needsMoreTimeMessagesByVehicle = {
-  'motorcycle': 'This activity needed a little more time today.',
-  'fire_truck': 'This activity needed a little more time today.',
-  'police_car': 'This activity needed a little more time today.',
-  'excavator': 'This activity needed a little more time today.',
-  'airplane': 'This activity needed a little more time today.',
-  'bus': 'This activity needed a little more time today.',
-  'supercar': 'This activity needed a little more time today.',
-  'train': 'This activity needed a little more time today.',
-  't_rex': 'This activity needed a little more time today.',
-  'shark': 'This activity needed a little more time today.',
-  'brachio': 'This activity needed a little more time today.',
-  'pteranodon': 'This activity needed a little more time today.',
+  'motorcycle': '今日の活動には、もう少し時間が必要でした。',
+  'fire_truck': '今日の活動には、もう少し時間が必要でした。',
+  'police_car': '今日の活動には、もう少し時間が必要でした。',
+  'excavator': '今日の活動には、もう少し時間が必要でした。',
+  'airplane': '今日の活動には、もう少し時間が必要でした。',
+  'bus': '今日の活動には、もう少し時間が必要でした。',
+  'supercar': '今日の活動には、もう少し時間が必要でした。',
+  'train': '今日の活動には、もう少し時間が必要でした。',
+  't_rex': '今日の活動には、もう少し時間が必要でした。',
+  'shark': '今日の活動には、もう少し時間が必要でした。',
+  'brachio': '今日の活動には、もう少し時間が必要でした。',
+  'pteranodon': '今日の活動には、もう少し時間が必要でした。',
 };

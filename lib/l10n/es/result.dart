@@ -103,12 +103,12 @@ class EsResultTexts implements ResultTextSet {
       ActivityCompletionStatus.completedBeforeEnd ||
       ActivityCompletionStatus.completedAtEnd ||
       ActivityCompletionStatus.completedAfterEnd =>
-        'View parent tips for a completed activity',
+        'Ver consejos para adultos sobre una actividad completada',
       ActivityCompletionStatus.timeEnded =>
-        'View parent tips for a time-ended activity',
+        'Ver consejos para adultos sobre una actividad con tiempo terminado',
       ActivityCompletionStatus.needsMoreTime ||
       ActivityCompletionStatus.canceled =>
-        'View parent tips for an incomplete activity',
+        'Ver consejos para adultos sobre una actividad incompleta',
     };
   }
 
@@ -131,14 +131,14 @@ class EsResultTexts implements ResultTextSet {
       ActivityCompletionStatus.completedBeforeEnd ||
       ActivityCompletionStatus.completedAtEnd ||
       ActivityCompletionStatus.completedAfterEnd => const [
-        "What you check together is saved in today's activity record.",
+        'Lo que revisen juntos se guarda en el registro de actividad de hoy.',
       ],
       ActivityCompletionStatus.timeEnded => const [
-        'After the timer ends, check the mission together and save the record.',
+        'Cuando termine el temporizador, revisen juntos la misión y guarden el registro.',
       ],
       ActivityCompletionStatus.needsMoreTime ||
       ActivityCompletionStatus.canceled => const [
-        'If the activity was not wrapped up, keep the record as guidance for the next try.',
+        'Si la actividad no se cerró del todo, usen el registro como guía para el próximo intento.',
       ],
     };
   }
@@ -148,17 +148,17 @@ class EsResultTexts implements ResultTextSet {
       ActivityCompletionStatus.completedBeforeEnd ||
       ActivityCompletionStatus.completedAtEnd ||
       ActivityCompletionStatus.completedAfterEnd => const [
-        'Choose Obtener pegatina to receive one sticker for the selected vehicle.',
-        'If a reward goal is active, the sticker can fill one goal slot.',
+        'Elige Obtener pegatina para recibir una pegatina del vehículo seleccionado.',
+        'Si hay una meta de recompensa activa, la pegatina puede llenar un espacio de la meta.',
       ],
       ActivityCompletionStatus.timeEnded => const [
-        'A time-ended activity is still recorded as part of the routine.',
-        'Check together, then choose whether to get a sticker.',
+        'Una actividad con tiempo terminado también se registra como parte de la rutina.',
+        'Revisen juntos y luego elijan si reciben una pegatina.',
       ],
       ActivityCompletionStatus.needsMoreTime ||
       ActivityCompletionStatus.canceled => const [
-        'Choose Sin pegatina esta vez to save the record without a sticker.',
-        'An incomplete result is a planning clue, not a punishment.',
+        'Elige Sin pegatina esta vez para guardar el registro sin pegatina.',
+        'Un resultado incompleto es una pista para planificar, no un castigo.',
       ],
     };
   }
@@ -171,20 +171,20 @@ class EsResultTexts implements ResultTextSet {
       ActivityCompletionStatus.completedBeforeEnd ||
       ActivityCompletionStatus.completedAtEnd ||
       ActivityCompletionStatus.completedAfterEnd => const [
-        "What you check together is saved in today's activity record.",
-        'Choose Obtener pegatina to receive one sticker for the selected vehicle.',
-        'If a reward goal is active, the sticker can fill one goal slot.',
+        'Lo que revisen juntos se guarda en el registro de actividad de hoy.',
+        'Elige Obtener pegatina para recibir una pegatina del vehículo seleccionado.',
+        'Si hay una meta de recompensa activa, la pegatina puede llenar un espacio de la meta.',
       ],
       ActivityCompletionStatus.timeEnded => const [
-        'The timer reached the end and the activity was recorded.',
-        'This is a routine transition, not a pass-or-fail result.',
-        'Check together, then choose whether to get a sticker.',
+        'El temporizador llegó al final y la actividad quedó registrada.',
+        'Es una transición de la rutina, no un resultado de aprobado o fallado.',
+        'Revisen juntos y luego elijan si reciben una pegatina.',
       ],
       ActivityCompletionStatus.needsMoreTime ||
       ActivityCompletionStatus.canceled => const [
-        'This activity needed a little more time today.',
-        'Choose Sin pegatina esta vez to save the record without a sticker.',
-        'Use the record to adjust the next try.',
+        'Esta actividad necesitó un poco más de tiempo hoy.',
+        'Elige Sin pegatina esta vez para guardar el registro sin pegatina.',
+        'Usa el registro para ajustar el próximo intento.',
       ],
     };
   }
@@ -197,46 +197,46 @@ class EsResultTexts implements ResultTextSet {
       ActivityCompletionStatus.completedBeforeEnd ||
       ActivityCompletionStatus.completedAtEnd ||
       ActivityCompletionStatus.completedAfterEnd => const [
-        'I liked doing this activity with you today.',
-        'I saw how hard you tried while the timer was going.',
-        'The sticker is fun, but your effort matters most.',
+        'Me gustó hacer esta actividad contigo hoy.',
+        'Vi cuánto te esforzaste mientras corría el temporizador.',
+        'La pegatina es divertida, pero tu esfuerzo es lo más importante.',
       ],
       ActivityCompletionStatus.timeEnded => const [
-        "Time is up. Let's decide the next step.",
-        'I saw how hard you tried while the timer was going.',
-        'What activity should we try next?',
+        'Se acabó el tiempo. Decidamos el siguiente paso.',
+        'Vi cuánto te esforzaste mientras corría el temporizador.',
+        '¿Qué actividad probamos ahora?',
       ],
       ActivityCompletionStatus.needsMoreTime ||
       ActivityCompletionStatus.canceled => const [
-        'That needed a little more time today. That’s okay.',
-        'Let’s look at how far you got.',
-        'I can give you more time next round.',
+        'Hoy hizo falta un poco más de tiempo. Está bien.',
+        'Miremos hasta dónde llegaste.',
+        'La próxima vez puedo darte más tiempo.',
       ],
     };
   }
 
   String resultHelpAvoidTitle(ActivityCompletionStatus status) =>
-      'Try to avoid';
+      'Intenta evitar';
 
   List<String> resultHelpAvoidItems(ActivityCompletionStatus status) {
     return switch (status) {
       ActivityCompletionStatus.completedBeforeEnd ||
       ActivityCompletionStatus.completedAtEnd ||
       ActivityCompletionStatus.completedAfterEnd => const [
-        'Good job being fast.',
-        'You have to succeed every time.',
-        'You have to do better to get a sticker.',
+        'Buen trabajo por hacerlo rápido.',
+        'Tienes que lograrlo siempre.',
+        'Tienes que hacerlo mejor para recibir una pegatina.',
       ],
       ActivityCompletionStatus.timeEnded => const [
-        'Time is up, so you have to stop now.',
-        'Why did you not do more?',
-        'Hurry to the next thing.',
+        'Se acabó el tiempo, así que tienes que parar ahora.',
+        '¿Por qué no hiciste más?',
+        'Apúrate con lo siguiente.',
       ],
       ActivityCompletionStatus.needsMoreTime ||
       ActivityCompletionStatus.canceled => const [
-        'You failed.',
-        'Why did you only do this much?',
-        'You did not get a sticker because you did not do well.',
+        'Fallaste.',
+        '¿Por qué solo hiciste esto?',
+        'No recibiste pegatina porque no lo hiciste bien.',
       ],
     };
   }
@@ -249,36 +249,36 @@ class EsResultTexts implements ResultTextSet {
       ActivityCompletionStatus.completedBeforeEnd ||
       ActivityCompletionStatus.completedAtEnd ||
       ActivityCompletionStatus.completedAfterEnd => const [
-        'If the activity flow felt short, try adjusting the timer next time.',
-        'If your child seemed comfortable, repeat the same duration to build confidence.',
-        'Praise the routine flow and effort more than the sticker.',
+        'Si la actividad se sintió corta, prueba ajustar el temporizador la próxima vez.',
+        'Si tu hijo estuvo cómodo, repite la misma duración para darle confianza.',
+        'Elogia la rutina y el esfuerzo más que la pegatina.',
       ],
       ActivityCompletionStatus.timeEnded => const [
-        'For activities that end by time, keeping the same duration may be enough.',
-        'If your child wanted more time, try a slightly longer timer next time.',
-        'Give a short cue before moving to the next activity.',
+        'Para actividades que terminan por tiempo, mantener la misma duración puede ser suficiente.',
+        'Si tu hijo quería más tiempo, prueba un temporizador un poco más largo la próxima vez.',
+        'Da una señal breve antes de pasar a la siguiente actividad.',
       ],
       ActivityCompletionStatus.needsMoreTime ||
       ActivityCompletionStatus.canceled => const [
-        'If incomplete results happen often, try a longer default duration.',
-        'If the activity feels hard, break it into smaller visible steps.',
-        'Use the record to understand routine patterns, not to grade the child.',
+        'Si los resultados incompletos se repiten, prueba una duración predeterminada más larga.',
+        'Si la actividad se siente difícil, divídela en pasos visibles más pequeños.',
+        'Usa el registro para entender patrones de la rutina, no para calificar al niño.',
       ],
     };
   }
 }
 
 const _needsMoreTimeMessagesByVehicle = {
-  'motorcycle': 'This activity needed a little more time today.',
-  'fire_truck': 'This activity needed a little more time today.',
-  'police_car': 'This activity needed a little more time today.',
-  'excavator': 'This activity needed a little more time today.',
-  'airplane': 'This activity needed a little more time today.',
-  'bus': 'This activity needed a little more time today.',
-  'supercar': 'This activity needed a little more time today.',
-  'train': 'This activity needed a little more time today.',
-  't_rex': 'This activity needed a little more time today.',
-  'shark': 'This activity needed a little more time today.',
-  'brachio': 'This activity needed a little more time today.',
-  'pteranodon': 'This activity needed a little more time today.',
+  'motorcycle': 'Esta actividad necesitó un poco más de tiempo hoy.',
+  'fire_truck': 'Esta actividad necesitó un poco más de tiempo hoy.',
+  'police_car': 'Esta actividad necesitó un poco más de tiempo hoy.',
+  'excavator': 'Esta actividad necesitó un poco más de tiempo hoy.',
+  'airplane': 'Esta actividad necesitó un poco más de tiempo hoy.',
+  'bus': 'Esta actividad necesitó un poco más de tiempo hoy.',
+  'supercar': 'Esta actividad necesitó un poco más de tiempo hoy.',
+  'train': 'Esta actividad necesitó un poco más de tiempo hoy.',
+  't_rex': 'Esta actividad necesitó un poco más de tiempo hoy.',
+  'shark': 'Esta actividad necesitó un poco más de tiempo hoy.',
+  'brachio': 'Esta actividad necesitó un poco más de tiempo hoy.',
+  'pteranodon': 'Esta actividad necesitó un poco más de tiempo hoy.',
 };
