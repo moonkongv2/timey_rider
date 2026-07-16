@@ -20,65 +20,65 @@ class EsUserGuideTexts implements UserGuideTextSet {
 
   String get whatIsTimeyRiderTitle => '¿Qué es Timey Rider?';
   List<String> get whatIsTimeyRiderItems => const [
-    'Timey Rider turns routines like brushing teeth, reading, cleanup, and play time into small riding missions.',
-    'Children choose a vehicle and follow the course for the set timer duration.',
-    'At the end, each activity is recorded through its completion mode: confirm done, time ended, or parent check.',
+    'Timey Rider convierte rutinas como lavarse los dientes, leer, ordenar y jugar en pequeñas misiones de conducción.',
+    'Los niños eligen un vehículo y siguen la ruta durante el tiempo configurado.',
+    'Al final, cada actividad se registra según su modo de finalización: confirmar que terminó, tiempo terminado o revisión de un adulto.',
   ];
 
   String get startMissionTitle => 'Iniciar una misión';
   List<String> get startMissionItems => const [
-    'After setting the child name, choose a vehicle from the home screen.',
+    'Después de configurar el nombre del niño, elige un vehículo en la pantalla de inicio.',
     'Toca Crear temporizador en Inicio y elige misión, marcadores y duración.',
-    'Use Other in the same flow when the routine does not match a preset mission.',
-    'Pausing during the timer is not a failure; the mission can resume when needed.',
+    'Usa Otro en el mismo flujo cuando la rutina no coincida con una misión predefinida.',
+    'Pausar durante el temporizador no es un fracaso; la misión puede continuar cuando sea necesario.',
   ];
 
   String get courseMarkersTitle => 'Marcadores de ruta';
   List<String> get courseMarkersItems => const [
     'Los marcadores de ruta son pequeñas metas visuales durante una actividad.',
-    'Off: no markers are shown on the road.',
-    'Auto: the app previews and uses picture markers that fit the selected activity.',
-    'Choose: pick up to 5 picture markers before starting.',
-    'Only manually chosen picture markers are saved to activity records.',
-    'Markers do not decide completion or sticker results.',
+    'No: no se muestran marcadores en la ruta.',
+    'Auto: la app muestra una vista previa y usa marcadores con imágenes que encajan con la actividad elegida.',
+    'Elegir: selecciona hasta 5 marcadores con imágenes antes de empezar.',
+    'Solo los marcadores elegidos manualmente se guardan en los registros de actividad.',
+    'Los marcadores no determinan si la actividad se completa ni las pegatinas obtenidas.',
   ];
 
   List<String> get motivationItems => const [
     'Los videos de ánimo son clips breves de apoyo durante el temporizador.',
-    'They do not decide stickers or results.',
-    'Short timers may skip some milestones to avoid overlap.',
-    'Longer timers or custom interval mode may use time-based scheduling.',
-    'You can choose 3, 5, or 10 minute intervals.',
-    'If sound is off, the video may appear without voice playback.',
+    'No determinan las pegatinas ni los resultados.',
+    'En temporizadores cortos, algunos hitos pueden omitirse para evitar superposiciones.',
+    'Los temporizadores más largos o el modo de intervalo personalizado pueden usar una programación por tiempo.',
+    'Puedes elegir intervalos de 3, 5 o 10 minutos.',
+    'Si el sonido está desactivado, el video puede aparecer sin reproducción de voz.',
   ];
 
   String get completionTitle => 'Finalización y pegatinas';
   List<String> get completionItems => const [
-    'When you confirm the activity is done, it is recorded as complete.',
-    'After the timer ends, check together and choose whether to get a sticker.',
-    'Choose Obtener pegatina to receive the selected sticker.',
-    'Choose Sin pegatina esta vez to save the record and guide the next timer choice.',
-    'The child-facing result keeps a next-try tone instead of harsh failure wording.',
+    'Cuando confirmas que la actividad terminó, se registra como completada.',
+    'Cuando termine el temporizador, revisen juntos y elijan si reciben una pegatina.',
+    'Elige Obtener pegatina para recibir la pegatina seleccionada.',
+    'Elige Sin pegatina esta vez para guardar el registro y orientar la próxima elección de temporizador.',
+    'El resultado que ve el niño mantiene un tono de próximo intento, sin palabras duras de fracaso.',
   ];
 
   String get historyRewardsTitle => 'Historial y metas de recompensa';
   List<String> get historyRewardsItems => const [
-    'Activity history shows activity name, target time, actual time, and completion status.',
-    'Earned stickers and manually chosen picture markers can appear with the record.',
-    'Earned stickers collect in the sticker collection screen.',
-    'If reward goals are active, received stickers can fill goal slots.',
+    'El historial muestra el nombre de la actividad, el tiempo objetivo, el tiempo real y el estado de finalización.',
+    'Las pegatinas ganadas y los marcadores con imágenes elegidos manualmente pueden aparecer con el registro.',
+    'Las pegatinas ganadas se reúnen en la pantalla de colección de pegatinas.',
+    'Si hay metas de recompensa activas, las pegatinas recibidas pueden llenar espacios de la meta.',
   ];
 
   String get exitResumeTitle => 'Salir y continuar durante un temporizador';
   List<String> get exitResumeItems => const [
-    'Using back during a timer asks for confirmation first.',
-    'Pausing is not a failure; the mission can continue after a short break.',
-    'When an active timer is saved, the home screen may show an in-progress card. Use that card to resume or cancel when it appears.',
+    'Usar atrás durante un temporizador pide confirmación primero.',
+    'Pausar no es un fracaso; la misión puede continuar después de una pausa breve.',
+    'Cuando se guarda un temporizador activo, la pantalla de inicio puede mostrar una tarjeta en progreso. Usa esa tarjeta para reanudar o cancelar cuando aparezca.',
   ];
 
   List<String> get guardianTipsItems => const [
-    'Praise the routine attempt first, not only the sticker.',
-    'Set the default timer duration to a pace that fits the child instead of making the goal too short.',
-    'Treat needs-more-time results as notes for the next try, not as punishment.',
+    'Elogia primero el intento de rutina, no solo la pegatina.',
+    'Configura la duración predeterminada a un ritmo que encaje con el niño, en vez de hacer que la meta sea demasiado corta.',
+    'Trata los resultados que necesitan más tiempo como notas para el próximo intento, no como castigo.',
   ];
 }

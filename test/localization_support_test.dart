@@ -257,6 +257,56 @@ void main() {
     );
   });
 
+  test('User guide copy is localized for Spanish Portuguese and Japanese', () {
+    const englishCopy = [
+      'Timey Rider turns routines like brushing teeth, reading, cleanup, and play time into small riding missions.',
+      'Children choose a vehicle and follow the course for the set timer duration.',
+      'At the end, each activity is recorded through its completion mode: confirm done, time ended, or parent check.',
+      'After setting the child name, choose a vehicle from the home screen.',
+      'Use Other in the same flow when the routine does not match a preset mission.',
+      'Pausing during the timer is not a failure; the mission can resume when needed.',
+      'Off: no markers are shown on the road.',
+      'They do not decide stickers or results.',
+      'When you confirm the activity is done, it is recorded as complete.',
+      'Activity history shows activity name, target time, actual time, and completion status.',
+      'Using back during a timer asks for confirmation first.',
+      'Praise the routine attempt first, not only the sticker.',
+      'Treat needs-more-time results as notes for the next try, not as punishment.',
+    ];
+    final localizedCopies = [
+      for (final locale in const [
+        Locale('es'),
+        Locale('pt', 'BR'),
+        Locale('ja'),
+      ]) ...[
+        ...AppTexts.forLocale(locale).userGuide.whatIsTimeyRiderItems,
+        ...AppTexts.forLocale(locale).userGuide.startMissionItems,
+        ...AppTexts.forLocale(locale).userGuide.courseMarkersItems,
+        ...AppTexts.forLocale(locale).userGuide.motivationItems,
+        ...AppTexts.forLocale(locale).userGuide.completionItems,
+        ...AppTexts.forLocale(locale).userGuide.historyRewardsItems,
+        ...AppTexts.forLocale(locale).userGuide.exitResumeItems,
+        ...AppTexts.forLocale(locale).userGuide.guardianTipsItems,
+      ],
+    ];
+
+    for (final copy in localizedCopies) {
+      expect(englishCopy, isNot(contains(copy)));
+    }
+    expect(
+      AppTexts.forLocale(const Locale('es')).userGuide.courseMarkersItems[1],
+      'No: no se muestran marcadores en la ruta.',
+    );
+    expect(
+      AppTexts.forLocale(const Locale('pt', 'BR')).userGuide.completionItems[2],
+      'Escolha Ganhar adesivo para receber o adesivo selecionado.',
+    );
+    expect(
+      AppTexts.forLocale(const Locale('ja')).userGuide.guardianTipsItems.last,
+      'もう少し時間が必要だった結果は、罰ではなく次の挑戦のメモとして扱ってください。',
+    );
+  });
+
   test('VehicleDefinition.labelForLanguage returns new locale labels', () {
     final vehicle = VehicleCatalog.motorcycle;
 
