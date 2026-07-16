@@ -26,6 +26,38 @@ void main() {
     expect(AppTexts.forLocale(const Locale('fr')).common.apply, 'Apply');
   });
 
+  test('Spanish and Portuguese child name setup copy is localized', () {
+    const englishCopy = [
+      'Who is riding today?',
+      "Enter your child's name first.",
+      "Enter your child's name.",
+    ];
+    final localizedCopies = [
+      AppTexts.forLocale(const Locale('es')).settings.childNameSetupTitle,
+      AppTexts.forLocale(const Locale('es')).settings.childNameSetupSubtitle,
+      AppTexts.forLocale(const Locale('es')).settings.childNameRequiredMessage,
+      AppTexts.forLocale(const Locale('pt', 'BR')).settings.childNameSetupTitle,
+      AppTexts.forLocale(
+        const Locale('pt', 'BR'),
+      ).settings.childNameSetupSubtitle,
+      AppTexts.forLocale(
+        const Locale('pt', 'BR'),
+      ).settings.childNameRequiredMessage,
+    ];
+
+    for (final copy in localizedCopies) {
+      expect(englishCopy, isNot(contains(copy)));
+    }
+    expect(
+      AppTexts.forLocale(const Locale('es')).settings.childNameSetupTitle,
+      '¿Quién va a montar hoy?',
+    );
+    expect(
+      AppTexts.forLocale(const Locale('pt', 'BR')).settings.childNameSetupTitle,
+      'Quem vai pilotar hoje?',
+    );
+  });
+
   test('VehicleDefinition.labelForLanguage returns new locale labels', () {
     final vehicle = VehicleCatalog.motorcycle;
 

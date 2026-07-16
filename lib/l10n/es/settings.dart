@@ -37,10 +37,10 @@ class EsSettingsTexts implements SettingsTextSet {
   String get vehicleSelection => 'Elegir vehículo';
   String get childNameTitle => 'Nombre del niño';
   String get childNameFieldLabel => 'Nombre';
-  String get childNameSetupTitle => 'Who is riding today?';
-  String get childNameSetupSubtitle => "Enter your child's name first.";
+  String get childNameSetupTitle => '¿Quién va a montar hoy?';
+  String get childNameSetupSubtitle => 'Primero escribe el nombre de tu hijo.';
   String get saveChildName => 'Guardar nombre';
-  String get childNameRequiredMessage => "Enter your child's name.";
+  String get childNameRequiredMessage => 'Escribe el nombre de tu hijo.';
   String get childNameSavedMessage => 'Nombre guardado.';
   String get avatarSettingsTitle => 'Rider image settings';
   String get avatarDefaultState => 'Using default image';

@@ -37,10 +37,10 @@ class PtBrSettingsTexts implements SettingsTextSet {
   String get vehicleSelection => 'Escolher veículo';
   String get childNameTitle => 'Nome da criança';
   String get childNameFieldLabel => 'Nome';
-  String get childNameSetupTitle => 'Who is riding today?';
-  String get childNameSetupSubtitle => "Enter your child's name first.";
+  String get childNameSetupTitle => 'Quem vai pilotar hoje?';
+  String get childNameSetupSubtitle => 'Primeiro, informe o nome da criança.';
   String get saveChildName => 'Salvar nome';
-  String get childNameRequiredMessage => "Enter your child's name.";
+  String get childNameRequiredMessage => 'Informe o nome da criança.';
   String get childNameSavedMessage => 'Nome salvo.';
   String get avatarSettingsTitle => 'Rider image settings';
   String get avatarDefaultState => 'Using default image';
