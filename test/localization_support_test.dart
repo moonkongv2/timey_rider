@@ -58,6 +58,71 @@ void main() {
     );
   });
 
+  test('Settings copy is localized for Spanish Portuguese and Japanese', () {
+    const englishCopy = [
+      'Show remaining time',
+      'Use custom video interval',
+      'Motivation video interval',
+      'Motivation video guide',
+      'They do not decide stickers or results.',
+      'Short timers may skip some milestones so clips do not overlap.',
+      'Turns sounds during the timer on or off.',
+      'Applies while the timer is running.',
+      'Auto previews and uses picture markers that fit the activity. Only manually chosen picture markers are saved to activity records.',
+      'Rider image settings',
+      'Using default image',
+      'Using custom rider',
+      'Open rider image settings',
+      'Locked vehicles available',
+      'Vehicle pack unlocked',
+      'The vehicle pack unlocks all locked vehicles. Purchase and restore options open after a parent check.',
+      'View vehicle pack',
+    ];
+    final localizedCopies = [
+      for (final locale in const [
+        Locale('es'),
+        Locale('pt', 'BR'),
+        Locale('ja'),
+      ]) ...[
+        AppTexts.forLocale(locale).settings.showRemainingTime,
+        AppTexts.forLocale(locale).settings.motivationVideoCustomInterval,
+        AppTexts.forLocale(locale).settings.motivationVideoInterval,
+        AppTexts.forLocale(locale).settings.motivationVideoHelpTitle,
+        ...AppTexts.forLocale(
+          locale,
+        ).settings.motivationVideoHelpBodyParagraphs,
+        ...AppTexts.forLocale(locale).settings.motivationVideoHelpBulletItems,
+        AppTexts.forLocale(locale).settings.savedOnlySubtitle,
+        AppTexts.forLocale(locale).settings.keepScreenAwakeSubtitle,
+        AppTexts.forLocale(locale).settings.markerModeDescription,
+        AppTexts.forLocale(locale).settings.avatarSettingsTitle,
+        AppTexts.forLocale(locale).settings.avatarDefaultState,
+        AppTexts.forLocale(locale).settings.avatarCustomState,
+        AppTexts.forLocale(locale).settings.avatarSettingsButton,
+        AppTexts.forLocale(locale).settings.vehiclePackLockedState,
+        AppTexts.forLocale(locale).settings.vehiclePackUnlockedState,
+        AppTexts.forLocale(locale).settings.vehiclePackSettingsDescription,
+        AppTexts.forLocale(locale).settings.vehiclePackManageButton,
+      ],
+    ];
+
+    for (final copy in localizedCopies) {
+      expect(englishCopy, isNot(contains(copy)));
+    }
+    expect(
+      AppTexts.forLocale(const Locale('es')).settings.showRemainingTime,
+      'Mostrar tiempo restante',
+    );
+    expect(
+      AppTexts.forLocale(const Locale('pt', 'BR')).settings.showRemainingTime,
+      'Mostrar tempo restante',
+    );
+    expect(
+      AppTexts.forLocale(const Locale('ja')).settings.showRemainingTime,
+      '残り時間を表示',
+    );
+  });
+
   test('VehicleDefinition.labelForLanguage returns new locale labels', () {
     final vehicle = VehicleCatalog.motorcycle;
 

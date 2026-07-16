@@ -6,34 +6,36 @@ class PtBrSettingsTexts implements SettingsTextSet {
   const PtBrSettingsTexts();
 
   String get title => 'Configurações';
-  String get showRemainingTime => 'Show remaining time';
+  String get showRemainingTime => 'Mostrar tempo restante';
   String get soundEnabled => 'Efeitos sonoros';
   String get motivationVideoEnabled => 'Vídeos de incentivo';
-  String get motivationVideoCustomInterval => 'Use custom video interval';
-  String get motivationVideoInterval => 'Motivation video interval';
-  String get motivationVideoHelpTitle => 'Motivation video guide';
+  String get motivationVideoCustomInterval =>
+      'Usar intervalo de vídeo personalizado';
+  String get motivationVideoInterval => 'Intervalo dos vídeos de incentivo';
+  String get motivationVideoHelpTitle => 'Guia dos vídeos de incentivo';
   String get motivationVideoHelpSummary =>
       'Os vídeos de incentivo são clipes curtos durante o timer.';
   List<String> get motivationVideoHelpBodyParagraphs => const [
     'Os vídeos de incentivo são clipes curtos que podem aparecer durante o timer.',
-    'They do not decide stickers or results.',
+    'Eles não definem figurinhas nem resultados.',
   ];
   List<String> get motivationVideoHelpBulletItems => const [
-    'Short timers may skip some milestones so clips do not overlap.',
-    'Longer timers or custom interval mode may use time-based scheduling.',
-    'Custom intervals can be set to 3, 5, or 10 minutes.',
-    'Sound effects and video display settings can behave separately.',
-    'The app spaces videos out so they do not overlap too frequently.',
+    'Timers curtos podem pular alguns marcos para que os clipes não se sobreponham.',
+    'Timers mais longos ou o modo de intervalo personalizado podem usar uma programação por tempo.',
+    'Os intervalos personalizados podem ser de 3, 5 ou 10 minutos.',
+    'Os efeitos sonoros e a exibição de vídeos podem ser configurados separadamente.',
+    'O app espaça os vídeos para que eles não apareçam com frequência demais.',
   ];
   String get keepScreenAwake => 'Manter tela ligada';
-  String get savedOnlySubtitle => 'Turns sounds during the timer on or off.';
-  String get keepScreenAwakeSubtitle => 'Applies while the timer is running.';
+  String get savedOnlySubtitle => 'Ativa ou desativa os sons durante o timer.';
+  String get keepScreenAwakeSubtitle =>
+      'Aplica-se enquanto o timer está em andamento.';
   String get markerModeTitle => 'Marcadores da rota';
   String get markerModeOff => 'Desligado';
   String get markerModeManual => 'Escolher';
   String get markerModeActivityDefault => 'Auto';
   String get markerModeDescription =>
-      'Auto previews and uses picture markers that fit the activity. Only manually chosen picture markers are saved to activity records.';
+      'Auto mostra uma prévia e usa marcadores com imagens que combinam com a atividade. Apenas os marcadores escolhidos manualmente são salvos nos registros de atividade.';
   String get vehicleSelection => 'Escolher veículo';
   String get childNameTitle => 'Nome da criança';
   String get childNameFieldLabel => 'Nome';
@@ -42,16 +44,16 @@ class PtBrSettingsTexts implements SettingsTextSet {
   String get saveChildName => 'Salvar nome';
   String get childNameRequiredMessage => 'Informe o nome da criança.';
   String get childNameSavedMessage => 'Nome salvo.';
-  String get avatarSettingsTitle => 'Rider image settings';
-  String get avatarDefaultState => 'Using default image';
-  String get avatarCustomState => 'Using custom rider';
-  String get avatarSettingsButton => 'Open rider image settings';
+  String get avatarSettingsTitle => 'Configurações da imagem do piloto';
+  String get avatarDefaultState => 'Usando imagem padrão';
+  String get avatarCustomState => 'Usando piloto personalizado';
+  String get avatarSettingsButton => 'Abrir configurações da imagem do piloto';
   String get vehiclePackSettingsTitle => 'Pacote de veículos';
-  String get vehiclePackLockedState => 'Locked vehicles available';
-  String get vehiclePackUnlockedState => 'Vehicle pack unlocked';
+  String get vehiclePackLockedState => 'Veículos bloqueados disponíveis';
+  String get vehiclePackUnlockedState => 'Pacote de veículos desbloqueado';
   String get vehiclePackSettingsDescription =>
-      'The vehicle pack unlocks all locked vehicles. Purchase and restore options open after a parent check.';
-  String get vehiclePackManageButton => 'View vehicle pack';
+      'O pacote de veículos desbloqueia todos os veículos bloqueados. As opções de compra e restauração abrem depois de uma verificação dos pais.';
+  String get vehiclePackManageButton => 'Ver pacote de veículos';
   String get vehiclePackRestoreButton => 'Restaurar compra';
 
   String motivationVideoIntervalSegmentLabel(int minutes) => '$minutes min';
