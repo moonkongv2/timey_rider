@@ -114,8 +114,20 @@ void main() {
       'Mostrar tiempo restante',
     );
     expect(
+      AppTexts.forLocale(
+        const Locale('es'),
+      ).settings.motivationVideoCustomInterval,
+      'Intervalo de video personalizado',
+    );
+    expect(
       AppTexts.forLocale(const Locale('pt', 'BR')).settings.showRemainingTime,
       'Mostrar tempo restante',
+    );
+    expect(
+      AppTexts.forLocale(
+        const Locale('pt', 'BR'),
+      ).settings.motivationVideoCustomInterval,
+      'Intervalo de vídeo personalizado',
     );
     expect(
       AppTexts.forLocale(const Locale('ja')).settings.showRemainingTime,

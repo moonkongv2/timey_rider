@@ -10,7 +10,7 @@ class EsSettingsTexts implements SettingsTextSet {
   String get soundEnabled => 'Efectos de sonido';
   String get motivationVideoEnabled => 'Videos de ánimo';
   String get motivationVideoCustomInterval =>
-      'Usar intervalo de video personalizado';
+      'Intervalo de video personalizado';
   String get motivationVideoInterval => 'Intervalo de videos de ánimo';
   String get motivationVideoHelpTitle => 'Guía de videos de ánimo';
   String get motivationVideoHelpSummary =>

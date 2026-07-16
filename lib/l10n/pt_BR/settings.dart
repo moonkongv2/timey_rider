@@ -10,7 +10,7 @@ class PtBrSettingsTexts implements SettingsTextSet {
   String get soundEnabled => 'Efeitos sonoros';
   String get motivationVideoEnabled => 'Vídeos de incentivo';
   String get motivationVideoCustomInterval =>
-      'Usar intervalo de vídeo personalizado';
+      'Intervalo de vídeo personalizado';
   String get motivationVideoInterval => 'Intervalo dos vídeos de incentivo';
   String get motivationVideoHelpTitle => 'Guia dos vídeos de incentivo';
   String get motivationVideoHelpSummary =>
