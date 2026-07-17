@@ -12,6 +12,7 @@ class EnCommonTexts implements CommonTextSet {
   String get complete => 'Done';
   String get finishPointSemanticLabel => 'finish point';
   String get home => 'Home';
+  String get locked => 'Locked';
   String get notYet => 'Not yet';
   String get restartRide => 'Start again';
   String get settings => 'Settings';

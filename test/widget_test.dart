@@ -5746,6 +5746,7 @@ void main() {
                 title: '차량 선택',
                 selectedVehicleId: 'motorcycle',
                 onVehicleSelected: (_) {},
+                lockedVehicleLabel: '잠김',
                 avatarForVehicle: (vehicleId) {
                   final avatarConfig = avatarConfigs[vehicleId];
                   if (avatarConfig == null) {
@@ -5803,6 +5804,7 @@ void main() {
                 title: '차량 선택',
                 selectedVehicleId: 'fire_truck',
                 onVehicleSelected: (_) {},
+                lockedVehicleLabel: '잠김',
                 showSelectedPreview: true,
                 showChoices: false,
                 avatar: VehicleAvatarPresentation(

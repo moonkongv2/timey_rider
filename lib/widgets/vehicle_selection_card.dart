@@ -24,7 +24,7 @@ class VehicleSelectionCard extends StatelessWidget {
     this.avatarForVehicle,
     this.avatarImageBuilder,
     this.isVehicleLocked,
-    this.lockedVehicleLabel = 'Locked',
+    required this.lockedVehicleLabel,
     this.onLockedVehiclePressed,
     this.showSelectedPreview = false,
     this.showChoices = true,

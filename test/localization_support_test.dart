@@ -27,6 +27,17 @@ void main() {
     expect(AppTexts.forLocale(const Locale('fr')).common.apply, 'Apply');
   });
 
+  test('Common locked label is localized', () {
+    expect(AppTexts.forLocale(const Locale('en')).common.locked, 'Locked');
+    expect(AppTexts.forLocale(const Locale('ko')).common.locked, '잠김');
+    expect(AppTexts.forLocale(const Locale('es')).common.locked, 'Bloqueado');
+    expect(
+      AppTexts.forLocale(const Locale('pt', 'BR')).common.locked,
+      'Bloqueado',
+    );
+    expect(AppTexts.forLocale(const Locale('ja')).common.locked, 'ロック中');
+  });
+
   test('Spanish and Portuguese child name setup copy is localized', () {
     const englishCopy = [
       'Who is riding today?',

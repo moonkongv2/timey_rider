@@ -12,6 +12,7 @@ class EsCommonTexts implements CommonTextSet {
   String get complete => 'Listo';
   String get finishPointSemanticLabel => 'punto de llegada';
   String get home => 'Inicio';
+  String get locked => 'Bloqueado';
   String get notYet => 'Todavía no';
   String get restartRide => 'Empezar de nuevo';
   String get settings => 'Ajustes';

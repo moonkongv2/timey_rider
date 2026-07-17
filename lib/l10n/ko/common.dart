@@ -12,6 +12,7 @@ class CommonTexts implements CommonTextSet {
   String get complete => '완료';
   String get finishPointSemanticLabel => '도착 지점';
   String get home => '홈으로';
+  String get locked => '잠김';
   String get notYet => '아직이야';
   String get restartRide => '다시 출발';
   String get settings => '설정';

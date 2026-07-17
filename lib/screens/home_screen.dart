@@ -492,6 +492,7 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
         avatarForVehicle: _config.avatarPresentationForVehicle,
         avatarImageBuilder: widget.avatarImageBuilder,
         isVehicleLocked: shouldApplyVehicleLocks ? _isVehicleLocked : null,
+        lockedVehicleLabel: texts.common.locked,
         onLockedVehiclePressed: shouldApplyVehicleLocks
             ? _handleLockedVehiclePressed
             : null,
@@ -681,6 +682,7 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
                   avatar: selectedVehicleAvatar,
                   avatarForVehicle: _config.avatarPresentationForVehicle,
                   avatarImageBuilder: widget.avatarImageBuilder,
+                  lockedVehicleLabel: texts.common.locked,
                   showSelectedPreview: true,
                   showChoices: false,
                   actionLabel: texts.home.vehicleChangeButton,
@@ -806,6 +808,7 @@ class _VehiclePickerSheet extends StatelessWidget {
     required this.avatar,
     required this.avatarForVehicle,
     this.isVehicleLocked,
+    required this.lockedVehicleLabel,
     this.onLockedVehiclePressed,
     this.avatarImageBuilder,
   });
@@ -815,6 +818,7 @@ class _VehiclePickerSheet extends StatelessWidget {
   final VehicleAvatarPresentation avatar;
   final VehicleAvatarPresentationResolver avatarForVehicle;
   final VehicleLockResolver? isVehicleLocked;
+  final String lockedVehicleLabel;
   final Future<bool> Function(String vehicleId)? onLockedVehiclePressed;
   final Widget Function(BuildContext context, String imagePath)?
   avatarImageBuilder;
@@ -861,6 +865,7 @@ class _VehiclePickerSheet extends StatelessWidget {
                 avatarForVehicle: avatarForVehicle,
                 avatarImageBuilder: avatarImageBuilder,
                 isVehicleLocked: isVehicleLocked,
+                lockedVehicleLabel: lockedVehicleLabel,
                 onLockedVehiclePressed: onLockedVehiclePressed == null
                     ? null
                     : (vehicleId) {

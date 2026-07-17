@@ -484,6 +484,7 @@ class _AvatarSetupScreenState extends State<AvatarSetupScreen> {
                 isVehicleLocked: _shouldApplyVehicleLocks
                     ? _isVehicleLocked
                     : null,
+                lockedVehicleLabel: AppTexts.of(context).common.locked,
                 onLockedVehiclePressed: _shouldApplyVehicleLocks
                     ? _handleLockedVehiclePressed
                     : null,
@@ -554,6 +555,7 @@ class _AvatarSetupScreenState extends State<AvatarSetupScreen> {
                 isVehicleLocked: _shouldApplyVehicleLocks
                     ? _isVehicleLocked
                     : null,
+                lockedVehicleLabel: AppTexts.of(context).common.locked,
                 onLockedVehiclePressed: _shouldApplyVehicleLocks
                     ? _handleLockedVehiclePressed
                     : null,

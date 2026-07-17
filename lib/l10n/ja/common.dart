@@ -12,6 +12,7 @@ class JaCommonTexts implements CommonTextSet {
   String get complete => 'できた';
   String get finishPointSemanticLabel => 'ゴール地点';
   String get home => 'ホーム';
+  String get locked => 'ロック中';
   String get notYet => 'まだ';
   String get restartRide => 'もう一度';
   String get settings => '設定';

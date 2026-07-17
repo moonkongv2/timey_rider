@@ -12,6 +12,7 @@ class PtBrCommonTexts implements CommonTextSet {
   String get complete => 'Pronto';
   String get finishPointSemanticLabel => 'ponto de chegada';
   String get home => 'Início';
+  String get locked => 'Bloqueado';
   String get notYet => 'Ainda não';
   String get restartRide => 'Começar de novo';
   String get settings => 'Configurações';

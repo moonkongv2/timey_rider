@@ -10,6 +10,7 @@ abstract interface class CommonTextSet {
   String get complete;
   String get finishPointSemanticLabel;
   String get home;
+  String get locked;
   String get notYet;
   String get restartRide;
   String get settings;
