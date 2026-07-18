@@ -164,6 +164,53 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
+  Future<void> _restoreVehiclePackPurchase() async {
+    final purchaseController = widget.purchaseController;
+    if (purchaseController == null) {
+      return;
+    }
+
+    final parentGatePresenter =
+        widget.parentGatePresenter ?? showParentGateSheet;
+    final didPassGate = await parentGatePresenter(context);
+    if (!mounted || !didPassGate) {
+      return;
+    }
+
+    await purchaseController.restoreVehiclePack();
+    if (!mounted) {
+      return;
+    }
+
+    final message = _vehiclePackRestoreMessage(
+      AppTexts.of(context).purchase,
+      purchaseController.state,
+    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(message)));
+  }
+
+  String _vehiclePackRestoreMessage(
+    PurchaseTextSet texts,
+    VehiclePackPurchaseState state,
+  ) {
+    if (state.vehiclePackUnlocked) {
+      return state.status == VehiclePackPurchaseStatus.restored
+          ? texts.vehiclePackRestoredMessage
+          : texts.vehiclePackPurchasedMessage;
+    }
+
+    return switch (state.status) {
+      VehiclePackPurchaseStatus.restoreNotFound =>
+        texts.vehiclePackRestoreNotFoundMessage,
+      VehiclePackPurchaseStatus.productUnavailable =>
+        texts.vehiclePackPurchaseUnavailableMessage,
+      VehiclePackPurchaseStatus.error => texts.vehiclePackErrorMessage,
+      _ => texts.vehiclePackRestoringMessage,
+    };
+  }
+
   @override
   Widget build(BuildContext context) {
     final texts = AppTexts.of(context);
@@ -366,7 +413,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       const SizedBox(height: 8),
                       OutlinedButton.icon(
                         key: const ValueKey('vehiclePackSettingsRestoreButton'),
-                        onPressed: _openVehiclePackPurchase,
+                        onPressed: _restoreVehiclePackPurchase,
                         icon: const Icon(Icons.restore_rounded),
                         label: Text(texts.settings.vehiclePackRestoreButton),
                       ),

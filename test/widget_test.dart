@@ -5143,6 +5143,69 @@ void main() {
     expect(purchaseSheetVehicleIds, ['fire_truck']);
   });
 
+  testWidgets('Settings screen restores vehicle pack after parent gate', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    var parentGateCallCount = 0;
+    var purchaseSheetCallCount = 0;
+    final purchaseClient = _FakeIapPurchaseClient();
+    final purchaseController = VehiclePackPurchaseController(
+      purchaseClient: purchaseClient,
+      entitlementStore: _FakePurchaseEntitlementStore(),
+    );
+    addTearDown(purchaseController.dispose);
+
+    await tester.pumpWidget(
+      MaterialApp(
+        locale: const Locale('ko'),
+        supportedLocales: const [Locale('ko'), Locale('en')],
+        localizationsDelegates: const [
+          GlobalMaterialLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+        ],
+        home: SettingsScreen(
+          config: ActivityTimerConfig.defaults().copyWith(
+            vehicleId: 'fire_truck',
+          ),
+          onConfigChanged: (_) {},
+          purchaseController: purchaseController,
+          purchaseState: const VehiclePackPurchaseState.initial(),
+          parentGatePresenter: (_) async {
+            parentGateCallCount += 1;
+            return true;
+          },
+          vehiclePackPurchasePresenter:
+              (_, {required controller, required vehicleId}) async {
+                purchaseSheetCallCount += 1;
+              },
+        ),
+      ),
+    );
+
+    await tester.scrollUntilVisible(
+      find.byKey(const ValueKey('vehiclePackSettingsRestoreButton')),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(
+      find.byKey(const ValueKey('vehiclePackSettingsRestoreButton')),
+    );
+    await tester.pump();
+    await tester.pump();
+
+    expect(parentGateCallCount, 1);
+    expect(purchaseClient.restoreCallCount, 1);
+    expect(purchaseSheetCallCount, 0);
+    expect(find.text('복원할 차량팩 구매 내역을 찾지 못했어요.'), findsOneWidget);
+  });
+
   testWidgets('Settings screen shows unlocked vehicle pack state', (
     tester,
   ) async {
@@ -11486,6 +11549,7 @@ class _FakePurchaseEntitlementStore implements PurchaseEntitlementStore {
 class _FakeIapPurchaseClient implements IapPurchaseClient {
   final _purchaseStreamController =
       StreamController<List<IapPurchaseUpdate>>.broadcast();
+  var restoreCallCount = 0;
 
   @override
   Stream<List<IapPurchaseUpdate>> get purchaseStream {
@@ -11511,7 +11575,9 @@ class _FakeIapPurchaseClient implements IapPurchaseClient {
   }
 
   @override
-  Future<void> restorePurchases() async {}
+  Future<void> restorePurchases() async {
+    restoreCallCount += 1;
+  }
 
   void emitPurchase(IapPurchaseUpdate purchase) {
     _purchaseStreamController.add([purchase]);
