@@ -5065,8 +5065,16 @@ void main() {
       ),
     );
 
+    await tester.scrollUntilVisible(
+      find.byKey(const ValueKey('userGuideSettingsTile')),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.pumpAndSettle();
+
     expect(find.byKey(const ValueKey('userGuideSettingsTile')), findsOneWidget);
-    expect(find.text('사용 안내'), findsOneWidget);
+    expect(find.text('도움말 및 지원'), findsOneWidget);
+    expect(find.text('사용 가이드'), findsOneWidget);
     expect(find.text('활동 미션, 응원 영상, 차량 스티커 규칙을 확인해요.'), findsOneWidget);
 
     await tester.tap(find.byKey(const ValueKey('userGuideSettingsTile')));
@@ -5188,14 +5196,14 @@ void main() {
     );
 
     await tester.scrollUntilVisible(
-      find.byKey(const ValueKey('vehiclePackSettingsRestoreButton')),
+      find.byKey(const ValueKey('restorePurchaseSettingsTile')),
       200,
       scrollable: find.byType(Scrollable).first,
     );
     await tester.pumpAndSettle();
 
     await tester.tap(
-      find.byKey(const ValueKey('vehiclePackSettingsRestoreButton')),
+      find.byKey(const ValueKey('restorePurchaseSettingsTile')),
     );
     await tester.pump();
     await tester.pump();

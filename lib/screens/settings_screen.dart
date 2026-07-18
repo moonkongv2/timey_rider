@@ -50,7 +50,12 @@ Future<bool> _launchSettingsExternalUri(Uri uri) {
 }
 
 Future<String> _loadSettingsAppVersion() async {
-  final packageInfo = await PackageInfo.fromPlatform();
+  final PackageInfo packageInfo;
+  try {
+    packageInfo = await PackageInfo.fromPlatform();
+  } catch (_) {
+    return '';
+  }
   if (packageInfo.buildNumber.isEmpty) {
     return packageInfo.version;
   }
@@ -96,10 +101,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
   late final TextEditingController _childNameController = TextEditingController(
     text: widget.config.childName,
   );
+  late Future<String> _appVersionFuture;
 
   @override
   void initState() {
     super.initState();
+    _appVersionFuture = widget.appVersionLoader();
     widget.purchaseController?.addListener(_handlePurchaseStateChanged);
   }
 
@@ -109,6 +116,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
     if (oldWidget.purchaseController != widget.purchaseController) {
       oldWidget.purchaseController?.removeListener(_handlePurchaseStateChanged);
       widget.purchaseController?.addListener(_handlePurchaseStateChanged);
+    }
+    if (oldWidget.appVersionLoader != widget.appVersionLoader) {
+      _appVersionFuture = widget.appVersionLoader();
     }
     if (oldWidget.config.childName != widget.config.childName &&
         _childNameController.text != widget.config.childName) {
@@ -169,6 +179,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
       bodyParagraphs: texts.motivationVideoHelpBodyParagraphs,
       bulletItems: texts.motivationVideoHelpBulletItems,
     );
+  }
+
+  void _openUserGuide() {
+    Navigator.of(
+      context,
+    ).push(MaterialPageRoute(builder: (_) => const UserGuideScreen()));
   }
 
   Future<void> _openVehiclePackPurchase() async {
@@ -240,6 +256,41 @@ class _SettingsScreenState extends State<SettingsScreen> {
     };
   }
 
+  Widget _buildSettingsSection({
+    required String title,
+    required TextStyle? titleStyle,
+    required List<Widget> children,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(title, style: titleStyle),
+        const SizedBox(height: 8),
+        Card(child: Column(children: children)),
+      ],
+    );
+  }
+
+  Widget _buildAppVersionText() {
+    return FutureBuilder<String>(
+      future: _appVersionFuture,
+      builder: (context, snapshot) {
+        return ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 140),
+          child: Text(
+            snapshot.data ?? '',
+            overflow: TextOverflow.ellipsis,
+            textAlign: TextAlign.end,
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+              color: AppColors.textSecondary,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final texts = AppTexts.of(context);
@@ -259,26 +310,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
       body: ListView(
         padding: const EdgeInsets.all(20),
         children: [
-          Card(
-            child: ListTile(
-              key: const ValueKey('userGuideSettingsTile'),
-              leading: const Icon(Icons.menu_book_rounded),
-              title: Text(
-                texts.userGuide.title,
-                style: Theme.of(
-                  context,
-                ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w900),
-              ),
-              subtitle: Text(texts.userGuide.subtitle),
-              trailing: const Icon(Icons.chevron_right_rounded),
-              onTap: () {
-                Navigator.of(context).push(
-                  MaterialPageRoute(builder: (_) => const UserGuideScreen()),
-                );
-              },
-            ),
-          ),
-          const SizedBox(height: 20),
           Card(
             child: Padding(
               padding: const EdgeInsets.all(20),
@@ -439,13 +470,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         icon: const Icon(Icons.lock_open_rounded),
                         label: Text(texts.settings.vehiclePackManageButton),
                       ),
-                      const SizedBox(height: 8),
-                      OutlinedButton.icon(
-                        key: const ValueKey('vehiclePackSettingsRestoreButton'),
-                        onPressed: _restoreVehiclePackPurchase,
-                        icon: const Icon(Icons.restore_rounded),
-                        label: Text(texts.settings.vehiclePackRestoreButton),
-                      ),
                     ],
                   ],
                 ),
@@ -582,6 +606,56 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   ),
               ],
             ),
+          ),
+          const SizedBox(height: 20),
+          _buildSettingsSection(
+            title: texts.settings.helpAndSupportSectionTitle,
+            titleStyle: sectionTitleStyle,
+            children: [
+              ListTile(
+                key: const ValueKey('userGuideSettingsTile'),
+                leading: const Icon(Icons.menu_book_rounded),
+                title: Text(texts.settings.userGuideSettingsItemTitle),
+                subtitle: Text(texts.userGuide.subtitle),
+                trailing: const Icon(Icons.chevron_right_rounded),
+                onTap: _openUserGuide,
+              ),
+              ListTile(
+                key: const ValueKey('restorePurchaseSettingsTile'),
+                enabled: widget.purchaseController != null,
+                leading: const Icon(Icons.restore_rounded),
+                title: Text(texts.settings.restorePurchaseSettingsItemTitle),
+                trailing: const Icon(Icons.chevron_right_rounded),
+                onTap: widget.purchaseController == null
+                    ? null
+                    : _restoreVehiclePackPurchase,
+              ),
+              ListTile(
+                key: const ValueKey('contactSupportSettingsTile'),
+                leading: const Icon(Icons.support_agent_rounded),
+                title: Text(texts.settings.contactSupportSettingsItemTitle),
+                trailing: const Icon(Icons.chevron_right_rounded),
+              ),
+            ],
+          ),
+          const SizedBox(height: 20),
+          _buildSettingsSection(
+            title: texts.settings.aboutSectionTitle,
+            titleStyle: sectionTitleStyle,
+            children: [
+              ListTile(
+                key: const ValueKey('privacyPolicySettingsTile'),
+                leading: const Icon(Icons.privacy_tip_rounded),
+                title: Text(texts.settings.privacyPolicySettingsItemTitle),
+                trailing: const Icon(Icons.chevron_right_rounded),
+              ),
+              ListTile(
+                key: const ValueKey('appVersionSettingsTile'),
+                leading: const Icon(Icons.info_outline_rounded),
+                title: Text(texts.settings.appVersionSettingsItemTitle),
+                trailing: _buildAppVersionText(),
+              ),
+            ],
           ),
           const SizedBox(height: 20),
         ],
