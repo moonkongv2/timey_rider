@@ -5049,6 +5049,7 @@ void main() {
     tester.view.devicePixelRatio = 1.0;
     addTearDown(tester.view.resetPhysicalSize);
     addTearDown(tester.view.resetDevicePixelRatio);
+    var parentGateCallCount = 0;
     await tester.pumpWidget(
       MaterialApp(
         locale: const Locale('ko'),
@@ -5061,6 +5062,10 @@ void main() {
         home: SettingsScreen(
           config: ActivityTimerConfig.defaults(),
           onConfigChanged: (_) {},
+          parentGatePresenter: (_) async {
+            parentGateCallCount += 1;
+            return true;
+          },
         ),
       ),
     );
@@ -5087,6 +5092,7 @@ void main() {
       find.textContaining('아이의 루틴을 함께 돕는 보호자도 참고할 수 있어요.'),
       findsOneWidget,
     );
+    expect(parentGateCallCount, 0);
   });
 
   testWidgets('Settings screen opens vehicle pack purchase after parent gate', (
@@ -5221,7 +5227,7 @@ void main() {
     tester.view.devicePixelRatio = 1.0;
     addTearDown(tester.view.resetPhysicalSize);
     addTearDown(tester.view.resetDevicePixelRatio);
-    var parentGateCallCount = 0;
+    final events = <String>[];
     final launchedUris = <Uri>[];
 
     await tester.pumpWidget(
@@ -5237,10 +5243,11 @@ void main() {
           config: ActivityTimerConfig.defaults(),
           onConfigChanged: (_) {},
           parentGatePresenter: (_) async {
-            parentGateCallCount += 1;
+            events.add('gate');
             return true;
           },
           urlLauncher: (uri) async {
+            events.add('launch');
             launchedUris.add(uri);
             return true;
           },
@@ -5259,8 +5266,58 @@ void main() {
     await tester.tap(find.byKey(const ValueKey('contactSupportSettingsTile')));
     await tester.pump();
 
-    expect(parentGateCallCount, 1);
+    expect(events, ['gate', 'launch']);
     expect(launchedUris, [SettingsScreen.supportUri]);
+  });
+
+  testWidgets('Settings screen opens privacy link after parent gate', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    final events = <String>[];
+    final launchedUris = <Uri>[];
+
+    await tester.pumpWidget(
+      MaterialApp(
+        locale: const Locale('en'),
+        supportedLocales: const [Locale('ko'), Locale('en')],
+        localizationsDelegates: const [
+          GlobalMaterialLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+        ],
+        home: SettingsScreen(
+          config: ActivityTimerConfig.defaults(),
+          onConfigChanged: (_) {},
+          parentGatePresenter: (_) async {
+            events.add('gate');
+            return true;
+          },
+          urlLauncher: (uri) async {
+            events.add('launch');
+            launchedUris.add(uri);
+            return true;
+          },
+          appVersionLoader: () async => '1.0.0 (1)',
+        ),
+      ),
+    );
+
+    await tester.scrollUntilVisible(
+      find.byKey(const ValueKey('privacyPolicySettingsTile')),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byKey(const ValueKey('privacyPolicySettingsTile')));
+    await tester.pump();
+
+    expect(events, ['gate', 'launch']);
+    expect(launchedUris, [SettingsScreen.privacyPolicyUri]);
   });
 
   testWidgets('Settings screen blocks privacy link when parent gate fails', (
@@ -5312,6 +5369,46 @@ void main() {
     expect(launchedUris, isEmpty);
   });
 
+  testWidgets('Settings screen shows link failure message', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(
+      MaterialApp(
+        locale: const Locale('en'),
+        supportedLocales: const [Locale('ko'), Locale('en')],
+        localizationsDelegates: const [
+          GlobalMaterialLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+        ],
+        home: SettingsScreen(
+          config: ActivityTimerConfig.defaults(),
+          onConfigChanged: (_) {},
+          parentGatePresenter: (_) async => true,
+          urlLauncher: (_) async => false,
+          appVersionLoader: () async => '1.0.0 (1)',
+        ),
+      ),
+    );
+
+    await tester.scrollUntilVisible(
+      find.byKey(const ValueKey('contactSupportSettingsTile')),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byKey(const ValueKey('contactSupportSettingsTile')));
+    await tester.pump();
+
+    expect(find.text('Could not open the link.'), findsOneWidget);
+  });
+
   testWidgets('Settings screen shows unlocked vehicle pack state', (
     tester,
   ) async {
@@ -5341,6 +5438,7 @@ void main() {
           config: ActivityTimerConfig.defaults(),
           onConfigChanged: (_) {},
           purchaseController: purchaseController,
+          appVersionLoader: () async => '1.0.0 (1)',
         ),
       ),
     );
@@ -5362,6 +5460,32 @@ void main() {
       find.byKey(const ValueKey('vehiclePackSettingsRestoreButton')),
       findsNothing,
     );
+
+    await tester.scrollUntilVisible(
+      find.byKey(const ValueKey('restorePurchaseSettingsTile')),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.pumpAndSettle();
+
+    expect(
+      find.byKey(const ValueKey('restorePurchaseSettingsTile')),
+      findsOneWidget,
+    );
+
+    await tester.scrollUntilVisible(
+      find.byKey(const ValueKey('appVersionSettingsTile')),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.pumpAndSettle();
+
+    final appVersionTile = tester.widget<ListTile>(
+      find.byKey(const ValueKey('appVersionSettingsTile')),
+    );
+    expect(appVersionTile.onTap, isNull);
+    expect(find.text('App Version'), findsOneWidget);
+    expect(find.text('1.0.0 (1)'), findsOneWidget);
   });
 
   testWidgets('User guide uses English localization', (tester) async {
