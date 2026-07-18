@@ -52,6 +52,14 @@ class JaSettingsTexts implements SettingsTextSet {
       'のりものパックを使うと、ロック中ののりものをすべて使えるようになります。購入と復元の操作は、保護者確認のあとに開きます。';
   String get vehiclePackManageButton => 'のりものパックを見る';
   String get vehiclePackRestoreButton => '購入を復元';
+  String get helpAndSupportSectionTitle => 'ヘルプとサポート';
+  String get userGuideSettingsItemTitle => '使い方ガイド';
+  String get restorePurchaseSettingsItemTitle => '購入を復元';
+  String get contactSupportSettingsItemTitle => 'サポートに問い合わせる';
+  String get aboutSectionTitle => '情報';
+  String get privacyPolicySettingsItemTitle => 'プライバシーポリシー';
+  String get appVersionSettingsItemTitle => 'アプリバージョン';
+  String get externalLinkOpenErrorMessage => 'リンクを開けませんでした。';
 
   String motivationVideoIntervalSegmentLabel(int minutes) => '$minutes min';
 }

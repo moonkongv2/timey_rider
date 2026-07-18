@@ -53,6 +53,14 @@ class EnSettingsTexts implements SettingsTextSet {
       'The vehicle pack unlocks all locked vehicles. Purchase and restore options open after a parent check.';
   String get vehiclePackManageButton => 'View vehicle pack';
   String get vehiclePackRestoreButton => 'Restore purchase';
+  String get helpAndSupportSectionTitle => 'Help & Support';
+  String get userGuideSettingsItemTitle => 'User Guide';
+  String get restorePurchaseSettingsItemTitle => 'Restore Purchase';
+  String get contactSupportSettingsItemTitle => 'Contact Support';
+  String get aboutSectionTitle => 'About';
+  String get privacyPolicySettingsItemTitle => 'Privacy Policy';
+  String get appVersionSettingsItemTitle => 'App Version';
+  String get externalLinkOpenErrorMessage => 'Could not open the link.';
 
   String motivationVideoIntervalSegmentLabel(int minutes) => '$minutes min';
 }

@@ -56,6 +56,14 @@ class EsSettingsTexts implements SettingsTextSet {
       'El pack de vehículos desbloquea todos los vehículos bloqueados. Las opciones de compra y restauración se abren después de una comprobación para padres.';
   String get vehiclePackManageButton => 'Ver pack de vehículos';
   String get vehiclePackRestoreButton => 'Restaurar compra';
+  String get helpAndSupportSectionTitle => 'Ayuda y soporte';
+  String get userGuideSettingsItemTitle => 'Guía de uso';
+  String get restorePurchaseSettingsItemTitle => 'Restaurar compra';
+  String get contactSupportSettingsItemTitle => 'Contactar con soporte';
+  String get aboutSectionTitle => 'Acerca de';
+  String get privacyPolicySettingsItemTitle => 'Política de privacidad';
+  String get appVersionSettingsItemTitle => 'Versión de la app';
+  String get externalLinkOpenErrorMessage => 'No se pudo abrir el enlace.';
 
   String motivationVideoIntervalSegmentLabel(int minutes) => '$minutes min';
 }

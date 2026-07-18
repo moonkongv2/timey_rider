@@ -70,7 +70,7 @@ void main() {
     );
   });
 
-  test('Settings copy is localized for Spanish Portuguese and Japanese', () {
+  test('Settings copy is localized for Korean Spanish Portuguese and Japanese', () {
     const englishCopy = [
       'Show remaining time',
       'Use custom video interval',
@@ -89,6 +89,14 @@ void main() {
       'Vehicle pack unlocked',
       'The vehicle pack unlocks all locked vehicles. Purchase and restore options open after a parent check.',
       'View vehicle pack',
+      'Help & Support',
+      'User Guide',
+      'Restore Purchase',
+      'Contact Support',
+      'About',
+      'Privacy Policy',
+      'App Version',
+      'Could not open the link.',
     ];
     final localizedCopies = [
       for (final locale in const [
@@ -115,6 +123,14 @@ void main() {
         AppTexts.forLocale(locale).settings.vehiclePackUnlockedState,
         AppTexts.forLocale(locale).settings.vehiclePackSettingsDescription,
         AppTexts.forLocale(locale).settings.vehiclePackManageButton,
+        AppTexts.forLocale(locale).settings.helpAndSupportSectionTitle,
+        AppTexts.forLocale(locale).settings.userGuideSettingsItemTitle,
+        AppTexts.forLocale(locale).settings.restorePurchaseSettingsItemTitle,
+        AppTexts.forLocale(locale).settings.contactSupportSettingsItemTitle,
+        AppTexts.forLocale(locale).settings.aboutSectionTitle,
+        AppTexts.forLocale(locale).settings.privacyPolicySettingsItemTitle,
+        AppTexts.forLocale(locale).settings.appVersionSettingsItemTitle,
+        AppTexts.forLocale(locale).settings.externalLinkOpenErrorMessage,
       ],
     ];
 
@@ -144,6 +160,46 @@ void main() {
     expect(
       AppTexts.forLocale(const Locale('ja')).settings.showRemainingTime,
       '残り時間を表示',
+    );
+    expect(
+      AppTexts.forLocale(
+        const Locale('ko'),
+      ).settings.helpAndSupportSectionTitle,
+      '도움말 및 지원',
+    );
+    expect(
+      AppTexts.forLocale(
+        const Locale('ko'),
+      ).settings.userGuideSettingsItemTitle,
+      '사용 가이드',
+    );
+    expect(
+      AppTexts.forLocale(
+        const Locale('ko'),
+      ).settings.restorePurchaseSettingsItemTitle,
+      '구매 복원',
+    );
+    expect(
+      AppTexts.forLocale(
+        const Locale('ko'),
+      ).settings.contactSupportSettingsItemTitle,
+      '고객지원',
+    );
+    expect(
+      AppTexts.forLocale(const Locale('ko')).settings.aboutSectionTitle,
+      '정보',
+    );
+    expect(
+      AppTexts.forLocale(
+        const Locale('ko'),
+      ).settings.privacyPolicySettingsItemTitle,
+      '개인정보처리방침',
+    );
+    expect(
+      AppTexts.forLocale(
+        const Locale('ko'),
+      ).settings.appVersionSettingsItemTitle,
+      '앱 버전',
     );
   });
 

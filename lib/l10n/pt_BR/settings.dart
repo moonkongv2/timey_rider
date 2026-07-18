@@ -55,6 +55,14 @@ class PtBrSettingsTexts implements SettingsTextSet {
       'O pacote de veículos desbloqueia todos os veículos bloqueados. As opções de compra e restauração abrem depois de uma verificação dos pais.';
   String get vehiclePackManageButton => 'Ver pacote de veículos';
   String get vehiclePackRestoreButton => 'Restaurar compra';
+  String get helpAndSupportSectionTitle => 'Ajuda e suporte';
+  String get userGuideSettingsItemTitle => 'Guia de uso';
+  String get restorePurchaseSettingsItemTitle => 'Restaurar compra';
+  String get contactSupportSettingsItemTitle => 'Falar com o suporte';
+  String get aboutSectionTitle => 'Sobre';
+  String get privacyPolicySettingsItemTitle => 'Política de privacidade';
+  String get appVersionSettingsItemTitle => 'Versão do app';
+  String get externalLinkOpenErrorMessage => 'Não foi possível abrir o link.';
 
   String motivationVideoIntervalSegmentLabel(int minutes) => '$minutes min';
 }

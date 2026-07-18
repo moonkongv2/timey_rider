@@ -52,6 +52,14 @@ class SettingsTexts implements SettingsTextSet {
       '차량팩을 열면 잠긴 빠방을 모두 사용할 수 있어요. 구매와 복원은 보호자 확인 후 진행돼요.';
   String get vehiclePackManageButton => '차량팩 보기';
   String get vehiclePackRestoreButton => '구매 복원';
+  String get helpAndSupportSectionTitle => '도움말 및 지원';
+  String get userGuideSettingsItemTitle => '사용 가이드';
+  String get restorePurchaseSettingsItemTitle => '구매 복원';
+  String get contactSupportSettingsItemTitle => '고객지원';
+  String get aboutSectionTitle => '정보';
+  String get privacyPolicySettingsItemTitle => '개인정보처리방침';
+  String get appVersionSettingsItemTitle => '앱 버전';
+  String get externalLinkOpenErrorMessage => '링크를 열 수 없어요.';
 
   String motivationVideoIntervalSegmentLabel(int minutes) => '$minutes분';
 }

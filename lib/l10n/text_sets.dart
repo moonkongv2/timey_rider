@@ -277,6 +277,14 @@ abstract interface class SettingsTextSet {
   String get vehiclePackSettingsDescription;
   String get vehiclePackManageButton;
   String get vehiclePackRestoreButton;
+  String get helpAndSupportSectionTitle;
+  String get userGuideSettingsItemTitle;
+  String get restorePurchaseSettingsItemTitle;
+  String get contactSupportSettingsItemTitle;
+  String get aboutSectionTitle;
+  String get privacyPolicySettingsItemTitle;
+  String get appVersionSettingsItemTitle;
+  String get externalLinkOpenErrorMessage;
 
   String motivationVideoIntervalSegmentLabel(int minutes);
 }
