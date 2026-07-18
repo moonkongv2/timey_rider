@@ -410,8 +410,6 @@ class _AvatarSetupScreenState extends State<AvatarSetupScreen> {
     final shouldShowCompositePreview =
         _avatarMode == AvatarImageMode.custom && hasPreviewAvatarImage;
 
-    print("DEBUG: _avatarMode=$_avatarMode, hasPreviewAvatarImage=$hasPreviewAvatarImage, previewAvatarImagePath=$previewAvatarImagePath");
-
     return Scaffold(
       backgroundColor: AppColors.cream,
       appBar: AppBar(
