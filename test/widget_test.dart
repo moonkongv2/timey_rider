@@ -11299,16 +11299,6 @@ Future<void> _scrollAvatarAdjustmentIntoView(WidgetTester tester) async {
   } catch (_) {}
 }
 
-Future<void> _scrollAvatarAdjustmentBackIntoView(WidgetTester tester) async {
-  for (var index = 0; index < 6; index += 1) {
-    if (find.byKey(const ValueKey('avatarScaleSlider')).evaluate().isNotEmpty) {
-      return;
-    }
-    await tester.drag(find.byType(ListView), const Offset(0, 500));
-    await tester.pumpAndSettle();
-  }
-}
-
 Future<void> _scrollAvatarSetupToBottom(WidgetTester tester) async {
   for (var index = 0; index < 6; index += 1) {
     await tester.drag(find.byType(ListView), const Offset(0, -700));
