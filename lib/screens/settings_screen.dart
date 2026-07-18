@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:package_info_plus/package_info_plus.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../l10n/app_texts.dart';
 import '../l10n/text_sets.dart';
@@ -9,6 +11,9 @@ import '../widgets/app/app_help_sheet.dart';
 import '../widgets/purchase/parent_gate_sheet.dart';
 import '../widgets/purchase/vehicle_pack_purchase_sheet.dart';
 import 'user_guide_screen.dart';
+
+typedef SettingsUrlLauncher = Future<bool> Function(Uri uri);
+typedef SettingsAppVersionLoader = Future<String> Function();
 
 const _courseMarkerGuideImageAssetPath =
     'assets/images/onboarding/onboarding_04_course_markers.png';
@@ -40,6 +45,19 @@ const _markerModes = [
   ActivityMarkerMode.activityDefault,
 ];
 
+Future<bool> _launchSettingsExternalUri(Uri uri) {
+  return launchUrl(uri, mode: LaunchMode.externalApplication);
+}
+
+Future<String> _loadSettingsAppVersion() async {
+  final packageInfo = await PackageInfo.fromPlatform();
+  if (packageInfo.buildNumber.isEmpty) {
+    return packageInfo.version;
+  }
+
+  return '${packageInfo.version} (${packageInfo.buildNumber})';
+}
+
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({
     super.key,
@@ -49,7 +67,16 @@ class SettingsScreen extends StatefulWidget {
     this.purchaseState = const VehiclePackPurchaseState.initial(),
     this.parentGatePresenter,
     this.vehiclePackPurchasePresenter,
+    this.urlLauncher = _launchSettingsExternalUri,
+    this.appVersionLoader = _loadSettingsAppVersion,
   });
+
+  static final Uri privacyPolicyUri = Uri.parse(
+    'https://florencejyrider.github.io/app-legal-pages/privacy/timey-rider/',
+  );
+  static final Uri supportUri = Uri.parse(
+    'https://florencejyrider.github.io/app-legal-pages/support/timey-rider/',
+  );
 
   final ActivityTimerConfig config;
   final ValueChanged<ActivityTimerConfig> onConfigChanged;
@@ -57,6 +84,8 @@ class SettingsScreen extends StatefulWidget {
   final VehiclePackPurchaseState purchaseState;
   final ParentGatePresenter? parentGatePresenter;
   final VehiclePackPurchasePresenter? vehiclePackPurchasePresenter;
+  final SettingsUrlLauncher urlLauncher;
+  final SettingsAppVersionLoader appVersionLoader;
 
   @override
   State<SettingsScreen> createState() => _SettingsScreenState();

@@ -50,6 +50,16 @@ dependencies:
   in_app_purchase_android: 0.4.0+10
   in_app_purchase_storekit: 0.4.8+1
   in_app_purchase_platform_interface: 1.4.0
+  # Keep the endorsed URL launcher implementations pinned so dependency
+  # resolution does not raise the app's current Flutter/Dart floor.
+  url_launcher: 6.2.6
+  package_info_plus: 10.1.0
+  url_launcher_android: 6.3.29
+  url_launcher_ios: 6.3.6
+  url_launcher_linux: 3.2.2
+  url_launcher_macos: 3.2.5
+  url_launcher_web: 2.4.1
+  url_launcher_windows: 3.1.5
 
 dev_dependencies:
   flutter_test:
