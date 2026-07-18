@@ -116,61 +116,72 @@ class VehiclePackPurchaseController extends ChangeNotifier {
       ),
     );
 
-    final isAvailable = await _purchaseClient.isAvailable();
-    if (!isAvailable) {
-      _setState(
-        _state.copyWith(
-          status: VehiclePackPurchaseStatus.productUnavailable,
-          product: null,
-          error: _controllerError(
-            'store_unavailable',
-            'The store is not available.',
+    try {
+      final isAvailable = await _purchaseClient.isAvailable();
+      if (!isAvailable) {
+        _setState(
+          _state.copyWith(
+            status: VehiclePackPurchaseStatus.productUnavailable,
+            product: null,
+            error: _controllerError(
+              'store_unavailable',
+              'The store is not available.',
+            ),
+            storeAvailable: false,
           ),
-          storeAvailable: false,
-        ),
-      );
-      return null;
-    }
-
-    final result = await _purchaseClient.queryProducts({
-      VehicleUnlockCatalog.vehiclePackProductId,
-    });
-    IapProductDetails? product;
-    for (final candidate in result.products) {
-      if (candidate.id == VehicleUnlockCatalog.vehiclePackProductId) {
-        product = candidate;
-        break;
+        );
+        return null;
       }
-    }
 
-    if (product == null) {
+      final result = await _purchaseClient.queryProducts({
+        VehicleUnlockCatalog.vehiclePackProductId,
+      });
+      IapProductDetails? product;
+      for (final candidate in result.products) {
+        if (candidate.id == VehicleUnlockCatalog.vehiclePackProductId) {
+          product = candidate;
+          break;
+        }
+      }
+
+      if (product == null) {
+        _setState(
+          _state.copyWith(
+            status: VehiclePackPurchaseStatus.productUnavailable,
+            product: null,
+            error:
+                result.error ??
+                _controllerError(
+                  'product_not_found',
+                  'The vehicle pack product was not found.',
+                ),
+            notFoundIds: result.notFoundIds,
+            storeAvailable: true,
+          ),
+        );
+        return null;
+      }
+
       _setState(
         _state.copyWith(
-          status: VehiclePackPurchaseStatus.productUnavailable,
-          product: null,
-          error:
-              result.error ??
-              _controllerError(
-                'product_not_found',
-                'The vehicle pack product was not found.',
-              ),
+          status: VehiclePackPurchaseStatus.idle,
+          product: product,
+          error: null,
           notFoundIds: result.notFoundIds,
           storeAvailable: true,
         ),
       );
+      return product;
+    } catch (error) {
+      _setState(
+        _state.copyWith(
+          status: VehiclePackPurchaseStatus.error,
+          product: null,
+          error: _controllerError('product_load_failed', '$error'),
+        ),
+      );
       return null;
     }
-
-    _setState(
-      _state.copyWith(
-        status: VehiclePackPurchaseStatus.idle,
-        product: product,
-        error: null,
-        notFoundIds: result.notFoundIds,
-        storeAvailable: true,
-      ),
-    );
-    return product;
   }
 
   Future<bool> buyVehiclePack({IapProductDetails? product}) async {

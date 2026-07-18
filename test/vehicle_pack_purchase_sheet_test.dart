@@ -101,7 +101,7 @@ void main() {
     );
   });
 
-  testWidgets('vehicle pack purchase sheet can retry product loading', (
+  testWidgets('vehicle pack purchase sheet retries product loading and buys', (
     tester,
   ) async {
     final client = _FakeIapPurchaseClient(
@@ -131,11 +131,11 @@ void main() {
     );
 
     await tester.tap(find.byKey(const ValueKey('vehiclePackPurchaseButton')));
-    await tester.pumpAndSettle();
+    await tester.pump();
 
     expect(find.text('Price \$2.99'), findsOneWidget);
     expect(client.queryCount, 2);
-    expect(client.buyCount, 0);
+    expect(client.buyCount, 1);
   });
 
   testWidgets(

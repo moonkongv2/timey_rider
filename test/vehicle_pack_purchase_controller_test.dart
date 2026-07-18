@@ -218,6 +218,23 @@ void main() {
     controller.dispose();
   });
 
+  test('loadVehiclePackProduct handles query errors', () async {
+    final client = _FakeIapPurchaseClient(
+      queryError: Exception('query failed'),
+    );
+    final store = _FakePurchaseEntitlementStore();
+    final controller = _controller(client: client, store: store);
+
+    final product = await controller.loadVehiclePackProduct();
+
+    expect(product, isNull);
+    expect(controller.state.status, VehiclePackPurchaseStatus.error);
+    expect(controller.state.product, isNull);
+    expect(controller.state.error?.code, 'product_load_failed');
+
+    controller.dispose();
+  });
+
   test('buyVehiclePack records purchase start through client', () async {
     final client = _FakeIapPurchaseClient();
     final store = _FakePurchaseEntitlementStore();
@@ -301,12 +318,14 @@ class _FakeIapPurchaseClient implements IapPurchaseClient {
   _FakeIapPurchaseClient({
     bool isAvailable = true,
     this.queryResult,
+    this.queryError,
     List<String>? events,
   }) : _isAvailable = isAvailable,
        events = events ?? <String>[];
 
   final bool _isAvailable;
   final IapProductQueryResult? queryResult;
+  final Object? queryError;
   final _purchaseStreamController =
       StreamController<List<IapPurchaseUpdate>>.broadcast();
   final purchasedProductIds = <String>[];
@@ -339,6 +358,10 @@ class _FakeIapPurchaseClient implements IapPurchaseClient {
 
   @override
   Future<IapProductQueryResult> queryProducts(Set<String> productIds) async {
+    final queryError = this.queryError;
+    if (queryError != null) {
+      throw queryError;
+    }
     return queryResult ?? IapProductQueryResult(products: [_product()]);
   }
 

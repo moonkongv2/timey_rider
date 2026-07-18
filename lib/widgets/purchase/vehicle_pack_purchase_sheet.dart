@@ -88,8 +88,10 @@ class _VehiclePackPurchaseSheetState extends State<VehiclePackPurchaseSheet> {
   Future<void> _buyVehiclePack() async {
     var product = _purchaseState.product;
     if (product == null) {
-      await widget.controller.loadVehiclePackProduct();
-      return;
+      product = await widget.controller.loadVehiclePackProduct();
+      if (product == null) {
+        return;
+      }
     }
     if (!mounted) {
       return;
