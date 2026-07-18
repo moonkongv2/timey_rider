@@ -8,7 +8,7 @@ class JaCommonTexts implements CommonTextSet {
   String get appTitle => 'Timey Rider';
   String get apply => '適用';
   String get cancel => 'キャンセル';
-  String get defaultChildName => 'ジユル';
+  String get defaultChildName => 'ハル';
   String get complete => 'できた';
   String get finishPointSemanticLabel => 'ゴール地点';
   String get home => 'ホーム';

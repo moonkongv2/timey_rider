@@ -8,7 +8,7 @@ class EnCommonTexts implements CommonTextSet {
   String get appTitle => 'Timey Rider';
   String get apply => 'Apply';
   String get cancel => 'Cancel';
-  String get defaultChildName => 'Jiyul';
+  String get defaultChildName => 'Riley';
   String get complete => 'Done';
   String get finishPointSemanticLabel => 'finish point';
   String get home => 'Home';
