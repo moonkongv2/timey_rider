@@ -187,6 +187,33 @@ class _SettingsScreenState extends State<SettingsScreen> {
     ).push(MaterialPageRoute(builder: (_) => const UserGuideScreen()));
   }
 
+  Future<void> _openProtectedExternalLink(Uri uri) async {
+    final parentGatePresenter =
+        widget.parentGatePresenter ?? showParentGateSheet;
+    final didPassGate = await parentGatePresenter(context);
+    if (!mounted || !didPassGate) {
+      return;
+    }
+
+    bool didOpen;
+    try {
+      didOpen = await widget.urlLauncher(uri);
+    } catch (_) {
+      didOpen = false;
+    }
+    if (!mounted || didOpen) {
+      return;
+    }
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          AppTexts.of(context).settings.externalLinkOpenErrorMessage,
+        ),
+      ),
+    );
+  }
+
   Future<void> _openVehiclePackPurchase() async {
     final purchaseController = widget.purchaseController;
     if (purchaseController == null) {
@@ -635,6 +662,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 leading: const Icon(Icons.support_agent_rounded),
                 title: Text(texts.settings.contactSupportSettingsItemTitle),
                 trailing: const Icon(Icons.chevron_right_rounded),
+                onTap: () =>
+                    _openProtectedExternalLink(SettingsScreen.supportUri),
               ),
             ],
           ),
@@ -648,6 +677,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 leading: const Icon(Icons.privacy_tip_rounded),
                 title: Text(texts.settings.privacyPolicySettingsItemTitle),
                 trailing: const Icon(Icons.chevron_right_rounded),
+                onTap: () =>
+                    _openProtectedExternalLink(SettingsScreen.privacyPolicyUri),
               ),
               ListTile(
                 key: const ValueKey('appVersionSettingsTile'),

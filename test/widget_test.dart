@@ -5214,6 +5214,104 @@ void main() {
     expect(find.text('복원할 차량팩 구매 내역을 찾지 못했어요.'), findsOneWidget);
   });
 
+  testWidgets('Settings screen opens support link after parent gate', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    var parentGateCallCount = 0;
+    final launchedUris = <Uri>[];
+
+    await tester.pumpWidget(
+      MaterialApp(
+        locale: const Locale('en'),
+        supportedLocales: const [Locale('ko'), Locale('en')],
+        localizationsDelegates: const [
+          GlobalMaterialLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+        ],
+        home: SettingsScreen(
+          config: ActivityTimerConfig.defaults(),
+          onConfigChanged: (_) {},
+          parentGatePresenter: (_) async {
+            parentGateCallCount += 1;
+            return true;
+          },
+          urlLauncher: (uri) async {
+            launchedUris.add(uri);
+            return true;
+          },
+          appVersionLoader: () async => '1.0.0 (1)',
+        ),
+      ),
+    );
+
+    await tester.scrollUntilVisible(
+      find.byKey(const ValueKey('contactSupportSettingsTile')),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byKey(const ValueKey('contactSupportSettingsTile')));
+    await tester.pump();
+
+    expect(parentGateCallCount, 1);
+    expect(launchedUris, [SettingsScreen.supportUri]);
+  });
+
+  testWidgets('Settings screen blocks privacy link when parent gate fails', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    var parentGateCallCount = 0;
+    final launchedUris = <Uri>[];
+
+    await tester.pumpWidget(
+      MaterialApp(
+        locale: const Locale('en'),
+        supportedLocales: const [Locale('ko'), Locale('en')],
+        localizationsDelegates: const [
+          GlobalMaterialLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+        ],
+        home: SettingsScreen(
+          config: ActivityTimerConfig.defaults(),
+          onConfigChanged: (_) {},
+          parentGatePresenter: (_) async {
+            parentGateCallCount += 1;
+            return false;
+          },
+          urlLauncher: (uri) async {
+            launchedUris.add(uri);
+            return true;
+          },
+          appVersionLoader: () async => '1.0.0 (1)',
+        ),
+      ),
+    );
+
+    await tester.scrollUntilVisible(
+      find.byKey(const ValueKey('privacyPolicySettingsTile')),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byKey(const ValueKey('privacyPolicySettingsTile')));
+    await tester.pump();
+
+    expect(parentGateCallCount, 1);
+    expect(launchedUris, isEmpty);
+  });
+
   testWidgets('Settings screen shows unlocked vehicle pack state', (
     tester,
   ) async {
