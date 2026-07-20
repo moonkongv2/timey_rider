@@ -16,6 +16,7 @@ import 'package:timey_rider/catalogs/activity_marker_catalog.dart';
 import 'package:timey_rider/catalogs/avatar_prompt_catalog.dart';
 import 'package:timey_rider/catalogs/motivation_asset_catalog.dart';
 import 'package:timey_rider/catalogs/vehicle_catalog.dart';
+import 'package:timey_rider/config/app_feature_flags.dart';
 import 'package:timey_rider/l10n/app_texts.dart';
 import 'package:timey_rider/main.dart' as app;
 import 'package:timey_rider/models/active_activity_timer_session.dart';
@@ -98,6 +99,10 @@ void main() {
     expect(config.customAvatarsByVehicle, isEmpty);
     expect(config.markerIds, ActivityCatalog.defaultActivity.markerIds);
     expect(config.selectedMarkerIds, isEmpty);
+  });
+
+  test('Motivation media availability defaults to false for launch builds', () {
+    expect(AppFeatureFlags.motivationMediaAvailable, isFalse);
   });
 
   test('Activity marker catalog has non-empty unique ids', () {
@@ -4033,6 +4038,7 @@ void main() {
             ),
             activityProgressService: LocalActivityProgressService(),
             onConfigChanged: (config) => changedConfig = config,
+            motivationMediaAvailable: true,
           ),
         ),
       );
@@ -5530,7 +5536,9 @@ void main() {
     );
   });
 
-  testWidgets('User guide shows key Korean guide copy', (tester) async {
+  testWidgets('User guide hides motivation section when unavailable', (
+    tester,
+  ) async {
     tester.view.physicalSize = const Size(390, 844);
     tester.view.devicePixelRatio = 1.0;
     addTearDown(tester.view.resetPhysicalSize);
@@ -5545,6 +5553,62 @@ void main() {
           GlobalWidgetsLocalizations.delegate,
         ],
         home: UserGuideScreen(),
+      ),
+    );
+
+    await tester.drag(find.byType(ListView), const Offset(0, -1200));
+    await tester.pumpAndSettle();
+
+    expect(find.text('동기부여 영상'), findsNothing);
+    expect(find.textContaining('일부 구간을 건너뛸 수 있어요'), findsNothing);
+  });
+
+  testWidgets('User guide shows motivation section when available', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    await tester.pumpWidget(
+      const MaterialApp(
+        locale: Locale('ko'),
+        supportedLocales: [Locale('ko'), Locale('en')],
+        localizationsDelegates: [
+          GlobalMaterialLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+        ],
+        home: UserGuideScreen(motivationMediaAvailable: true),
+      ),
+    );
+
+    await tester.scrollUntilVisible(
+      find.text('동기부여 영상'),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('동기부여 영상'), findsOneWidget);
+    expect(find.textContaining('일부 구간을 건너뛸 수 있어요'), findsOneWidget);
+  });
+
+  testWidgets('User guide shows key Korean guide copy', (tester) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    await tester.pumpWidget(
+      const MaterialApp(
+        locale: Locale('ko'),
+        supportedLocales: [Locale('ko'), Locale('en')],
+        localizationsDelegates: [
+          GlobalMaterialLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+        ],
+        home: UserGuideScreen(motivationMediaAvailable: true),
       ),
     );
 
@@ -5689,6 +5753,87 @@ void main() {
     expect(latestConfig.markerMode, ActivityMarkerMode.manual);
   });
 
+  testWidgets('Settings screen hides motivation section when unavailable', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    ActivityTimerConfig? changedConfig;
+
+    await tester.pumpWidget(
+      MaterialApp(
+        locale: const Locale('en'),
+        supportedLocales: const [Locale('ko'), Locale('en')],
+        localizationsDelegates: const [
+          GlobalMaterialLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+        ],
+        home: SettingsScreen(
+          config: ActivityTimerConfig.defaults(),
+          onConfigChanged: (config) => changedConfig = config,
+        ),
+      ),
+    );
+
+    await tester.drag(find.byType(ListView), const Offset(0, -900));
+    await tester.pumpAndSettle();
+
+    expect(find.byKey(const ValueKey('motivationVideoHelpButton')), findsNothing);
+    expect(find.byKey(const ValueKey('motivationVideoEnabledSwitch')), findsNothing);
+    expect(
+      find.byKey(const ValueKey('motivationVideoCustomIntervalSwitch')),
+      findsNothing,
+    );
+    expect(
+      find.byKey(const ValueKey('motivationVideoIntervalSegmentedButton')),
+      findsNothing,
+    );
+    expect(changedConfig, isNull);
+  });
+
+  testWidgets('Settings screen shows motivation section when available', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(
+      MaterialApp(
+        locale: const Locale('en'),
+        supportedLocales: const [Locale('ko'), Locale('en')],
+        localizationsDelegates: const [
+          GlobalMaterialLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+        ],
+        home: SettingsScreen(
+          config: ActivityTimerConfig.defaults(),
+          onConfigChanged: (_) {},
+          motivationMediaAvailable: true,
+        ),
+      ),
+    );
+
+    await tester.scrollUntilVisible(
+      find.byKey(const ValueKey('motivationVideoCustomIntervalSwitch')),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.byKey(const ValueKey('motivationVideoHelpButton')), findsOneWidget);
+    expect(find.byKey(const ValueKey('motivationVideoEnabledSwitch')), findsOneWidget);
+    expect(
+      find.byKey(const ValueKey('motivationVideoCustomIntervalSwitch')),
+      findsOneWidget,
+    );
+  });
+
   testWidgets('Settings screen updates motivation video settings', (
     tester,
   ) async {
@@ -5710,6 +5855,7 @@ void main() {
         home: SettingsScreen(
           config: latestConfig,
           onConfigChanged: (config) => latestConfig = config,
+          motivationMediaAvailable: true,
         ),
       ),
     );
@@ -5789,6 +5935,7 @@ void main() {
         home: SettingsScreen(
           config: ActivityTimerConfig.defaults(),
           onConfigChanged: (_) {},
+          motivationMediaAvailable: true,
         ),
       ),
     );
@@ -5844,6 +5991,7 @@ void main() {
           ),
           activityProgressService: LocalActivityProgressService(),
           onConfigChanged: (config) => changedConfig = config,
+          motivationMediaAvailable: true,
         ),
       ),
     );
@@ -8878,6 +9026,7 @@ void main() {
           ),
           activityProgressService: LocalActivityProgressService(),
           motivationAudioService: motivationAudioService,
+          motivationMediaAvailable: true,
           now: () => now,
           onConfigChanged: (_) {},
         ),
@@ -8933,6 +9082,7 @@ void main() {
               soundEnabled: false,
             ),
             activityProgressService: LocalActivityProgressService(),
+            motivationMediaAvailable: true,
             now: () => now,
             onConfigChanged: (_) {},
           ),
@@ -9003,6 +9153,7 @@ void main() {
               motivationVideoInterval: const Duration(minutes: 5),
             ),
             activityProgressService: LocalActivityProgressService(),
+            motivationMediaAvailable: true,
             now: () => now,
             onConfigChanged: (_) {},
           ),
@@ -9072,6 +9223,7 @@ void main() {
             soundEnabled: false,
           ),
           activityProgressService: LocalActivityProgressService(),
+          motivationMediaAvailable: true,
           now: () => now,
           onConfigChanged: (config) => changedConfig = config,
         ),
@@ -9143,6 +9295,7 @@ void main() {
               soundEnabled: false,
             ),
             activityProgressService: LocalActivityProgressService(),
+            motivationMediaAvailable: true,
             now: () => now,
             onConfigChanged: (config) => changedConfig = config,
           ),
@@ -9218,6 +9371,7 @@ void main() {
               soundEnabled: false,
             ),
             activityProgressService: LocalActivityProgressService(),
+            motivationMediaAvailable: true,
             now: () => now,
             onConfigChanged: (_) {},
           ),
@@ -9299,6 +9453,7 @@ void main() {
             motivationVideoEnabled: false,
           ),
           activityProgressService: LocalActivityProgressService(),
+          motivationMediaAvailable: true,
           now: () => now,
           onConfigChanged: (_) {},
         ),
@@ -9322,6 +9477,244 @@ void main() {
       await tester.pump(const Duration(milliseconds: 250));
     }
   });
+
+  testWidgets('Timer screen hides portrait motivation entry point when unavailable', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(
+      MaterialApp(
+        locale: const Locale('en'),
+        home: TimerScreen(
+          config: ActivityTimerConfig.defaults(),
+          activityProgressService: LocalActivityProgressService(),
+          onConfigChanged: (_) {},
+        ),
+      ),
+    );
+    for (int i = 0; i < 40; i++) {
+      await tester.pump(const Duration(milliseconds: 250));
+    }
+
+    expect(find.byKey(const ValueKey('motivationSettingsButton')), findsNothing);
+    expect(find.byIcon(Icons.video_settings_rounded), findsNothing);
+
+    await tester.pumpWidget(const SizedBox.shrink());
+    for (int i = 0; i < 40; i++) {
+      await tester.pump(const Duration(milliseconds: 250));
+    }
+  });
+
+  testWidgets('Timer screen hides landscape motivation entry point when unavailable', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    tester.view.physicalSize = const Size(1200, 600);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(() {
+      tester.view.resetPhysicalSize();
+      tester.view.resetDevicePixelRatio();
+    });
+
+    await tester.pumpWidget(
+      MaterialApp(
+        locale: const Locale('en'),
+        home: TimerScreen(
+          config: ActivityTimerConfig.defaults(),
+          activityProgressService: LocalActivityProgressService(),
+          onConfigChanged: (_) {},
+        ),
+      ),
+    );
+    for (int i = 0; i < 40; i++) {
+      await tester.pump(const Duration(milliseconds: 250));
+    }
+
+    expect(find.byIcon(Icons.arrow_back_rounded), findsOneWidget);
+    expect(find.byKey(const ValueKey('motivationSettingsButton')), findsNothing);
+    expect(find.byIcon(Icons.video_settings_rounded), findsNothing);
+
+    await tester.pumpWidget(const SizedBox.shrink());
+    for (int i = 0; i < 40; i++) {
+      await tester.pump(const Duration(milliseconds: 250));
+    }
+  });
+
+  testWidgets(
+    'Timer screen hides compact landscape motivation entry point when unavailable',
+    (tester) async {
+      tester.view.physicalSize = const Size(390, 844);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+      tester.view.physicalSize = const Size(852, 393);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(() {
+        tester.view.resetPhysicalSize();
+        tester.view.resetDevicePixelRatio();
+      });
+
+      await tester.pumpWidget(
+        MaterialApp(
+          locale: const Locale('en'),
+          home: TimerScreen(
+            config: ActivityTimerConfig.defaults(),
+            activityProgressService: LocalActivityProgressService(),
+            onConfigChanged: (_) {},
+          ),
+        ),
+      );
+      for (int i = 0; i < 40; i++) {
+        await tester.pump(const Duration(milliseconds: 250));
+      }
+
+      expect(find.byKey(const ValueKey('compactLandscapeControls')), findsOneWidget);
+      expect(find.byKey(const ValueKey('motivationSettingsButton')), findsNothing);
+      expect(find.byIcon(Icons.video_settings_rounded), findsNothing);
+      expect(find.byIcon(Icons.pause_rounded), findsOneWidget);
+
+      await tester.pumpWidget(const SizedBox.shrink());
+      for (int i = 0; i < 40; i++) {
+        await tester.pump(const Duration(milliseconds: 250));
+      }
+    },
+  );
+
+  testWidgets(
+    'Timer screen blocks motivation cue and audio when unavailable',
+    (tester) async {
+      tester.view.physicalSize = const Size(390, 844);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+      SharedPreferences.setMockInitialValues({
+        'savedActivityTimerPresetsInitialized': true,
+      });
+      addTearDown(() async {
+        await const ActiveActivityTimerSessionStore().clear();
+      });
+      final motivationAudioService = _FakeMotivationAudioService();
+      final store = ActiveActivityTimerSessionStore();
+      var now = DateTime(2026);
+
+      await tester.pumpWidget(
+        MaterialApp(
+          locale: const Locale('ko'),
+          supportedLocales: const [Locale('ko'), Locale('en')],
+          localizationsDelegates: const [
+            GlobalMaterialLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+          ],
+          home: TimerScreen(
+            config: ActivityTimerConfig.defaults().copyWith(
+              duration: const Duration(seconds: 100),
+              soundEnabled: true,
+              motivationVideoEnabled: true,
+            ),
+            activityProgressService: LocalActivityProgressService(),
+            motivationAudioService: motivationAudioService,
+            now: () => now,
+            onConfigChanged: (_) {},
+          ),
+        ),
+      );
+      for (int i = 0; i < 40; i++) {
+        await tester.pump(const Duration(milliseconds: 250));
+      }
+
+      now = now.add(const Duration(seconds: 10));
+      await tester.pump(const Duration(milliseconds: 250));
+      await tester.pump(motivationVoiceStartDelay);
+
+      expect(find.byKey(const ValueKey('motivationVideoBubble_10')), findsNothing);
+      expect(motivationAudioService.playedAssets, isEmpty);
+      final session = await store.load();
+      expect(session, isNotNull);
+      expect(session!.config.motivationVideoEnabled, isTrue);
+      expect(session.shownMotivationMilestones, isEmpty);
+      expect(session.lastMotivationVideoShownAt, isNull);
+
+      await tester.pumpWidget(const SizedBox.shrink());
+      for (int i = 0; i < 40; i++) {
+        await tester.pump(const Duration(milliseconds: 250));
+      }
+    },
+  );
+
+  testWidgets(
+    'Timer screen blocks restored motivation-enabled session when unavailable',
+    (tester) async {
+      tester.view.physicalSize = const Size(390, 844);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+      SharedPreferences.setMockInitialValues({
+        'savedActivityTimerPresetsInitialized': true,
+      });
+      addTearDown(() async {
+        await const ActiveActivityTimerSessionStore().clear();
+      });
+      final motivationAudioService = _FakeMotivationAudioService();
+      final store = ActiveActivityTimerSessionStore();
+      final startedAt = DateTime(2026);
+      final now = startedAt.add(const Duration(seconds: 10));
+      final session = ActiveActivityTimerSession(
+        sessionId: 'motivation-enabled-session',
+        startedAt: startedAt,
+        config: ActivityTimerConfig.defaults().copyWith(
+          duration: const Duration(seconds: 100),
+          soundEnabled: true,
+          motivationVideoEnabled: true,
+        ),
+        state: ActiveActivityTimerSessionState.running,
+      );
+
+      await tester.pumpWidget(
+        MaterialApp(
+          locale: const Locale('ko'),
+          supportedLocales: const [Locale('ko'), Locale('en')],
+          localizationsDelegates: const [
+            GlobalMaterialLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+          ],
+          home: TimerScreen(
+            config: ActivityTimerConfig.defaults(),
+            restoredSession: session,
+            activityProgressService: LocalActivityProgressService(),
+            motivationAudioService: motivationAudioService,
+            now: () => now,
+            onConfigChanged: (_) {},
+          ),
+        ),
+      );
+      for (int i = 0; i < 40; i++) {
+        await tester.pump(const Duration(milliseconds: 250));
+      }
+      await tester.pump(motivationVoiceStartDelay);
+
+      expect(find.byKey(const ValueKey('motivationVideoBubble_10')), findsNothing);
+      expect(motivationAudioService.playedAssets, isEmpty);
+      final savedSession = await store.load();
+      expect(savedSession, isNotNull);
+      expect(savedSession!.config.motivationVideoEnabled, isTrue);
+      expect(savedSession.shownMotivationMilestones, isEmpty);
+      expect(savedSession.lastMotivationVideoShownAt, isNull);
+
+      await tester.pumpWidget(const SizedBox.shrink());
+      for (int i = 0; i < 40; i++) {
+        await tester.pump(const Duration(milliseconds: 250));
+      }
+    },
+  );
 
   testWidgets('Timer screen keeps vehicle fixed when paused', (tester) async {
     tester.view.physicalSize = const Size(390, 844);
@@ -9560,6 +9953,7 @@ void main() {
           home: TimerScreen(
             config: ActivityTimerConfig.defaults(),
             activityProgressService: LocalActivityProgressService(),
+            motivationMediaAvailable: true,
             onConfigChanged: (_) {},
           ),
         ),
@@ -9627,6 +10021,7 @@ void main() {
             motivationVideoUseCustomInterval: true,
           ),
           activityProgressService: LocalActivityProgressService(),
+          motivationMediaAvailable: true,
           onConfigChanged: (_) {},
         ),
       ),

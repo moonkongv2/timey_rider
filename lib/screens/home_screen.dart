@@ -9,6 +9,7 @@ import '../catalogs/activity_catalog.dart';
 import '../catalogs/activity_marker_catalog.dart';
 import '../catalogs/vehicle_catalog.dart';
 import '../catalogs/vehicle_unlock_catalog.dart';
+import '../config/app_feature_flags.dart';
 import '../l10n/app_texts.dart';
 import '../models/active_activity_timer_session.dart';
 import '../models/activity.dart';
@@ -68,6 +69,7 @@ class HomeScreen extends StatefulWidget {
     this.parentGatePresenter,
     this.vehiclePackPurchasePresenter,
     this.avatarImageBuilder,
+    this.motivationMediaAvailable = AppFeatureFlags.motivationMediaAvailable,
     this.now,
   });
 
@@ -84,6 +86,7 @@ class HomeScreen extends StatefulWidget {
   final VehiclePackPurchasePresenter? vehiclePackPurchasePresenter;
   final Widget Function(BuildContext context, String imagePath)?
   avatarImageBuilder;
+  final bool motivationMediaAvailable;
   final DateTime Function()? now;
 
   @override
@@ -316,6 +319,7 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
           activityProgressService: widget.activityProgressService,
           activeSessionStore: widget.activeSessionStore,
           onConfigChanged: _updateTimerRuntimeConfig,
+          motivationMediaAvailable: widget.motivationMediaAvailable,
         ),
       ),
     );
@@ -397,6 +401,7 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
           activityProgressService: widget.activityProgressService,
           activeSessionStore: widget.activeSessionStore,
           onConfigChanged: _updateTimerRuntimeConfig,
+          motivationMediaAvailable: widget.motivationMediaAvailable,
         ),
       ),
     );
@@ -561,6 +566,7 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
           purchaseState: widget.purchaseState,
           parentGatePresenter: widget.parentGatePresenter,
           vehiclePackPurchasePresenter: widget.vehiclePackPurchasePresenter,
+          motivationMediaAvailable: widget.motivationMediaAvailable,
         ),
       ),
     );
