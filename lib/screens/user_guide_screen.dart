@@ -1,12 +1,18 @@
 import 'package:flutter/material.dart';
 
+import '../config/app_feature_flags.dart';
 import '../l10n/app_texts.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_radius.dart';
 import '../theme/app_spacing.dart';
 
 class UserGuideScreen extends StatelessWidget {
-  const UserGuideScreen({super.key});
+  const UserGuideScreen({
+    super.key,
+    this.motivationMediaAvailable = AppFeatureFlags.motivationMediaAvailable,
+  });
+
+  final bool motivationMediaAvailable;
 
   @override
   Widget build(BuildContext context) {
@@ -93,12 +99,13 @@ class UserGuideScreen extends StatelessWidget {
             items: texts.courseMarkersItems,
             accentColor: AppColors.surfaceYellow,
           ),
-          _GuideSectionCard(
-            icon: Icons.ondemand_video_rounded,
-            title: texts.motivationTitle,
-            items: texts.motivationItems,
-            accentColor: AppColors.surfacePink,
-          ),
+          if (motivationMediaAvailable)
+            _GuideSectionCard(
+              icon: Icons.ondemand_video_rounded,
+              title: texts.motivationTitle,
+              items: texts.motivationItems,
+              accentColor: AppColors.surfacePink,
+            ),
           _GuideSectionCard(
             icon: Icons.emoji_events_rounded,
             title: texts.completionTitle,

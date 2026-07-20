@@ -9,6 +9,19 @@ abstract interface class MotivationAudioService {
   Future<void> dispose();
 }
 
+class NoopMotivationAudioService implements MotivationAudioService {
+  const NoopMotivationAudioService();
+
+  @override
+  Future<void> playAsset(String assetPath) async {}
+
+  @override
+  Future<void> stop() async {}
+
+  @override
+  Future<void> dispose() async {}
+}
+
 class AudioplayersMotivationAudioService implements MotivationAudioService {
   AudioplayersMotivationAudioService()
     : _player = AudioPlayer(),

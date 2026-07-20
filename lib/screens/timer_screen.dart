@@ -7,6 +7,7 @@ import '../catalogs/activity_catalog.dart';
 import '../catalogs/activity_marker_catalog.dart';
 import '../catalogs/motivation_asset_catalog.dart';
 import '../catalogs/vehicle_catalog.dart';
+import '../config/app_feature_flags.dart';
 import '../controllers/activity_timer_controller.dart';
 import '../l10n/app_texts.dart';
 import '../l10n/text_sets.dart';
@@ -165,6 +166,7 @@ class TimerScreen extends StatefulWidget {
     this.orientationService = const SystemOrientationService(),
     this.activeSessionStore = const ActiveActivityTimerSessionStore(),
     this.motivationAudioService,
+    this.motivationMediaAvailable = AppFeatureFlags.motivationMediaAvailable,
     this.restoredSession,
     this.now,
   });
@@ -176,6 +178,7 @@ class TimerScreen extends StatefulWidget {
   final OrientationService orientationService;
   final ActiveActivityTimerSessionStore activeSessionStore;
   final MotivationAudioService? motivationAudioService;
+  final bool motivationMediaAvailable;
   final ActiveActivityTimerSession? restoredSession;
   final DateTime Function()? now;
 
@@ -247,7 +250,10 @@ class _TimerScreenState extends State<TimerScreen>
     WidgetsBinding.instance.addObserver(this);
     _timerConfig = widget.config;
     _motivationAudioService =
-        widget.motivationAudioService ?? AudioplayersMotivationAudioService();
+        widget.motivationAudioService ??
+        (widget.motivationMediaAvailable
+            ? AudioplayersMotivationAudioService()
+            : const NoopMotivationAudioService());
     _ownsMotivationAudioService = widget.motivationAudioService == null;
     final restoredSession = widget.restoredSession;
     if (restoredSession == null) {
@@ -470,7 +476,10 @@ class _TimerScreenState extends State<TimerScreen>
   }
 
   void _maybeShowMotivationVideo() {
-    if (!mounted || _isFinishDriving || _activeMotivationMilestone != null) {
+    if (!widget.motivationMediaAvailable ||
+        !mounted ||
+        _isFinishDriving ||
+        _activeMotivationMilestone != null) {
       return;
     }
 
@@ -517,6 +526,9 @@ class _TimerScreenState extends State<TimerScreen>
   }
 
   void _scheduleMotivationVoice() {
+    if (!widget.motivationMediaAvailable) {
+      return;
+    }
     _motivationVoiceTimer?.cancel();
     _motivationVoiceTimer = Timer(motivationVoiceStartDelay, () {
       if (!mounted) {
@@ -527,7 +539,7 @@ class _TimerScreenState extends State<TimerScreen>
   }
 
   void _maybePlayMotivationVoice() {
-    if (!_timerConfig.soundEnabled) {
+    if (!widget.motivationMediaAvailable || !_timerConfig.soundEnabled) {
       return;
     }
 
@@ -603,6 +615,9 @@ class _TimerScreenState extends State<TimerScreen>
   }
 
   Future<void> _openMotivationSettings() async {
+    if (!widget.motivationMediaAvailable) {
+      return;
+    }
     final result = await showModalBottomSheet<_MotivationVideoSettingsResult>(
       context: context,
       isScrollControlled: true,
@@ -1107,6 +1122,9 @@ class _TimerScreenState extends State<TimerScreen>
             !canUseTimerControls || isAwaitingArrivalAcknowledgement
             ? null
             : handlePauseResume;
+        final handleMotivationSettings = widget.motivationMediaAvailable
+            ? _openMotivationSettings
+            : null;
 
         final isScreenLandscape =
             MediaQuery.orientationOf(context) == Orientation.landscape;
@@ -1131,12 +1149,13 @@ class _TimerScreenState extends State<TimerScreen>
                     foregroundColor: AppColors.brown900,
                     elevation: 0,
                     actions: [
-                      IconButton(
-                        key: const ValueKey('motivationSettingsButton'),
-                        tooltip: texts.settings.motivationVideoEnabled,
-                        icon: const Icon(Icons.video_settings_rounded),
-                        onPressed: _openMotivationSettings,
-                      ),
+                      if (handleMotivationSettings != null)
+                        IconButton(
+                          key: const ValueKey('motivationSettingsButton'),
+                          tooltip: texts.settings.motivationVideoEnabled,
+                          icon: const Icon(Icons.video_settings_rounded),
+                          onPressed: handleMotivationSettings,
+                        ),
                     ],
                   ),
             body: SafeArea(
@@ -1274,7 +1293,7 @@ class _TimerScreenState extends State<TimerScreen>
                       motivationVideoLayer: landscapeMotivationVideoLayer,
                       arrivalPanel: arrivalPanel,
                       onBack: _confirmExit,
-                      onMotivationSettings: _openMotivationSettings,
+                      onMotivationSettings: handleMotivationSettings,
                       controls:
                           arrivalPanel ??
                           TimerControlBar(
@@ -1286,7 +1305,7 @@ class _TimerScreenState extends State<TimerScreen>
                       compactControls: _CompactLandscapeControls(
                         isPaused: _controller.isPaused,
                         completeLabel: completeLabel,
-                        onMotivationSettings: _openMotivationSettings,
+                        onMotivationSettings: handleMotivationSettings,
                         onPauseResume: handlePauseResumeAction,
                         onComplete: handleComplete,
                       ),
@@ -1354,7 +1373,7 @@ class _LandscapeTimerLayout extends StatelessWidget {
   final Widget? motivationVideoLayer;
   final Widget? arrivalPanel;
   final VoidCallback onBack;
-  final VoidCallback onMotivationSettings;
+  final VoidCallback? onMotivationSettings;
   final Widget controls;
   final Widget compactControls;
 
@@ -1420,7 +1439,7 @@ class _CompactLandscapeControls extends StatelessWidget {
 
   final bool isPaused;
   final String completeLabel;
-  final VoidCallback onMotivationSettings;
+  final VoidCallback? onMotivationSettings;
   final VoidCallback? onPauseResume;
   final VoidCallback? onComplete;
 
@@ -1432,14 +1451,16 @@ class _CompactLandscapeControls extends StatelessWidget {
       key: const ValueKey('compactLandscapeControls'),
       mainAxisSize: MainAxisSize.min,
       children: [
-        _CompactLandscapeButton(
-          key: const ValueKey('motivationSettingsButton'),
-          label: texts.settings.motivationVideoEnabled,
-          icon: Icons.video_settings_rounded,
-          onPressed: onMotivationSettings,
-          variant: _CompactLandscapeButtonVariant.outline,
-        ),
-        const SizedBox(height: AppSpacing.sm),
+        if (onMotivationSettings != null) ...[
+          _CompactLandscapeButton(
+            key: const ValueKey('motivationSettingsButton'),
+            label: texts.settings.motivationVideoEnabled,
+            icon: Icons.video_settings_rounded,
+            onPressed: onMotivationSettings,
+            variant: _CompactLandscapeButtonVariant.outline,
+          ),
+          const SizedBox(height: AppSpacing.sm),
+        ],
         _CompactLandscapeButton(
           label: isPaused ? texts.common.restartRide : texts.timer.pauseButton,
           icon: isPaused ? Icons.play_arrow_rounded : Icons.pause_rounded,
@@ -1643,7 +1664,7 @@ class _LandscapeCourseCanvas extends StatelessWidget {
   final Widget? motivationVideoLayer;
   final Widget? arrivalPanel;
   final VoidCallback onBack;
-  final VoidCallback onMotivationSettings;
+  final VoidCallback? onMotivationSettings;
   final Widget? compactControls;
 
   @override
@@ -1697,7 +1718,8 @@ class _LandscapeCourseCanvas extends StatelessWidget {
                     icon: Icons.arrow_back_rounded,
                     onPressed: onBack,
                   ),
-                  if (compactControls == null) ...[
+                  if (compactControls == null &&
+                      onMotivationSettings != null) ...[
                     const SizedBox(width: AppSpacing.sm),
                     _LandscapeIconButton(
                       key: const ValueKey('motivationSettingsButton'),
@@ -1705,7 +1727,7 @@ class _LandscapeCourseCanvas extends StatelessWidget {
                         context,
                       ).settings.motivationVideoEnabled,
                       icon: Icons.video_settings_rounded,
-                      onPressed: onMotivationSettings,
+                      onPressed: onMotivationSettings!,
                     ),
                   ],
                 ],
