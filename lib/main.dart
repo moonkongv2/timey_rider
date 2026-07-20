@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 
 import 'app.dart';
@@ -13,7 +11,7 @@ import 'services/vehicle_pack_purchase_controller.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  unawaited(const SystemOrientationService().lockPortrait());
+  await const SystemOrientationService().lockPortrait();
 
   final settingsService = LocalSettingsService();
   final activityProgressService = LocalActivityProgressService();
