@@ -22,13 +22,12 @@ The app is designed around one simple goal: make daily routines feel like cozy j
 - Vehicle-specific custom avatar storage and preview
 - Custom avatar setup flow with image upload, per-vehicle adjustment controls, and prompt guidance
 - Animated road, rail, sky, or water course progress based on the selected vehicle
-- Portrait and landscape timer layouts with dedicated road, vehicle, and motivation video layers
+- Portrait and landscape timer layouts with dedicated road and vehicle layers
 - Pause, resume, complete, arrival prompt, and exit confirmation flows
 - Optional remaining-time display, sound effects, and keep-screen-awake setting
-- Short motivation video overlay during timer milestones
-- Locale-based shared motivation voice playback when sound is enabled
+- Deferred motivation video and voice support behind `ENABLE_MOTIVATION_MEDIA`
 - Completion result screen with vehicle-specific success videos and fallback handling
-- In-app parent guide and contextual help for markers, motivation videos, results, rewards, and history
+- In-app parent guide and contextual help for markers, results, rewards, and history
 - Local active timer session restore, activity history, progress summary, reward stickers, and reward goal tracking
 - Sticker collection and reward goal screens
 - Korean and English localization
@@ -42,16 +41,28 @@ The app is designed around one simple goal: make daily routines feel like cozy j
 4. Pick a rider vehicle on the home screen.
 5. Start the activity timer with automatic or selected picture markers.
 6. Watch the selected rider move along the course as the timer progresses.
-7. See short motivation videos and optional cheer audio during the timer.
-8. Complete the activity, let time end, or record that more time is needed.
-9. Review the result and earned stickers.
-10. Track activity history, sticker inventory, and reward goals from the home screen.
+7. Complete the activity, let time end, or record that more time is needed.
+8. Review the result and earned stickers.
+9. Track activity history, sticker inventory, and reward goals from the home screen.
 
 ## Motivation Media
 
-Motivation videos are short silent cheer-up clips, focused on smiling and thumbs-up style encouragement rather than spoken lip-sync video.
+Motivation videos and voice playback are temporarily deferred from launch builds
+behind `ENABLE_MOTIVATION_MEDIA` because complete localized voice resources are
+not ready for every supported language.
 
-Current behavior:
+The implementation, catalog, settings schema, localized strings, tests, and
+source media files are preserved for later restoration. Launch builds do not
+show or execute motivation media, and motivation media assets are not bundled.
+
+See `docs/motivation_media.md` for the restoration checklist and build
+commands.
+
+When the feature is explicitly available, motivation videos are short silent
+cheer-up clips, focused on smiling and thumbs-up style encouragement rather than
+spoken lip-sync video.
+
+Enabled behavior:
 
 - Milestones still decide when a motivation video can appear.
 - The actual video is selected from the current vehicle's candidate list.
@@ -64,7 +75,7 @@ Current behavior:
 - Unsupported locales fall back to English voice clips.
 - Vehicle-specific voice override support is reserved in the catalog structure, but not used yet.
 
-Asset layout:
+Deferred source asset layout:
 
 ```text
 assets/
@@ -99,8 +110,8 @@ assets/
 - Custom local text bundles for Korean and English
 - `shared_preferences` for local settings, progress, history, stickers, and rewards
 - `in_app_purchase` for the optional one-time vehicle pack purchase
-- `video_player` for splash, motivation, and result videos
-- `audioplayers` for motivation voice playback
+- `video_player` for splash, result, and flagged motivation videos
+- `audioplayers` for flagged motivation voice playback
 - `image_picker`, `path_provider`, and `image` for custom avatar image import and normalization
 - `wakelock_plus` for the keep-screen-awake timer setting
 - `flutter_launcher_icons` for launcher icon generation
@@ -192,12 +203,12 @@ lib/
     reward_sticker_image.dart        # Sticker image with fallback
 
 assets/
-  audio/motivation/                  # Locale-based shared motivation voice clips
+  audio/motivation/                  # Deferred locale-based shared motivation voice clips
   fonts/                             # Cal Sans font
   images/                            # Vehicles, markers, result fallbacks
   icons/                             # Launcher icon source assets
   videos/                            # Splash and result media
-  videos/motivation/                 # Vehicle-specific silent motivation videos
+  videos/motivation/                 # Deferred vehicle-specific silent motivation videos
 
 test/
   active_activity_timer_session_store_test.dart # Active timer persistence tests
@@ -249,14 +260,14 @@ dart run flutter_launcher_icons
 - Vehicle course visuals are selected through `VehicleCourseKind`, so airplanes and pteranodons use sky styling, sharks use water styling, trains use rail styling, and other vehicles use road styling.
 - Activity markers are previewed or selected before a ride and expanded into repeated course slots by `ActivityMarkerCatalog`.
 - Custom avatar images are stored per vehicle, so multiple vehicle tiles can keep their own custom avatar previews.
-- User-facing guide and help copy should stay synchronized with actual timer, marker, motivation, and reward rules.
+- User-facing guide and help copy should stay synchronized with actual timer, marker, and reward rules.
 - Settings, activity progress, sticker inventory, reward goals, and avatar config are stored locally with `SharedPreferences`.
 - First-run onboarding state is stored locally; existing users with a saved child name skip onboarding by default.
-- Motivation video paths and voice paths should be registered through `MotivationAssetCatalog`.
+- Deferred motivation video paths and voice paths should stay registered through `MotivationAssetCatalog`.
 - Vehicle and sticker assets should keep consistent canvas size, padding, and visual scale when adding new artwork.
 - UI polish should use the shared design tokens in `lib/theme/` and reusable app widgets in `lib/widgets/app/`.
 - Launcher icon assets live under `assets/icons/`; regenerate platform icons with `dart run flutter_launcher_icons` after changing them.
 
 ## Status
 
-This is an active Flutter prototype with a polished kid-friendly UI. Core flows are covered by focused unit and widget tests, including first launch, home actions, vehicle selection, custom avatars, active timer restore, timer copy, course progress, motivation media catalogs, localization fallback, stickers, and reward persistence.
+This is an active Flutter prototype with a polished kid-friendly UI. Core flows are covered by focused unit and widget tests, including first launch, home actions, vehicle selection, custom avatars, active timer restore, timer copy, course progress, deferred motivation media availability, localization fallback, stickers, and reward persistence.
