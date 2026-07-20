@@ -16,6 +16,8 @@ void main() {
       );
 
       await _pumpAvatarSetup(tester, customConfig);
+      _closeGuide(tester);
+      await tester.pumpAndSettle();
 
       await _scrollToText(tester, '라이더 이미지 만들기 가이드');
       expect(find.text('라이더 이미지 만들기 가이드'), findsOneWidget);
@@ -48,6 +50,10 @@ void main() {
     tester,
   ) async {
     await _pumpAvatarSetup(tester, ActivityTimerConfig.defaults());
+
+    expect(find.text('우리 아이 라이더 만들기 안내'), findsOneWidget);
+    _closeGuide(tester);
+    await tester.pumpAndSettle();
 
     expect(find.byTooltip('안내 다시 보기'), findsOneWidget);
     await tester.tap(find.byKey(const ValueKey('avatarGuideReplayButton')));

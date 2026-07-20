@@ -67,6 +67,9 @@ class _AvatarSetupScreenState extends State<AvatarSetupScreen> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _showRiderGuide();
+    });
   }
 
   void _showRiderGuide() {
