@@ -24,7 +24,7 @@ class TimerControlBar extends StatelessWidget {
   Widget build(BuildContext context) {
     final texts = AppTexts.of(context);
     final pauseResumeButton = AppBouncyButton(
-      label: isPaused ? texts.common.restartRide : texts.timer.pauseButton,
+      label: isPaused ? texts.timer.resumeButton : texts.timer.pauseButton,
       icon: isPaused ? Icons.play_arrow_rounded : Icons.pause_rounded,
       onPressed: onPauseResume,
       variant: AppButtonVariant.outline,

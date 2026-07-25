@@ -19,6 +19,7 @@ class TimerTexts implements TimerTextSet {
   String get exitDialogCancelButton => '계속하기';
   String get exitDialogConfirmButton => '그만하기';
   String get pauseButton => '일시정지';
+  String get resumeButton => '재개';
   String completeActivityButton(String activityId) {
     return switch (activityId) {
       'brushing' => '양치 완료',

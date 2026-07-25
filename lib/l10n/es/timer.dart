@@ -20,6 +20,7 @@ class EsTimerTexts implements TimerTextSet {
   String get exitDialogCancelButton => 'Seguir';
   String get exitDialogConfirmButton => 'Salir';
   String get pauseButton => 'Pausa';
+  String get resumeButton => 'Reanudar';
   String completeActivityButton(String activityId) {
     return switch (activityId) {
       'brushing' => 'Dientes listos',

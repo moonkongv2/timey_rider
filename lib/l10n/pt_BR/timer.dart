@@ -20,6 +20,7 @@ class PtBrTimerTexts implements TimerTextSet {
   String get exitDialogCancelButton => 'Continuar';
   String get exitDialogConfirmButton => 'Sair';
   String get pauseButton => 'Pausar';
+  String get resumeButton => 'Retomar';
   String completeActivityButton(String activityId) {
     return switch (activityId) {
       'brushing' => 'Escovação pronta',

@@ -19,6 +19,7 @@ class JaTimerTexts implements TimerTextSet {
   String get exitDialogCancelButton => '続ける';
   String get exitDialogConfirmButton => '離れる';
   String get pauseButton => '一時停止';
+  String get resumeButton => '再開';
   String completeActivityButton(String activityId) {
     return switch (activityId) {
       'brushing' => '歯みがき完了',

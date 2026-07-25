@@ -21,6 +21,7 @@ class EnTimerTexts implements TimerTextSet {
   String get exitDialogCancelButton => 'Keep going';
   String get exitDialogConfirmButton => 'Leave';
   String get pauseButton => 'Pause';
+  String get resumeButton => 'Resume';
   String completeActivityButton(String activityId) {
     return switch (activityId) {
       'brushing' => 'Done Brushing',

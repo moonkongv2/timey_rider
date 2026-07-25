@@ -1797,7 +1797,7 @@ class _CompactLandscapeControls extends StatelessWidget {
           const SizedBox(height: AppSpacing.sm),
         ],
         _CompactLandscapeButton(
-          label: isPaused ? texts.common.restartRide : texts.timer.pauseButton,
+          label: isPaused ? texts.timer.resumeButton : texts.timer.pauseButton,
           icon: isPaused ? Icons.play_arrow_rounded : Icons.pause_rounded,
           onPressed: onPauseResume,
           variant: _CompactLandscapeButtonVariant.outline,
