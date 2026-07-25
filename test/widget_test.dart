@@ -7069,6 +7069,76 @@ void main() {
     }
   });
 
+  testWidgets('RoadView marker callback ignores initially cleared markers', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    final markers = ActivityMarkerCatalog.courseSlotsFor([
+      'top_teeth',
+      'bottom_teeth',
+    ]);
+    final passedMarkers = <int>[];
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: SizedBox(
+            width: 420,
+            height: 640,
+            child: RoadView(
+              progress: 1,
+              vehicle: VehicleCatalog.fireTruck,
+              markers: markers,
+              onCourseMarkerPassed: passedMarkers.add,
+            ),
+          ),
+        ),
+      ),
+    );
+
+    expect(passedMarkers, isEmpty);
+  });
+
+  testWidgets('RoadView marker callback emits highest marker on large jump', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    final markers = ActivityMarkerCatalog.courseSlotsFor([
+      'top_teeth',
+      'bottom_teeth',
+    ]);
+    final passedMarkers = <int>[];
+
+    Widget roadAt(double progress) {
+      return MaterialApp(
+        home: Scaffold(
+          body: SizedBox(
+            width: 420,
+            height: 640,
+            child: RoadView(
+              progress: progress,
+              vehicle: VehicleCatalog.fireTruck,
+              markers: markers,
+              onCourseMarkerPassed: passedMarkers.add,
+            ),
+          ),
+        ),
+      );
+    }
+
+    await tester.pumpWidget(roadAt(0));
+    await tester.pumpWidget(roadAt(1));
+    await tester.pumpWidget(roadAt(1));
+
+    expect(passedMarkers, [markers.length - 1]);
+  });
+
   testWidgets('RoadView keeps dense activity markers clear of finish star', (
     tester,
   ) async {
@@ -8351,6 +8421,96 @@ void main() {
     await tester.pump(const Duration(milliseconds: 250));
 
     expect(timerAudioService.calls, ['startOrResumeBgm', 'stopBgm']);
+
+    await tester.pumpWidget(const SizedBox.shrink());
+    await tester.pump();
+  });
+
+  testWidgets('TimerScreen plays marker SFX when a course marker is passed', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    final startedAt = DateTime(2026, 6, 10, 8);
+    var now = startedAt;
+    final timerAudioService = _FakeTimerAudioService();
+    final config = ActivityTimerConfig.defaults().copyWith(
+      duration: const Duration(minutes: 10),
+      markerIds: const ['top_teeth', 'bottom_teeth'],
+    );
+
+    await tester.pumpWidget(
+      MaterialApp(
+        locale: const Locale('ko'),
+        home: TimerScreen(
+          config: config,
+          restoredSession: ActiveActivityTimerSession(
+            sessionId: 'marker-sfx-session',
+            startedAt: startedAt,
+            config: config,
+            state: ActiveActivityTimerSessionState.running,
+          ),
+          activityProgressService: LocalActivityProgressService(),
+          timerAudioService: timerAudioService,
+          now: () => now,
+          onConfigChanged: (_) {},
+        ),
+      ),
+    );
+    await tester.pump();
+    expect(timerAudioService.calls, ['startOrResumeBgm']);
+
+    now = startedAt.add(const Duration(minutes: 2));
+    await tester.pump(const Duration(milliseconds: 250));
+
+    expect(timerAudioService.calls, contains('playMarkerSfx'));
+
+    await tester.pumpWidget(const SizedBox.shrink());
+    await tester.pump();
+  });
+
+  testWidgets('TimerScreen does not play marker SFX when sound is disabled', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    final startedAt = DateTime(2026, 6, 10, 8);
+    var now = startedAt;
+    final timerAudioService = _FakeTimerAudioService();
+    final config = ActivityTimerConfig.defaults().copyWith(
+      duration: const Duration(minutes: 10),
+      markerIds: const ['top_teeth', 'bottom_teeth'],
+      soundEnabled: false,
+    );
+
+    await tester.pumpWidget(
+      MaterialApp(
+        locale: const Locale('ko'),
+        home: TimerScreen(
+          config: config,
+          restoredSession: ActiveActivityTimerSession(
+            sessionId: 'marker-sfx-muted-session',
+            startedAt: startedAt,
+            config: config,
+            state: ActiveActivityTimerSessionState.running,
+          ),
+          activityProgressService: LocalActivityProgressService(),
+          timerAudioService: timerAudioService,
+          now: () => now,
+          onConfigChanged: (_) {},
+        ),
+      ),
+    );
+    await tester.pump();
+
+    now = startedAt.add(const Duration(minutes: 2));
+    await tester.pump(const Duration(milliseconds: 250));
+
+    expect(timerAudioService.calls, isNot(contains('playMarkerSfx')));
 
     await tester.pumpWidget(const SizedBox.shrink());
     await tester.pump();

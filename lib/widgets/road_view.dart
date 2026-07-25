@@ -34,6 +34,7 @@ class RoadView extends StatelessWidget {
     this.showMotivationVideo = true,
     this.markers = const [],
     this.markerClearProgress,
+    this.onCourseMarkerPassed,
     this.isRoadMotionActive = false,
     this.courseDuration = const Duration(minutes: 5),
   }) : cameraProgress = cameraProgress ?? progress ?? 0,
@@ -53,6 +54,7 @@ class RoadView extends StatelessWidget {
   final bool showMotivationVideo;
   final List<ActivityMarkerDefinition> markers;
   final double? markerClearProgress;
+  final ValueChanged<int>? onCourseMarkerPassed;
   final bool isRoadMotionActive;
   final Duration courseDuration;
   static const double _portraitVehicleSize = 164;
@@ -160,6 +162,7 @@ class RoadView extends StatelessWidget {
                         _RoadMarkerLayer(
                           markers: markers,
                           clearProgress: clearProgress,
+                          onMarkerPassed: onCourseMarkerPassed,
                           geometry: geometry,
                           markerSize: isLandscape ? 50 : 33,
                           goalStarSize: goalStarSize,
@@ -460,10 +463,11 @@ class _AnimatedRoadPaintState extends State<_AnimatedRoadPaint>
   }
 }
 
-class _RoadMarkerLayer extends StatelessWidget {
+class _RoadMarkerLayer extends StatefulWidget {
   const _RoadMarkerLayer({
     required this.markers,
     required this.clearProgress,
+    required this.onMarkerPassed,
     required this.geometry,
     required this.markerSize,
     required this.goalStarSize,
@@ -471,30 +475,79 @@ class _RoadMarkerLayer extends StatelessWidget {
 
   final List<ActivityMarkerDefinition> markers;
   final double clearProgress;
+  final ValueChanged<int>? onMarkerPassed;
   final RoadCourseGeometry geometry;
   final double markerSize;
   final double goalStarSize;
+
+  @override
+  State<_RoadMarkerLayer> createState() => _RoadMarkerLayerState();
+}
+
+class _RoadMarkerLayerState extends State<_RoadMarkerLayer> {
+  late double _lastClearProgress;
+
+  @override
+  void initState() {
+    super.initState();
+    _lastClearProgress = widget.clearProgress;
+  }
+
+  @override
+  void didUpdateWidget(covariant _RoadMarkerLayer oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    _notifyMarkerCrossing();
+    _lastClearProgress = widget.clearProgress;
+  }
+
+  void _notifyMarkerCrossing() {
+    final onMarkerPassed = widget.onMarkerPassed;
+    if (onMarkerPassed == null ||
+        widget.markers.isEmpty ||
+        widget.clearProgress <= _lastClearProgress) {
+      return;
+    }
+
+    int? highestCrossedIndex;
+    for (var index = 0; index < widget.markers.length; index += 1) {
+      final markerProgress = _markerSlotProgress(
+        index: index,
+        slotCount: widget.markers.length,
+        geometry: widget.geometry,
+        markerSize: widget.markerSize,
+        goalStarSize: widget.goalStarSize,
+      );
+      if (_lastClearProgress < markerProgress &&
+          widget.clearProgress >= markerProgress) {
+        highestCrossedIndex = index;
+      }
+    }
+
+    if (highestCrossedIndex != null) {
+      onMarkerPassed(highestCrossedIndex);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return IgnorePointer(
       child: Stack(
         children: [
-          for (var index = 0; index < markers.length; index += 1)
+          for (var index = 0; index < widget.markers.length; index += 1)
             _RoadActivityMarker(
               key: ValueKey('roadActivityMarkerSlot_$index'),
-              marker: markers[index],
+              marker: widget.markers[index],
               index: index,
-              markerSize: markerSize,
+              markerSize: widget.markerSize,
               progress: _markerSlotProgress(
                 index: index,
-                slotCount: markers.length,
-                geometry: geometry,
-                markerSize: markerSize,
-                goalStarSize: goalStarSize,
+                slotCount: widget.markers.length,
+                geometry: widget.geometry,
+                markerSize: widget.markerSize,
+                goalStarSize: widget.goalStarSize,
               ),
-              clearProgress: clearProgress,
-              geometry: geometry,
+              clearProgress: widget.clearProgress,
+              geometry: widget.geometry,
             ),
         ],
       ),

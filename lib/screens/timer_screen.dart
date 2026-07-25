@@ -244,6 +244,7 @@ class _TimerScreenState extends State<TimerScreen>
   bool _isAppResumed = true;
   bool _isDisposing = false;
   _TimerBgmTarget _lastTimerBgmTarget = _TimerBgmTarget.stopped;
+  int _highestHandledCourseMarkerIndex = -1;
   late final String _activeSessionId;
 
   ActivityDefinition get _activity =>
@@ -715,6 +716,24 @@ class _TimerScreenState extends State<TimerScreen>
       _activeMotivationMilestone = null;
       _activeMotivationVideoPath = null;
     });
+  }
+
+  void _handleCourseMarkerPassed(int markerIndex) {
+    if (markerIndex <= _highestHandledCourseMarkerIndex) {
+      return;
+    }
+    _highestHandledCourseMarkerIndex = markerIndex;
+
+    if (!_timerConfig.soundEnabled ||
+        _controller.state != ActivityTimerState.running ||
+        !mounted ||
+        _isPreviewing ||
+        _isFinishDriving ||
+        !_isAppResumed) {
+      return;
+    }
+
+    unawaited(_timerAudioService.playMarkerSfx());
   }
 
   Future<void> _confirmExit() async {
@@ -1264,6 +1283,7 @@ class _TimerScreenState extends State<TimerScreen>
                     showMotivationVideo: !isLandscape,
                     markers: courseMarkers,
                     markerClearProgress: vehicleDisplayProgress,
+                    onCourseMarkerPassed: _handleCourseMarkerPassed,
                     isRoadMotionActive:
                         _isFinishDriving ||
                         _controller.state == ActivityTimerState.running,
