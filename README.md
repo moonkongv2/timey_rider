@@ -24,7 +24,7 @@ The app is designed around one simple goal: make daily routines feel like cozy j
 - Animated road, rail, sky, or water course progress based on the selected vehicle
 - Portrait and landscape timer layouts with dedicated road and vehicle layers
 - Pause, resume, complete, arrival prompt, and exit confirmation flows
-- Optional remaining-time display, sound effects, and keep-screen-awake setting
+- Optional remaining-time display, timer sounds, and keep-screen-awake setting
 - Deferred motivation video and voice support behind `ENABLE_MOTIVATION_MEDIA`
 - Completion result screen with vehicle-specific success videos and fallback handling
 - In-app parent guide and contextual help for markers, results, rewards, and history
@@ -92,6 +92,33 @@ assets/
       en_1.mp3
       en_2.mp3
 ```
+
+## Timer Audio
+
+Timer audio is bundled separately from deferred motivation media. The active
+timer can play low-volume looping BGM during the ride and a short marker sound
+when the rider passes a visible course marker.
+
+The existing `soundEnabled` setting controls all timer sounds. Turning it off
+stops timer BGM, suppresses marker sounds, and prevents motivation voice
+playback when motivation media is explicitly enabled later. The runtime sound
+button on the timer screen updates the same setting and persists it with the
+active timer session.
+
+Runtime timer audio assets are registered individually in `pubspec.yaml`:
+
+```text
+assets/audio/timer_bgm/timer_bgm_01.mp3
+assets/audio/marker/marker_01.mp3
+```
+
+The timer audio catalog lives in
+`lib/catalogs/timer_audio_asset_catalog.dart`, including the asset paths and
+default playback volumes.
+
+License evidence is stored under `_licenses/` folders inside `assets/audio`.
+Those files are repository evidence only and are not registered as Flutter
+assets. See `assets/audio/README.md` for the expected layout and rules.
 
 ## Assets Status / TODO
 

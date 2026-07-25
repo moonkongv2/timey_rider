@@ -1716,6 +1716,32 @@ void main() {
     }
   });
 
+  test('Timer audio playable validation ignores dot store files', () {
+    final dotStoreFiles = Directory('assets/audio')
+        .listSync(recursive: true)
+        .whereType<File>()
+        .where((file) => file.uri.pathSegments.last == '.DS_Store')
+        .toList();
+    expect(dotStoreFiles, isNotEmpty);
+
+    final playableFiles = Directory('assets/audio')
+        .listSync(recursive: true)
+        .whereType<File>()
+        .map((file) => file.path)
+        .where((path) => path.endsWith('.mp3'))
+        .where(
+          (path) =>
+              path.startsWith('assets/audio/timer_bgm/') ||
+              path.startsWith('assets/audio/marker/'),
+        )
+        .toList();
+
+    expect(
+      playableFiles,
+      unorderedEquals(TimerAudioAssetCatalog.runtimeAssetPaths),
+    );
+  });
+
   test('Timer audio pubspec entries include only runtime files', () {
     final assetEntries = File('pubspec.yaml')
         .readAsLinesSync()
@@ -7139,6 +7165,44 @@ void main() {
     expect(passedMarkers, [markers.length - 1]);
   });
 
+  testWidgets('RoadView marker callback does not replay after remount', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    final markers = ActivityMarkerCatalog.courseSlotsFor([
+      'top_teeth',
+      'bottom_teeth',
+    ]);
+    final passedMarkers = <int>[];
+
+    Widget roadAt(double progress, Key key) {
+      return MaterialApp(
+        home: Scaffold(
+          body: SizedBox(
+            width: 420,
+            height: 640,
+            child: RoadView(
+              key: key,
+              progress: progress,
+              vehicle: VehicleCatalog.fireTruck,
+              markers: markers,
+              onCourseMarkerPassed: passedMarkers.add,
+            ),
+          ),
+        ),
+      );
+    }
+
+    await tester.pumpWidget(roadAt(0, const ValueKey('first-road')));
+    await tester.pumpWidget(roadAt(1, const ValueKey('first-road')));
+    await tester.pumpWidget(roadAt(1, const ValueKey('second-road')));
+
+    expect(passedMarkers, [markers.length - 1]);
+  });
+
   testWidgets('RoadView keeps dense activity markers clear of finish star', (
     tester,
   ) async {
@@ -8344,6 +8408,71 @@ void main() {
     await tester.pump();
   });
 
+  testWidgets('TimerScreen does not start timer BGM when sound is disabled', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    final timerAudioService = _FakeTimerAudioService();
+
+    await tester.pumpWidget(
+      MaterialApp(
+        locale: const Locale('ko'),
+        home: TimerScreen(
+          config: ActivityTimerConfig.defaults().copyWith(
+            duration: const Duration(minutes: 10),
+            soundEnabled: false,
+          ),
+          activityProgressService: LocalActivityProgressService(),
+          timerAudioService: timerAudioService,
+          onConfigChanged: (_) {},
+        ),
+      ),
+    );
+    for (int i = 0; i < 40; i++) {
+      await tester.pump(const Duration(milliseconds: 250));
+    }
+
+    expect(timerAudioService.calls, isEmpty);
+
+    await tester.pumpWidget(const SizedBox.shrink());
+    await tester.pump();
+  });
+
+  testWidgets('TimerScreen does not repeatedly start BGM while running', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    final timerAudioService = _FakeTimerAudioService();
+
+    await tester.pumpWidget(
+      MaterialApp(
+        locale: const Locale('ko'),
+        home: TimerScreen(
+          config: ActivityTimerConfig.defaults().copyWith(
+            duration: const Duration(minutes: 10),
+          ),
+          activityProgressService: LocalActivityProgressService(),
+          timerAudioService: timerAudioService,
+          onConfigChanged: (_) {},
+        ),
+      ),
+    );
+    for (int i = 0; i < 48; i++) {
+      await tester.pump(const Duration(milliseconds: 250));
+    }
+
+    expect(timerAudioService.calls, ['startOrResumeBgm']);
+
+    await tester.pumpWidget(const SizedBox.shrink());
+    await tester.pump();
+  });
+
   testWidgets('TimerScreen pauses and resumes timer BGM with controls', (
     tester,
   ) async {
@@ -8384,6 +8513,64 @@ void main() {
       'startOrResumeBgm',
       'pauseBgm',
       'startOrResumeBgm',
+    ]);
+
+    await tester.pumpWidget(const SizedBox.shrink());
+    await tester.pump();
+  });
+
+  testWidgets('TimerScreen syncs timer BGM with app lifecycle', (tester) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    SharedPreferences.setMockInitialValues({
+      'savedActivityTimerPresetsInitialized': true,
+    });
+    final timerAudioService = _FakeTimerAudioService();
+
+    await tester.pumpWidget(
+      MaterialApp(
+        locale: const Locale('ko'),
+        home: TimerScreen(
+          config: ActivityTimerConfig.defaults().copyWith(
+            duration: const Duration(minutes: 10),
+          ),
+          activityProgressService: LocalActivityProgressService(),
+          timerAudioService: timerAudioService,
+          onConfigChanged: (_) {},
+        ),
+      ),
+    );
+    for (int i = 0; i < 40; i++) {
+      await tester.pump(const Duration(milliseconds: 250));
+    }
+
+    tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.paused);
+    await tester.pump();
+    tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.resumed);
+    await tester.pump();
+
+    expect(timerAudioService.calls, [
+      'startOrResumeBgm',
+      'pauseBgm',
+      'startOrResumeBgm',
+    ]);
+
+    tester
+        .widget<TimerControlBar>(find.byType(TimerControlBar))
+        .onPauseResume!();
+    await tester.pump();
+    tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.paused);
+    await tester.pump();
+    tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.resumed);
+    await tester.pump();
+
+    expect(timerAudioService.calls, [
+      'startOrResumeBgm',
+      'pauseBgm',
+      'startOrResumeBgm',
+      'pauseBgm',
     ]);
 
     await tester.pumpWidget(const SizedBox.shrink());
@@ -8451,6 +8638,93 @@ void main() {
     await tester.pump();
   });
 
+  testWidgets('TimerScreen restored sessions sync timer BGM by state', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    final startedAt = DateTime(2026, 6, 10, 8);
+
+    Future<List<String>> pumpRestored(
+      ActiveActivityTimerSessionState state,
+    ) async {
+      final timerAudioService = _FakeTimerAudioService();
+      final config = ActivityTimerConfig.defaults().copyWith(
+        duration: const Duration(minutes: 10),
+      );
+      await tester.pumpWidget(
+        MaterialApp(
+          locale: const Locale('ko'),
+          home: TimerScreen(
+            config: ActivityTimerConfig.defaults(),
+            restoredSession: ActiveActivityTimerSession(
+              sessionId: 'restored-${state.name}',
+              startedAt: startedAt,
+              config: config,
+              state: state,
+              pausedAt: state == ActiveActivityTimerSessionState.paused
+                  ? startedAt.add(const Duration(minutes: 2))
+                  : null,
+            ),
+            activityProgressService: LocalActivityProgressService(),
+            timerAudioService: timerAudioService,
+            now: () => startedAt.add(const Duration(minutes: 3)),
+            onConfigChanged: (_) {},
+          ),
+        ),
+      );
+      await tester.pump();
+      await tester.pumpWidget(const SizedBox.shrink());
+      await tester.pump();
+      return timerAudioService.calls;
+    }
+
+    expect(
+      await pumpRestored(ActiveActivityTimerSessionState.running),
+      ['startOrResumeBgm', 'stopBgm', 'stopAll'],
+    );
+    expect(
+      await pumpRestored(ActiveActivityTimerSessionState.paused),
+      ['pauseBgm', 'stopBgm', 'stopAll'],
+    );
+
+    await tester.pumpWidget(const SizedBox.shrink());
+    await tester.pump();
+  });
+
+  testWidgets('TimerScreen stops injected timer audio service on dispose', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    final timerAudioService = _FakeTimerAudioService();
+
+    await tester.pumpWidget(
+      MaterialApp(
+        locale: const Locale('ko'),
+        home: TimerScreen(
+          config: ActivityTimerConfig.defaults().copyWith(
+            duration: const Duration(minutes: 10),
+            soundEnabled: false,
+          ),
+          activityProgressService: LocalActivityProgressService(),
+          timerAudioService: timerAudioService,
+          onConfigChanged: (_) {},
+        ),
+      ),
+    );
+    await tester.pump();
+
+    await tester.pumpWidget(const SizedBox.shrink());
+    await tester.pump();
+
+    expect(timerAudioService.calls, ['stopAll']);
+  });
+
   testWidgets('TimerScreen stops timer BGM when timer arrives', (tester) async {
     tester.view.physicalSize = const Size(390, 844);
     tester.view.devicePixelRatio = 1.0;
@@ -8480,6 +8754,43 @@ void main() {
 
     now = now.add(const Duration(seconds: 2));
     await tester.pump(const Duration(milliseconds: 250));
+
+    expect(timerAudioService.calls, ['startOrResumeBgm', 'stopBgm']);
+
+    await tester.pumpWidget(const SizedBox.shrink());
+    await tester.pump();
+  });
+
+  testWidgets('TimerScreen stops timer BGM on manual completion', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    final timerAudioService = _FakeTimerAudioService();
+
+    await tester.pumpWidget(
+      MaterialApp(
+        locale: const Locale('ko'),
+        home: TimerScreen(
+          config: ActivityTimerConfig.defaults().copyWith(
+            duration: const Duration(minutes: 10),
+          ),
+          activityProgressService: LocalActivityProgressService(),
+          timerAudioService: timerAudioService,
+          onConfigChanged: (_) {},
+        ),
+      ),
+    );
+    for (int i = 0; i < 40; i++) {
+      await tester.pump(const Duration(milliseconds: 250));
+    }
+
+    tester.widget<TimerControlBar>(find.byType(TimerControlBar)).onComplete!();
+    await tester.pump();
+    await tester.tap(find.byType(FilledButton).last);
+    await tester.pump();
 
     expect(timerAudioService.calls, ['startOrResumeBgm', 'stopBgm']);
 
