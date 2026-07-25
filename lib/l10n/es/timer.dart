@@ -41,6 +41,7 @@ class EsTimerTexts implements TimerTextSet {
   String get finishDriveTimeLabel => 'Terminando';
   String get previewReady => 'Listos... 🚦';
   String get previewGo => '¡Vamos! 🌟';
+  String get viewCourseButton => 'Ver ruta';
   String get arrivalConfirmButton => 'Ver llegada';
   String get arrivalResultButton => 'Ver resultado';
 

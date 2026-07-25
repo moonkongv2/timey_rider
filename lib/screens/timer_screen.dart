@@ -40,6 +40,7 @@ const _landscapeCourseCanvasSize = Size(1200, 520);
 const _compactLandscapeControlsWidth = 72.0;
 const _compactLandscapeControlsRightInset =
     _compactLandscapeControlsWidth + AppSpacing.xl;
+const _longCoursePreviewThreshold = Duration(minutes: 5);
 const motivationMinimumVideoInterval = Duration(seconds: 10);
 const motivationVoiceStartDelay = Duration(milliseconds: 350);
 const _motivationVideoIntervalOptions = [
@@ -205,12 +206,14 @@ class _TimerStatusCopy {
 
 enum _TimerBgmTarget { stopped, paused, playing }
 
+enum _CoursePreviewMode { none, startup, overview }
+
 class _TimerScreenState extends State<TimerScreen>
     with WidgetsBindingObserver, TickerProviderStateMixin {
   late final ActivityTimerController _controller;
   late final AnimationController _finishDriveController;
   AnimationController? _previewController;
-  bool _isPreviewing = false;
+  _CoursePreviewMode _coursePreviewMode = _CoursePreviewMode.none;
   _PreviewMessageState _previewMessageState = _PreviewMessageState.none;
   late final MotivationAudioService _motivationAudioService;
   late final bool _ownsMotivationAudioService;
@@ -254,6 +257,15 @@ class _TimerScreenState extends State<TimerScreen>
       !_isFinishDriving &&
       !_arrivalAcknowledged &&
       _controller.state == ActivityTimerState.arrived;
+
+  bool get _isStartupPreviewing =>
+      _coursePreviewMode == _CoursePreviewMode.startup;
+
+  bool get _isCourseOverviewing =>
+      _coursePreviewMode == _CoursePreviewMode.overview;
+
+  bool get _isCameraPreviewActive =>
+      _coursePreviewMode != _CoursePreviewMode.none;
 
   @override
   void initState() {
@@ -311,48 +323,46 @@ class _TimerScreenState extends State<TimerScreen>
 
   Future<void> _startPreviewSequence() async {
     try {
-      final needsPreview = _timerConfig.duration.inMinutes > 5;
+      final needsPreview = _timerConfig.duration > _longCoursePreviewThreshold;
 
       if (!mounted) return;
       setState(() {
-        _isPreviewing = true;
+        _coursePreviewMode = _CoursePreviewMode.startup;
       });
 
       if (needsPreview) {
-        _previewController = AnimationController(
-          vsync: this,
-          duration: const Duration(milliseconds: 2000),
+        final previewController = _ensurePreviewController(
+          const Duration(milliseconds: 2000),
         );
-        _previewController!.addListener(() => setState(() {}));
 
         await _safeDelay(const Duration(milliseconds: 500));
-        if (!mounted) return;
+        if (!mounted || !_isStartupPreviewing) return;
 
-        await _previewController!.forward().orCancel;
+        await previewController.forward().orCancel;
 
-        if (!mounted) return;
+        if (!mounted || !_isStartupPreviewing) return;
         await _safeDelay(const Duration(milliseconds: 1200));
 
-        if (!mounted) return;
-        _previewController!.duration = const Duration(milliseconds: 1000);
-        await _previewController!.reverse().orCancel;
+        if (!mounted || !_isStartupPreviewing) return;
+        previewController.duration = const Duration(milliseconds: 1000);
+        await previewController.reverse().orCancel;
       }
 
-      if (!mounted) return;
+      if (!mounted || !_isStartupPreviewing) return;
       setState(() {
         _previewMessageState = _PreviewMessageState.ready;
       });
       await _safeDelay(const Duration(milliseconds: 700));
 
-      if (!mounted) return;
+      if (!mounted || !_isStartupPreviewing) return;
       setState(() {
         _previewMessageState = _PreviewMessageState.go;
       });
       await _safeDelay(const Duration(milliseconds: 700));
 
-      if (!mounted) return;
+      if (!mounted || !_isStartupPreviewing) return;
       setState(() {
-        _isPreviewing = false;
+        _coursePreviewMode = _CoursePreviewMode.none;
         _previewMessageState = _PreviewMessageState.none;
       });
       _controller.start();
@@ -361,6 +371,122 @@ class _TimerScreenState extends State<TimerScreen>
     } on TickerCanceled {
       return;
     }
+  }
+
+  AnimationController _ensurePreviewController(Duration duration) {
+    final existingController = _previewController;
+    if (existingController != null) {
+      existingController
+        ..stop()
+        ..duration = duration
+        ..reset();
+      return existingController;
+    }
+
+    final controller = AnimationController(vsync: this, duration: duration)
+      ..addListener(() {
+        if (mounted) {
+          setState(() {});
+        }
+      });
+    _previewController = controller;
+    return controller;
+  }
+
+  Future<void> _startCourseOverviewPreview() async {
+    if (!mounted ||
+        _controller.startedAt == null ||
+        _controller.state == ActivityTimerState.arrived ||
+        _controller.state == ActivityTimerState.completed ||
+        _isStartupPreviewing ||
+        _isCourseOverviewing ||
+        _isFinishDriving) {
+      return;
+    }
+
+    _cancelPreviewDelay();
+    _previewController?.dispose();
+    final previewController =
+        AnimationController(
+          vsync: this,
+          duration: const Duration(milliseconds: 1600),
+          value: _controller.progress.clamp(0.0, 1.0).toDouble(),
+        )..addListener(() {
+          if (mounted) {
+            setState(() {});
+          }
+        });
+    _previewController = previewController;
+
+    setState(() {
+      _coursePreviewMode = _CoursePreviewMode.overview;
+      _previewMessageState = _PreviewMessageState.none;
+    });
+
+    try {
+      await previewController
+          .animateTo(1, curve: Curves.easeInOutCubic)
+          .orCancel;
+    } on TickerCanceled {
+      return;
+    }
+
+    if (!_shouldContinueCourseOverviewPreview()) {
+      return;
+    }
+
+    await _safeDelay(const Duration(milliseconds: 450));
+    if (!_shouldContinueCourseOverviewPreview()) {
+      return;
+    }
+
+    final returnProgress = _controller.progress.clamp(0.0, 1.0).toDouble();
+    previewController.duration = const Duration(milliseconds: 800);
+    try {
+      await previewController
+          .animateBack(returnProgress, curve: Curves.easeInOutCubic)
+          .orCancel;
+    } on TickerCanceled {
+      return;
+    }
+
+    if (!_shouldContinueCourseOverviewPreview()) {
+      return;
+    }
+
+    _resetCourseOverviewPreview();
+  }
+
+  bool _shouldContinueCourseOverviewPreview() {
+    if (!mounted || !_isCourseOverviewing) {
+      return false;
+    }
+    if (_controller.state == ActivityTimerState.arrived ||
+        _controller.state == ActivityTimerState.completed ||
+        _isFinishDriving) {
+      _cancelCourseOverviewPreview();
+      return false;
+    }
+    return true;
+  }
+
+  void _cancelCourseOverviewPreview() {
+    if (!_isCourseOverviewing) {
+      return;
+    }
+    _cancelPreviewDelay();
+    _previewController?.stop();
+    _resetCourseOverviewPreview();
+  }
+
+  void _resetCourseOverviewPreview() {
+    if (!mounted) {
+      _coursePreviewMode = _CoursePreviewMode.none;
+      return;
+    }
+    setState(() {
+      _coursePreviewMode = _CoursePreviewMode.none;
+    });
   }
 
   Future<void> _safeDelay(Duration duration) async {
@@ -412,6 +538,8 @@ class _TimerScreenState extends State<TimerScreen>
   @override
   void dispose() {
     _isDisposing = true;
+    _previewController?.stop();
+    _coursePreviewMode = _CoursePreviewMode.none;
     _syncTimerBgm();
     WidgetsBinding.instance.removeObserver(this);
     _cancelPreviewDelay();
@@ -491,7 +619,7 @@ class _TimerScreenState extends State<TimerScreen>
   _TimerBgmTarget _timerBgmTarget() {
     if (_isDisposing ||
         !_timerConfig.soundEnabled ||
-        _isPreviewing ||
+        _isStartupPreviewing ||
         _isFinishDriving ||
         _activeSessionFinalized ||
         _controller.state == ActivityTimerState.arrived ||
@@ -530,6 +658,7 @@ class _TimerScreenState extends State<TimerScreen>
       return;
     }
 
+    _cancelCourseOverviewPreview();
     _arrivalPromptShown = true;
     _captureArrivalSnapshot();
     unawaited(_persistActiveSession());
@@ -745,7 +874,7 @@ class _TimerScreenState extends State<TimerScreen>
     if (!_timerConfig.soundEnabled ||
         _controller.state != ActivityTimerState.running ||
         !mounted ||
-        _isPreviewing ||
+        _isStartupPreviewing ||
         _isFinishDriving ||
         !_isAppResumed) {
       return;
@@ -759,6 +888,7 @@ class _TimerScreenState extends State<TimerScreen>
       return;
     }
 
+    _cancelCourseOverviewPreview();
     _exitPromptShown = true;
     final shouldResumeAfterPrompt =
         _controller.state == ActivityTimerState.running ||
@@ -820,9 +950,12 @@ class _TimerScreenState extends State<TimerScreen>
   }
 
   Future<void> _confirmComplete() async {
-    if (_controller.startedAt == null || _isPreviewing || _isFinishDriving) {
+    if (_controller.startedAt == null ||
+        _isStartupPreviewing ||
+        _isFinishDriving) {
       return;
     }
+    _cancelCourseOverviewPreview();
     if (_isAwaitingArrivalAcknowledgement) {
       _arrivalPromptTimer?.cancel();
       setState(() {
@@ -894,6 +1027,7 @@ class _TimerScreenState extends State<TimerScreen>
       return;
     }
 
+    _cancelCourseOverviewPreview();
     _arrivalPromptTimer?.cancel();
     _captureArrivalSnapshot();
     setState(() {
@@ -940,6 +1074,7 @@ class _TimerScreenState extends State<TimerScreen>
   }
 
   void _startFinishDrive(ActivitySessionResult result) {
+    _cancelCourseOverviewPreview();
     _motivationVoiceTimer?.cancel();
     unawaited(_motivationAudioService.stop());
 
@@ -1147,10 +1282,12 @@ class _TimerScreenState extends State<TimerScreen>
                   .toDouble()
             : timerProgress;
 
-        final cameraDisplayProgress = _isPreviewing
+        final cameraDisplayProgress = _isCameraPreviewActive
             ? (_previewController?.value ?? 0.0).clamp(0.0, 1.0).toDouble()
             : displayProgress;
-        final vehicleDisplayProgress = _isPreviewing ? 0.0 : displayProgress;
+        final vehicleDisplayProgress = _isStartupPreviewing
+            ? 0.0
+            : displayProgress;
 
         String? previewMessageText;
         switch (_previewMessageState) {
@@ -1174,6 +1311,7 @@ class _TimerScreenState extends State<TimerScreen>
           if (_isFinishDriving) {
             return;
           }
+          _cancelCourseOverviewPreview();
           if (_controller.isPaused) {
             _controller.resume();
           } else {
@@ -1186,7 +1324,7 @@ class _TimerScreenState extends State<TimerScreen>
             _isAwaitingArrivalAcknowledgement;
         final timerHasStarted = _controller.startedAt != null;
         final canUseTimerControls =
-            timerHasStarted && !_isPreviewing && !_isFinishDriving;
+            timerHasStarted && !_isStartupPreviewing && !_isFinishDriving;
         final shouldShowArrivalPanel =
             isAwaitingArrivalAcknowledgement && _arrivalPanelVisible;
         final languageCode = Localizations.localeOf(context).languageCode;
@@ -1244,6 +1382,18 @@ class _TimerScreenState extends State<TimerScreen>
             ? _openMotivationSettings
             : null;
         final handleTimerSoundToggle = _toggleTimerSound;
+        final canShowCourseOverview =
+            _timerConfig.duration > _longCoursePreviewThreshold &&
+            timerHasStarted &&
+            _controller.state != ActivityTimerState.arrived &&
+            _controller.state != ActivityTimerState.completed &&
+            !_isStartupPreviewing &&
+            !_isFinishDriving;
+        final handleCourseOverview = !canShowCourseOverview
+            ? null
+            : _isCourseOverviewing
+            ? null
+            : _startCourseOverviewPreview;
 
         final isScreenLandscape =
             MediaQuery.orientationOf(context) == Orientation.landscape;
@@ -1284,6 +1434,13 @@ class _TimerScreenState extends State<TimerScreen>
                           tooltip: texts.settings.motivationVideoEnabled,
                           icon: const Icon(Icons.video_settings_rounded),
                           onPressed: handleMotivationSettings,
+                        ),
+                      if (canShowCourseOverview)
+                        IconButton(
+                          key: const ValueKey('courseOverviewButton'),
+                          tooltip: texts.timer.viewCourseButton,
+                          icon: const Icon(Icons.map_rounded),
+                          onPressed: handleCourseOverview,
                         ),
                     ],
                   ),
@@ -1426,6 +1583,8 @@ class _TimerScreenState extends State<TimerScreen>
                       isSoundEnabled: _timerConfig.soundEnabled,
                       onSoundToggle: handleTimerSoundToggle,
                       onMotivationSettings: handleMotivationSettings,
+                      showCourseOverview: canShowCourseOverview,
+                      onCourseOverview: handleCourseOverview,
                       controls:
                           arrivalPanel ??
                           TimerControlBar(
@@ -1440,6 +1599,8 @@ class _TimerScreenState extends State<TimerScreen>
                         isSoundEnabled: _timerConfig.soundEnabled,
                         onSoundToggle: handleTimerSoundToggle,
                         onMotivationSettings: handleMotivationSettings,
+                        showCourseOverview: canShowCourseOverview,
+                        onCourseOverview: handleCourseOverview,
                         onPauseResume: handlePauseResumeAction,
                         onComplete: handleComplete,
                       ),
@@ -1498,6 +1659,8 @@ class _LandscapeTimerLayout extends StatelessWidget {
     required this.isSoundEnabled,
     required this.onSoundToggle,
     required this.onMotivationSettings,
+    required this.showCourseOverview,
+    required this.onCourseOverview,
     required this.controls,
     required this.compactControls,
   });
@@ -1512,6 +1675,8 @@ class _LandscapeTimerLayout extends StatelessWidget {
   final bool isSoundEnabled;
   final VoidCallback onSoundToggle;
   final VoidCallback? onMotivationSettings;
+  final bool showCourseOverview;
+  final VoidCallback? onCourseOverview;
   final Widget controls;
   final Widget compactControls;
 
@@ -1541,6 +1706,8 @@ class _LandscapeTimerLayout extends StatelessWidget {
             isSoundEnabled: isSoundEnabled,
             onSoundToggle: onSoundToggle,
             onMotivationSettings: onMotivationSettings,
+            showCourseOverview: showCourseOverview,
+            onCourseOverview: onCourseOverview,
             compactControls: isCompactLandscape ? compactControls : null,
           );
 
@@ -1575,6 +1742,8 @@ class _CompactLandscapeControls extends StatelessWidget {
     required this.isSoundEnabled,
     required this.onSoundToggle,
     required this.onMotivationSettings,
+    required this.showCourseOverview,
+    required this.onCourseOverview,
     required this.onPauseResume,
     required this.onComplete,
   });
@@ -1584,6 +1753,8 @@ class _CompactLandscapeControls extends StatelessWidget {
   final bool isSoundEnabled;
   final VoidCallback onSoundToggle;
   final VoidCallback? onMotivationSettings;
+  final bool showCourseOverview;
+  final VoidCallback? onCourseOverview;
   final VoidCallback? onPauseResume;
   final VoidCallback? onComplete;
 
@@ -1611,6 +1782,16 @@ class _CompactLandscapeControls extends StatelessWidget {
             label: texts.settings.motivationVideoEnabled,
             icon: Icons.video_settings_rounded,
             onPressed: onMotivationSettings,
+            variant: _CompactLandscapeButtonVariant.outline,
+          ),
+          const SizedBox(height: AppSpacing.sm),
+        ],
+        if (showCourseOverview) ...[
+          _CompactLandscapeButton(
+            key: const ValueKey('courseOverviewButton'),
+            label: texts.timer.viewCourseButton,
+            icon: Icons.map_rounded,
+            onPressed: onCourseOverview,
             variant: _CompactLandscapeButtonVariant.outline,
           ),
           const SizedBox(height: AppSpacing.sm),
@@ -1810,6 +1991,8 @@ class _LandscapeCourseCanvas extends StatelessWidget {
     required this.isSoundEnabled,
     required this.onSoundToggle,
     required this.onMotivationSettings,
+    required this.showCourseOverview,
+    required this.onCourseOverview,
     this.compactControls,
   });
 
@@ -1823,6 +2006,8 @@ class _LandscapeCourseCanvas extends StatelessWidget {
   final bool isSoundEnabled;
   final VoidCallback onSoundToggle;
   final VoidCallback? onMotivationSettings;
+  final bool showCourseOverview;
+  final VoidCallback? onCourseOverview;
   final Widget? compactControls;
 
   @override
@@ -1897,6 +2082,15 @@ class _LandscapeCourseCanvas extends StatelessWidget {
                         onPressed: onMotivationSettings!,
                       ),
                     ],
+                    if (showCourseOverview) ...[
+                      const SizedBox(width: AppSpacing.sm),
+                      _LandscapeIconButton(
+                        key: const ValueKey('courseOverviewButton'),
+                        label: AppTexts.of(context).timer.viewCourseButton,
+                        icon: Icons.map_rounded,
+                        onPressed: onCourseOverview,
+                      ),
+                    ],
                   ],
                 ],
               ),
@@ -1949,7 +2143,7 @@ class _LandscapeIconButton extends StatelessWidget {
 
   final String label;
   final IconData icon;
-  final VoidCallback onPressed;
+  final VoidCallback? onPressed;
 
   @override
   Widget build(BuildContext context) {

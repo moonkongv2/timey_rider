@@ -40,6 +40,7 @@ class TimerTexts implements TimerTextSet {
   String get finishDriveTimeLabel => '마무리 중';
   String get previewReady => '준비... 🚦';
   String get previewGo => '출발! 🌟';
+  String get viewCourseButton => '코스 보기';
   String get arrivalConfirmButton => '도착 확인';
   String get arrivalResultButton => '결과 보기';
 

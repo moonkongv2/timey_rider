@@ -42,6 +42,7 @@ class EnTimerTexts implements TimerTextSet {
   String get finishDriveTimeLabel => 'Finishing up';
   String get previewReady => 'Ready... 🚦';
   String get previewGo => 'Go! 🌟';
+  String get viewCourseButton => 'View course';
   String get arrivalConfirmButton => 'See arrival';
   String get arrivalResultButton => 'See result';
 

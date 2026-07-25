@@ -40,6 +40,7 @@ class JaTimerTexts implements TimerTextSet {
   String get finishDriveTimeLabel => '仕上げ中';
   String get previewReady => 'よーい… 🚦';
   String get previewGo => 'スタート！ 🌟';
+  String get viewCourseButton => 'コースを見る';
   String get arrivalConfirmButton => '到着を見る';
   String get arrivalResultButton => '結果を見る';
 

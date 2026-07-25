@@ -9046,6 +9046,75 @@ void main() {
     }
   });
 
+  testWidgets('TimerScreen course overview scrolls back to vehicle progress', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(600, 900);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    SharedPreferences.setMockInitialValues({'savedActivityTimerPresetsInitialized': true});
+    addTearDown(() async {
+      await const ActiveActivityTimerSessionStore().clear();
+    });
+    final startedAt = DateTime(2026, 6, 10, 8);
+    final now = startedAt.add(const Duration(minutes: 10));
+    final config = ActivityTimerConfig.defaults().copyWith(
+      duration: const Duration(minutes: 30),
+    );
+    final session = ActiveActivityTimerSession(
+      sessionId: 'course-overview-scroll-session',
+      startedAt: startedAt,
+      config: config,
+      state: ActiveActivityTimerSessionState.running,
+    );
+
+    await tester.pumpWidget(
+      MaterialApp(
+        locale: const Locale('ko'),
+        home: TimerScreen(
+          config: ActivityTimerConfig.defaults(),
+          restoredSession: session,
+          activityProgressService: LocalActivityProgressService(),
+          now: () => now,
+          onConfigChanged: (_) {},
+        ),
+      ),
+    );
+    await tester.pump();
+
+    var roadView = tester.widget<RoadView>(find.byType(RoadView));
+    expect(roadView.cameraProgress, closeTo(1 / 3, 0.01));
+    expect(roadView.vehicleProgress, closeTo(1 / 3, 0.01));
+
+    tester
+        .widget<IconButton>(find.byKey(const ValueKey('courseOverviewButton')))
+        .onPressed!();
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 1600));
+
+    roadView = tester.widget<RoadView>(find.byType(RoadView));
+    expect(roadView.cameraProgress, closeTo(1, 0.01));
+    expect(roadView.vehicleProgress, closeTo(1 / 3, 0.01));
+
+    await tester.pump(const Duration(milliseconds: 450));
+    await tester.pump(const Duration(milliseconds: 400));
+
+    roadView = tester.widget<RoadView>(find.byType(RoadView));
+    expect(roadView.cameraProgress, lessThan(1));
+    expect(roadView.cameraProgress, greaterThan(roadView.vehicleProgress));
+    expect(roadView.vehicleProgress, closeTo(1 / 3, 0.01));
+
+    await tester.pump(const Duration(milliseconds: 401));
+
+    roadView = tester.widget<RoadView>(find.byType(RoadView));
+    expect(roadView.cameraProgress, closeTo(roadView.vehicleProgress, 0.01));
+    expect(roadView.vehicleProgress, closeTo(1 / 3, 0.01));
+
+    await tester.pumpWidget(const SizedBox.shrink());
+    await tester.pump();
+  });
+
   testWidgets(
     'TimerScreen restores arrived sessions at the finish until acknowledged',
     (tester) async {
