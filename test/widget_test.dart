@@ -10428,6 +10428,76 @@ void main() {
     expect(find.text('오늘의 미션'), findsNothing);
   });
 
+  testWidgets('Timer exit waits for active session clear before returning home', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    SharedPreferences.setMockInitialValues({'savedActivityTimerPresetsInitialized': true});
+    final startedAt = DateTime(2026, 6, 10, 8);
+    final store = _DelayedClearActiveSessionStore(
+      ActiveActivityTimerSession(
+        sessionId: 'active-session',
+        startedAt: startedAt,
+        config: ActivityTimerConfig.defaults().copyWith(
+          childName: '지율',
+          duration: const Duration(minutes: 35),
+          soundEnabled: false,
+        ),
+        state: ActiveActivityTimerSessionState.running,
+      ),
+    );
+
+    await tester.pumpWidget(
+      MaterialApp(
+        locale: const Locale('ko'),
+        supportedLocales: const [Locale('ko'), Locale('en')],
+        localizationsDelegates: const [
+          GlobalMaterialLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+        ],
+        home: HomeScreen(
+          config: ActivityTimerConfig.defaults().copyWith(childName: '지율'),
+          activityProgressService: LocalActivityProgressService(),
+          activeSessionStore: store,
+          onConfigChanged: (_) {},
+          now: () => startedAt,
+        ),
+      ),
+    );
+    for (int i = 0; i < 40; i++) {
+      await tester.pump(const Duration(milliseconds: 250));
+    }
+
+    expect(find.byKey(const ValueKey('activeTimerResumeCard')), findsOneWidget);
+
+    await tester.tap(find.text('이어가기'));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 400));
+    expect(find.byType(TimerScreen), findsOneWidget);
+
+    await tester.tap(find.byType(BackButton));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 320));
+    await tester.tap(find.text('그만하기'));
+    await tester.pump();
+
+    expect(store.clearStarted, isTrue);
+    expect(find.byType(TimerScreen), findsOneWidget);
+    expect(store.currentSession, isNotNull);
+
+    store.completeClear();
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 400));
+
+    expect(find.byType(TimerScreen), findsNothing);
+    expect(find.byKey(const ValueKey('activeTimerResumeCard')), findsNothing);
+    expect(store.currentSession, isNull);
+  });
+
   testWidgets('English locale shows English home copy', (tester) async {
     tester.view.physicalSize = const Size(390, 844);
     tester.view.devicePixelRatio = 1.0;
@@ -12367,6 +12437,39 @@ class _FakeTimerAudioService implements TimerAudioService {
   @override
   Future<void> dispose() async {
     calls.add('dispose');
+  }
+}
+
+class _DelayedClearActiveSessionStore extends ActiveActivityTimerSessionStore {
+  _DelayedClearActiveSessionStore(this.currentSession);
+
+  ActiveActivityTimerSession? currentSession;
+  Completer<void>? _clearCompleter;
+
+  bool get clearStarted => _clearCompleter != null;
+
+  @override
+  Future<void> save(ActiveActivityTimerSession session) async {
+    currentSession = session;
+  }
+
+  @override
+  Future<ActiveActivityTimerSession?> load() async {
+    return currentSession;
+  }
+
+  @override
+  Future<void> clear() async {
+    _clearCompleter ??= Completer<void>();
+    await _clearCompleter!.future;
+    currentSession = null;
+  }
+
+  void completeClear() {
+    final completer = _clearCompleter;
+    if (completer != null && !completer.isCompleted) {
+      completer.complete();
+    }
   }
 }
 

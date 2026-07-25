@@ -764,7 +764,10 @@ class _TimerScreenState extends State<TimerScreen>
       _allowExit = true;
       _activeSessionFinalized = true;
       _syncTimerBgm();
-      unawaited(_clearActiveSession());
+      await _clearActiveSession();
+      if (!mounted) {
+        return;
+      }
       final navigator = Navigator.of(context);
       if (route != null && navigator.canPop()) {
         navigator.removeRoute(route);
