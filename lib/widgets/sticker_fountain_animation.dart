@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -53,6 +54,7 @@ class _StickerFountainOverlayState extends State<_StickerFountainOverlay>
     with SingleTickerProviderStateMixin {
   late final AnimationController _controller;
   late final List<_ParticleData> _particles;
+  final AudioPlayer _audioPlayer = AudioPlayer();
 
   static const _maxParticles = 40;
   static const _duration = Duration(milliseconds: 2200);
@@ -62,6 +64,13 @@ class _StickerFountainOverlayState extends State<_StickerFountainOverlay>
     super.initState();
     _controller = AnimationController(vsync: this, duration: _duration);
     _particles = _generateParticles();
+
+    _audioPlayer.setReleaseMode(ReleaseMode.stop);
+    _audioPlayer.play(
+      AssetSource('audio/sticker_popup.mp3'),
+      mode: PlayerMode.lowLatency,
+    );
+
     _controller.forward().then((_) {
       if (mounted) widget.onFinished();
     });
@@ -95,6 +104,7 @@ class _StickerFountainOverlayState extends State<_StickerFountainOverlay>
 
   @override
   void dispose() {
+    _audioPlayer.dispose();
     _controller.dispose();
     super.dispose();
   }
