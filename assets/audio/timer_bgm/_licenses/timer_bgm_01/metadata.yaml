@@ -1,0 +1,29 @@
+asset_id: timer_bgm_01
+app_asset_path: assets/audio/timer_bgm/timer_bgm_01.mp3
+purpose: timer_background_music
+
+source:
+  platform: Pixabay
+  title: Cute Happy Kids
+  creator: https://pixabay.com/users/maksymmalko-46459014/
+  content_url: https://pixabay.com/music/electronic-cute-happy-kids-481995/
+  content_id: "481995"
+  content_id_registered: TODO_USER
+
+license:
+  name: Pixabay Content License
+  downloaded_at: 2026-07-22 13:25:30 UTC
+  license_terms_saved_at: TODO_USER
+  attribution_required: false
+
+files:
+  app_filename: timer_bgm_01.mp3
+  original_filename: TODO_USER
+
+modifications:
+  - TODO_USER
+
+evidence:
+  content_page: TODO_USER
+  license_page: Content_License_Pixabay.pdf
+  license_certificate: electronic-cute-happy-kids-481995-license.txt

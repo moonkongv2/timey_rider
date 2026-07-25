@@ -15,6 +15,7 @@ import 'package:timey_rider/catalogs/activity_catalog.dart';
 import 'package:timey_rider/catalogs/activity_marker_catalog.dart';
 import 'package:timey_rider/catalogs/avatar_prompt_catalog.dart';
 import 'package:timey_rider/catalogs/motivation_asset_catalog.dart';
+import 'package:timey_rider/catalogs/timer_audio_asset_catalog.dart';
 import 'package:timey_rider/catalogs/vehicle_catalog.dart';
 import 'package:timey_rider/config/app_feature_flags.dart';
 import 'package:timey_rider/l10n/app_texts.dart';
@@ -1678,6 +1679,91 @@ void main() {
       isNull,
     );
     expect(File(fallbackPath).existsSync(), isTrue, reason: fallbackPath);
+  });
+
+  test('Timer audio asset catalog has playable files', () {
+    expect(
+      TimerAudioAssetCatalog.runtimeAssetPaths,
+      unorderedEquals({
+        'assets/audio/timer_bgm/timer_bgm_01.mp3',
+        'assets/audio/marker/marker_01.mp3',
+      }),
+    );
+    expect(TimerAudioAssetCatalog.bgmVolume, 0.22);
+    expect(TimerAudioAssetCatalog.markerSfxVolume, 0.080);
+
+    for (final path in TimerAudioAssetCatalog.runtimeAssetPaths) {
+      expect(File(path).existsSync(), isTrue, reason: path);
+    }
+  });
+
+  test('Timer audio playable validation ignores non-audio evidence files', () {
+    final playableFilesByDirectory = {
+      'assets/audio/timer_bgm': ['timer_bgm_01.mp3'],
+      'assets/audio/marker': ['marker_01.mp3'],
+    };
+
+    for (final entry in playableFilesByDirectory.entries) {
+      final playableFilenames = Directory(entry.key)
+          .listSync()
+          .whereType<File>()
+          .map((file) => file.uri.pathSegments.last)
+          .where((filename) => filename.endsWith('.mp3'))
+          .toList();
+
+      expect(playableFilenames, unorderedEquals(entry.value));
+    }
+  });
+
+  test('Timer audio pubspec entries include only runtime files', () {
+    final assetEntries = File('pubspec.yaml')
+        .readAsLinesSync()
+        .map((line) => line.trim())
+        .where((line) => line.startsWith('- '))
+        .map((line) => line.substring(2))
+        .toSet();
+
+    for (final path in TimerAudioAssetCatalog.runtimeAssetPaths) {
+      expect(assetEntries, contains(path), reason: path);
+    }
+
+    expect(assetEntries, isNot(contains('assets/audio/')));
+    expect(assetEntries, isNot(contains('assets/audio/timer_bgm/')));
+    expect(assetEntries, isNot(contains('assets/audio/marker/')));
+
+    final timerAudioEntries = assetEntries.where(
+      (path) =>
+          path.startsWith('assets/audio/timer_bgm/') ||
+          path.startsWith('assets/audio/marker/'),
+    );
+    expect(
+      timerAudioEntries,
+      unorderedEquals(TimerAudioAssetCatalog.runtimeAssetPaths),
+    );
+    expect(
+      assetEntries.any(
+        (path) =>
+            path.contains('/_licenses/') ||
+            path.endsWith('metadata.yaml') ||
+            path.endsWith('.pdf'),
+      ),
+      isFalse,
+    );
+  });
+
+  test('Timer audio metadata points at catalog runtime paths', () {
+    final metadataByAssetPath = {
+      TimerAudioAssetCatalog.bgmPath: File(
+        'assets/audio/timer_bgm/_licenses/timer_bgm_01/metadata.yaml',
+      ).readAsStringSync(),
+      TimerAudioAssetCatalog.markerSfxPath: File(
+        'assets/audio/marker/_licenses/marker_01/metadata.yaml',
+      ).readAsStringSync(),
+    };
+
+    for (final entry in metadataByAssetPath.entries) {
+      expect(entry.value, contains('app_asset_path: ${entry.key}'));
+    }
   });
 
   test('Motivation video selection can pick a vehicle candidate by index', () {

@@ -1,0 +1,29 @@
+asset_id: marker_01
+app_asset_path: assets/audio/marker/marker_01.mp3
+purpose: course_marker_sound
+
+source:
+  platform: license-cleared-resource
+  title: marker_01
+  creator: TODO_USER
+  content_url: not_applicable
+  content_id: not_applicable
+  content_id_registered: not_applicable
+
+license:
+  name: license-cleared-resource
+  downloaded_at: not_applicable
+  license_terms_saved_at: not_applicable
+  attribution_required: false
+
+files:
+  app_filename: marker_01.mp3
+  original_filename: TODO_USER
+
+modifications:
+  - TODO_USER
+
+evidence:
+  content_page: not_applicable
+  license_page: not_applicable
+  license_certificate: not_applicable
