@@ -23,6 +23,7 @@ import '../services/local_activity_progress_service.dart';
 import '../services/motivation_audio_service.dart';
 import '../services/orientation_service.dart';
 import '../services/screen_awake_service.dart';
+import '../services/timer_audio_service.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_radius.dart';
 import '../theme/app_shadows.dart';
@@ -166,6 +167,7 @@ class TimerScreen extends StatefulWidget {
     this.orientationService = const SystemOrientationService(),
     this.activeSessionStore = const ActiveActivityTimerSessionStore(),
     this.motivationAudioService,
+    this.timerAudioService,
     this.motivationMediaAvailable = AppFeatureFlags.motivationMediaAvailable,
     this.restoredSession,
     this.now,
@@ -178,6 +180,7 @@ class TimerScreen extends StatefulWidget {
   final OrientationService orientationService;
   final ActiveActivityTimerSessionStore activeSessionStore;
   final MotivationAudioService? motivationAudioService;
+  final TimerAudioService? timerAudioService;
   final bool motivationMediaAvailable;
   final ActiveActivityTimerSession? restoredSession;
   final DateTime Function()? now;
@@ -200,6 +203,8 @@ class _TimerStatusCopy {
   final Color iconBackgroundColor;
 }
 
+enum _TimerBgmTarget { stopped, paused, playing }
+
 class _TimerScreenState extends State<TimerScreen>
     with WidgetsBindingObserver, TickerProviderStateMixin {
   late final ActivityTimerController _controller;
@@ -209,6 +214,8 @@ class _TimerScreenState extends State<TimerScreen>
   _PreviewMessageState _previewMessageState = _PreviewMessageState.none;
   late final MotivationAudioService _motivationAudioService;
   late final bool _ownsMotivationAudioService;
+  late final TimerAudioService _timerAudioService;
+  late final bool _ownsTimerAudioService;
   late ActivityTimerConfig _timerConfig;
   final math.Random _motivationRandom = math.Random();
   final Set<int> _shownMotivationMilestones = {};
@@ -234,6 +241,9 @@ class _TimerScreenState extends State<TimerScreen>
   DateTime? _arrivalCompletedAt;
   Duration? _arrivalActualDuration;
   bool _handoffOrientation = false;
+  bool _isAppResumed = true;
+  bool _isDisposing = false;
+  _TimerBgmTarget _lastTimerBgmTarget = _TimerBgmTarget.stopped;
   late final String _activeSessionId;
 
   ActivityDefinition get _activity =>
@@ -255,6 +265,9 @@ class _TimerScreenState extends State<TimerScreen>
             ? AudioplayersMotivationAudioService()
             : const NoopMotivationAudioService());
     _ownsMotivationAudioService = widget.motivationAudioService == null;
+    _timerAudioService =
+        widget.timerAudioService ?? AudioplayersTimerAudioService();
+    _ownsTimerAudioService = widget.timerAudioService == null;
     final restoredSession = widget.restoredSession;
     if (restoredSession == null) {
       _controller = ActivityTimerController(
@@ -288,6 +301,7 @@ class _TimerScreenState extends State<TimerScreen>
     unawaited(_persistActiveSession());
     unawaited(widget.orientationService.allowTimerOrientations());
     _applyScreenAwakeSetting();
+    _syncTimerBgm();
   }
 
   String _createActiveSessionId() {
@@ -341,6 +355,7 @@ class _TimerScreenState extends State<TimerScreen>
         _previewMessageState = _PreviewMessageState.none;
       });
       _controller.start();
+      _syncTimerBgm();
       unawaited(_persistActiveSession());
     } on TickerCanceled {
       return;
@@ -383,6 +398,7 @@ class _TimerScreenState extends State<TimerScreen>
     if (oldWidget.config != widget.config) {
       _timerConfig = widget.config;
       unawaited(_persistActiveSession());
+      _syncTimerBgm();
     }
     if (oldWidget.screenAwakeService != widget.screenAwakeService &&
         _screenAwakeEnabled) {
@@ -394,11 +410,14 @@ class _TimerScreenState extends State<TimerScreen>
 
   @override
   void dispose() {
+    _isDisposing = true;
+    _syncTimerBgm();
     WidgetsBinding.instance.removeObserver(this);
     _cancelPreviewDelay();
     _motivationVoiceTimer?.cancel();
     _arrivalPromptTimer?.cancel();
     unawaited(_disposeMotivationAudioService());
+    unawaited(_disposeTimerAudioService());
     if (!_handoffOrientation) {
       unawaited(widget.orientationService.lockPortrait());
     }
@@ -417,14 +436,18 @@ class _TimerScreenState extends State<TimerScreen>
   void didChangeAppLifecycleState(AppLifecycleState state) {
     switch (state) {
       case AppLifecycleState.resumed:
+        _isAppResumed = true;
         _controller.refreshFromClock();
         unawaited(_persistActiveSession());
+        _syncTimerBgm();
         break;
       case AppLifecycleState.inactive:
       case AppLifecycleState.hidden:
       case AppLifecycleState.paused:
       case AppLifecycleState.detached:
+        _isAppResumed = false;
         unawaited(_persistActiveSession());
+        _syncTimerBgm();
         break;
     }
   }
@@ -434,6 +457,53 @@ class _TimerScreenState extends State<TimerScreen>
     if (_ownsMotivationAudioService) {
       await _motivationAudioService.dispose();
     }
+  }
+
+  Future<void> _disposeTimerAudioService() async {
+    if (_ownsTimerAudioService) {
+      await _timerAudioService.dispose();
+    } else {
+      await _timerAudioService.stopAll();
+    }
+  }
+
+  void _syncTimerBgm() {
+    final target = _timerBgmTarget();
+    if (target == _lastTimerBgmTarget) {
+      return;
+    }
+    _lastTimerBgmTarget = target;
+
+    switch (target) {
+      case _TimerBgmTarget.playing:
+        unawaited(_timerAudioService.startOrResumeBgm());
+        break;
+      case _TimerBgmTarget.paused:
+        unawaited(_timerAudioService.pauseBgm());
+        break;
+      case _TimerBgmTarget.stopped:
+        unawaited(_timerAudioService.stopBgm());
+        break;
+    }
+  }
+
+  _TimerBgmTarget _timerBgmTarget() {
+    if (_isDisposing ||
+        !_timerConfig.soundEnabled ||
+        _isPreviewing ||
+        _isFinishDriving ||
+        _activeSessionFinalized ||
+        _controller.state == ActivityTimerState.arrived ||
+        _controller.state == ActivityTimerState.completed) {
+      return _TimerBgmTarget.stopped;
+    }
+    if (_controller.state == ActivityTimerState.paused || !_isAppResumed) {
+      return _TimerBgmTarget.paused;
+    }
+    if (_controller.state == ActivityTimerState.running) {
+      return _TimerBgmTarget.playing;
+    }
+    return _TimerBgmTarget.stopped;
   }
 
   void _applyScreenAwakeSetting() {
@@ -446,6 +516,7 @@ class _TimerScreenState extends State<TimerScreen>
   }
 
   void _handleTimerChanged() {
+    _syncTimerBgm();
     if (_isFinishDriving) {
       return;
     }
@@ -657,6 +728,7 @@ class _TimerScreenState extends State<TimerScreen>
         _controller.state == ActivityTimerState.arrived;
     if (shouldResumeAfterPrompt) {
       _controller.pause();
+      _syncTimerBgm();
       unawaited(_persistActiveSession());
     }
 
@@ -690,6 +762,8 @@ class _TimerScreenState extends State<TimerScreen>
     _exitPromptShown = false;
     if (shouldExit == true) {
       _allowExit = true;
+      _activeSessionFinalized = true;
+      _syncTimerBgm();
       unawaited(_clearActiveSession());
       final navigator = Navigator.of(context);
       if (route != null && navigator.canPop()) {
@@ -700,6 +774,7 @@ class _TimerScreenState extends State<TimerScreen>
 
     if (shouldResumeAfterPrompt && _controller.isPaused) {
       _controller.resume();
+      _syncTimerBgm();
       unawaited(_persistActiveSession());
     }
   }
@@ -754,6 +829,7 @@ class _TimerScreenState extends State<TimerScreen>
         : ActivityCompletionStatus.completedBeforeEnd;
     _activeSessionFinalized = true;
     final result = _controller.complete(completionStatus: completionStatus);
+    _syncTimerBgm();
     await _clearActiveSession();
     if (result.completedBeforeEnd) {
       _startFinishDrive(result);
@@ -793,6 +869,7 @@ class _TimerScreenState extends State<TimerScreen>
         : ActivityCompletionStatus.needsMoreTime;
     _activeSessionFinalized = true;
     final result = _completeArrival(completionStatus: completionStatus);
+    _syncTimerBgm();
     await _clearActiveSession();
     _openResult(result);
   }
@@ -845,6 +922,7 @@ class _TimerScreenState extends State<TimerScreen>
       _activeMotivationMilestone = null;
       _activeMotivationVideoPath = null;
     });
+    _syncTimerBgm();
     _finishDriveController.forward();
   }
 
