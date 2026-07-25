@@ -672,6 +672,24 @@ class _TimerScreenState extends State<TimerScreen>
     unawaited(_persistActiveSession());
   }
 
+  void _toggleTimerSound() {
+    final nextConfig = _timerConfig.copyWith(
+      soundEnabled: !_timerConfig.soundEnabled,
+    );
+
+    setState(() {
+      _timerConfig = nextConfig;
+    });
+
+    if (!nextConfig.soundEnabled) {
+      _motivationVoiceTimer?.cancel();
+      unawaited(_motivationAudioService.stop());
+    }
+    widget.onConfigChanged(nextConfig);
+    unawaited(_persistActiveSession());
+    _syncTimerBgm();
+  }
+
   Iterable<int> _shownMilestonesForCurrentSchedule(
     motivation_schedule.MotivationVideoSchedule schedule,
   ) {
@@ -1225,6 +1243,7 @@ class _TimerScreenState extends State<TimerScreen>
         final handleMotivationSettings = widget.motivationMediaAvailable
             ? _openMotivationSettings
             : null;
+        final handleTimerSoundToggle = _toggleTimerSound;
 
         final isScreenLandscape =
             MediaQuery.orientationOf(context) == Orientation.landscape;
@@ -1249,6 +1268,16 @@ class _TimerScreenState extends State<TimerScreen>
                     foregroundColor: AppColors.brown900,
                     elevation: 0,
                     actions: [
+                      IconButton(
+                        key: const ValueKey('timerSoundToggleButton'),
+                        tooltip: texts.settings.soundEnabled,
+                        icon: Icon(
+                          _timerConfig.soundEnabled
+                              ? Icons.volume_up_rounded
+                              : Icons.volume_off_rounded,
+                        ),
+                        onPressed: handleTimerSoundToggle,
+                      ),
                       if (handleMotivationSettings != null)
                         IconButton(
                           key: const ValueKey('motivationSettingsButton'),
@@ -1394,6 +1423,8 @@ class _TimerScreenState extends State<TimerScreen>
                       motivationVideoLayer: landscapeMotivationVideoLayer,
                       arrivalPanel: arrivalPanel,
                       onBack: _confirmExit,
+                      isSoundEnabled: _timerConfig.soundEnabled,
+                      onSoundToggle: handleTimerSoundToggle,
                       onMotivationSettings: handleMotivationSettings,
                       controls:
                           arrivalPanel ??
@@ -1406,6 +1437,8 @@ class _TimerScreenState extends State<TimerScreen>
                       compactControls: _CompactLandscapeControls(
                         isPaused: _controller.isPaused,
                         completeLabel: completeLabel,
+                        isSoundEnabled: _timerConfig.soundEnabled,
+                        onSoundToggle: handleTimerSoundToggle,
                         onMotivationSettings: handleMotivationSettings,
                         onPauseResume: handlePauseResumeAction,
                         onComplete: handleComplete,
@@ -1462,6 +1495,8 @@ class _LandscapeTimerLayout extends StatelessWidget {
     required this.motivationVideoLayer,
     required this.arrivalPanel,
     required this.onBack,
+    required this.isSoundEnabled,
+    required this.onSoundToggle,
     required this.onMotivationSettings,
     required this.controls,
     required this.compactControls,
@@ -1474,6 +1509,8 @@ class _LandscapeTimerLayout extends StatelessWidget {
   final Widget? motivationVideoLayer;
   final Widget? arrivalPanel;
   final VoidCallback onBack;
+  final bool isSoundEnabled;
+  final VoidCallback onSoundToggle;
   final VoidCallback? onMotivationSettings;
   final Widget controls;
   final Widget compactControls;
@@ -1501,6 +1538,8 @@ class _LandscapeTimerLayout extends StatelessWidget {
             motivationVideoLayer: motivationVideoLayer,
             arrivalPanel: isCompactLandscape ? arrivalPanel : null,
             onBack: onBack,
+            isSoundEnabled: isSoundEnabled,
+            onSoundToggle: onSoundToggle,
             onMotivationSettings: onMotivationSettings,
             compactControls: isCompactLandscape ? compactControls : null,
           );
@@ -1533,6 +1572,8 @@ class _CompactLandscapeControls extends StatelessWidget {
   const _CompactLandscapeControls({
     required this.isPaused,
     required this.completeLabel,
+    required this.isSoundEnabled,
+    required this.onSoundToggle,
     required this.onMotivationSettings,
     required this.onPauseResume,
     required this.onComplete,
@@ -1540,6 +1581,8 @@ class _CompactLandscapeControls extends StatelessWidget {
 
   final bool isPaused;
   final String completeLabel;
+  final bool isSoundEnabled;
+  final VoidCallback onSoundToggle;
   final VoidCallback? onMotivationSettings;
   final VoidCallback? onPauseResume;
   final VoidCallback? onComplete;
@@ -1552,6 +1595,16 @@ class _CompactLandscapeControls extends StatelessWidget {
       key: const ValueKey('compactLandscapeControls'),
       mainAxisSize: MainAxisSize.min,
       children: [
+        _CompactLandscapeButton(
+          key: const ValueKey('timerSoundToggleButton'),
+          label: texts.settings.soundEnabled,
+          icon: isSoundEnabled
+              ? Icons.volume_up_rounded
+              : Icons.volume_off_rounded,
+          onPressed: onSoundToggle,
+          variant: _CompactLandscapeButtonVariant.outline,
+        ),
+        const SizedBox(height: AppSpacing.sm),
         if (onMotivationSettings != null) ...[
           _CompactLandscapeButton(
             key: const ValueKey('motivationSettingsButton'),
@@ -1754,6 +1807,8 @@ class _LandscapeCourseCanvas extends StatelessWidget {
     required this.motivationVideoLayer,
     required this.arrivalPanel,
     required this.onBack,
+    required this.isSoundEnabled,
+    required this.onSoundToggle,
     required this.onMotivationSettings,
     this.compactControls,
   });
@@ -1765,6 +1820,8 @@ class _LandscapeCourseCanvas extends StatelessWidget {
   final Widget? motivationVideoLayer;
   final Widget? arrivalPanel;
   final VoidCallback onBack;
+  final bool isSoundEnabled;
+  final VoidCallback onSoundToggle;
   final VoidCallback? onMotivationSettings;
   final Widget? compactControls;
 
@@ -1819,17 +1876,27 @@ class _LandscapeCourseCanvas extends StatelessWidget {
                     icon: Icons.arrow_back_rounded,
                     onPressed: onBack,
                   ),
-                  if (compactControls == null &&
-                      onMotivationSettings != null) ...[
+                  if (compactControls == null) ...[
                     const SizedBox(width: AppSpacing.sm),
                     _LandscapeIconButton(
-                      key: const ValueKey('motivationSettingsButton'),
-                      label: AppTexts.of(
-                        context,
-                      ).settings.motivationVideoEnabled,
-                      icon: Icons.video_settings_rounded,
-                      onPressed: onMotivationSettings!,
+                      key: const ValueKey('timerSoundToggleButton'),
+                      label: AppTexts.of(context).settings.soundEnabled,
+                      icon: isSoundEnabled
+                          ? Icons.volume_up_rounded
+                          : Icons.volume_off_rounded,
+                      onPressed: onSoundToggle,
                     ),
+                    if (onMotivationSettings != null) ...[
+                      const SizedBox(width: AppSpacing.sm),
+                      _LandscapeIconButton(
+                        key: const ValueKey('motivationSettingsButton'),
+                        label: AppTexts.of(
+                          context,
+                        ).settings.motivationVideoEnabled,
+                        icon: Icons.video_settings_rounded,
+                        onPressed: onMotivationSettings!,
+                      ),
+                    ],
                   ],
                 ],
               ),

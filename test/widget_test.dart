@@ -8390,6 +8390,67 @@ void main() {
     await tester.pump();
   });
 
+  testWidgets('TimerScreen toggles sound and syncs timer BGM', (tester) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    SharedPreferences.setMockInitialValues({
+      'savedActivityTimerPresetsInitialized': true,
+    });
+    addTearDown(() async {
+      await const ActiveActivityTimerSessionStore().clear();
+    });
+    final timerAudioService = _FakeTimerAudioService();
+    final changedConfigs = <ActivityTimerConfig>[];
+    final store = ActiveActivityTimerSessionStore();
+
+    await tester.pumpWidget(
+      MaterialApp(
+        locale: const Locale('ko'),
+        home: TimerScreen(
+          config: ActivityTimerConfig.defaults().copyWith(
+            duration: const Duration(minutes: 10),
+          ),
+          activityProgressService: LocalActivityProgressService(),
+          timerAudioService: timerAudioService,
+          onConfigChanged: changedConfigs.add,
+        ),
+      ),
+    );
+    for (int i = 0; i < 40; i++) {
+      await tester.pump(const Duration(milliseconds: 250));
+    }
+    expect(timerAudioService.calls, ['startOrResumeBgm']);
+
+    await tester.tap(find.byKey(const ValueKey('timerSoundToggleButton')));
+    await tester.pump();
+
+    expect(changedConfigs.last.soundEnabled, isFalse);
+    expect(timerAudioService.calls, ['startOrResumeBgm', 'stopBgm']);
+    var session = await store.load();
+    expect(session, isNotNull);
+    expect(session!.config.soundEnabled, isFalse);
+    expect(find.byIcon(Icons.volume_off_rounded), findsOneWidget);
+
+    await tester.tap(find.byKey(const ValueKey('timerSoundToggleButton')));
+    await tester.pump();
+
+    expect(changedConfigs.last.soundEnabled, isTrue);
+    expect(timerAudioService.calls, [
+      'startOrResumeBgm',
+      'stopBgm',
+      'startOrResumeBgm',
+    ]);
+    session = await store.load();
+    expect(session, isNotNull);
+    expect(session!.config.soundEnabled, isTrue);
+    expect(find.byIcon(Icons.volume_up_rounded), findsOneWidget);
+
+    await tester.pumpWidget(const SizedBox.shrink());
+    await tester.pump();
+  });
+
   testWidgets('TimerScreen stops timer BGM when timer arrives', (tester) async {
     tester.view.physicalSize = const Size(390, 844);
     tester.view.devicePixelRatio = 1.0;
@@ -9902,6 +9963,8 @@ void main() {
     }
 
     expect(find.byIcon(Icons.arrow_back_rounded), findsOneWidget);
+    expect(find.byKey(const ValueKey('timerSoundToggleButton')), findsOneWidget);
+    expect(find.byIcon(Icons.volume_up_rounded), findsOneWidget);
     expect(find.byKey(const ValueKey('motivationSettingsButton')), findsNothing);
     expect(find.byIcon(Icons.video_settings_rounded), findsNothing);
 
@@ -9940,6 +10003,8 @@ void main() {
       }
 
       expect(find.byKey(const ValueKey('compactLandscapeControls')), findsOneWidget);
+      expect(find.byKey(const ValueKey('timerSoundToggleButton')), findsOneWidget);
+      expect(find.byIcon(Icons.volume_up_rounded), findsOneWidget);
       expect(find.byKey(const ValueKey('motivationSettingsButton')), findsNothing);
       expect(find.byIcon(Icons.video_settings_rounded), findsNothing);
       expect(find.byIcon(Icons.pause_rounded), findsOneWidget);
@@ -10237,6 +10302,8 @@ void main() {
     );
     expect(find.byType(SingleChildScrollView), findsOneWidget);
     expect(find.byIcon(Icons.arrow_back_rounded), findsOneWidget);
+    expect(find.byKey(const ValueKey('timerSoundToggleButton')), findsOneWidget);
+    expect(find.byIcon(Icons.volume_up_rounded), findsOneWidget);
     expect(
       tester.widget<TimerControlBar>(find.byType(TimerControlBar)).isVertical,
       isFalse,
@@ -10332,6 +10399,9 @@ void main() {
       final controlsRect = tester.getRect(
         find.byKey(const ValueKey('compactLandscapeControls')),
       );
+      final soundRect = tester.getRect(
+        find.byKey(const ValueKey('timerSoundToggleButton')),
+      );
       final settingsRect = tester.getRect(
         find.byKey(const ValueKey('motivationSettingsButton')),
       );
@@ -10342,15 +10412,18 @@ void main() {
 
       expect(find.byType(SingleChildScrollView), findsNothing);
       expect(find.byType(TimerControlBar), findsNothing);
+      expect(find.byIcon(Icons.volume_up_rounded), findsOneWidget);
       expect(find.byIcon(Icons.video_settings_rounded), findsOneWidget);
       expect(roadRect.width, greaterThan(760));
       expect(roadRect.height, greaterThan(320));
       expect(controlsRect.left, greaterThanOrEqualTo(expectedRoadRight));
       expect(controlsRect.right, lessThanOrEqualTo(roadRect.right));
       expect(controlsRect.width, lessThanOrEqualTo(72));
-      expect(controlsRect.height, lessThanOrEqualTo(210));
+      expect(controlsRect.height, lessThanOrEqualTo(280));
+      expect(controlsRect.contains(soundRect.center), isTrue);
       expect(controlsRect.contains(settingsRect.center), isTrue);
       expect(controlsRect.contains(pauseRect.center), isTrue);
+      expect(soundRect.bottom, lessThanOrEqualTo(settingsRect.top));
       expect(settingsRect.bottom, lessThanOrEqualTo(pauseRect.top));
       expect(
         controlsRect.right,
