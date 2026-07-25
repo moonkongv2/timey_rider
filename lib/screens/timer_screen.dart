@@ -1107,7 +1107,7 @@ class _TimerScreenState extends State<TimerScreen>
             : null;
         final completeLabel = isAwaitingArrivalAcknowledgement
             ? texts.timer.arrivalConfirmButton
-            : texts.timer.completeActivityButton(activity.id);
+            : texts.common.complete;
         final handleComplete = !canUseTimerControls
             ? null
             : isAwaitingArrivalAcknowledgement
