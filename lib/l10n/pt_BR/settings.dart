@@ -7,7 +7,7 @@ class PtBrSettingsTexts implements SettingsTextSet {
 
   String get title => 'Configurações';
   String get showRemainingTime => 'Mostrar tempo restante';
-  String get soundEnabled => 'Efeitos sonoros';
+  String get soundEnabled => 'Sons do timer';
   String get motivationVideoEnabled => 'Vídeos de incentivo';
   String get motivationVideoCustomInterval =>
       'Intervalo de vídeo personalizado';
@@ -23,11 +23,12 @@ class PtBrSettingsTexts implements SettingsTextSet {
     'Timers curtos podem pular alguns marcos para que os clipes não se sobreponham.',
     'Timers mais longos ou o modo de intervalo personalizado podem usar uma programação por tempo.',
     'Os intervalos personalizados podem ser de 3, 5 ou 10 minutos.',
-    'Os efeitos sonoros e a exibição de vídeos podem ser configurados separadamente.',
+    'Os sons do timer e a exibição de vídeos podem ser configurados separadamente.',
     'O app espaça os vídeos para que eles não apareçam com frequência demais.',
   ];
   String get keepScreenAwake => 'Manter tela ligada';
-  String get savedOnlySubtitle => 'Ativa ou desativa os sons durante o timer.';
+  String get savedOnlySubtitle =>
+      'Ativa ou desativa a música, os sons dos marcadores e as vozes de incentivo do timer.';
   String get keepScreenAwakeSubtitle =>
       'Aplica-se enquanto o timer está em andamento.';
   String get markerModeTitle => 'Marcadores da rota';

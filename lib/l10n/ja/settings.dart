@@ -7,7 +7,7 @@ class JaSettingsTexts implements SettingsTextSet {
 
   String get title => '設定';
   String get showRemainingTime => '残り時間を表示';
-  String get soundEnabled => '効果音';
+  String get soundEnabled => 'タイマーの音';
   String get motivationVideoEnabled => '応援動画';
   String get motivationVideoCustomInterval => '動画間隔を自分で設定';
   String get motivationVideoInterval => '応援動画の間隔';
@@ -21,11 +21,11 @@ class JaSettingsTexts implements SettingsTextSet {
     '短いタイマーでは、動画が重ならないように一部の区切りをスキップすることがあります。',
     '長いタイマーや間隔を指定するモードでは、時間に合わせて表示されることがあります。',
     'カスタム間隔は3分、5分、10分から選べます。',
-    '効果音と動画表示の設定は別々に動作します。',
+    'タイマーの音と動画表示の設定は別々に動作します。',
     '動画が頻繁に重なって出ないよう、アプリが間隔を空けます。',
   ];
   String get keepScreenAwake => '画面をオンのままにする';
-  String get savedOnlySubtitle => 'タイマー中の音をオン/オフします。';
+  String get savedOnlySubtitle => 'タイマー中の音楽、マーカー音、応援の声をオン/オフします。';
   String get keepScreenAwakeSubtitle => 'タイマー実行中に適用されます。';
   String get markerModeTitle => 'コースマーカー';
   String get markerModeOff => 'オフ';

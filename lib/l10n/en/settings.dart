@@ -7,7 +7,7 @@ class EnSettingsTexts implements SettingsTextSet {
 
   String get title => 'Settings';
   String get showRemainingTime => 'Show remaining time';
-  String get soundEnabled => 'Sound effects';
+  String get soundEnabled => 'Timer sounds';
   String get motivationVideoEnabled => 'Motivation videos';
   String get motivationVideoCustomInterval => 'Use custom video interval';
   String get motivationVideoInterval => 'Motivation video interval';
@@ -22,11 +22,12 @@ class EnSettingsTexts implements SettingsTextSet {
     'Short timers may skip some milestones so clips do not overlap.',
     'Longer timers or custom interval mode may use time-based scheduling.',
     'Custom intervals can be set to 3, 5, or 10 minutes.',
-    'Sound effects and video display settings can behave separately.',
+    'Timer sound and video display settings can behave separately.',
     'The app spaces videos out so they do not overlap too frequently.',
   ];
   String get keepScreenAwake => 'Keep screen awake';
-  String get savedOnlySubtitle => 'Turns sounds during the timer on or off.';
+  String get savedOnlySubtitle =>
+      'Turns timer music, marker sounds, and encouragement voices on or off.';
   String get keepScreenAwakeSubtitle => 'Applies while the timer is running.';
   String get markerModeTitle => 'Course markers';
   String get markerModeOff => 'Off';

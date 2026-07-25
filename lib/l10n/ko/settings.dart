@@ -7,7 +7,7 @@ class SettingsTexts implements SettingsTextSet {
 
   String get title => '설정';
   String get showRemainingTime => '남은 시간 보여주기';
-  String get soundEnabled => '효과음 사용';
+  String get soundEnabled => '타이머 소리';
   String get motivationVideoEnabled => '동기부여 영상 사용';
   String get motivationVideoCustomInterval => '영상 간격 직접 설정';
   String get motivationVideoInterval => '동기부여 영상 간격';
@@ -21,11 +21,11 @@ class SettingsTexts implements SettingsTextSet {
     '짧은 타이머에서는 영상이 겹치지 않도록 일부 구간을 건너뛸 수 있어요.',
     '긴 타이머나 영상 간격 직접 설정을 쓰면 시간 간격 기준으로 나올 수 있어요.',
     '직접 설정 간격은 3분, 5분, 10분 중에서 고를 수 있어요.',
-    '효과음 설정과 영상 사용 설정은 따로 동작할 수 있어요.',
+    '타이머 소리 설정과 영상 사용 설정은 따로 동작할 수 있어요.',
     '영상이 너무 자주 겹치지 않도록 앱이 표시 간격을 조절해요.',
   ];
   String get keepScreenAwake => '화면 계속 켜두기';
-  String get savedOnlySubtitle => '타이머 진행 중 나오는 소리를 켜고 꺼요';
+  String get savedOnlySubtitle => '타이머 중 배경음악, 마커음, 응원 목소리를 켜고 꺼요.';
   String get keepScreenAwakeSubtitle => '타이머가 실행 중일 때 적용돼요';
   String get markerModeTitle => '코스 마커';
   String get markerModeOff => '사용 안 함';

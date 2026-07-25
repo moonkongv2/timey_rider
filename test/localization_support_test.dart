@@ -73,12 +73,13 @@ void main() {
   test('Settings copy is localized for Korean Spanish Portuguese and Japanese', () {
     const englishCopy = [
       'Show remaining time',
+      'Timer sounds',
       'Use custom video interval',
       'Motivation video interval',
       'Motivation video guide',
       'They do not decide stickers or results.',
       'Short timers may skip some milestones so clips do not overlap.',
-      'Turns sounds during the timer on or off.',
+      'Turns timer music, marker sounds, and encouragement voices on or off.',
       'Applies while the timer is running.',
       'Auto previews and uses picture markers that fit the activity. Only manually chosen picture markers are saved to activity records.',
       'Rider image settings',
@@ -105,6 +106,7 @@ void main() {
         Locale('ja'),
       ]) ...[
         AppTexts.forLocale(locale).settings.showRemainingTime,
+        AppTexts.forLocale(locale).settings.soundEnabled,
         AppTexts.forLocale(locale).settings.motivationVideoCustomInterval,
         AppTexts.forLocale(locale).settings.motivationVideoInterval,
         AppTexts.forLocale(locale).settings.motivationVideoHelpTitle,

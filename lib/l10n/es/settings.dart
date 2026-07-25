@@ -7,7 +7,7 @@ class EsSettingsTexts implements SettingsTextSet {
 
   String get title => 'Ajustes';
   String get showRemainingTime => 'Mostrar tiempo restante';
-  String get soundEnabled => 'Efectos de sonido';
+  String get soundEnabled => 'Sonidos del temporizador';
   String get motivationVideoEnabled => 'Videos de ánimo';
   String get motivationVideoCustomInterval =>
       'Intervalo de video personalizado';
@@ -23,12 +23,12 @@ class EsSettingsTexts implements SettingsTextSet {
     'En temporizadores cortos, algunos hitos pueden omitirse para que los clips no se superpongan.',
     'Los temporizadores más largos o el modo de intervalo personalizado pueden usar una programación por tiempo.',
     'Los intervalos personalizados pueden ser de 3, 5 o 10 minutos.',
-    'Los efectos de sonido y la visualización de videos se pueden configurar por separado.',
+    'Los sonidos del temporizador y la visualización de videos se pueden configurar por separado.',
     'La app separa los videos para que no aparezcan demasiado seguido.',
   ];
   String get keepScreenAwake => 'Mantener pantalla encendida';
   String get savedOnlySubtitle =>
-      'Activa o desactiva los sonidos durante el temporizador.';
+      'Activa o desactiva la música, los sonidos de marcadores y las voces de ánimo del temporizador.';
   String get keepScreenAwakeSubtitle =>
       'Se aplica mientras el temporizador está en marcha.';
   String get markerModeTitle => 'Marcadores de ruta';
