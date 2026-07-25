@@ -1204,7 +1204,7 @@ class _ActiveTimerResumeCard extends StatelessWidget {
                       minimumSize: const Size.fromHeight(44),
                     ),
                     child: Text(
-                      texts.home.activeTimerCancelButton,
+                      texts.common.cancel,
                       overflow: TextOverflow.ellipsis,
                     ),
                   ),
