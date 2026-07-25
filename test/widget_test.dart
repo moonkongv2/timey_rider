@@ -9443,6 +9443,267 @@ void main() {
     await tester.pump();
   });
 
+  testWidgets('TimerScreen course overview can run again after finishing', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(600, 900);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    SharedPreferences.setMockInitialValues({'savedActivityTimerPresetsInitialized': true});
+    final startedAt = DateTime(2026, 6, 10, 8);
+    final now = startedAt.add(const Duration(minutes: 10));
+    final config = ActivityTimerConfig.defaults().copyWith(
+      duration: const Duration(minutes: 30),
+    );
+
+    await tester.pumpWidget(
+      MaterialApp(
+        locale: const Locale('ko'),
+        home: TimerScreen(
+          config: ActivityTimerConfig.defaults(),
+          restoredSession: ActiveActivityTimerSession(
+            sessionId: 'course-overview-repeat-session',
+            startedAt: startedAt,
+            config: config,
+            state: ActiveActivityTimerSessionState.running,
+          ),
+          activityProgressService: LocalActivityProgressService(),
+          now: () => now,
+          onConfigChanged: (_) {},
+        ),
+      ),
+    );
+    await tester.pump();
+
+    tester
+        .widget<IconButton>(find.byKey(const ValueKey('courseOverviewButton')))
+        .onPressed!();
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 1600));
+    await tester.pump(const Duration(milliseconds: 450));
+    await tester.pump(const Duration(milliseconds: 801));
+
+    var roadView = tester.widget<RoadView>(find.byType(RoadView));
+    expect(roadView.cameraProgress, closeTo(roadView.vehicleProgress, 0.01));
+    expect(
+      tester
+          .widget<IconButton>(find.byKey(const ValueKey('courseOverviewButton')))
+          .onPressed,
+      isNotNull,
+    );
+
+    tester
+        .widget<IconButton>(find.byKey(const ValueKey('courseOverviewButton')))
+        .onPressed!();
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 800));
+
+    roadView = tester.widget<RoadView>(find.byType(RoadView));
+    expect(roadView.cameraProgress, greaterThan(roadView.vehicleProgress));
+
+    await tester.pumpWidget(const SizedBox.shrink());
+    await tester.pump();
+  });
+
+  testWidgets('TimerScreen course overview cancels when exit is canceled', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(600, 900);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    SharedPreferences.setMockInitialValues({'savedActivityTimerPresetsInitialized': true});
+    final startedAt = DateTime(2026, 6, 10, 8);
+    final now = startedAt.add(const Duration(minutes: 10));
+    final config = ActivityTimerConfig.defaults().copyWith(
+      duration: const Duration(minutes: 30),
+    );
+    final navigatorKey = GlobalKey<NavigatorState>();
+
+    await tester.pumpWidget(
+      MaterialApp(
+        navigatorKey: navigatorKey,
+        locale: const Locale('ko'),
+        home: const Scaffold(body: Center(child: Text('타이머 열기'))),
+      ),
+    );
+    navigatorKey.currentState!.push(
+      MaterialPageRoute(
+        builder: (_) => TimerScreen(
+          config: ActivityTimerConfig.defaults(),
+          restoredSession: ActiveActivityTimerSession(
+            sessionId: 'course-overview-exit-cancel-session',
+            startedAt: startedAt,
+            config: config,
+            state: ActiveActivityTimerSessionState.running,
+          ),
+          activityProgressService: LocalActivityProgressService(),
+          now: () => now,
+          onConfigChanged: (_) {},
+        ),
+      ),
+    );
+    await tester.pump();
+    await tester.pump();
+
+    tester
+        .widget<IconButton>(find.byKey(const ValueKey('courseOverviewButton')))
+        .onPressed!();
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 800));
+    await tester.binding.handlePopRoute();
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 320));
+
+    var roadView = tester.widget<RoadView>(find.byType(RoadView));
+    expect(roadView.cameraProgress, closeTo(roadView.vehicleProgress, 0.01));
+    expect(find.byType(AlertDialog), findsOneWidget);
+
+    await tester.tap(find.byType(TextButton).last);
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 320));
+
+    expect(find.byType(AlertDialog), findsNothing);
+    expect(find.byType(TimerScreen), findsOneWidget);
+    expect(find.byIcon(Icons.pause_rounded), findsOneWidget);
+
+    await tester.pumpWidget(const SizedBox.shrink());
+    await tester.pump();
+  });
+
+  testWidgets('TimerScreen course overview exit waits for session clear', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(600, 900);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    SharedPreferences.setMockInitialValues({'savedActivityTimerPresetsInitialized': true});
+    final startedAt = DateTime(2026, 6, 10, 8);
+    final store = _DelayedClearActiveSessionStore(
+      ActiveActivityTimerSession(
+        sessionId: 'course-overview-exit-confirm-session',
+        startedAt: startedAt,
+        config: ActivityTimerConfig.defaults().copyWith(
+          duration: const Duration(minutes: 30),
+          soundEnabled: false,
+        ),
+        state: ActiveActivityTimerSessionState.running,
+      ),
+    );
+    final navigatorKey = GlobalKey<NavigatorState>();
+
+    await tester.pumpWidget(
+      MaterialApp(
+        navigatorKey: navigatorKey,
+        locale: const Locale('ko'),
+        home: const Scaffold(body: Center(child: Text('타이머 열기'))),
+      ),
+    );
+    navigatorKey.currentState!.push(
+      MaterialPageRoute(
+        builder: (_) => TimerScreen(
+          config: ActivityTimerConfig.defaults(),
+          restoredSession: store.currentSession,
+          activityProgressService: LocalActivityProgressService(),
+          activeSessionStore: store,
+          now: () => startedAt.add(const Duration(minutes: 10)),
+          onConfigChanged: (_) {},
+        ),
+      ),
+    );
+    await tester.pump();
+    await tester.pump();
+
+    tester
+        .widget<IconButton>(find.byKey(const ValueKey('courseOverviewButton')))
+        .onPressed!();
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 800));
+
+    await tester.binding.handlePopRoute();
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 320));
+    expect(find.byType(AlertDialog), findsOneWidget);
+    await tester.tap(find.byType(FilledButton).last);
+    await tester.pump();
+
+    expect(store.clearStarted, isTrue);
+    expect(find.byType(TimerScreen), findsOneWidget);
+    expect(store.currentSession, isNotNull);
+
+    store.completeClear();
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 400));
+
+    expect(find.byType(TimerScreen), findsNothing);
+    expect(find.text('타이머 열기'), findsOneWidget);
+    expect(store.currentSession, isNull);
+  });
+
+  testWidgets('TimerScreen course overview complete reaches result screen', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(600, 900);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    SharedPreferences.setMockInitialValues({'savedActivityTimerPresetsInitialized': true});
+    final startedAt = DateTime(2026, 6, 10, 8);
+    final now = startedAt.add(const Duration(minutes: 10));
+    final config = ActivityTimerConfig.defaults().copyWith(
+      duration: const Duration(minutes: 30),
+    );
+
+    await tester.pumpWidget(
+      MaterialApp(
+        locale: const Locale('ko'),
+        home: TimerScreen(
+          config: ActivityTimerConfig.defaults(),
+          restoredSession: ActiveActivityTimerSession(
+            sessionId: 'course-overview-complete-result-session',
+            startedAt: startedAt,
+            config: config,
+            state: ActiveActivityTimerSessionState.running,
+          ),
+          activityProgressService: LocalActivityProgressService(),
+          now: () => now,
+          onConfigChanged: (_) {},
+        ),
+      ),
+    );
+    await tester.pump();
+
+    tester
+        .widget<IconButton>(find.byKey(const ValueKey('courseOverviewButton')))
+        .onPressed!();
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 800));
+    tester.widget<TimerControlBar>(find.byType(TimerControlBar)).onComplete!();
+    await tester.pump();
+
+    var roadView = tester.widget<RoadView>(find.byType(RoadView));
+    expect(roadView.cameraProgress, closeTo(roadView.vehicleProgress, 0.01));
+
+    await tester.tap(find.byType(FilledButton).last);
+    await tester.pump();
+    await tester.pump(const Duration(seconds: 4));
+    await tester.pump();
+
+    expect(find.byType(ResultScreen), findsOneWidget);
+    expect(
+      tester
+          .widget<ResultScreen>(find.byType(ResultScreen))
+          .result
+          .completionStatus,
+      ActivityCompletionStatus.completedBeforeEnd,
+    );
+
+    await tester.pumpWidget(const SizedBox.shrink());
+    await tester.pump();
+  });
+
   testWidgets(
     'TimerScreen restores arrived sessions at the finish until acknowledged',
     (tester) async {
