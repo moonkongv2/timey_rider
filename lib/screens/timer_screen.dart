@@ -354,7 +354,7 @@ class _TimerScreenState extends State<TimerScreen>
         previewController.duration = const Duration(milliseconds: 1000);
         await previewController.reverse().orCancel;
         _setCourseLoadingPreviewActive(false);
-        await _stopCourseLoadingAudio();
+        unawaited(_stopCourseLoadingAudio());
       }
 
       if (!mounted || !_isStartupPreviewing) return;
@@ -371,7 +371,7 @@ class _TimerScreenState extends State<TimerScreen>
       await _safeDelay(_startupPreviewMessageDelay);
 
       if (!mounted || !_isStartupPreviewing) return;
-      await _stopStartupPreviewAudio();
+      unawaited(_stopStartupPreviewAudio());
       setState(() {
         _coursePreviewMode = _CoursePreviewMode.none;
         _previewMessageState = _PreviewMessageState.none;

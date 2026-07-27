@@ -8481,7 +8481,167 @@ void main() {
       await tester.pump(const Duration(milliseconds: 250));
     }
 
-    expect(timerAudioService.calls, ['startOrResumeBgm']);
+    expect(
+      timerAudioService.calls.where((call) => call == 'startOrResumeBgm'),
+      ['startOrResumeBgm'],
+    );
+
+    await tester.pumpWidget(const SizedBox.shrink());
+    await tester.pump();
+  });
+
+  testWidgets(
+    'TimerScreen short startup skips course loading but plays ready beep',
+    (tester) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    final timerAudioService = _FakeTimerAudioService();
+
+    await tester.pumpWidget(
+      MaterialApp(
+        locale: const Locale('ko'),
+        home: TimerScreen(
+          config: ActivityTimerConfig.defaults().copyWith(
+            duration: const Duration(minutes: 5),
+          ),
+          activityProgressService: LocalActivityProgressService(),
+          timerAudioService: timerAudioService,
+          onConfigChanged: (_) {},
+        ),
+      ),
+    );
+    for (int i = 0; i < 10; i++) {
+      await tester.pump(const Duration(milliseconds: 250));
+    }
+
+    expect(timerAudioService.calls, [
+      'playReadyStartBeep',
+      'stopReadyStartBeep',
+      'startOrResumeBgm',
+    ]);
+
+    await tester.pumpWidget(const SizedBox.shrink());
+    await tester.pump();
+  });
+
+  testWidgets('TimerScreen sound toggle stops course loading during startup', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    final timerAudioService = _FakeTimerAudioService();
+
+    await tester.pumpWidget(
+      MaterialApp(
+        locale: const Locale('ko'),
+        home: TimerScreen(
+          config: ActivityTimerConfig.defaults().copyWith(
+            duration: const Duration(minutes: 10),
+          ),
+          activityProgressService: LocalActivityProgressService(),
+          timerAudioService: timerAudioService,
+          onConfigChanged: (_) {},
+        ),
+      ),
+    );
+    await tester.pump(const Duration(milliseconds: 600));
+    expect(timerAudioService.calls, ['playCourseLoading']);
+
+    await tester.tap(find.byKey(const ValueKey('timerSoundToggleButton')));
+    await tester.pump();
+
+    expect(timerAudioService.calls, [
+      'playCourseLoading',
+      'stopCourseLoading',
+    ]);
+
+    await tester.pumpWidget(const SizedBox.shrink());
+    await tester.pump();
+  });
+
+  testWidgets(
+    'TimerScreen lifecycle pauses and resumes course loading preview',
+    (tester) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    final timerAudioService = _FakeTimerAudioService();
+
+    await tester.pumpWidget(
+      MaterialApp(
+        locale: const Locale('ko'),
+        home: TimerScreen(
+          config: ActivityTimerConfig.defaults().copyWith(
+            duration: const Duration(minutes: 10),
+          ),
+          activityProgressService: LocalActivityProgressService(),
+          timerAudioService: timerAudioService,
+          onConfigChanged: (_) {},
+        ),
+      ),
+    );
+    await tester.pump(const Duration(milliseconds: 600));
+    expect(timerAudioService.calls, ['playCourseLoading']);
+
+    tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.paused);
+    await tester.pump();
+    tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.resumed);
+    await tester.pump();
+
+    expect(timerAudioService.calls, [
+      'playCourseLoading',
+      'stopCourseLoading',
+      'playCourseLoading',
+    ]);
+
+    await tester.pumpWidget(const SizedBox.shrink());
+    await tester.pump();
+  });
+
+  testWidgets('TimerScreen lifecycle does not replay ready beep', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    final timerAudioService = _FakeTimerAudioService();
+
+    await tester.pumpWidget(
+      MaterialApp(
+        locale: const Locale('ko'),
+        home: TimerScreen(
+          config: ActivityTimerConfig.defaults().copyWith(
+            duration: const Duration(minutes: 10),
+          ),
+          activityProgressService: LocalActivityProgressService(),
+          timerAudioService: timerAudioService,
+          onConfigChanged: (_) {},
+        ),
+      ),
+    );
+    for (int i = 0; i < 23; i++) {
+      await tester.pump(const Duration(milliseconds: 250));
+    }
+    expect(
+      timerAudioService.calls.where((call) => call == 'playReadyStartBeep'),
+      ['playReadyStartBeep'],
+    );
+
+    tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.paused);
+    await tester.pump();
+    tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.resumed);
+    await tester.pump();
+
+    expect(
+      timerAudioService.calls.where((call) => call == 'playReadyStartBeep'),
+      ['playReadyStartBeep'],
+    );
 
     await tester.pumpWidget(const SizedBox.shrink());
     await tester.pump();
@@ -8765,12 +8925,13 @@ void main() {
     for (int i = 0; i < 8; i++) {
       await tester.pump(const Duration(milliseconds: 250));
     }
-    expect(timerAudioService.calls, ['startOrResumeBgm']);
+    expect(timerAudioService.calls.last, 'startOrResumeBgm');
+    timerAudioService.calls.clear();
 
     now = now.add(const Duration(seconds: 2));
     await tester.pump(const Duration(milliseconds: 250));
 
-    expect(timerAudioService.calls, ['startOrResumeBgm', 'stopBgm']);
+    expect(timerAudioService.calls, ['stopBgm']);
 
     await tester.pumpWidget(const SizedBox.shrink());
     await tester.pump();
@@ -8801,13 +8962,15 @@ void main() {
     for (int i = 0; i < 40; i++) {
       await tester.pump(const Duration(milliseconds: 250));
     }
+    expect(timerAudioService.calls.last, 'startOrResumeBgm');
+    timerAudioService.calls.clear();
 
     tester.widget<TimerControlBar>(find.byType(TimerControlBar)).onComplete!();
     await tester.pump();
     await tester.tap(find.byType(FilledButton).last);
     await tester.pump();
 
-    expect(timerAudioService.calls, ['startOrResumeBgm', 'stopBgm']);
+    expect(timerAudioService.calls, ['stopBgm']);
 
     await tester.pumpWidget(const SizedBox.shrink());
     await tester.pump();
