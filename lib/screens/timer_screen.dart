@@ -42,6 +42,9 @@ const _compactLandscapeControlsRightInset =
     _compactLandscapeControlsWidth + AppSpacing.xl;
 const _longCoursePreviewThreshold = Duration(minutes: 5);
 const _startupPreviewMessageDelay = Duration(milliseconds: 770);
+const _finishDriveShortSfxThreshold = Duration(milliseconds: 1500);
+const _finishDriveLongSfxThreshold = Duration(milliseconds: 2500);
+const _finishArrivalHoldDuration = Duration(seconds: 1);
 const motivationMinimumVideoInterval = Duration(seconds: 10);
 const motivationVoiceStartDelay = Duration(milliseconds: 350);
 const _motivationVideoIntervalOptions = [
@@ -238,6 +241,7 @@ class _TimerScreenState extends State<TimerScreen>
   Timer? _previewTimer;
   Completer<void>? _previewDelayCompleter;
   bool _isFinishDriving = false;
+  bool _finishDriveArrivedHolding = false;
   bool _activeSessionFinalized = false;
   Animation<double>? _finishDriveAnimation;
   ActivitySessionResult? _pendingFinishDriveResult;
@@ -661,6 +665,9 @@ class _TimerScreenState extends State<TimerScreen>
         _syncTimerBgm();
         _syncCourseLoadingAudio();
         unawaited(_stopReadyStartBeepAudio());
+        if (_isFinishDriving) {
+          unawaited(_timerAudioService.stopFinishDriveSfx());
+        }
         break;
     }
   }
@@ -898,6 +905,9 @@ class _TimerScreenState extends State<TimerScreen>
       _motivationVoiceTimer?.cancel();
       unawaited(_motivationAudioService.stop());
       unawaited(_stopReadyStartBeepAudio());
+      if (_isFinishDriving) {
+        unawaited(_timerAudioService.stopFinishDriveSfx());
+      }
     }
     widget.onConfigChanged(nextConfig);
     unawaited(_persistActiveSession());
@@ -1165,10 +1175,13 @@ class _TimerScreenState extends State<TimerScreen>
     unawaited(_motivationAudioService.stop());
 
     _finishDriveStartProgress = _controller.progress.clamp(0.0, 1.0).toDouble();
+    final finishDriveDuration = finishDriveDurationForProgress(
+      _finishDriveStartProgress,
+    );
     _pendingFinishDriveResult = result;
     _finishDriveController
       ..stop()
-      ..duration = finishDriveDurationForProgress(_finishDriveStartProgress)
+      ..duration = finishDriveDuration
       ..reset();
     _finishDriveAnimation =
         Tween<double>(begin: _finishDriveStartProgress, end: 1).animate(
@@ -1180,10 +1193,12 @@ class _TimerScreenState extends State<TimerScreen>
 
     setState(() {
       _isFinishDriving = true;
+      _finishDriveArrivedHolding = false;
       _activeMotivationMilestone = null;
       _activeMotivationVideoPath = null;
     });
     _syncTimerBgm();
+    _playFinishDriveSfx(finishDriveDuration);
     _finishDriveController.forward();
   }
 
@@ -1192,11 +1207,44 @@ class _TimerScreenState extends State<TimerScreen>
       return;
     }
 
-    final result = _pendingFinishDriveResult;
-    _pendingFinishDriveResult = null;
-    if (result != null && mounted) {
-      _openResult(result);
+    unawaited(_completeFinishDrive());
+  }
+
+  void _playFinishDriveSfx(Duration finishDriveDuration) {
+    if (!_timerConfig.soundEnabled || !_isAppResumed) {
+      return;
     }
+    if (finishDriveDuration < _finishDriveShortSfxThreshold) {
+      return;
+    }
+    if (finishDriveDuration < _finishDriveLongSfxThreshold) {
+      unawaited(_timerAudioService.playFinishDriveShortSfx());
+      return;
+    }
+    unawaited(_timerAudioService.playFinishDriveLongSfx());
+  }
+
+  Future<void> _completeFinishDrive() async {
+    final result = _pendingFinishDriveResult;
+    if (result == null || !mounted || !_isFinishDriving) {
+      return;
+    }
+
+    unawaited(_timerAudioService.stopFinishDriveSfx());
+    if (_timerConfig.soundEnabled && _isAppResumed) {
+      unawaited(_timerAudioService.playFinishArrivalSfx());
+    }
+    setState(() {
+      _finishDriveArrivedHolding = true;
+    });
+
+    await _safeDelay(_finishArrivalHoldDuration);
+    if (!mounted || !_isFinishDriving || _pendingFinishDriveResult != result) {
+      return;
+    }
+
+    _pendingFinishDriveResult = null;
+    _openResult(result);
   }
 
   void _openResult(ActivitySessionResult result) {
@@ -1299,7 +1347,7 @@ class _TimerScreenState extends State<TimerScreen>
     ActivityTimerState state,
     double progress,
   ) {
-    if (_isFinishDriving) {
+    if (_isFinishDriving && !_finishDriveArrivedHolding) {
       return _TimerStatusCopy(
         progressMessage: texts.finishDriveProgressMessage,
         timeLabel: texts.finishDriveTimeLabel,
