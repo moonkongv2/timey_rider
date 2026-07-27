@@ -10,11 +10,14 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:video_player/video_player.dart';
+// ignore: depend_on_referenced_packages
+import 'package:video_player_platform_interface/video_player_platform_interface.dart';
 
 import 'package:timey_rider/catalogs/activity_catalog.dart';
 import 'package:timey_rider/catalogs/activity_marker_catalog.dart';
 import 'package:timey_rider/catalogs/avatar_prompt_catalog.dart';
 import 'package:timey_rider/catalogs/motivation_asset_catalog.dart';
+import 'package:timey_rider/catalogs/result_audio_asset_catalog.dart';
 import 'package:timey_rider/catalogs/timer_audio_asset_catalog.dart';
 import 'package:timey_rider/catalogs/vehicle_catalog.dart';
 import 'package:timey_rider/config/app_feature_flags.dart';
@@ -31,6 +34,7 @@ import 'package:timey_rider/models/reward_goal.dart';
 import 'package:timey_rider/models/reward_item.dart';
 import 'package:timey_rider/models/vehicle.dart';
 import 'package:timey_rider/models/vehicle_avatar_presentation.dart';
+import 'package:timey_rider/navigation/app_route_observer.dart';
 import 'package:timey_rider/screens/avatar_setup_screen.dart';
 import 'package:timey_rider/widgets/avatar/rider_guide_bottom_sheet.dart';
 import 'package:timey_rider/screens/home_screen.dart';
@@ -52,6 +56,7 @@ import 'package:timey_rider/services/local_saved_timer_preset_service.dart';
 import 'package:timey_rider/services/local_settings_service.dart';
 import 'package:timey_rider/services/motivation_audio_service.dart';
 import 'package:timey_rider/services/orientation_service.dart';
+import 'package:timey_rider/services/result_audio_service.dart';
 import 'package:timey_rider/services/screen_awake_service.dart';
 import 'package:timey_rider/services/timer_audio_service.dart';
 import 'package:timey_rider/services/vehicle_pack_purchase_controller.dart';
@@ -904,6 +909,168 @@ void main() {
     }
   });
 
+  testWidgets('ResultScreen plays cheering only after success intro starts', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    SharedPreferences.setMockInitialValues({'savedActivityTimerPresetsInitialized': true});
+    final originalPlatform = VideoPlayerPlatform.instance;
+    final videoPlatform = _FakeVideoPlayerPlatform();
+    VideoPlayerPlatform.instance = videoPlatform;
+    addTearDown(() {
+      VideoPlayerPlatform.instance = originalPlatform;
+    });
+    final resultAudioService = _FakeResultAudioService();
+
+    await tester.pumpWidget(
+      MaterialApp(
+        locale: const Locale('ko'),
+        navigatorObservers: [appRouteObserver],
+        home: ResultScreen(
+          result: _activityResult(completedBeforeEnd: true),
+          config: ActivityTimerConfig.defaults(),
+          activityProgressService: LocalActivityProgressService(),
+          resultAudioService: resultAudioService,
+          onConfigChanged: (_) {},
+        ),
+      ),
+    );
+    await tester.pump();
+
+    expect(videoPlatform.calls, contains('play'));
+    expect(resultAudioService.calls, ['playCrowdCheering']);
+
+    videoPlatform.complete(0);
+    await tester.pump();
+
+    expect(resultAudioService.calls, ['playCrowdCheering', 'stop']);
+
+    await tester.pumpWidget(const SizedBox.shrink());
+    await tester.pump();
+  });
+
+  testWidgets('ResultScreen suppresses cheering when sound is disabled', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    SharedPreferences.setMockInitialValues({'savedActivityTimerPresetsInitialized': true});
+    final originalPlatform = VideoPlayerPlatform.instance;
+    final videoPlatform = _FakeVideoPlayerPlatform();
+    VideoPlayerPlatform.instance = videoPlatform;
+    addTearDown(() {
+      VideoPlayerPlatform.instance = originalPlatform;
+    });
+    final resultAudioService = _FakeResultAudioService();
+
+    await tester.pumpWidget(
+      MaterialApp(
+        locale: const Locale('ko'),
+        navigatorObservers: [appRouteObserver],
+        home: ResultScreen(
+          result: _activityResult(completedBeforeEnd: true),
+          config: ActivityTimerConfig.defaults().copyWith(soundEnabled: false),
+          activityProgressService: LocalActivityProgressService(),
+          resultAudioService: resultAudioService,
+          onConfigChanged: (_) {},
+        ),
+      ),
+    );
+    await tester.pump();
+
+    expect(videoPlatform.calls, contains('play'));
+    expect(resultAudioService.calls, isEmpty);
+
+    await tester.pumpWidget(const SizedBox.shrink());
+    await tester.pump();
+  });
+
+  testWidgets('ResultScreen stops cheering on app lifecycle pause', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    SharedPreferences.setMockInitialValues({'savedActivityTimerPresetsInitialized': true});
+    final originalPlatform = VideoPlayerPlatform.instance;
+    final videoPlatform = _FakeVideoPlayerPlatform();
+    VideoPlayerPlatform.instance = videoPlatform;
+    addTearDown(() {
+      VideoPlayerPlatform.instance = originalPlatform;
+    });
+    final resultAudioService = _FakeResultAudioService();
+
+    await tester.pumpWidget(
+      MaterialApp(
+        locale: const Locale('ko'),
+        navigatorObservers: [appRouteObserver],
+        home: ResultScreen(
+          result: _activityResult(completedBeforeEnd: true),
+          config: ActivityTimerConfig.defaults(),
+          activityProgressService: LocalActivityProgressService(),
+          resultAudioService: resultAudioService,
+          onConfigChanged: (_) {},
+        ),
+      ),
+    );
+    await tester.pump();
+
+    tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.paused);
+    await tester.pump();
+    tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.resumed);
+    await tester.pump();
+
+    expect(resultAudioService.calls, ['playCrowdCheering', 'stop']);
+
+    await tester.pumpWidget(const SizedBox.shrink());
+    await tester.pump();
+  });
+
+  testWidgets('ResultScreen plays sticker collect when awarded sticker lands', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    SharedPreferences.setMockInitialValues({'savedActivityTimerPresetsInitialized': true});
+    final originalPlatform = VideoPlayerPlatform.instance;
+    final videoPlatform = _FakeVideoPlayerPlatform();
+    VideoPlayerPlatform.instance = videoPlatform;
+    addTearDown(() {
+      VideoPlayerPlatform.instance = originalPlatform;
+    });
+    final resultAudioService = _FakeResultAudioService();
+
+    await tester.pumpWidget(
+      MaterialApp(
+        locale: const Locale('ko'),
+        navigatorObservers: [appRouteObserver],
+        home: ResultScreen(
+          result: _activityResult(completedBeforeEnd: true),
+          config: ActivityTimerConfig.defaults(),
+          activityProgressService: LocalActivityProgressService(),
+          resultAudioService: resultAudioService,
+          onConfigChanged: (_) {},
+        ),
+      ),
+    );
+    await tester.pump();
+    videoPlatform.complete(0);
+    await tester.pumpAndSettle();
+
+    expect(resultAudioService.calls, contains('playStickerCollect'));
+
+    await tester.pumpWidget(const SizedBox.shrink());
+    await tester.pump();
+  });
+
   testWidgets('Completed-after-arrival result also shows intro video screen', (
     tester,
   ) async {
@@ -1682,7 +1849,7 @@ void main() {
     expect(File(fallbackPath).existsSync(), isTrue, reason: fallbackPath);
   });
 
-  test('Timer audio asset catalog has playable files', () {
+  test('Timer audio and result audio asset catalogs have playable files', () {
     expect(
       TimerAudioAssetCatalog.runtimeAssetPaths,
       unorderedEquals({
@@ -1690,14 +1857,31 @@ void main() {
         'assets/audio/marker/marker_01.mp3',
         'assets/audio/course_loading.mp3',
         'assets/audio/ready_start_beep_02.mp3',
+        'assets/audio/final_drive_short.mp3',
+        'assets/audio/final_drive_long.mp3',
+        'assets/audio/finish_arrival.mp3',
+      }),
+    );
+    expect(
+      ResultAudioAssetCatalog.runtimeAssetPaths,
+      unorderedEquals({
+        'assets/audio/crowd_cheering.mp3',
+        'assets/audio/sticker_collect.mp3',
       }),
     );
     expect(TimerAudioAssetCatalog.bgmVolume, 0.22);
     expect(TimerAudioAssetCatalog.markerSfxVolume, 0.080);
     expect(TimerAudioAssetCatalog.courseLoadingVolume, 0.20);
     expect(TimerAudioAssetCatalog.readyStartBeepVolume, 0.12);
+    expect(TimerAudioAssetCatalog.finishDriveVolume, 0.16);
+    expect(TimerAudioAssetCatalog.finishArrivalVolume, 0.24);
+    expect(ResultAudioAssetCatalog.crowdCheeringVolume, 0.70);
+    expect(ResultAudioAssetCatalog.stickerCollectVolume, 0.55);
 
-    for (final path in TimerAudioAssetCatalog.runtimeAssetPaths) {
+    for (final path in [
+      ...TimerAudioAssetCatalog.runtimeAssetPaths,
+      ...ResultAudioAssetCatalog.runtimeAssetPaths,
+    ]) {
       expect(File(path).existsSync(), isTrue, reason: path);
     }
   });
@@ -1738,13 +1922,21 @@ void main() {
               path.startsWith('assets/audio/timer_bgm/') ||
               path.startsWith('assets/audio/marker/') ||
               path == TimerAudioAssetCatalog.courseLoadingPath ||
-              path == TimerAudioAssetCatalog.readyStartBeepPath,
+              path == TimerAudioAssetCatalog.readyStartBeepPath ||
+              path == TimerAudioAssetCatalog.finishDriveShortAssetPath ||
+              path == TimerAudioAssetCatalog.finishDriveLongAssetPath ||
+              path == TimerAudioAssetCatalog.finishArrivalAssetPath ||
+              path == ResultAudioAssetCatalog.crowdCheeringAssetPath ||
+              path == ResultAudioAssetCatalog.stickerCollectAssetPath,
         )
         .toList();
 
     expect(
       playableFiles,
-      unorderedEquals(TimerAudioAssetCatalog.runtimeAssetPaths),
+      unorderedEquals([
+        ...TimerAudioAssetCatalog.runtimeAssetPaths,
+        ...ResultAudioAssetCatalog.runtimeAssetPaths,
+      ]),
     );
   });
 
@@ -1759,6 +1951,9 @@ void main() {
     for (final path in TimerAudioAssetCatalog.runtimeAssetPaths) {
       expect(assetEntries, contains(path), reason: path);
     }
+    for (final path in ResultAudioAssetCatalog.runtimeAssetPaths) {
+      expect(assetEntries, contains(path), reason: path);
+    }
 
     expect(assetEntries, isNot(contains('assets/audio/')));
     expect(assetEntries, isNot(contains('assets/audio/timer_bgm/')));
@@ -1769,11 +1964,19 @@ void main() {
           path.startsWith('assets/audio/timer_bgm/') ||
           path.startsWith('assets/audio/marker/') ||
           path == TimerAudioAssetCatalog.courseLoadingPath ||
-          path == TimerAudioAssetCatalog.readyStartBeepPath,
+          path == TimerAudioAssetCatalog.readyStartBeepPath ||
+          path == TimerAudioAssetCatalog.finishDriveShortAssetPath ||
+          path == TimerAudioAssetCatalog.finishDriveLongAssetPath ||
+          path == TimerAudioAssetCatalog.finishArrivalAssetPath ||
+          path == ResultAudioAssetCatalog.crowdCheeringAssetPath ||
+          path == ResultAudioAssetCatalog.stickerCollectAssetPath,
     );
     expect(
       timerAudioEntries,
-      unorderedEquals(TimerAudioAssetCatalog.runtimeAssetPaths),
+      unorderedEquals([
+        ...TimerAudioAssetCatalog.runtimeAssetPaths,
+        ...ResultAudioAssetCatalog.runtimeAssetPaths,
+      ]),
     );
     expect(
       assetEntries.any(
@@ -8970,7 +9173,8 @@ void main() {
     await tester.tap(find.byType(FilledButton).last);
     await tester.pump();
 
-    expect(timerAudioService.calls, ['stopBgm']);
+    expect(timerAudioService.calls.first, 'stopBgm');
+    expect(timerAudioService.calls, contains('playFinishDriveLongSfx'));
 
     await tester.pumpWidget(const SizedBox.shrink());
     await tester.pump();
@@ -9867,6 +10071,7 @@ void main() {
     await tester.tap(find.byType(FilledButton).last);
     await tester.pump();
     await tester.pump(const Duration(seconds: 4));
+    await tester.pump(const Duration(seconds: 1));
     await tester.pump();
 
     expect(find.byType(ResultScreen), findsOneWidget);
@@ -10127,35 +10332,12 @@ void main() {
   testWidgets('Fast finish drive animates display progress to finish', (
     tester,
   ) async {
-    tester.view.physicalSize = const Size(390, 844);
-    tester.view.devicePixelRatio = 1.0;
-    addTearDown(tester.view.resetPhysicalSize);
-    addTearDown(tester.view.resetDevicePixelRatio);
-    var now = DateTime(2026);
-
-    await tester.pumpWidget(
-      MaterialApp(
-        locale: const Locale('ko'),
-        home: TimerScreen(
-          config: ActivityTimerConfig.defaults().copyWith(
-            duration: const Duration(seconds: 100),
-          ),
-          activityProgressService: LocalActivityProgressService(),
-          now: () => now,
-          onConfigChanged: (_) {},
-        ),
-      ),
+    await _pumpRunningTimerAtProgress(
+      tester,
+      progress: 0.5,
+      timerAudioService: _FakeTimerAudioService(),
     );
-    for (int i = 0; i < 40; i++) {
-      await tester.pump(const Duration(milliseconds: 250));
-    }
-    now = now.add(const Duration(seconds: 50));
-    await tester.pump(const Duration(milliseconds: 250));
-
-    tester.widget<TimerControlBar>(find.byType(TimerControlBar)).onComplete!();
-    await tester.pump();
-    await tester.tap(find.byType(FilledButton).last);
-    await tester.pump();
+    await _completeTimerFromControl(tester);
 
     final driveDuration = finishDriveDurationForProgress(0.5);
     await tester.pump(driveDuration - const Duration(milliseconds: 1));
@@ -10169,12 +10351,142 @@ void main() {
     await tester.pump(const Duration(milliseconds: 2));
     await tester.pump();
 
+    expect(find.byType(ResultScreen), findsNothing);
+    expect(tester.widget<RoadView>(find.byType(RoadView)).progress, 1);
+
+    await tester.pump(const Duration(seconds: 1));
+    await tester.pump();
+
     expect(find.byType(ResultScreen), findsOneWidget);
 
     await tester.pumpWidget(const SizedBox.shrink());
-    for (int i = 0; i < 40; i++) {
-      await tester.pump(const Duration(milliseconds: 250));
-    }
+    await tester.pump();
+  });
+
+  testWidgets('TimerScreen skips finish-drive SFX under threshold', (
+    tester,
+  ) async {
+    final timerAudioService = _FakeTimerAudioService();
+
+    await _pumpRunningTimerAtProgress(
+      tester,
+      progress: 0.9,
+      timerAudioService: timerAudioService,
+    );
+    timerAudioService.calls.clear();
+    await _completeTimerFromControl(tester);
+
+    expect(timerAudioService.calls, isNot(contains('playFinishDriveShortSfx')));
+    expect(timerAudioService.calls, isNot(contains('playFinishDriveLongSfx')));
+
+    await tester.pump(finishDriveDurationForProgress(0.9));
+    await tester.pump(const Duration(milliseconds: 1));
+    await tester.pump();
+
+    expect(timerAudioService.calls, [
+      'stopBgm',
+      'stopFinishDriveSfx',
+      'playFinishArrivalSfx',
+    ]);
+
+    await tester.pumpWidget(const SizedBox.shrink());
+    await tester.pump();
+  });
+
+  testWidgets('TimerScreen plays short finish-drive SFX by threshold', (
+    tester,
+  ) async {
+    final timerAudioService = _FakeTimerAudioService();
+
+    await _pumpRunningTimerAtProgress(
+      tester,
+      progress: 0.6,
+      timerAudioService: timerAudioService,
+    );
+    timerAudioService.calls.clear();
+    await _completeTimerFromControl(tester);
+
+    expect(timerAudioService.calls, [
+      'stopBgm',
+      'playFinishDriveShortSfx',
+    ]);
+
+    await tester.pumpWidget(const SizedBox.shrink());
+    await tester.pump();
+  });
+
+  testWidgets('TimerScreen plays long finish-drive SFX by threshold', (
+    tester,
+  ) async {
+    final timerAudioService = _FakeTimerAudioService();
+
+    await _pumpRunningTimerAtProgress(
+      tester,
+      progress: 0.1,
+      timerAudioService: timerAudioService,
+    );
+    timerAudioService.calls.clear();
+    await _completeTimerFromControl(tester);
+
+    expect(timerAudioService.calls, [
+      'stopBgm',
+      'playFinishDriveLongSfx',
+    ]);
+
+    await tester.pumpWidget(const SizedBox.shrink());
+    await tester.pump();
+  });
+
+  testWidgets('TimerScreen suppresses finish audio when sound is disabled', (
+    tester,
+  ) async {
+    final timerAudioService = _FakeTimerAudioService();
+
+    await _pumpRunningTimerAtProgress(
+      tester,
+      progress: 0.1,
+      timerAudioService: timerAudioService,
+      soundEnabled: false,
+    );
+    timerAudioService.calls.clear();
+    await _completeTimerFromControl(tester);
+
+    expect(timerAudioService.calls, isEmpty);
+    await tester.pump(finishDriveDurationForProgress(0.1));
+    await tester.pump(const Duration(milliseconds: 1));
+    await tester.pump();
+    expect(timerAudioService.calls, ['stopFinishDriveSfx']);
+
+    await tester.pumpWidget(const SizedBox.shrink());
+    await tester.pump();
+  });
+
+  testWidgets('TimerScreen stops finish-drive SFX on lifecycle pause', (
+    tester,
+  ) async {
+    final timerAudioService = _FakeTimerAudioService();
+
+    await _pumpRunningTimerAtProgress(
+      tester,
+      progress: 0.1,
+      timerAudioService: timerAudioService,
+    );
+    timerAudioService.calls.clear();
+    await _completeTimerFromControl(tester);
+
+    tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.paused);
+    await tester.pump();
+    tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.resumed);
+    await tester.pump();
+
+    expect(timerAudioService.calls, [
+      'stopBgm',
+      'playFinishDriveLongSfx',
+      'stopFinishDriveSfx',
+    ]);
+
+    await tester.pumpWidget(const SizedBox.shrink());
+    await tester.pump();
   });
 
   testWidgets('Controls are disabled during fast finish drive', (tester) async {
@@ -13546,6 +13858,57 @@ Future<void> _pumpPurchaseControllerUnlock(
   }
 }
 
+Future<void> _pumpRunningTimerAtProgress(
+  WidgetTester tester, {
+  required double progress,
+  required _FakeTimerAudioService timerAudioService,
+  bool soundEnabled = true,
+}) async {
+  tester.view.physicalSize = const Size(390, 844);
+  tester.view.devicePixelRatio = 1.0;
+  addTearDown(tester.view.resetPhysicalSize);
+  addTearDown(tester.view.resetDevicePixelRatio);
+  SharedPreferences.setMockInitialValues({
+    'savedActivityTimerPresetsInitialized': true,
+  });
+  final startedAt = DateTime(2026);
+  final duration = const Duration(seconds: 100);
+  final config = ActivityTimerConfig.defaults().copyWith(
+    duration: duration,
+    soundEnabled: soundEnabled,
+  );
+  final now = startedAt.add(
+    Duration(milliseconds: (duration.inMilliseconds * progress).round()),
+  );
+
+  await tester.pumpWidget(
+    MaterialApp(
+      locale: const Locale('ko'),
+      home: TimerScreen(
+        config: config,
+        restoredSession: ActiveActivityTimerSession(
+          sessionId: 'finish-audio-session-$progress-$soundEnabled',
+          startedAt: startedAt,
+          config: config,
+          state: ActiveActivityTimerSessionState.running,
+        ),
+        activityProgressService: LocalActivityProgressService(),
+        timerAudioService: timerAudioService,
+        now: () => now,
+        onConfigChanged: (_) {},
+      ),
+    ),
+  );
+  await tester.pump();
+}
+
+Future<void> _completeTimerFromControl(WidgetTester tester) async {
+  tester.widget<TimerControlBar>(find.byType(TimerControlBar)).onComplete!();
+  await tester.pump();
+  await tester.tap(find.byType(FilledButton).last);
+  await tester.pump();
+}
+
 Future<void> _scrollAvatarVehicleSelectionIntoView(WidgetTester tester) async {
   try {
     await tester.dragUntilVisible(
@@ -13830,6 +14193,26 @@ class _FakeTimerAudioService implements TimerAudioService {
   }
 
   @override
+  Future<void> playFinishDriveShortSfx() async {
+    calls.add('playFinishDriveShortSfx');
+  }
+
+  @override
+  Future<void> playFinishDriveLongSfx() async {
+    calls.add('playFinishDriveLongSfx');
+  }
+
+  @override
+  Future<void> stopFinishDriveSfx() async {
+    calls.add('stopFinishDriveSfx');
+  }
+
+  @override
+  Future<void> playFinishArrivalSfx() async {
+    calls.add('playFinishArrivalSfx');
+  }
+
+  @override
   Future<void> stopAll() async {
     calls.add('stopAll');
   }
@@ -13837,6 +14220,125 @@ class _FakeTimerAudioService implements TimerAudioService {
   @override
   Future<void> dispose() async {
     calls.add('dispose');
+  }
+}
+
+class _FakeResultAudioService implements ResultAudioService {
+  final List<String> calls = [];
+
+  @override
+  Future<void> playCrowdCheering() async {
+    calls.add('playCrowdCheering');
+  }
+
+  @override
+  Future<void> playStickerCollect() async {
+    calls.add('playStickerCollect');
+  }
+
+  @override
+  Future<void> stop() async {
+    calls.add('stop');
+  }
+
+  @override
+  Future<void> dispose() async {
+    calls.add('dispose');
+  }
+}
+
+class _FakeVideoPlayerPlatform extends VideoPlayerPlatform {
+  final List<String> calls = [];
+  final Map<int, StreamController<VideoEvent>> streams = {};
+  int _nextPlayerId = 0;
+
+  @override
+  Future<int?> create(DataSource dataSource) async {
+    return _create();
+  }
+
+  @override
+  Future<int?> createWithOptions(VideoCreationOptions options) async {
+    return _create();
+  }
+
+  Future<int> _create() async {
+    calls.add('create');
+    final playerId = _nextPlayerId;
+    _nextPlayerId += 1;
+    final stream = StreamController<VideoEvent>();
+    streams[playerId] = stream;
+    Future<void>.microtask(() {
+      stream.add(
+        VideoEvent(
+          eventType: VideoEventType.initialized,
+          size: const Size(100, 100),
+          duration: const Duration(seconds: 1),
+        ),
+      );
+    });
+    return playerId;
+  }
+
+  void complete(int playerId) {
+    streams[playerId]?.add(VideoEvent(eventType: VideoEventType.completed));
+  }
+
+  @override
+  Future<void> init() async {
+    calls.add('init');
+  }
+
+  @override
+  Stream<VideoEvent> videoEventsFor(int playerId) {
+    return streams[playerId]!.stream;
+  }
+
+  @override
+  Future<void> play(int playerId) async {
+    calls.add('play');
+  }
+
+  @override
+  Future<void> pause(int playerId) async {
+    calls.add('pause');
+  }
+
+  @override
+  Future<void> setLooping(int playerId, bool looping) async {
+    calls.add('setLooping');
+  }
+
+  @override
+  Future<void> setVolume(int playerId, double volume) async {
+    calls.add('setVolume');
+  }
+
+  @override
+  Future<void> setPlaybackSpeed(int playerId, double speed) async {
+    calls.add('setPlaybackSpeed');
+  }
+
+  @override
+  Future<void> seekTo(int playerId, Duration position) async {
+    calls.add('seekTo');
+  }
+
+  @override
+  Future<Duration> getPosition(int playerId) async {
+    calls.add('position');
+    return Duration.zero;
+  }
+
+  @override
+  Widget buildView(int playerId) {
+    return Texture(textureId: playerId);
+  }
+
+  @override
+  Future<void> dispose(int playerId) async {
+    calls.add('dispose');
+    await streams.remove(playerId)?.close();
   }
 }
 
