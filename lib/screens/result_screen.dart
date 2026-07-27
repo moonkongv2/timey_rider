@@ -11,8 +11,10 @@ import '../models/activity_session_result.dart';
 import '../models/activity_timer_config.dart';
 import '../models/reward_goal.dart';
 import '../models/reward_item.dart';
+import '../navigation/app_route_observer.dart';
 import '../services/local_activity_progress_service.dart';
 import '../services/orientation_service.dart';
+import '../services/result_audio_service.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_radius.dart';
 import '../theme/app_spacing.dart';
@@ -118,6 +120,7 @@ class ResultScreen extends StatefulWidget {
     required this.onConfigChanged,
     this.introControllerFactory,
     this.orientationService = const SystemOrientationService(),
+    this.resultAudioService,
   });
 
   final ActivitySessionResult result;
@@ -126,12 +129,14 @@ class ResultScreen extends StatefulWidget {
   final ValueChanged<ActivityTimerConfig> onConfigChanged;
   final ResultIntroControllerFactory? introControllerFactory;
   final OrientationService orientationService;
+  final ResultAudioService? resultAudioService;
 
   @override
   State<ResultScreen> createState() => _ResultScreenState();
 }
 
-class _ResultScreenState extends State<ResultScreen> {
+class _ResultScreenState extends State<ResultScreen>
+    with WidgetsBindingObserver, RouteAware {
   static const _successImagePath = 'assets/images/result_success.png';
 
   VideoPlayerController? _introController;
@@ -141,14 +146,30 @@ class _ResultScreenState extends State<ResultScreen> {
   bool _introFallback = false;
   bool _handoffOrientation = false;
   bool _flyingAnimationFinished = false;
+  bool _isAppResumed = true;
+  late final ResultAudioService _resultAudioService;
+  late final bool _ownsResultAudioService;
   final GlobalKey _albumButtonKey = GlobalKey();
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    _resultAudioService =
+        widget.resultAudioService ?? AudioplayersResultAudioService();
+    _ownsResultAudioService = widget.resultAudioService == null;
     unawaited(widget.orientationService.allowTimerOrientations());
     if (!_needsStickerChoice) {
       _recordResult(widget.result);
+    }
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final route = ModalRoute.of(context);
+    if (route is PageRoute<dynamic>) {
+      appRouteObserver.subscribe(this, route);
     }
   }
 
@@ -200,7 +221,8 @@ class _ResultScreenState extends State<ResultScreen> {
       return;
     }
 
-    if (value.position >= value.duration) {
+    if (value.isCompleted || value.position >= value.duration) {
+      unawaited(_resultAudioService.stop());
       setState(() => _introFinished = true);
     }
   }
@@ -215,10 +237,14 @@ class _ResultScreenState extends State<ResultScreen> {
       await controller.initialize();
       await controller.setLooping(false);
       await controller.play();
+      if (widget.config.soundEnabled && _isAppResumed) {
+        unawaited(_resultAudioService.playCrowdCheering());
+      }
       if (mounted) {
         setState(() {});
       }
     } catch (_) {
+      unawaited(_resultAudioService.stop());
       if (mounted) {
         setState(() {
           _introFallback = true;
@@ -229,16 +255,47 @@ class _ResultScreenState extends State<ResultScreen> {
   }
 
   @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    switch (state) {
+      case AppLifecycleState.resumed:
+        _isAppResumed = true;
+        break;
+      case AppLifecycleState.inactive:
+      case AppLifecycleState.hidden:
+      case AppLifecycleState.paused:
+      case AppLifecycleState.detached:
+        _isAppResumed = false;
+        unawaited(_resultAudioService.stop());
+        break;
+    }
+  }
+
+  @override
+  void didPushNext() {
+    unawaited(_resultAudioService.stop());
+  }
+
+  @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    appRouteObserver.unsubscribe(this);
     final controller = _introController;
     if (controller != null) {
       controller.removeListener(_handleIntroChanged);
       controller.dispose();
     }
+    unawaited(_disposeResultAudioService());
     if (!_handoffOrientation) {
       unawaited(widget.orientationService.lockPortrait());
     }
     super.dispose();
+  }
+
+  Future<void> _disposeResultAudioService() async {
+    await _resultAudioService.stop();
+    if (_ownsResultAudioService) {
+      await _resultAudioService.dispose();
+    }
   }
 
   void _restart(BuildContext context) {
@@ -544,6 +601,11 @@ class _ResultScreenState extends State<ResultScreen> {
                 reward: awardedRewards.first,
                 targetKey: _albumButtonKey,
                 onAnimationFinished: () {
+                  if (!_flyingAnimationFinished &&
+                      widget.config.soundEnabled &&
+                      _isAppResumed) {
+                    unawaited(_resultAudioService.playStickerCollect());
+                  }
                   if (mounted) {
                     setState(() {
                       _flyingAnimationFinished = true;
