@@ -13640,6 +13640,26 @@ class _FakeTimerAudioService implements TimerAudioService {
   }
 
   @override
+  Future<void> playCourseLoading() async {
+    calls.add('playCourseLoading');
+  }
+
+  @override
+  Future<void> stopCourseLoading() async {
+    calls.add('stopCourseLoading');
+  }
+
+  @override
+  Future<void> playReadyStartBeep() async {
+    calls.add('playReadyStartBeep');
+  }
+
+  @override
+  Future<void> stopReadyStartBeep() async {
+    calls.add('stopReadyStartBeep');
+  }
+
+  @override
   Future<void> stopAll() async {
     calls.add('stopAll');
   }
