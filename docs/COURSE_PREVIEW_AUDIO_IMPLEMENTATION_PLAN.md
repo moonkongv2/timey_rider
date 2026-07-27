@@ -1,8 +1,17 @@
 # Course Preview Audio Implementation Plan
 
+## Implementation Status
+
+- Implemented through Commit 5.
+- Manual simulator QA has been completed by the user.
+- Final verification passed:
+  - `flutter test test/widget_test.dart --plain-name "Timer audio"`
+  - `flutter test test/widget_test.dart --plain-name "TimerScreen"`
+  - `flutter analyze`
+
 ## Repo Fit Summary
 
-- The preview audio assets are already present locally but not yet tracked:
+- The preview audio assets are tracked and registered:
   - `assets/audio/course_loading.mp3`
   - `assets/audio/ready_start_beep_02.mp3`
 - Runtime timer audio is centralized in:
@@ -116,10 +125,11 @@ The current `ready_start_beep_02.mp3` length fits a 770 ms Ready + 770 ms Go seq
 
 ## Manual Check Areas
 
-- Timer startup preview for durations longer than 5 minutes.
-- Timer startup for durations 5 minutes or shorter.
-- Ready/Go cue timing.
-- Transition from preview audio to timer BGM.
-- Sound off and sound toggle behavior.
-- App background/foreground during startup preview.
-- Restored session entry.
+- Completed by the user:
+  - Timer startup preview for durations longer than 5 minutes.
+  - Timer startup for durations 5 minutes or shorter.
+  - Ready/Go cue timing.
+  - Transition from preview audio to timer BGM.
+  - Sound off and sound toggle behavior.
+  - App background/foreground during startup preview.
+  - Restored session entry.
