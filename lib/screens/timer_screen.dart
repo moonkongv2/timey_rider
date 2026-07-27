@@ -41,6 +41,7 @@ const _compactLandscapeControlsWidth = 72.0;
 const _compactLandscapeControlsRightInset =
     _compactLandscapeControlsWidth + AppSpacing.xl;
 const _longCoursePreviewThreshold = Duration(minutes: 5);
+const _startupPreviewMessageDelay = Duration(milliseconds: 770);
 const motivationMinimumVideoInterval = Duration(seconds: 10);
 const motivationVoiceStartDelay = Duration(milliseconds: 350);
 const _motivationVideoIntervalOptions = [
@@ -246,6 +247,10 @@ class _TimerScreenState extends State<TimerScreen>
   bool _handoffOrientation = false;
   bool _isAppResumed = true;
   bool _isDisposing = false;
+  bool _courseLoadingPreviewActive = false;
+  bool _courseLoadingAudioPlaying = false;
+  bool _readyStartBeepPlayed = false;
+  bool _readyStartBeepPlaying = false;
   _TimerBgmTarget _lastTimerBgmTarget = _TimerBgmTarget.stopped;
   int _highestHandledCourseMarkerIndex = -1;
   late final String _activeSessionId;
@@ -324,6 +329,7 @@ class _TimerScreenState extends State<TimerScreen>
   Future<void> _startPreviewSequence() async {
     try {
       final needsPreview = _timerConfig.duration > _longCoursePreviewThreshold;
+      _readyStartBeepPlayed = false;
 
       if (!mounted) return;
       setState(() {
@@ -334,6 +340,7 @@ class _TimerScreenState extends State<TimerScreen>
         final previewController = _ensurePreviewController(
           const Duration(milliseconds: 2000),
         );
+        _setCourseLoadingPreviewActive(true);
 
         await _safeDelay(const Duration(milliseconds: 500));
         if (!mounted || !_isStartupPreviewing) return;
@@ -346,21 +353,25 @@ class _TimerScreenState extends State<TimerScreen>
         if (!mounted || !_isStartupPreviewing) return;
         previewController.duration = const Duration(milliseconds: 1000);
         await previewController.reverse().orCancel;
+        _setCourseLoadingPreviewActive(false);
+        await _stopCourseLoadingAudio();
       }
 
       if (!mounted || !_isStartupPreviewing) return;
+      _playReadyStartBeep();
       setState(() {
         _previewMessageState = _PreviewMessageState.ready;
       });
-      await _safeDelay(const Duration(milliseconds: 700));
+      await _safeDelay(_startupPreviewMessageDelay);
 
       if (!mounted || !_isStartupPreviewing) return;
       setState(() {
         _previewMessageState = _PreviewMessageState.go;
       });
-      await _safeDelay(const Duration(milliseconds: 700));
+      await _safeDelay(_startupPreviewMessageDelay);
 
       if (!mounted || !_isStartupPreviewing) return;
+      await _stopStartupPreviewAudio();
       setState(() {
         _coursePreviewMode = _CoursePreviewMode.none;
         _previewMessageState = _PreviewMessageState.none;
@@ -370,6 +381,13 @@ class _TimerScreenState extends State<TimerScreen>
       unawaited(_persistActiveSession());
     } on TickerCanceled {
       return;
+    } finally {
+      _courseLoadingPreviewActive = false;
+      if (!_isStartupPreviewing) {
+        unawaited(_stopStartupPreviewAudio());
+      } else {
+        _syncCourseLoadingAudio();
+      }
     }
   }
 
@@ -519,6 +537,63 @@ class _TimerScreenState extends State<TimerScreen>
     _previewDelayCompleter = null;
   }
 
+  void _setCourseLoadingPreviewActive(bool active) {
+    if (_courseLoadingPreviewActive == active) {
+      return;
+    }
+    _courseLoadingPreviewActive = active;
+    _syncCourseLoadingAudio();
+  }
+
+  void _syncCourseLoadingAudio() {
+    final shouldPlay =
+        !_isDisposing &&
+        _isStartupPreviewing &&
+        _courseLoadingPreviewActive &&
+        _timerConfig.soundEnabled &&
+        _isAppResumed;
+    if (shouldPlay == _courseLoadingAudioPlaying) {
+      return;
+    }
+    _courseLoadingAudioPlaying = shouldPlay;
+
+    if (shouldPlay) {
+      unawaited(_timerAudioService.playCourseLoading());
+    } else {
+      unawaited(_timerAudioService.stopCourseLoading());
+    }
+  }
+
+  void _playReadyStartBeep() {
+    if (_readyStartBeepPlayed || !_timerConfig.soundEnabled || !_isAppResumed) {
+      return;
+    }
+    _readyStartBeepPlayed = true;
+    _readyStartBeepPlaying = true;
+    unawaited(_timerAudioService.playReadyStartBeep());
+  }
+
+  Future<void> _stopCourseLoadingAudio() async {
+    if (!_courseLoadingAudioPlaying) {
+      return;
+    }
+    _courseLoadingAudioPlaying = false;
+    await _timerAudioService.stopCourseLoading();
+  }
+
+  Future<void> _stopReadyStartBeepAudio() async {
+    if (!_readyStartBeepPlaying) {
+      return;
+    }
+    _readyStartBeepPlaying = false;
+    await _timerAudioService.stopReadyStartBeep();
+  }
+
+  Future<void> _stopStartupPreviewAudio() async {
+    _courseLoadingPreviewActive = false;
+    await Future.wait([_stopCourseLoadingAudio(), _stopReadyStartBeepAudio()]);
+  }
+
   @override
   void didUpdateWidget(covariant TimerScreen oldWidget) {
     super.didUpdateWidget(oldWidget);
@@ -540,6 +615,8 @@ class _TimerScreenState extends State<TimerScreen>
     _isDisposing = true;
     _previewController?.stop();
     _coursePreviewMode = _CoursePreviewMode.none;
+    _courseLoadingPreviewActive = false;
+    unawaited(_stopStartupPreviewAudio());
     _syncTimerBgm();
     WidgetsBinding.instance.removeObserver(this);
     _cancelPreviewDelay();

@@ -8404,13 +8404,19 @@ void main() {
       ),
     );
     await tester.pump(const Duration(milliseconds: 600));
-    expect(timerAudioService.calls, isEmpty);
+    expect(timerAudioService.calls, ['playCourseLoading']);
 
     for (int i = 0; i < 40; i++) {
       await tester.pump(const Duration(milliseconds: 250));
     }
 
-    expect(timerAudioService.calls, ['startOrResumeBgm']);
+    expect(timerAudioService.calls, [
+      'playCourseLoading',
+      'stopCourseLoading',
+      'playReadyStartBeep',
+      'stopReadyStartBeep',
+      'startOrResumeBgm',
+    ]);
 
     await tester.pumpWidget(const SizedBox.shrink());
     await tester.pump();
