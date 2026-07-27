@@ -8513,6 +8513,8 @@ void main() {
     for (int i = 0; i < 40; i++) {
       await tester.pump(const Duration(milliseconds: 250));
     }
+    expect(timerAudioService.calls.last, 'startOrResumeBgm');
+    timerAudioService.calls.clear();
 
     tester
         .widget<TimerControlBar>(find.byType(TimerControlBar))
@@ -8524,7 +8526,6 @@ void main() {
     await tester.pump();
 
     expect(timerAudioService.calls, [
-      'startOrResumeBgm',
       'pauseBgm',
       'startOrResumeBgm',
     ]);
@@ -8559,6 +8560,8 @@ void main() {
     for (int i = 0; i < 40; i++) {
       await tester.pump(const Duration(milliseconds: 250));
     }
+    expect(timerAudioService.calls.last, 'startOrResumeBgm');
+    timerAudioService.calls.clear();
 
     tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.paused);
     await tester.pump();
@@ -8566,7 +8569,6 @@ void main() {
     await tester.pump();
 
     expect(timerAudioService.calls, [
-      'startOrResumeBgm',
       'pauseBgm',
       'startOrResumeBgm',
     ]);
@@ -8581,7 +8583,6 @@ void main() {
     await tester.pump();
 
     expect(timerAudioService.calls, [
-      'startOrResumeBgm',
       'pauseBgm',
       'startOrResumeBgm',
       'pauseBgm',
@@ -8622,13 +8623,14 @@ void main() {
     for (int i = 0; i < 40; i++) {
       await tester.pump(const Duration(milliseconds: 250));
     }
-    expect(timerAudioService.calls, ['startOrResumeBgm']);
+    expect(timerAudioService.calls.last, 'startOrResumeBgm');
+    timerAudioService.calls.clear();
 
     await tester.tap(find.byKey(const ValueKey('timerSoundToggleButton')));
     await tester.pump();
 
     expect(changedConfigs.last.soundEnabled, isFalse);
-    expect(timerAudioService.calls, ['startOrResumeBgm', 'stopBgm']);
+    expect(timerAudioService.calls, ['stopBgm']);
     var session = await store.load();
     expect(session, isNotNull);
     expect(session!.config.soundEnabled, isFalse);
@@ -8639,7 +8641,6 @@ void main() {
 
     expect(changedConfigs.last.soundEnabled, isTrue);
     expect(timerAudioService.calls, [
-      'startOrResumeBgm',
       'stopBgm',
       'startOrResumeBgm',
     ]);

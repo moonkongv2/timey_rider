@@ -601,6 +601,10 @@ class _TimerScreenState extends State<TimerScreen>
       _timerConfig = widget.config;
       unawaited(_persistActiveSession());
       _syncTimerBgm();
+      _syncCourseLoadingAudio();
+      if (!_timerConfig.soundEnabled) {
+        unawaited(_stopReadyStartBeepAudio());
+      }
     }
     if (oldWidget.screenAwakeService != widget.screenAwakeService &&
         _screenAwakeEnabled) {
@@ -646,6 +650,7 @@ class _TimerScreenState extends State<TimerScreen>
         _controller.refreshFromClock();
         unawaited(_persistActiveSession());
         _syncTimerBgm();
+        _syncCourseLoadingAudio();
         break;
       case AppLifecycleState.inactive:
       case AppLifecycleState.hidden:
@@ -654,6 +659,8 @@ class _TimerScreenState extends State<TimerScreen>
         _isAppResumed = false;
         unawaited(_persistActiveSession());
         _syncTimerBgm();
+        _syncCourseLoadingAudio();
+        unawaited(_stopReadyStartBeepAudio());
         break;
     }
   }
@@ -890,10 +897,12 @@ class _TimerScreenState extends State<TimerScreen>
     if (!nextConfig.soundEnabled) {
       _motivationVoiceTimer?.cancel();
       unawaited(_motivationAudioService.stop());
+      unawaited(_stopReadyStartBeepAudio());
     }
     widget.onConfigChanged(nextConfig);
     unawaited(_persistActiveSession());
     _syncTimerBgm();
+    _syncCourseLoadingAudio();
   }
 
   Iterable<int> _shownMilestonesForCurrentSchedule(
