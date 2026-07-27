@@ -104,6 +104,11 @@ flutter:
     - assets/audio/marker/marker_01.mp3
     - assets/audio/course_loading.mp3
     - assets/audio/ready_start_beep_02.mp3
+    - assets/audio/final_drive_short.mp3
+    - assets/audio/final_drive_long.mp3
+    - assets/audio/finish_arrival.mp3
+    - assets/audio/crowd_cheering.mp3
+    - assets/audio/sticker_collect.mp3
     - assets/audio/sticker_popup.mp3
     - assets/videos/
   #   - images/a_dot_burr.jpeg
