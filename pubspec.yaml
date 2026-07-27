@@ -102,6 +102,8 @@ flutter:
     - assets/images/markers/
     - assets/audio/timer_bgm/timer_bgm_01.mp3
     - assets/audio/marker/marker_01.mp3
+    - assets/audio/course_loading.mp3
+    - assets/audio/ready_start_beep_02.mp3
     - assets/audio/sticker_popup.mp3
     - assets/videos/
   #   - images/a_dot_burr.jpeg

@@ -1688,10 +1688,14 @@ void main() {
       unorderedEquals({
         'assets/audio/timer_bgm/timer_bgm_01.mp3',
         'assets/audio/marker/marker_01.mp3',
+        'assets/audio/course_loading.mp3',
+        'assets/audio/ready_start_beep_02.mp3',
       }),
     );
     expect(TimerAudioAssetCatalog.bgmVolume, 0.22);
     expect(TimerAudioAssetCatalog.markerSfxVolume, 0.080);
+    expect(TimerAudioAssetCatalog.courseLoadingVolume, 0.20);
+    expect(TimerAudioAssetCatalog.readyStartBeepVolume, 0.12);
 
     for (final path in TimerAudioAssetCatalog.runtimeAssetPaths) {
       expect(File(path).existsSync(), isTrue, reason: path);
@@ -1732,7 +1736,9 @@ void main() {
         .where(
           (path) =>
               path.startsWith('assets/audio/timer_bgm/') ||
-              path.startsWith('assets/audio/marker/'),
+              path.startsWith('assets/audio/marker/') ||
+              path == TimerAudioAssetCatalog.courseLoadingPath ||
+              path == TimerAudioAssetCatalog.readyStartBeepPath,
         )
         .toList();
 
@@ -1761,7 +1767,9 @@ void main() {
     final timerAudioEntries = assetEntries.where(
       (path) =>
           path.startsWith('assets/audio/timer_bgm/') ||
-          path.startsWith('assets/audio/marker/'),
+          path.startsWith('assets/audio/marker/') ||
+          path == TimerAudioAssetCatalog.courseLoadingPath ||
+          path == TimerAudioAssetCatalog.readyStartBeepPath,
     );
     expect(
       timerAudioEntries,
