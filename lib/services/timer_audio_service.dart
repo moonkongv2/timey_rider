@@ -22,6 +22,14 @@ abstract interface class TimerAudioService {
 
   Future<void> stopReadyStartBeep();
 
+  Future<void> playFinishDriveShortSfx();
+
+  Future<void> playFinishDriveLongSfx();
+
+  Future<void> stopFinishDriveSfx();
+
+  Future<void> playFinishArrivalSfx();
+
   Future<void> stopAll();
 
   Future<void> dispose();
@@ -55,6 +63,18 @@ class NoopTimerAudioService implements TimerAudioService {
   Future<void> stopReadyStartBeep() async {}
 
   @override
+  Future<void> playFinishDriveShortSfx() async {}
+
+  @override
+  Future<void> playFinishDriveLongSfx() async {}
+
+  @override
+  Future<void> stopFinishDriveSfx() async {}
+
+  @override
+  Future<void> playFinishArrivalSfx() async {}
+
+  @override
   Future<void> stopAll() async {}
 
   @override
@@ -67,6 +87,8 @@ class AudioplayersTimerAudioService implements TimerAudioService {
       _markerPlayer = AudioPlayer(),
       _courseLoadingPlayer = AudioPlayer(),
       _readyStartBeepPlayer = AudioPlayer(),
+      _finishDrivePlayer = AudioPlayer(),
+      _finishArrivalPlayer = AudioPlayer(),
       _audioContext = AudioContextConfig(
         focus: AudioContextConfigFocus.gain,
         respectSilence: false,
@@ -76,6 +98,8 @@ class AudioplayersTimerAudioService implements TimerAudioService {
   final AudioPlayer _markerPlayer;
   final AudioPlayer _courseLoadingPlayer;
   final AudioPlayer _readyStartBeepPlayer;
+  final AudioPlayer _finishDrivePlayer;
+  final AudioPlayer _finishArrivalPlayer;
   final AudioContext _audioContext;
 
   bool _bgmSourceLoaded = false;
@@ -235,12 +259,65 @@ class AudioplayersTimerAudioService implements TimerAudioService {
   }
 
   @override
+  Future<void> playFinishDriveShortSfx() {
+    return _playFinishDriveSfx(
+      TimerAudioAssetCatalog.finishDriveShortAssetPath,
+      'Timer finish-drive short SFX playback failed',
+    );
+  }
+
+  @override
+  Future<void> playFinishDriveLongSfx() {
+    return _playFinishDriveSfx(
+      TimerAudioAssetCatalog.finishDriveLongAssetPath,
+      'Timer finish-drive long SFX playback failed',
+    );
+  }
+
+  @override
+  Future<void> stopFinishDriveSfx() async {
+    if (_disposed) {
+      return;
+    }
+    try {
+      await _finishDrivePlayer.stop();
+    } catch (error, stackTrace) {
+      debugPrint('Timer finish-drive SFX stop failed: $error');
+      debugPrintStack(stackTrace: stackTrace);
+    }
+  }
+
+  @override
+  Future<void> playFinishArrivalSfx() async {
+    if (_disposed) {
+      return;
+    }
+    try {
+      await _finishArrivalPlayer.stop();
+      await _finishArrivalPlayer.setReleaseMode(ReleaseMode.stop);
+      await _finishArrivalPlayer.play(
+        AssetSource(
+          _assetSourcePath(TimerAudioAssetCatalog.finishArrivalAssetPath),
+        ),
+        volume: TimerAudioAssetCatalog.finishArrivalVolume,
+        ctx: _audioContext,
+        mode: PlayerMode.lowLatency,
+      );
+    } catch (error, stackTrace) {
+      debugPrint('Timer finish-arrival SFX playback failed: $error');
+      debugPrintStack(stackTrace: stackTrace);
+    }
+  }
+
+  @override
   Future<void> stopAll() async {
     await Future.wait([
       stopBgm(),
       _stopMarkerSfx(),
       stopCourseLoading(),
       stopReadyStartBeep(),
+      stopFinishDriveSfx(),
+      _stopFinishArrivalSfx(),
     ]);
   }
 
@@ -261,8 +338,35 @@ class AudioplayersTimerAudioService implements TimerAudioService {
         _readyStartBeepPlayer,
         'Timer ready/start beep player dispose failed',
       ),
+      _disposePlayer(
+        _finishDrivePlayer,
+        'Timer finish-drive player dispose failed',
+      ),
+      _disposePlayer(
+        _finishArrivalPlayer,
+        'Timer finish-arrival player dispose failed',
+      ),
     ]);
     _disposed = true;
+  }
+
+  Future<void> _playFinishDriveSfx(String assetPath, String message) async {
+    if (_disposed) {
+      return;
+    }
+    try {
+      await _finishDrivePlayer.stop();
+      await _finishDrivePlayer.setReleaseMode(ReleaseMode.stop);
+      await _finishDrivePlayer.play(
+        AssetSource(_assetSourcePath(assetPath)),
+        volume: TimerAudioAssetCatalog.finishDriveVolume,
+        ctx: _audioContext,
+        mode: PlayerMode.lowLatency,
+      );
+    } catch (error, stackTrace) {
+      debugPrint('$message: $error');
+      debugPrintStack(stackTrace: stackTrace);
+    }
   }
 
   Future<void> _stopMarkerSfx() async {
@@ -273,6 +377,18 @@ class AudioplayersTimerAudioService implements TimerAudioService {
       await _markerPlayer.stop();
     } catch (error, stackTrace) {
       debugPrint('Timer marker SFX stop failed: $error');
+      debugPrintStack(stackTrace: stackTrace);
+    }
+  }
+
+  Future<void> _stopFinishArrivalSfx() async {
+    if (_disposed) {
+      return;
+    }
+    try {
+      await _finishArrivalPlayer.stop();
+    } catch (error, stackTrace) {
+      debugPrint('Timer finish-arrival SFX stop failed: $error');
       debugPrintStack(stackTrace: stackTrace);
     }
   }
