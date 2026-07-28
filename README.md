@@ -30,7 +30,7 @@ The app is designed around one simple goal: make daily routines feel like cozy j
 - In-app parent guide and contextual help for markers, results, rewards, and history
 - Local active timer session restore, activity history, progress summary, reward stickers, and reward goal tracking
 - Sticker collection and reward goal screens
-- Korean and English localization
+- English, Korean, Japanese, Spanish, and Brazilian Portuguese localization
 - Shared kid-friendly UI system with colors, radius, shadows, spacing, motion, cards, and bouncy buttons
 
 ## App Flow
@@ -96,8 +96,9 @@ assets/
 ## Timer Audio
 
 Timer audio is bundled separately from deferred motivation media. The active
-timer can play low-volume looping BGM during the ride and a short marker sound
-when the rider passes a visible course marker.
+timer can play low-volume looping BGM during the ride, course preview and
+ready/start cues, finish-drive sounds, and a short marker sound when the rider
+passes a visible course marker.
 
 The existing `soundEnabled` setting controls all timer sounds. Turning it off
 stops timer BGM, suppresses marker sounds, and prevents motivation voice
@@ -110,11 +111,28 @@ Runtime timer audio assets are registered individually in `pubspec.yaml`:
 ```text
 assets/audio/timer_bgm/timer_bgm_01.mp3
 assets/audio/marker/marker_01.mp3
+assets/audio/course_loading.mp3
+assets/audio/ready_start_beep_02.mp3
+assets/audio/final_drive_short.mp3
+assets/audio/final_drive_long.mp3
+assets/audio/finish_arrival.mp3
 ```
 
 The timer audio catalog lives in
 `lib/catalogs/timer_audio_asset_catalog.dart`, including the asset paths and
 default playback volumes.
+
+Result audio is also registered individually:
+
+```text
+assets/audio/crowd_cheering.mp3
+assets/audio/sticker_collect.mp3
+assets/audio/sticker_popup.mp3
+```
+
+Result screen playback paths and volumes live in
+`lib/catalogs/result_audio_asset_catalog.dart`; sticker popup audio is used by
+the sticker fountain animation.
 
 License evidence is stored under `_licenses/` folders inside `assets/audio`.
 Those files are repository evidence only and are not registered as Flutter
@@ -134,7 +152,7 @@ assets. See `assets/audio/README.md` for the expected layout and rules.
 - Flutter
 - Dart
 - Material 3
-- Custom local text bundles for Korean and English
+- Custom local text bundles for English, Korean, Japanese, Spanish, and Brazilian Portuguese
 - `shared_preferences` for local settings, progress, history, stickers, and rewards
 - `in_app_purchase` for the optional one-time vehicle pack purchase
 - `video_player` for splash, result, and flagged motivation videos
@@ -164,15 +182,18 @@ lib/
     activity_catalog.dart            # Built-in activity definitions and defaults
     activity_marker_catalog.dart     # Activity marker options and course slot generation
     timer_duration_catalog.dart      # Preset and custom timer duration constants
+    timer_audio_asset_catalog.dart   # Timer audio asset paths and playback volumes
     motivation_asset_catalog.dart    # Motivation video and voice asset catalogs
+    result_audio_asset_catalog.dart  # Result screen audio asset paths and playback volumes
     vehicle_catalog.dart             # Available vehicles and image assets
+    vehicle_unlock_catalog.dart      # Locked vehicle and vehicle pack purchase IDs
   controllers/
     activity_timer_controller.dart   # Timer state, progress, pause/resume logic
   l10n/
     app_texts.dart                   # Locale selection and text bundle wiring
     text_sets.dart                   # Text interfaces
-    en/, ko/                         # English and Korean copy
-    en/user_guide.dart, ko/user_guide.dart # Parent guide copy
+    en/, ko/, ja/, es/, pt_BR/       # Localized copy
+    */user_guide.dart                # Parent guide copy by locale
   models/
     activity_timer_config.dart       # User timer, vehicle, avatar, and display settings
     active_activity_timer_session.dart # Persisted active timer session data
@@ -183,6 +204,7 @@ lib/
     activity_history_entry.dart      # Stored activity history entry
     reward_goal.dart                 # Reward goal models
     reward_item.dart                 # Reward and sticker models
+    purchase_entitlement.dart        # Local vehicle pack entitlement state
     vehicle.dart                     # Vehicle definition and avatar slot
     vehicle_avatar_presentation.dart # Resolved default/custom avatar presentation
   navigation/
@@ -204,9 +226,17 @@ lib/
     active_activity_timer_session_store.dart # SharedPreferences store for active timer sessions
     local_avatar_image_service.dart  # Local avatar image normalization and storage
     local_settings_service.dart      # SharedPreferences wrapper for settings
+    local_recent_timer_service.dart  # Latest timer preset persistence
+    local_saved_timer_preset_service.dart # Saved and favorite timer presets
     local_activity_progress_service.dart # Local history, sticker, and reward persistence
+    local_purchase_entitlement_store.dart # Local vehicle pack entitlement cache
+    iap_purchase_client.dart         # Store purchase client abstraction
     motivation_audio_service.dart    # Motivation voice playback wrapper
+    result_audio_service.dart        # Result crowd and sticker audio playback wrapper
     screen_awake_service.dart        # Wakelock wrapper
+    timer_audio_service.dart         # Timer BGM, marker, preview, and finish audio wrapper
+    vehicle_pack_purchase_controller.dart # Vehicle pack product, purchase, and restore state
+    orientation_service.dart         # Orientation lock wrapper
   theme/
     app_colors.dart                  # Role-based color tokens
     app_motion.dart                  # Motion tokens
@@ -221,6 +251,7 @@ lib/
     app/                             # Reusable UI primitives
     app/app_help_sheet.dart          # Reusable contextual help bottom sheet
     avatar/                          # Avatar composite preview
+    purchase/                        # Parent gate and vehicle pack purchase sheets
     activity_marker_picker_sheet.dart # Automatic/selected marker picker
     road_view.dart                   # Road scene, vehicle placement, video bubble/layers
     road_painter.dart                # Road path drawing and progress highlight
