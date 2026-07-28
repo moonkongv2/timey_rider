@@ -13,8 +13,8 @@ The app is local-first. Settings, active timer sessions, history, sticker invent
 Read these files first for most reviews:
 
 - `lib/main.dart`: service creation and app bootstrap.
-- `lib/app.dart`: initial routing, onboarding, child name setup, and app-level config persistence.
-- `lib/screens/home_screen.dart`: activity selection, presets, active timer resume/cancel, and navigation into the timer.
+- `lib/app.dart`: initial routing, onboarding, child name setup, app-level config persistence, and purchase entitlement fallback.
+- `lib/screens/home_screen.dart`: activity selection, presets, active timer resume/cancel, vehicle pack entry points, and navigation into the timer.
 - `lib/screens/timer_screen.dart`: timer lifecycle, active session persistence, motivation media, orientation, and completion flow.
 - `lib/screens/result_screen.dart`: result recording, sticker choice, success/failure media, and reward goal updates.
 - `lib/controllers/activity_timer_controller.dart`: timer state machine and elapsed time calculation.
@@ -26,13 +26,16 @@ For data definitions, check:
 - `lib/catalogs/vehicle_catalog.dart`: vehicle assets, labels, avatar slots, and course kinds.
 - `lib/catalogs/activity_marker_catalog.dart`: marker definitions and course marker generation.
 - `lib/catalogs/motivation_asset_catalog.dart`: motivation video and voice asset selection.
+- `lib/catalogs/timer_audio_asset_catalog.dart`: timer BGM, marker, preview, and finish audio paths.
+- `lib/catalogs/result_audio_asset_catalog.dart`: result screen audio paths.
+- `lib/catalogs/vehicle_unlock_catalog.dart`: free vehicles, locked vehicles, and the vehicle pack product id.
 
 ## Main Runtime Flow
 
 The normal app flow is:
 
-1. `main.dart` loads `LocalSettingsService`, `LocalActivityProgressService`, and `ActiveActivityTimerSessionStore`.
-2. `TimeyRiderApp` decides whether to show splash, onboarding, child name setup, or home.
+1. `main.dart` loads `LocalSettingsService`, `LocalActivityProgressService`, `ActiveActivityTimerSessionStore`, and the cached vehicle pack entitlement.
+2. `TimeyRiderApp` decides whether to show splash, onboarding, child name setup, or home, applying a free-vehicle fallback if a saved vehicle is still locked.
 3. `HomeScreen` builds a timer config from the selected activity, duration, vehicle, and marker choices.
 4. `TimerScreen` starts or restores an `ActivityTimerController`.
 5. `TimerScreen` continuously saves an `ActiveActivityTimerSession` so the timer can be resumed later.
@@ -51,6 +54,7 @@ Most durable state is stored in `shared_preferences`.
 - `LocalActivityProgressService` persists activity history, sticker inventory, active reward goals, earned reward goals, and used reward goals.
 - `LocalRecentTimerService` and `LocalSavedTimerPresetService` persist timer presets.
 - `LocalAvatarImageService` handles imported avatar image storage and normalization.
+- `LocalPurchaseEntitlementStore` persists the cached vehicle pack entitlement.
 
 Review persistence changes carefully:
 
@@ -79,7 +83,8 @@ Review timer changes for:
 - elapsed time clamping at zero;
 - arrival behavior for different activity completion modes;
 - active session clearing after a recorded completion;
-- lifecycle handling when the app is paused or resumed.
+- lifecycle handling when the app is paused or resumed;
+- timer audio cleanup and one-shot cues for preview, ready/start, markers, finish drive, and arrival.
 
 ## Activities, Markers, Vehicles
 
@@ -87,16 +92,45 @@ Activities and vehicles are static catalogs, so changes usually need matching as
 
 For a new or changed activity, check:
 
-- `ActivityCatalog` has a stable id, Korean and English labels, emoji, default duration, preset durations, completion mode, reward default, and marker ids.
+- `ActivityCatalog` has a stable id, labels for every supported locale, emoji, default duration, preset durations, completion mode, reward default, and marker ids.
 - Marker ids exist in `ActivityMarkerCatalog`.
 - Tests cover catalog lookup and fallback behavior if relevant.
 
 For a new or changed vehicle, check:
 
-- `VehicleCatalog` has correct `assetPath`, `selectionAssetPath`, label copy, avatar slot, road anchor offset if needed, and course kind.
+- `VehicleCatalog` has correct `assetPath`, `selectionAssetPath`, label copy for every supported locale, avatar slot, road anchor offset if needed, and course kind.
 - Result video and motivation media fallbacks remain valid.
 - Reward sticker lookup still works.
+- Vehicle pack locking still matches `VehicleUnlockCatalog`.
 - Widget tests or focused rendering tests cover avatar and vehicle presentation when behavior changes.
+
+## Purchases And Parent Gate
+
+The vehicle pack is a client-only, non-consumable purchase. The app caches a
+local entitlement and relies on store restore for recovery across reinstall or
+device changes.
+
+Key files:
+
+- `lib/catalogs/vehicle_unlock_catalog.dart`
+- `lib/models/purchase_entitlement.dart`
+- `lib/services/iap_purchase_client.dart`
+- `lib/services/local_purchase_entitlement_store.dart`
+- `lib/services/vehicle_pack_purchase_controller.dart`
+- `lib/widgets/purchase/parent_gate_sheet.dart`
+- `lib/widgets/purchase/vehicle_pack_info_sheet.dart`
+- `lib/widgets/purchase/vehicle_pack_purchase_sheet.dart`
+- `docs/iap-release-setup.md`
+
+Review checks:
+
+- Locked vehicles remain visible but cannot be selected before entitlement.
+- Purchase and restore entry points remain behind the parent gate.
+- The pre-gate info sheet does not expose direct purchase or price wording.
+- Successful purchase or restore unlocks all locked vehicles and preserves the intended selection when applicable.
+- Failed, canceled, pending, unavailable, and not-found restore states do not corrupt local config.
+- Saved locked vehicle ids fall back to a free vehicle until entitlement is restored without overwriting the saved premium choice.
+- Product id changes stay synchronized with store setup docs and tests.
 
 ## Motivation Media
 
@@ -143,13 +177,18 @@ Key files:
 - `lib/l10n/text_sets.dart`
 - `lib/l10n/en/`
 - `lib/l10n/ko/`
+- `lib/l10n/ja/`
+- `lib/l10n/es/`
+- `lib/l10n/pt_BR/`
 
 When a change adds user-facing text:
 
 - Add it to the appropriate text set interface in `text_sets.dart`.
-- Implement both Korean and English versions.
+- Implement every supported locale: English, Korean, Japanese, Spanish, and Brazilian Portuguese.
+- For catalog labels, update every localized label field such as `labelKo`, `labelEn`, `labelJa`, `labelEs`, and `labelPtBr`.
 - Avoid embedding display strings directly in screens unless the surrounding file already treats the value as non-localized test/debug copy.
 - Check widget tests that assert exact text.
+- Check `test/localization_support_test.dart` for broad locale coverage.
 
 ## Rewards And History
 
@@ -204,6 +243,8 @@ Focused test choices:
 - Activity or marker catalog changes: `flutter test test/activity_domain_test.dart test/activity_marker_catalog_test.dart`
 - Timer preset changes: `flutter test test/activity_timer_preset_test.dart test/local_recent_timer_service_test.dart test/local_saved_timer_preset_service_test.dart`
 - Avatar changes: `flutter test test/local_avatar_image_service_test.dart test/avatar_composite_preview_test.dart test/vehicle_avatar_presentation_test.dart`
+- Localization changes: `flutter test test/localization_support_test.dart`
+- Purchase or locked vehicle changes: `flutter test test/app_purchase_entitlement_test.dart test/vehicle_pack_purchase_controller_test.dart test/vehicle_pack_purchase_sheet_test.dart test/parent_gate_sheet_test.dart test/iap_purchase_client_test.dart test/local_purchase_entitlement_store_test.dart`
 - Onboarding and app-level flow: `flutter test test/onboarding_screen_test.dart test/app_onboarding_flow_test.dart`
 - Broad UI behavior: `flutter test test/widget_test.dart`
 
@@ -217,8 +258,9 @@ Prioritize review attention when a change touches:
 - `ActivityTimerConfig`, because it is shared across many screens and persisted in multiple forms.
 - `LocalActivityProgressService`, because result recording updates several pieces of state at once.
 - `LocalSettingsService`, because settings changes can affect existing users after app upgrade.
+- `VehiclePackPurchaseController`, `IapPurchaseClient`, and `VehicleUnlockCatalog`, because purchase state affects vehicle selection, settings, avatar setup, and restore behavior.
 - vehicle or activity ids, because ids are persisted and referenced by catalogs, rewards, media, tests, and history.
-- localization interfaces, because adding a getter requires both language implementations.
+- localization interfaces, because adding a getter requires every supported locale implementation.
 - asset paths, because missing assets usually fail at runtime rather than compile time.
 
 ## Review Checklist
@@ -229,8 +271,9 @@ Use this short checklist before approving:
 - Existing app flow still works from home to timer to result.
 - Persisted models handle old and missing data safely.
 - Timer pause, resume, restore, arrival, and completion behavior still make sense.
-- User-facing text is localized in both supported languages.
+- User-facing text is localized in every supported language.
 - Asset paths match files under `assets/` and `pubspec.yaml`.
+- Parent-gated purchase, restore, support, and privacy entry points stay gated where required.
 - UI handles small screens and both timer orientations where relevant.
 - Tests cover the behavior or the risk is explicitly low.
 - `flutter analyze` and relevant `flutter test` commands were run or the reason they were not run is documented.

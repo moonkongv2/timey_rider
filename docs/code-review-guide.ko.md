@@ -13,8 +13,8 @@ Timey Rider는 아이용 루틴 타이머 Flutter 앱입니다. 아이가 활동
 대부분의 리뷰는 아래 파일을 먼저 읽으면 흐름을 잡기 쉽습니다.
 
 - `lib/main.dart`: 서비스 생성과 앱 부트스트랩.
-- `lib/app.dart`: 초기 라우팅, 온보딩, 아이 이름 설정, 앱 전역 설정 저장.
-- `lib/screens/home_screen.dart`: 활동 선택, 프리셋, 활성 타이머 재개/취소, 타이머 진입.
+- `lib/app.dart`: 초기 라우팅, 온보딩, 아이 이름 설정, 앱 전역 설정 저장, 구매 권한에 따른 fallback.
+- `lib/screens/home_screen.dart`: 활동 선택, 프리셋, 활성 타이머 재개/취소, 차량팩 진입점, 타이머 진입.
 - `lib/screens/timer_screen.dart`: 타이머 생명주기, 활성 세션 저장, 동기부여 미디어, 방향 전환, 완료 처리.
 - `lib/screens/result_screen.dart`: 결과 기록, 스티커 선택, 성공/실패 미디어, 보상 목표 업데이트.
 - `lib/controllers/activity_timer_controller.dart`: 타이머 상태 머신과 경과 시간 계산.
@@ -26,13 +26,16 @@ Timey Rider는 아이용 루틴 타이머 Flutter 앱입니다. 아이가 활동
 - `lib/catalogs/vehicle_catalog.dart`: 차량 asset, 라벨, 아바타 위치, 코스 종류.
 - `lib/catalogs/activity_marker_catalog.dart`: 활동 마커 정의와 코스 마커 생성.
 - `lib/catalogs/motivation_asset_catalog.dart`: 동기부여 영상과 음성 asset 선택.
+- `lib/catalogs/timer_audio_asset_catalog.dart`: 타이머 BGM, 마커, 미리보기, 도착 오디오 경로.
+- `lib/catalogs/result_audio_asset_catalog.dart`: 결과 화면 오디오 경로.
+- `lib/catalogs/vehicle_unlock_catalog.dart`: 무료 차량, 잠긴 차량, 차량팩 product id.
 
 ## 주요 실행 흐름
 
 일반적인 앱 흐름은 다음과 같습니다.
 
-1. `main.dart`가 `LocalSettingsService`, `LocalActivityProgressService`, `ActiveActivityTimerSessionStore`를 준비합니다.
-2. `TimeyRiderApp`이 splash, onboarding, child name setup, home 중 어떤 화면을 보여줄지 결정합니다.
+1. `main.dart`가 `LocalSettingsService`, `LocalActivityProgressService`, `ActiveActivityTimerSessionStore`, 저장된 차량팩 권한을 준비합니다.
+2. `TimeyRiderApp`이 splash, onboarding, child name setup, home 중 어떤 화면을 보여줄지 결정하고, 저장된 차량이 아직 잠겨 있으면 무료 차량 fallback을 적용합니다.
 3. `HomeScreen`이 선택한 활동, 시간, 차량, 마커로 타이머 설정을 만듭니다.
 4. `TimerScreen`이 `ActivityTimerController`를 새로 시작하거나 저장된 세션에서 복원합니다.
 5. `TimerScreen`은 실행 중인 `ActiveActivityTimerSession`을 계속 저장해 나중에 재개할 수 있게 합니다.
@@ -51,6 +54,7 @@ Timey Rider는 아이용 루틴 타이머 Flutter 앱입니다. 아이가 활동
 - `LocalActivityProgressService`: 활동 기록, 스티커 인벤토리, 활성/획득/사용된 보상 목표.
 - `LocalRecentTimerService`, `LocalSavedTimerPresetService`: 최근 타이머와 저장된 타이머 프리셋.
 - `LocalAvatarImageService`: 가져온 아바타 이미지 저장과 정규화.
+- `LocalPurchaseEntitlementStore`: 차량팩 권한 캐시.
 
 저장 관련 변경은 특히 보수적으로 리뷰합니다.
 
@@ -80,6 +84,7 @@ Timey Rider는 아이용 루틴 타이머 Flutter 앱입니다. 아이가 활동
 - 활동별 완료 방식에 따른 도착 처리 흐름이 맞는지.
 - 완료 후 활성 세션이 정리되는지.
 - 앱 pause/resume lifecycle에서 세션 저장과 시간 갱신이 맞는지.
+- 미리보기, ready/start, 마커, finish drive, arrival 같은 타이머 오디오 cue가 중복 재생되거나 누수되지 않는지.
 
 ## 활동, 마커, 차량
 
@@ -87,16 +92,44 @@ Timey Rider는 아이용 루틴 타이머 Flutter 앱입니다. 아이가 활동
 
 활동 변경 시 확인할 점:
 
-- `ActivityCatalog`에 안정적인 id, 한국어/영어 라벨, emoji, 기본 시간, 프리셋 시간, 완료 방식, 보상 기본값, 마커 id가 들어갔는지.
+- `ActivityCatalog`에 안정적인 id, 지원 locale별 라벨, emoji, 기본 시간, 프리셋 시간, 완료 방식, 보상 기본값, 마커 id가 들어갔는지.
 - 마커 id가 `ActivityMarkerCatalog`에 존재하는지.
 - catalog lookup과 fallback 동작이 테스트되는지.
 
 차량 변경 시 확인할 점:
 
-- `VehicleCatalog`의 `assetPath`, `selectionAssetPath`, 라벨, 아바타 슬롯, 필요한 road anchor offset, course kind가 맞는지.
+- `VehicleCatalog`의 `assetPath`, `selectionAssetPath`, 지원 locale별 라벨, 아바타 슬롯, 필요한 road anchor offset, course kind가 맞는지.
 - 결과 영상과 동기부여 미디어 fallback이 여전히 유효한지.
 - 보상 스티커 lookup이 깨지지 않는지.
+- 차량팩 잠금 정책이 `VehicleUnlockCatalog`와 계속 맞는지.
 - 동작이 바뀌었다면 아바타/차량 표시 테스트가 있는지.
+
+## 구매와 보호자 확인
+
+차량팩은 클라이언트 전용 non-consumable 구매입니다. 앱은 로컬 권한을
+캐시하고, 재설치나 기기 변경 후 복구는 스토어 restore에 의존합니다.
+
+주요 파일:
+
+- `lib/catalogs/vehicle_unlock_catalog.dart`
+- `lib/models/purchase_entitlement.dart`
+- `lib/services/iap_purchase_client.dart`
+- `lib/services/local_purchase_entitlement_store.dart`
+- `lib/services/vehicle_pack_purchase_controller.dart`
+- `lib/widgets/purchase/parent_gate_sheet.dart`
+- `lib/widgets/purchase/vehicle_pack_info_sheet.dart`
+- `lib/widgets/purchase/vehicle_pack_purchase_sheet.dart`
+- `docs/iap-release-setup.md`
+
+리뷰 체크포인트:
+
+- 잠긴 차량은 보이되 권한 전에는 바로 선택할 수 없어야 합니다.
+- 구매와 복원 진입점은 보호자 확인 뒤에만 열려야 합니다.
+- 보호자 확인 전 안내 sheet에는 가격이나 직접 구매 문구가 노출되지 않아야 합니다.
+- 구매나 복원 성공 시 잠긴 차량이 모두 열리고, 가능한 경우 사용자가 고르려던 차량 선택이 이어져야 합니다.
+- 실패, 취소, pending, 상품 없음, 복원 내역 없음 상태가 로컬 설정을 망가뜨리지 않아야 합니다.
+- 저장된 잠긴 차량 id는 권한 복원 전까지 무료 차량으로 fallback되지만, 저장된 premium 선택 자체를 덮어쓰면 안 됩니다.
+- product id 변경은 스토어 설정 문서와 테스트까지 함께 맞아야 합니다.
 
 ## 동기부여 미디어
 
@@ -143,13 +176,18 @@ UI 변경 리뷰 시 확인할 점:
 - `lib/l10n/text_sets.dart`
 - `lib/l10n/en/`
 - `lib/l10n/ko/`
+- `lib/l10n/ja/`
+- `lib/l10n/es/`
+- `lib/l10n/pt_BR/`
 
 사용자에게 보이는 문구가 추가되면:
 
 - `text_sets.dart`의 적절한 interface에 getter나 method를 추가합니다.
-- 한국어와 영어 구현을 모두 추가합니다.
+- 영어, 한국어, 일본어, 스페인어, 브라질 포르투갈어 구현을 모두 추가합니다.
+- catalog 라벨은 `labelKo`, `labelEn`, `labelJa`, `labelEs`, `labelPtBr`처럼 지원 locale별 필드를 모두 업데이트합니다.
 - 주변 코드가 명시적으로 비현지화 debug/test copy를 쓰는 경우가 아니라면 화면 파일에 문자열을 직접 넣지 않습니다.
 - 정확한 문구를 검증하는 widget test가 깨지는지 확인합니다.
+- 넓은 locale 검증은 `test/localization_support_test.dart`도 확인합니다.
 
 ## 보상과 활동 기록
 
@@ -204,6 +242,8 @@ flutter test
 - 활동/마커 catalog 변경: `flutter test test/activity_domain_test.dart test/activity_marker_catalog_test.dart`
 - 타이머 프리셋 변경: `flutter test test/activity_timer_preset_test.dart test/local_recent_timer_service_test.dart test/local_saved_timer_preset_service_test.dart`
 - 아바타 변경: `flutter test test/local_avatar_image_service_test.dart test/avatar_composite_preview_test.dart test/vehicle_avatar_presentation_test.dart`
+- 다국어 변경: `flutter test test/localization_support_test.dart`
+- 구매 또는 잠긴 차량 변경: `flutter test test/app_purchase_entitlement_test.dart test/vehicle_pack_purchase_controller_test.dart test/vehicle_pack_purchase_sheet_test.dart test/parent_gate_sheet_test.dart test/iap_purchase_client_test.dart test/local_purchase_entitlement_store_test.dart`
 - 온보딩과 앱 레벨 흐름: `flutter test test/onboarding_screen_test.dart test/app_onboarding_flow_test.dart`
 - 넓은 UI 동작: `flutter test test/widget_test.dart`
 
@@ -217,8 +257,9 @@ flutter test
 - `ActivityTimerConfig`: 여러 화면에서 공유되고 여러 저장 경로에 들어가는 핵심 모델입니다.
 - `LocalActivityProgressService`: 결과 기록 한 번에 여러 상태를 업데이트합니다.
 - `LocalSettingsService`: 앱 업데이트 후 기존 사용자 설정에 직접 영향을 줄 수 있습니다.
+- `VehiclePackPurchaseController`, `IapPurchaseClient`, `VehicleUnlockCatalog`: 구매 상태가 차량 선택, 설정, 아바타 설정, 복원 동작에 영향을 줍니다.
 - vehicle id 또는 activity id: 저장 데이터, catalog, 보상, 미디어, 테스트, 기록에서 참조됩니다.
-- localization interface: getter 추가 시 두 언어 구현이 모두 필요합니다.
+- localization interface: getter 추가 시 지원 locale 구현이 모두 필요합니다.
 - asset path: 컴파일보다 런타임에서 깨지는 경우가 많습니다.
 
 ## 리뷰 체크리스트
@@ -229,8 +270,9 @@ flutter test
 - home -> timer -> result 기본 흐름이 유지됩니다.
 - 저장 모델이 예전 데이터와 누락 데이터를 안전하게 처리합니다.
 - 타이머 pause, resume, restore, arrival, completion 동작이 자연스럽습니다.
-- 사용자에게 보이는 문구가 한국어/영어 모두 추가되었습니다.
+- 사용자에게 보이는 문구가 모든 지원 언어에 추가되었습니다.
 - asset 경로가 `assets/` 실제 파일과 `pubspec.yaml` 선언에 맞습니다.
+- 보호자 확인이 필요한 구매, 복원, 지원, 개인정보 링크 진입점이 계속 gate 뒤에 있습니다.
 - 관련 UI가 작은 화면과 타이머 양방향에서 깨지지 않습니다.
 - 위험도에 맞는 테스트가 있거나, 테스트가 불필요한 이유가 명확합니다.
 - `flutter analyze`와 관련 `flutter test` 실행 결과 또는 미실행 사유가 남아 있습니다.
