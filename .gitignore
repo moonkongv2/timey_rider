@@ -49,5 +49,10 @@ app.*.map.json
 /android/app/profile
 /android/app/release
 
+# Android release signing secrets
+/android/key.properties
+*.jks
+*.keystore
+
 # Scratch / Temp
 scratch/
