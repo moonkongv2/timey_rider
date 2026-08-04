@@ -13764,6 +13764,7 @@ Future<void> _pumpAvatarSetupScreen(
   VehiclePackInfoPresenter? vehiclePackInfoPresenter,
   ParentGatePresenter? parentGatePresenter,
   VehiclePackPurchasePresenter? vehiclePackPurchasePresenter,
+  bool dismissInitialGuide = true,
 }) async {
   tester.view.physicalSize = const Size(390, 844);
   tester.view.devicePixelRatio = 1;
@@ -13796,6 +13797,9 @@ Future<void> _pumpAvatarSetupScreen(
   );
   for (int i = 0; i < 40; i++) {
     await tester.pump(const Duration(milliseconds: 250));
+  }
+  if (dismissInitialGuide) {
+    await _dismissAvatarGuideIfVisible(tester);
   }
 }
 
