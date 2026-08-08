@@ -1853,7 +1853,7 @@ void main() {
     expect(
       TimerAudioAssetCatalog.runtimeAssetPaths,
       unorderedEquals({
-        'assets/audio/timer_bgm/timer_bgm_01.mp3',
+        'assets/audio/timer_bgm/timer_bgm_short.mp3',
         'assets/audio/marker/marker_01.mp3',
         'assets/audio/course_loading.mp3',
         'assets/audio/ready_start_beep_02.mp3',
@@ -1888,7 +1888,7 @@ void main() {
 
   test('Timer audio playable validation ignores non-audio evidence files', () {
     final playableFilesByDirectory = {
-      'assets/audio/timer_bgm': ['timer_bgm_01.mp3'],
+      'assets/audio/timer_bgm': ['timer_bgm_short.mp3'],
       'assets/audio/marker': ['marker_01.mp3'],
     };
 

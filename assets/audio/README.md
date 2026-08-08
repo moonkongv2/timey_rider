@@ -6,7 +6,7 @@ This folder contains runtime audio assets and license evidence.
 
 These audio files are bundled by `pubspec.yaml`:
 
-- `assets/audio/timer_bgm/timer_bgm_01.mp3`
+- `assets/audio/timer_bgm/timer_bgm_short.mp3`
 - `assets/audio/marker/marker_01.mp3`
 - `assets/audio/course_loading.mp3`
 - `assets/audio/ready_start_beep_02.mp3`

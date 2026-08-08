@@ -1,5 +1,5 @@
 asset_id: timer_bgm_01
-app_asset_path: assets/audio/timer_bgm/timer_bgm_01.mp3
+app_asset_path: assets/audio/timer_bgm/timer_bgm_short.mp3
 purpose: timer_background_music
 
 source:
@@ -17,11 +17,11 @@ license:
   attribution_required: false
 
 files:
-  app_filename: timer_bgm_01.mp3
+  app_filename: timer_bgm_short.mp3
   original_filename: TODO_USER
 
 modifications:
-  - TODO_USER
+  - Shortened for in-app timer playback.
 
 evidence:
   content_page: TODO_USER
