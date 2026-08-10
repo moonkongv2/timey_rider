@@ -40,6 +40,9 @@ Launch builds must not bundle these pubspec asset entries:
     - assets/audio/motivation/
 ```
 
+Launch-required splash and result videos are registered individually in
+`pubspec.yaml`; do not replace them with a broad `assets/videos/` entry.
+
 The media source files stay in Git. To re-enable the feature, restore both
 entries to `pubspec.yaml` before building with
 `ENABLE_MOTIVATION_MEDIA=true`.

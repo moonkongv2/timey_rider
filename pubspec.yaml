@@ -110,7 +110,19 @@ flutter:
     - assets/audio/crowd_cheering.mp3
     - assets/audio/sticker_collect.mp3
     - assets/audio/sticker_popup.mp3
-    - assets/videos/
+    - assets/videos/splash_animation.mp4
+    - assets/videos/result_airplane_success.mp4
+    - assets/videos/result_brachio_success.mp4
+    - assets/videos/result_bus_success.mp4
+    - assets/videos/result_excavator_success.mp4
+    - assets/videos/result_fire_truck_success.mp4
+    - assets/videos/result_motorcycle_success.mp4
+    - assets/videos/result_police_car_success.mp4
+    - assets/videos/result_pteranodon_success.mp4
+    - assets/videos/result_shark_success.mp4
+    - assets/videos/result_supercar_success.mp4
+    - assets/videos/result_t_rex_success.mp4
+    - assets/videos/result_train_success.mp4
   #   - images/a_dot_burr.jpeg
   #   - images/a_dot_ham.jpeg
 
