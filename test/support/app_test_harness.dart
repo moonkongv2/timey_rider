@@ -69,3 +69,59 @@ class CountingActivityProgressService extends LocalActivityProgressService {
     return super.loadSnapshot();
   }
 }
+
+Future<void> selectTimerBuilderActivity(
+  WidgetTester tester,
+  String activityId,
+) async {
+  tester
+      .widget<ChoiceChip>(
+        find.byKey(ValueKey('timerBuilderActivity_$activityId')),
+      )
+      .onSelected!(true);
+  await tester.pump();
+}
+
+Future<void> selectTimerBuilderManualMode(WidgetTester tester) async {
+  tester
+      .widget<OutlinedButton>(
+        find.descendant(
+          of: find.byKey(const ValueKey('timerBuilderMarkerManual')),
+          matching: find.byType(OutlinedButton),
+        ),
+      )
+      .onPressed!();
+  await tester.pump();
+}
+
+Future<void> selectTimerBuilderManualMarkers(
+  WidgetTester tester,
+  List<String> markerIds,
+) async {
+  await selectTimerBuilderManualMode(tester);
+
+  for (final markerId in markerIds) {
+    tester
+        .widget<ChoiceChip>(
+          find.byKey(ValueKey('timerBuilderMarker_$markerId')),
+        )
+        .onSelected!(true);
+    await tester.pump();
+  }
+}
+
+Future<void> setTimerBuilderMinutes(WidgetTester tester, int minutes) async {
+  tester
+      .widget<Slider>(find.byKey(const ValueKey('timerBuilderMinuteSlider')))
+      .onChanged!(minutes.toDouble());
+  await tester.pump();
+}
+
+Future<void> saveTimerBuilderPreset(WidgetTester tester) async {
+  tester
+      .widget<OutlinedButton>(
+        find.byKey(const ValueKey('timerBuilderSavePresetButton')),
+      )
+      .onPressed!();
+  await tester.pump();
+}
