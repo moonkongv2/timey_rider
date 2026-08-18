@@ -163,7 +163,8 @@ Do not create these files by default:
 
 If a temporary file is required to invoke a reviewer command:
 - Keep it compact.
-- For `agy` compact reviews, prefer a short temporary prompt under `/private/tmp` and pass it with `$(cat /private/tmp/...)` to avoid shell quoting and argument parsing issues.
+- For `agy` compact reviews, prefer passing the compact prompt directly as the `--print` argument.
+- Do not wrap `agy` in `/bin/zsh -lc`, use `$(cat ...)`, or redirect its output in the invocation. Read the command output directly instead.
 - Delete temporary compact-review prompt files after the review unless audit mode is requested.
 - Do not preserve it unless needed.
 - Do not create long prompt, review, decision, or summary artifacts.
@@ -202,12 +203,20 @@ codex exec --ephemeral -s read-only -C /Users/moonkong/dev/timey_rider -o codex_
 Antigravity reviewer:
 
 ```sh
-/Users/moonkong/.local/bin/agy --sandbox --print "$(cat codex_reviews/loop_N_prompt.md)" --print-timeout 10m > codex_reviews/loop_N_review.md
+/Users/moonkong/.local/bin/agy --sandbox --print '<review_prompt>' --print-timeout 10m --log-file /private/tmp/agy-review.log
 ```
 
-For compact mode, the same command shape may be used with temporary prompt or output files instead of persistent `codex_reviews/` files. Keep hardcoded command paths unchanged unless the user explicitly asks.
+Run the `agy` command with escalated host permissions from the first attempt because normal CLI startup needs to create its log and bind a localhost language-server port. Request a reusable approval scoped to this fixed command prefix:
 
-If `agy` fails with log-file creation, language-server startup, localhost bind, or `operation not permitted` errors, rerun the same review command with escalated permissions. These failures can happen during normal `agy` CLI startup inside the sandbox and are not a reason to skip the requested review loop.
+```text
+["/Users/moonkong/.local/bin/agy", "--sandbox", "--print"]
+```
+
+Keep `--sandbox` enabled so the reviewer agent's terminal tools remain restricted. Do not use `--dangerously-skip-permissions`.
+
+Capture reviewer output directly from the command result. In audit mode, write the captured output to `codex_reviews/loop_N_review.md` after the command completes. Keep the executable path, option order, and log path stable so the reusable approval continues to match.
+
+If the reusable approval is not yet available, request it once instead of first running `agy` in the restricted host sandbox and retrying after the expected failure.
 
 ## Reviewer Prompt Template
 The primary Codex should fill in the placeholders before each loop. Compact mode may keep the prompt in memory or a temporary file.
