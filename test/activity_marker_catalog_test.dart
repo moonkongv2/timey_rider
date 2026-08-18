@@ -138,4 +138,107 @@ void main() {
       defaultIds,
     );
   });
+  test('Activity marker catalog has non-empty unique ids', () {
+    final ids = ActivityMarkerCatalog.all.map((marker) => marker.id).toList();
+
+    expect(ids, isNotEmpty);
+    expect(ids.every((id) => id.trim().isNotEmpty), isTrue);
+    expect(ids.toSet(), hasLength(ids.length));
+  });
+
+  test('Activity marker automatic selection returns valid ids', () {
+    final ids = ActivityMarkerCatalog.automaticSelectionIds();
+
+    expect(ids, isNotEmpty);
+    expect(ids, hasLength(ActivityMarkerCatalog.maxSelectableMarkerCount));
+    for (final id in ids) {
+      expect(ActivityMarkerCatalog.findById(id), isNotNull);
+    }
+  });
+
+  test('Activity marker course slots returns exactly 30 markers', () {
+    final slots = ActivityMarkerCatalog.courseSlotsFor([
+      'top_teeth',
+      'bottom_teeth',
+    ]);
+
+    expect(slots, hasLength(30));
+  });
+
+  test('Activity marker course slot count scales with duration', () {
+    expect(
+      ActivityMarkerCatalog.courseSlotCountForDuration(
+        const Duration(minutes: 1),
+      ),
+      30,
+    );
+    expect(
+      ActivityMarkerCatalog.courseSlotCountForDuration(
+        const Duration(minutes: 5),
+      ),
+      30,
+    );
+    expect(
+      ActivityMarkerCatalog.courseSlotCountForDuration(
+        const Duration(minutes: 15),
+      ),
+      54,
+    );
+    expect(
+      ActivityMarkerCatalog.courseSlotCountForDuration(
+        const Duration(minutes: 25),
+      ),
+      90,
+    );
+    expect(
+      ActivityMarkerCatalog.courseSlotCountForDuration(
+        const Duration(minutes: 35),
+      ),
+      126,
+    );
+    expect(
+      ActivityMarkerCatalog.courseSlotCountForDuration(
+        const Duration(minutes: 60),
+      ),
+      144,
+    );
+  });
+
+  test('Activity marker course slots only uses selected ids', () {
+    const selectedIds = ['top_teeth', 'bottom_teeth', 'molars'];
+    final slots = ActivityMarkerCatalog.courseSlotsFor(selectedIds);
+
+    expect(slots.map((marker) => marker.id).toSet(), {
+      'top_teeth',
+      'bottom_teeth',
+      'molars',
+    });
+  });
+  test('Activity marker course slots fall back for invalid selected ids', () {
+    final slots = ActivityMarkerCatalog.courseSlotsFor(['missing']);
+
+    expect(
+      slots.map((marker) => marker.id).toSet(),
+      ActivityMarkerCatalog.defaultSelectionIds.toSet(),
+    );
+  });
+
+  test(
+    'Activity marker course slots avoids 3 consecutive identical ids when possible',
+    () {
+      final slots = ActivityMarkerCatalog.courseSlotsFor([
+        'top_teeth',
+        'top_teeth',
+        'bottom_teeth',
+      ]);
+
+      for (var index = 2; index < slots.length; index += 1) {
+        expect(
+          slots[index].id == slots[index - 1].id &&
+              slots[index].id == slots[index - 2].id,
+          isFalse,
+        );
+      }
+    },
+  );
 }
