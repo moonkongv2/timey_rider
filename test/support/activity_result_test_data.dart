@@ -1,6 +1,8 @@
 import 'package:timey_rider/catalogs/activity_catalog.dart';
 import 'package:timey_rider/models/activity_completion_status.dart';
 import 'package:timey_rider/models/activity_session_result.dart';
+import 'package:timey_rider/models/activity_progress_snapshot.dart';
+import 'package:timey_rider/services/local_activity_progress_service.dart';
 
 ActivitySessionResult activityResult({
   String activityId = 'brushing',
@@ -42,4 +44,12 @@ ActivitySessionResult activityResult({
                   ))
         : null,
   );
+}
+
+Future<RecordedActivitySession> recordActivityResult(
+  LocalActivityProgressService service,
+  ActivitySessionResult result, {
+  String vehicleId = 'motorcycle',
+}) {
+  return service.recordActivityResult(result, vehicleId: vehicleId);
 }
