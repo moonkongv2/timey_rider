@@ -1,9 +1,56 @@
 import 'dart:async';
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:in_app_purchase/in_app_purchase.dart';
+import 'package:in_app_purchase_android/in_app_purchase_android.dart';
+import 'package:in_app_purchase_android/billing_client_wrappers.dart';
 import 'package:timey_rider/services/iap_purchase_client.dart';
 
 void main() {
+  test('Android acknowledgement rejects non-OK billing response', () async {
+    final platform = _AndroidPlatform()..response = BillingResponse.error;
+    final client = InAppPurchaseClient(
+      inAppPurchase: _Store(),
+      androidPlatform: platform,
+    );
+    final purchase = _googlePurchase(PurchaseStateWrapper.purchased);
+    final update = IapPurchaseUpdate(
+      productId: 'vehicle_pack',
+      status: IapPurchaseStatus.purchased,
+      sourcePurchaseDetails: purchase,
+      pendingCompletePurchase: true,
+    );
+    await expectLater(client.completePurchase(update), throwsStateError);
+    platform.response = BillingResponse.ok;
+    await client.completePurchase(update);
+  });
+
+  test(
+    'Android query preserves pending transactions and reports errors',
+    () async {
+      final addition = _AndroidAddition()
+        ..response = QueryPurchaseDetailsResponse(
+          pastPurchases: [_googlePurchase(PurchaseStateWrapper.pending)],
+        );
+      final client = InAppPurchaseClient(
+        inAppPurchase: _Store(),
+        androidPlatform: _AndroidPlatform(),
+        androidAddition: addition,
+      );
+      final purchases = await client.queryExistingPurchases();
+      expect(purchases.single.status, IapPurchaseStatus.pending);
+      addition.response = QueryPurchaseDetailsResponse(
+        pastPurchases: [],
+        error: IAPError(
+          source: 'google_play',
+          code: 'offline',
+          message: 'offline',
+        ),
+      );
+      await expectLater(client.queryExistingPurchases(), throwsStateError);
+    },
+  );
+
   test('fake client returns configured availability and products', () async {
     final client = _FakeIapPurchaseClient(
       available: true,
@@ -150,4 +197,48 @@ class _FakeIapPurchaseClient implements IapPurchaseClient {
   void emitPurchases(List<IapPurchaseUpdate> purchases) {
     _purchaseStreamController.add(purchases);
   }
+}
+
+GooglePlayPurchaseDetails _googlePurchase(PurchaseStateWrapper state) {
+  return GooglePlayPurchaseDetails.fromPurchase(
+    PurchaseWrapper(
+      orderId: 'order-1',
+      packageName: 'com.timeyrider.app',
+      purchaseTime: 1,
+      purchaseToken: 'test-token',
+      signature: '',
+      products: const ['vehicle_pack'],
+      isAutoRenewing: false,
+      originalJson: '{}',
+      isAcknowledged: false,
+      purchaseState: state,
+    ),
+  ).single;
+}
+
+class _AndroidPlatform implements InAppPurchaseAndroidPlatform {
+  BillingResponse response = BillingResponse.ok;
+  @override
+  Future<BillingResultWrapper> completePurchase(
+    PurchaseDetails purchase,
+  ) async => BillingResultWrapper(responseCode: response);
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
+}
+
+class _AndroidAddition implements InAppPurchaseAndroidPlatformAddition {
+  QueryPurchaseDetailsResponse response = QueryPurchaseDetailsResponse(
+    pastPurchases: [],
+  );
+  @override
+  Future<QueryPurchaseDetailsResponse> queryPastPurchases({
+    String? applicationUserName,
+  }) async => response;
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
+}
+
+class _Store implements InAppPurchase {
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }

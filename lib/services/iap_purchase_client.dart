@@ -1,6 +1,9 @@
 import 'dart:async';
 
 import 'package:in_app_purchase/in_app_purchase.dart';
+import 'package:in_app_purchase_android/in_app_purchase_android.dart';
+import 'package:in_app_purchase_android/billing_client_wrappers.dart';
+import 'package:in_app_purchase_platform_interface/in_app_purchase_platform_interface.dart';
 
 enum IapPurchaseStatus { pending, purchased, restored, error, canceled }
 
@@ -86,9 +89,42 @@ abstract interface class IapPurchaseClient {
   Future<void> completePurchase(IapPurchaseUpdate purchase);
 }
 
-class InAppPurchaseClient implements IapPurchaseClient {
-  InAppPurchaseClient({InAppPurchase? inAppPurchase})
-    : _inAppPurchase = inAppPurchase ?? InAppPurchase.instance;
+abstract interface class IapPurchaseRecoveryClient {
+  Future<List<IapPurchaseUpdate>> queryExistingPurchases();
+}
+
+class InAppPurchaseClient
+    implements IapPurchaseClient, IapPurchaseRecoveryClient {
+  InAppPurchaseClient({
+    InAppPurchase? inAppPurchase,
+    InAppPurchaseAndroidPlatform? androidPlatform,
+    InAppPurchaseAndroidPlatformAddition? androidAddition,
+  }) : _inAppPurchase = inAppPurchase ?? InAppPurchase.instance,
+       _androidPlatformOverride = androidPlatform,
+       _androidAdditionOverride = androidAddition;
+
+  final InAppPurchaseAndroidPlatform? _androidPlatformOverride;
+  final InAppPurchaseAndroidPlatformAddition? _androidAdditionOverride;
+
+  InAppPurchaseAndroidPlatform? get _androidPlatform {
+    final platform = _androidPlatformOverride ?? InAppPurchasePlatform.instance;
+    return platform is InAppPurchaseAndroidPlatform ? platform : null;
+  }
+
+  @override
+  Future<List<IapPurchaseUpdate>> queryExistingPurchases() async {
+    if (_androidPlatform == null) return const [];
+    final addition =
+        _androidAdditionOverride ??
+        _inAppPurchase
+            .getPlatformAddition<InAppPurchaseAndroidPlatformAddition>();
+    final response = await addition.queryPastPurchases();
+    if (response.error != null) {
+      throw StateError('Purchase query failed: ${response.error!.code}');
+    }
+    // Preserve pending status; restorePurchases marks all Android entries restored.
+    return response.pastPurchases.map(_purchaseUpdateFromStore).toList();
+  }
 
   final InAppPurchase _inAppPurchase;
 
@@ -136,7 +172,7 @@ class InAppPurchaseClient implements IapPurchaseClient {
   }
 
   @override
-  Future<void> completePurchase(IapPurchaseUpdate purchase) {
+  Future<void> completePurchase(IapPurchaseUpdate purchase) async {
     final sourcePurchase = purchase.sourcePurchaseDetails;
     if (sourcePurchase is! PurchaseDetails) {
       throw ArgumentError.value(
@@ -146,7 +182,18 @@ class InAppPurchaseClient implements IapPurchaseClient {
       );
     }
 
-    return _inAppPurchase.completePurchase(sourcePurchase);
+    final androidPlatform = _androidPlatform;
+    if (sourcePurchase is GooglePlayPurchaseDetails &&
+        androidPlatform != null) {
+      final response = await androidPlatform.completePurchase(sourcePurchase);
+      if (response.responseCode != BillingResponse.ok) {
+        throw StateError(
+          'Purchase acknowledgement failed: ${response.responseCode.name}',
+        );
+      }
+      return;
+    }
+    await _inAppPurchase.completePurchase(sourcePurchase);
   }
 
   IapProductDetails _productDetailsFromStore(ProductDetails product) {
@@ -166,7 +213,12 @@ class InAppPurchaseClient implements IapPurchaseClient {
     final error = _errorFromStore(purchase.error);
     return IapPurchaseUpdate(
       productId: purchase.productID,
-      status: _purchaseStatusFromStore(purchase.status, error),
+      status:
+          purchase is GooglePlayPurchaseDetails &&
+              purchase.billingClientPurchase.purchaseState ==
+                  PurchaseStateWrapper.pending
+          ? IapPurchaseStatus.pending
+          : _purchaseStatusFromStore(purchase.status, error),
       purchaseId: purchase.purchaseID,
       transactionDate: purchase.transactionDate,
       pendingCompletePurchase: purchase.pendingCompletePurchase,
