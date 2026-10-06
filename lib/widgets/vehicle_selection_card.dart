@@ -130,35 +130,45 @@ class VehicleSelectionCard extends StatelessWidget {
                   const spacing = AppSpacing.sm;
                   final threeAcrossWidth =
                       (constraints.maxWidth - (spacing * 2)) / 3;
-                  final itemSize = threeAcrossWidth
-                      .clamp(72.0, 128.0)
-                      .toDouble();
+                  final preferredItemSize = threeAcrossWidth.clamp(72.0, 128.0);
+                  final columnCount =
+                      ((constraints.maxWidth + spacing) /
+                              (preferredItemSize + spacing))
+                          .floor()
+                          .clamp(1, VehicleCatalog.all.length);
+                  final itemSize =
+                      (constraints.maxWidth - spacing * (columnCount - 1)) /
+                      columnCount;
 
-                  return Wrap(
-                    alignment: WrapAlignment.center,
-                    spacing: spacing,
-                    runSpacing: spacing,
-                    clipBehavior: Clip.none,
-                    children: [
-                      for (final vehicle in VehicleCatalog.all)
-                        _VehicleChoiceButton(
-                          size: itemSize,
-                          vehicle: vehicle,
-                          isSelected: selectedVehicle.id == vehicle.id,
-                          isLocked: isVehicleLocked?.call(vehicle.id) ?? false,
-                          lockedLabel: lockedVehicleLabel,
-                          onTap: () {
-                            if (isVehicleLocked?.call(vehicle.id) ?? false) {
-                              onLockedVehiclePressed?.call(vehicle.id);
-                              return;
-                            }
-                            onVehicleSelected(vehicle.id);
-                          },
-                          avatar: avatar,
-                          resolvedAvatar: avatarForVehicle?.call(vehicle.id),
-                          avatarImageBuilder: avatarImageBuilder,
-                        ),
-                    ],
+                  return SizedBox(
+                    width: constraints.maxWidth,
+                    child: Wrap(
+                      alignment: WrapAlignment.center,
+                      spacing: spacing,
+                      runSpacing: spacing,
+                      clipBehavior: Clip.none,
+                      children: [
+                        for (final vehicle in VehicleCatalog.all)
+                          _VehicleChoiceButton(
+                            size: itemSize,
+                            vehicle: vehicle,
+                            isSelected: selectedVehicle.id == vehicle.id,
+                            isLocked:
+                                isVehicleLocked?.call(vehicle.id) ?? false,
+                            lockedLabel: lockedVehicleLabel,
+                            onTap: () {
+                              if (isVehicleLocked?.call(vehicle.id) ?? false) {
+                                onLockedVehiclePressed?.call(vehicle.id);
+                                return;
+                              }
+                              onVehicleSelected(vehicle.id);
+                            },
+                            avatar: avatar,
+                            resolvedAvatar: avatarForVehicle?.call(vehicle.id),
+                            avatarImageBuilder: avatarImageBuilder,
+                          ),
+                      ],
+                    ),
                   );
                 },
               ),
