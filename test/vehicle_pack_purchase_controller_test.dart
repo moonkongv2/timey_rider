@@ -8,6 +8,70 @@ import 'package:timey_rider/services/local_purchase_entitlement_store.dart';
 import 'package:timey_rider/services/vehicle_pack_purchase_controller.dart';
 
 void main() {
+  test(
+    'failed acknowledgement is retried without losing entitlement',
+    () async {
+      final client = _FakeIapPurchaseClient()
+        ..completionError = StateError('offline');
+      final store = _FakePurchaseEntitlementStore();
+      final controller = _controller(client: client, store: store);
+      client.emitPurchases([_purchase(status: IapPurchaseStatus.purchased)]);
+      await pumpEventQueue();
+      expect(controller.state.vehiclePackUnlocked, isTrue);
+      expect(controller.state.status, VehiclePackPurchaseStatus.error);
+      client.completionError = null;
+      await controller.recoverPurchases();
+      expect(controller.state.status, VehiclePackPurchaseStatus.purchased);
+      expect(client.completedProductIds, hasLength(2));
+      client.emitPurchases([_purchase(status: IapPurchaseStatus.purchased)]);
+      await pumpEventQueue();
+      expect(client.completedProductIds, hasLength(2));
+      controller.dispose();
+    },
+  );
+
+  test(
+    'recovery keeps pending locked then delivers completed transaction',
+    () async {
+      final client = _FakeIapPurchaseClient();
+      final controller = _controller(
+        client: client,
+        store: _FakePurchaseEntitlementStore(),
+      );
+      client.existingPurchases = [
+        _purchase(
+          status: IapPurchaseStatus.pending,
+          pendingCompletePurchase: false,
+        ),
+      ];
+      await controller.recoverPurchases();
+      expect(controller.state.vehiclePackUnlocked, isFalse);
+      expect(client.completedProductIds, isEmpty);
+      client.existingPurchases = [
+        _purchase(status: IapPurchaseStatus.purchased),
+      ];
+      await controller.recoverPurchases();
+      expect(controller.state.vehiclePackUnlocked, isTrue);
+      expect(client.completedProductIds, hasLength(1));
+      controller.dispose();
+    },
+  );
+
+  test('offline recovery preserves cached unlocked entitlement', () async {
+    final client = _FakeIapPurchaseClient()
+      ..recoveryError = StateError('offline');
+    final store = _FakePurchaseEntitlementStore()
+      ..entitlement = const PurchaseEntitlement(
+        vehiclePackUnlocked: true,
+        source: PurchaseEntitlementSource.localCache,
+      );
+    final controller = _controller(client: client, store: store);
+    await controller.loadCachedEntitlement();
+    await controller.recoverPurchases();
+    expect(controller.state.vehiclePackUnlocked, isTrue);
+    controller.dispose();
+  });
+
   test('purchased vehicle pack saves entitlement before completing', () async {
     final events = <String>[];
     final client = _FakeIapPurchaseClient(events: events);
@@ -314,7 +378,8 @@ class _FakePurchaseEntitlementStore implements PurchaseEntitlementStore {
   }
 }
 
-class _FakeIapPurchaseClient implements IapPurchaseClient {
+class _FakeIapPurchaseClient
+    implements IapPurchaseClient, IapPurchaseRecoveryClient {
   _FakeIapPurchaseClient({
     bool isAvailable = true,
     this.queryResult,
@@ -332,6 +397,15 @@ class _FakeIapPurchaseClient implements IapPurchaseClient {
   final completedProductIds = <String>[];
   final List<String> events;
   int restoreCallCount = 0;
+  Object? completionError;
+  Object? recoveryError;
+  List<IapPurchaseUpdate> existingPurchases = [];
+
+  @override
+  Future<List<IapPurchaseUpdate>> queryExistingPurchases() async {
+    if (recoveryError != null) throw recoveryError!;
+    return existingPurchases;
+  }
 
   @override
   Stream<List<IapPurchaseUpdate>> get purchaseStream {
@@ -349,6 +423,7 @@ class _FakeIapPurchaseClient implements IapPurchaseClient {
   Future<void> completePurchase(IapPurchaseUpdate purchase) async {
     completedProductIds.add(purchase.productId);
     events.add('complete:${purchase.productId}');
+    if (completionError != null) throw completionError!;
   }
 
   @override

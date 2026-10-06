@@ -78,7 +78,11 @@ class VehiclePackPurchaseController extends ChangeNotifier {
        _entitlementStore = entitlementStore,
        _now = now ?? DateTime.now {
     _purchaseSubscription = _purchaseClient.purchaseStream.listen(
-      (purchases) => unawaited(_handlePurchaseUpdates(purchases)),
+      (purchases) {
+        _purchaseUpdates = _purchaseUpdates.then(
+          (_) => _handlePurchaseUpdates(purchases),
+        );
+      },
       onError: (Object error) {
         _setState(
           _state.copyWith(
@@ -94,6 +98,11 @@ class VehiclePackPurchaseController extends ChangeNotifier {
   final PurchaseEntitlementStore _entitlementStore;
   final DateTime Function() _now;
   late final StreamSubscription<List<IapPurchaseUpdate>> _purchaseSubscription;
+  Future<void> _purchaseUpdates = Future.value();
+  Future<void>? _recoveryOperation;
+  final Map<String, IapPurchaseUpdate> _failedCompletions = {};
+  Timer? _retryTimer;
+  bool _disposed = false;
   final Set<String> _completedPurchaseKeys = {};
   final Set<String> _processingPurchaseKeys = {};
 
@@ -103,8 +112,54 @@ class VehiclePackPurchaseController extends ChangeNotifier {
 
   Future<PurchaseEntitlement> loadCachedEntitlement() async {
     final entitlement = await _entitlementStore.load();
-    _setState(_state.copyWith(entitlement: entitlement));
-    return entitlement;
+    if (!_state.vehiclePackUnlocked) {
+      _setState(_state.copyWith(entitlement: entitlement));
+    }
+    return _state.entitlement;
+  }
+
+  Future<void> recoverPurchases() {
+    return _recoveryOperation ??= _recoverPurchases().whenComplete(() {
+      _recoveryOperation = null;
+    });
+  }
+
+  Future<void> _recoverPurchases() async {
+    if (_disposed) return;
+    _retryTimer?.cancel();
+    try {
+      await _purchaseUpdates;
+      for (final purchase in _failedCompletions.values.toList()) {
+        if (_disposed) return;
+        await _handlePurchaseUpdates([purchase]);
+      }
+      final client = _purchaseClient;
+      if (client is IapPurchaseRecoveryClient) {
+        final purchases = await (client as IapPurchaseRecoveryClient)
+            .queryExistingPurchases();
+        if (_disposed) return;
+        _purchaseUpdates = _purchaseUpdates.then(
+          (_) => _handlePurchaseUpdates(purchases),
+        );
+        await _purchaseUpdates;
+      }
+    } catch (error) {
+      // A background store query must not revoke cached offline entitlement.
+      debugPrint('Unable to recover purchases: $error');
+      _scheduleRetry();
+    }
+    if (_failedCompletions.isNotEmpty ||
+        _state.status == VehiclePackPurchaseStatus.pending) {
+      _scheduleRetry();
+    }
+  }
+
+  void _scheduleRetry() {
+    if (_disposed || (_retryTimer?.isActive ?? false)) return;
+    _retryTimer = Timer(
+      const Duration(seconds: 30),
+      () => unawaited(recoverPurchases()),
+    );
   }
 
   Future<IapProductDetails?> loadVehiclePackProduct() async {
@@ -237,6 +292,7 @@ class VehiclePackPurchaseController extends ChangeNotifier {
     );
     try {
       await _purchaseClient.restorePurchases();
+      await _purchaseUpdates;
       if (_state.status == VehiclePackPurchaseStatus.restoring &&
           !_state.vehiclePackUnlocked) {
         _setState(
@@ -258,12 +314,16 @@ class VehiclePackPurchaseController extends ChangeNotifier {
 
   Future<void> _handlePurchaseUpdates(List<IapPurchaseUpdate> purchases) async {
     for (final purchase in purchases) {
+      if (_disposed) return;
       if (purchase.productId != VehicleUnlockCatalog.vehiclePackProductId) {
         continue;
       }
 
       switch (purchase.status) {
         case IapPurchaseStatus.pending:
+          if (_purchaseClient is IapPurchaseRecoveryClient) {
+            _scheduleRetry();
+          }
           _setState(
             _state.copyWith(
               status: VehiclePackPurchaseStatus.pending,
@@ -327,6 +387,7 @@ class VehiclePackPurchaseController extends ChangeNotifier {
       if (purchase.pendingCompletePurchase) {
         await _purchaseClient.completePurchase(purchase);
       }
+      _failedCompletions.remove(purchaseKey);
       _completedPurchaseKeys.add(purchaseKey);
       _setState(
         _state.copyWith(
@@ -336,6 +397,8 @@ class VehiclePackPurchaseController extends ChangeNotifier {
         ),
       );
     } catch (error) {
+      _failedCompletions[purchaseKey] = purchase;
+      _scheduleRetry();
       _setState(
         _state.copyWith(
           entitlement: entitlement,
@@ -384,12 +447,15 @@ class VehiclePackPurchaseController extends ChangeNotifier {
   }
 
   void _setState(VehiclePackPurchaseState state) {
+    if (_disposed) return;
     _state = state;
     notifyListeners();
   }
 
   @override
   void dispose() {
+    _disposed = true;
+    _retryTimer?.cancel();
     unawaited(_purchaseSubscription.cancel());
     super.dispose();
   }

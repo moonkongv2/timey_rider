@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
@@ -45,7 +47,8 @@ class TimeyRiderApp extends StatefulWidget {
   State<TimeyRiderApp> createState() => _TimeyRiderAppState();
 }
 
-class _TimeyRiderAppState extends State<TimeyRiderApp> {
+class _TimeyRiderAppState extends State<TimeyRiderApp>
+    with WidgetsBindingObserver {
   late ActivityTimerConfig _config = widget.initialConfig;
   late VehiclePackPurchaseState _purchaseState =
       (widget.purchaseController?.state ??
@@ -58,8 +61,10 @@ class _TimeyRiderAppState extends State<TimeyRiderApp> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _purchaseController = widget.purchaseController;
     _purchaseController?.addListener(_handlePurchaseStateChanged);
+    unawaited(_purchaseController?.recoverPurchases());
   }
 
   @override
@@ -69,6 +74,7 @@ class _TimeyRiderAppState extends State<TimeyRiderApp> {
       oldWidget.purchaseController?.removeListener(_handlePurchaseStateChanged);
       _purchaseController = widget.purchaseController;
       _purchaseController?.addListener(_handlePurchaseStateChanged);
+      unawaited(_purchaseController?.recoverPurchases());
       final purchaseController = _purchaseController;
       if (purchaseController != null) {
         _purchaseState = purchaseController.state;
@@ -77,7 +83,15 @@ class _TimeyRiderAppState extends State<TimeyRiderApp> {
   }
 
   @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      unawaited(_purchaseController?.recoverPurchases());
+    }
+  }
+
+  @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     _purchaseController?.removeListener(_handlePurchaseStateChanged);
     if (widget.disposePurchaseController) {
       _purchaseController?.dispose();
