@@ -11,6 +11,7 @@ import 'package:timey_rider/services/local_activity_progress_service.dart';
 import 'support/timer_test_harness.dart';
 
 void main() {
+  setUp(() => SharedPreferences.setMockInitialValues({}));
   testWidgets('Timer screen plays motivation voice after video starts', (
     tester,
   ) async {

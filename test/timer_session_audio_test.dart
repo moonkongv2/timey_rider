@@ -13,6 +13,7 @@ import 'package:timey_rider/widgets/timer_control_bar.dart';
 import 'support/timer_test_harness.dart';
 
 void main() {
+  setUp(() => SharedPreferences.setMockInitialValues({}));
   testWidgets('TimerScreen passes marker ids to road markers', (tester) async {
     tester.view.physicalSize = const Size(390, 844);
     tester.view.devicePixelRatio = 1.0;

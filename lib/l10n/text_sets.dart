@@ -13,6 +13,8 @@ abstract interface class CommonTextSet {
   String get locked;
   String get notYet;
   String get restartRide;
+  String get saveFailureMessage;
+  String get retry;
   String get settings;
   String get start;
 }

@@ -17,4 +17,6 @@ class CommonTexts implements CommonTextSet {
   String get restartRide => '다시 출발';
   String get settings => '설정';
   String get start => '출발';
+  String get saveFailureMessage => '기록을 저장하지 못했어요. 다시 시도해 주세요.';
+  String get retry => '다시 시도';
 }

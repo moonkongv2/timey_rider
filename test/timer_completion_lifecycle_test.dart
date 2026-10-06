@@ -16,6 +16,7 @@ import 'package:timey_rider/widgets/timer_control_bar.dart';
 import 'support/timer_test_harness.dart';
 
 void main() {
+  setUp(() => SharedPreferences.setMockInitialValues({}));
   testWidgets(
     'TimerScreen restores arrived sessions at the finish until acknowledged',
     (tester) async {
@@ -252,6 +253,11 @@ void main() {
 
     expect(find.byType(TimerScreen), findsOneWidget);
     expect(find.byType(ResultScreen), findsNothing);
+    final pending = await const ActiveActivityTimerSessionStore()
+        .loadPendingResult();
+    expect(pending, isNotNull);
+    expect(pending!.result.receiveSticker, isNull);
+    expect(await const ActiveActivityTimerSessionStore().load(), isNull);
     expect(
       tester.widget<TimerControlBar>(find.byType(TimerControlBar)).onComplete,
       isNull,

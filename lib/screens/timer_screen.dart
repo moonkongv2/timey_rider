@@ -16,6 +16,7 @@ import '../models/activity.dart';
 import '../models/activity_completion_status.dart';
 import '../models/activity_marker.dart';
 import '../models/activity_session_result.dart';
+import '../models/pending_activity_result.dart';
 import '../models/activity_timer_config.dart';
 import '../models/vehicle_avatar_presentation.dart';
 import '../services/active_activity_timer_session_store.dart';
@@ -245,6 +246,7 @@ class _TimerScreenState extends State<TimerScreen>
   bool _activeSessionFinalized = false;
   Animation<double>? _finishDriveAnimation;
   ActivitySessionResult? _pendingFinishDriveResult;
+  ActivitySessionResult? _completionAwaitingPersistence;
   double _finishDriveStartProgress = 0;
   DateTime? _arrivalCompletedAt;
   Duration? _arrivalActualDuration;
@@ -1046,6 +1048,13 @@ class _TimerScreenState extends State<TimerScreen>
   }
 
   Future<void> _confirmComplete() async {
+    final pending = _completionAwaitingPersistence;
+    if (pending != null) {
+      if (await _persistCompletedResult(pending) && mounted) {
+        _openResult(pending);
+      }
+      return;
+    }
     if (_controller.startedAt == null ||
         _isStartupPreviewing ||
         _isFinishDriving) {
@@ -1099,7 +1108,8 @@ class _TimerScreenState extends State<TimerScreen>
     _activeSessionFinalized = true;
     final result = _controller.complete(completionStatus: completionStatus);
     _syncTimerBgm();
-    await _clearActiveSession();
+    if (!await _persistCompletedResult(result)) return;
+    if (!mounted) return;
     if (result.completedBeforeEnd) {
       _startFinishDrive(result);
       return;
@@ -1140,7 +1150,8 @@ class _TimerScreenState extends State<TimerScreen>
     _activeSessionFinalized = true;
     final result = _completeArrival(completionStatus: completionStatus);
     _syncTimerBgm();
-    await _clearActiveSession();
+    if (!await _persistCompletedResult(result)) return;
+    if (!mounted) return;
     _openResult(result);
   }
 
@@ -1247,13 +1258,52 @@ class _TimerScreenState extends State<TimerScreen>
     _openResult(result);
   }
 
+  Future<bool> _persistCompletedResult(ActivitySessionResult result) async {
+    _completionAwaitingPersistence = result;
+    try {
+      await widget.activeSessionStore.savePendingResult(
+        PendingActivityResult(
+          session: ActiveActivityTimerSession(
+            sessionId: _activeSessionId,
+            startedAt: result.startedAt,
+            config: _timerConfig,
+            state: ActiveActivityTimerSessionState.arrived,
+          ),
+          result: _resultWithSelectedMarkers(
+            result,
+          ).copyWith(sessionId: _activeSessionId),
+        ),
+      );
+      _completionAwaitingPersistence = null;
+      return true;
+    } catch (error) {
+      debugPrint('Unable to persist completed activity: $error');
+      if (mounted) {
+        final texts = AppTexts.of(context).common;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(texts.saveFailureMessage),
+            action: SnackBarAction(
+              label: texts.retry,
+              onPressed: _confirmComplete,
+            ),
+          ),
+        );
+      }
+      return false;
+    }
+  }
+
   void _openResult(ActivitySessionResult result) {
-    final recordableResult = _resultWithSelectedMarkers(result);
+    final recordableResult = _resultWithSelectedMarkers(
+      result,
+    ).copyWith(sessionId: _activeSessionId);
     _handoffOrientation = true;
     Navigator.of(context).pushReplacement(
       MaterialPageRoute(
         builder: (_) => ResultScreen(
           result: recordableResult,
+          activeSessionStore: widget.activeSessionStore,
           config: _timerConfig,
           activityProgressService: widget.activityProgressService,
           onConfigChanged: widget.onConfigChanged,

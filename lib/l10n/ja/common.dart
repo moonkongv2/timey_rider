@@ -17,4 +17,6 @@ class JaCommonTexts implements CommonTextSet {
   String get restartRide => 'もう一度';
   String get settings => '設定';
   String get start => 'スタート';
+  String get saveFailureMessage => '記録を保存できませんでした。もう一度お試しください。';
+  String get retry => '再試行';
 }

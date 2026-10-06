@@ -8,11 +8,13 @@ import '../l10n/text_sets.dart';
 import '../models/activity_completion_status.dart';
 import '../models/activity_progress_snapshot.dart';
 import '../models/activity_session_result.dart';
+import '../models/pending_activity_result.dart';
 import '../models/activity_timer_config.dart';
 import '../models/reward_goal.dart';
 import '../models/reward_item.dart';
 import '../navigation/app_route_observer.dart';
 import '../services/local_activity_progress_service.dart';
+import '../services/active_activity_timer_session_store.dart';
 import '../services/orientation_service.dart';
 import '../services/result_audio_service.dart';
 import '../theme/app_colors.dart';
@@ -121,6 +123,7 @@ class ResultScreen extends StatefulWidget {
     this.introControllerFactory,
     this.orientationService = const SystemOrientationService(),
     this.resultAudioService,
+    this.activeSessionStore = const ActiveActivityTimerSessionStore(),
   });
 
   final ActivitySessionResult result;
@@ -130,6 +133,7 @@ class ResultScreen extends StatefulWidget {
   final ResultIntroControllerFactory? introControllerFactory;
   final OrientationService orientationService;
   final ResultAudioService? resultAudioService;
+  final ActiveActivityTimerSessionStore activeSessionStore;
 
   @override
   State<ResultScreen> createState() => _ResultScreenState();
@@ -141,6 +145,8 @@ class _ResultScreenState extends State<ResultScreen>
 
   VideoPlayerController? _introController;
   Future<RecordedActivitySession>? _recordedSession;
+  ActivitySessionResult? _resultForRecording;
+  bool _recordFailed = false;
   bool? _receiveSticker;
   bool _introFinished = false;
   bool _introFallback = false;
@@ -183,15 +189,24 @@ class _ResultScreenState extends State<ResultScreen>
         result.receiveSticker ??
         activityCompletionStatusCanReceiveSticker(result.completionStatus);
     _receiveSticker = receiveSticker;
-    _recordedSession = widget.activityProgressService.recordActivityResult(
-      result,
-      vehicleId: widget.config.vehicleId,
+    _resultForRecording = result;
+    _recordFailed = false;
+    _recordedSession = _persistResult(result);
+    _recordedSession!.then<void>(
+      (_) {},
+      onError: (Object error, StackTrace stackTrace) {
+        debugPrint('Unable to save activity result: $error');
+        if (mounted) setState(() => _recordFailed = true);
+      },
     );
     if (!receiveSticker) {
       _introFinished = true;
       return;
     }
 
+    final oldController = _introController;
+    oldController?.removeListener(_handleIntroChanged);
+    unawaited(oldController?.dispose());
     final introControllerFactory =
         widget.introControllerFactory ?? VideoPlayerController.asset;
     final introController = introControllerFactory(_introVideoPath);
@@ -200,7 +215,30 @@ class _ResultScreenState extends State<ResultScreen>
     _initializeIntroVideo();
   }
 
+  Future<RecordedActivitySession> _persistResult(
+    ActivitySessionResult result,
+  ) async {
+    final sessionId = result.sessionId;
+    if (sessionId != null) {
+      final pending = await widget.activeSessionStore.loadPendingResult();
+      if (pending != null && pending.session.sessionId == sessionId) {
+        await widget.activeSessionStore.savePendingResult(
+          PendingActivityResult(session: pending.session, result: result),
+        );
+      }
+    }
+    final recorded = await widget.activityProgressService.recordActivityResult(
+      result,
+      vehicleId: widget.config.vehicleId,
+    );
+    if (sessionId != null) {
+      await widget.activeSessionStore.clearPendingResult(sessionId);
+    }
+    return recorded;
+  }
+
   void _chooseSticker(bool receiveSticker) {
+    if (_recordedSession != null) return;
     _recordResult(widget.result.copyWith(receiveSticker: receiveSticker));
     setState(() {});
   }
@@ -298,12 +336,19 @@ class _ResultScreenState extends State<ResultScreen>
     }
   }
 
-  void _restart(BuildContext context) {
+  Future<void> _restart(BuildContext context) async {
+    try {
+      await _recordedSession;
+    } catch (_) {
+      return;
+    }
+    if (!context.mounted) return;
     _handoffOrientation = true;
     Navigator.of(context).pushReplacement(
       MaterialPageRoute(
         builder: (_) => TimerScreen(
           config: widget.config,
+          activeSessionStore: widget.activeSessionStore,
           activityProgressService: widget.activityProgressService,
           onConfigChanged: widget.onConfigChanged,
           orientationService: widget.orientationService,
@@ -322,6 +367,28 @@ class _ResultScreenState extends State<ResultScreen>
 
   @override
   Widget build(BuildContext context) {
+    if (_recordFailed) {
+      final texts = AppTexts.of(context).common;
+      return Scaffold(
+        body: SafeArea(
+          child: Center(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(texts.saveFailureMessage, textAlign: TextAlign.center),
+                FilledButton(
+                  onPressed: () {
+                    _recordResult(_resultForRecording!);
+                    setState(() {});
+                  },
+                  child: Text(texts.retry),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+    }
     final completionStatus = widget.result.completionStatus;
     final isPositive = isPositiveResult(completionStatus);
     final recordedSession = _recordedSession;

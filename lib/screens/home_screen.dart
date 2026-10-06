@@ -45,6 +45,7 @@ import 'reward_goal_screen.dart';
 import 'settings_screen.dart';
 import 'sticker_collection_screen.dart';
 import 'timer_screen.dart';
+import 'result_screen.dart';
 
 const _settingsIconAssetPath = 'assets/images/icon_setting_rgba.png';
 const _homeLogoAssetPath = 'assets/images/timey_rider_logo.png';
@@ -99,6 +100,7 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
   late Future<List<ActivityTimerPreset>> _favoriteTimerPresetsFuture;
   late Future<ActivityProgressSnapshot> _progressSnapshotFuture;
   bool _isRouteVisible = true;
+  bool _recoveringResult = false;
   final Map<String, bool> _customAvatarFileExistsByPath = {};
   String? _selectedVehicleCustomAvatarPath;
   bool _selectedVehicleCustomAvatarExists = false;
@@ -111,6 +113,9 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
     _favoriteTimerPresetsFuture = _loadFavoriteTimerPresets();
     _progressSnapshotFuture = widget.activityProgressService.loadSnapshot();
     _syncSelectedVehicleCustomAvatarExists(notify: false);
+    WidgetsBinding.instance.addPostFrameCallback(
+      (_) => _recoverPendingResult(),
+    );
   }
 
   @override
@@ -340,7 +345,32 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
     );
   }
 
+  Future<bool> _recoverPendingResult() async {
+    if (_recoveringResult) return true;
+    _recoveringResult = true;
+    try {
+      final pending = await widget.activeSessionStore.loadPendingResult();
+      if (!mounted || pending == null) return false;
+      await Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (_) => ResultScreen(
+            result: pending.result,
+            config: pending.session.config,
+            activeSessionStore: widget.activeSessionStore,
+            activityProgressService: widget.activityProgressService,
+            onConfigChanged: _updateTimerRuntimeConfig,
+          ),
+        ),
+      );
+      if (mounted) _refreshHomeData();
+      return true;
+    } finally {
+      _recoveringResult = false;
+    }
+  }
+
   Future<bool> _resolveActiveSessionBeforeNewTimer() async {
+    if (await _recoverPendingResult()) return false;
     final activeSession = await _loadActiveSession();
     if (!mounted) {
       return false;

@@ -17,4 +17,7 @@ class PtBrCommonTexts implements CommonTextSet {
   String get restartRide => 'Começar de novo';
   String get settings => 'Configurações';
   String get start => 'Começar';
+  String get saveFailureMessage =>
+      'Não foi possível salvar a atividade. Tente novamente.';
+  String get retry => 'Tentar novamente';
 }

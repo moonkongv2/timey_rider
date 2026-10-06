@@ -17,4 +17,7 @@ class EnCommonTexts implements CommonTextSet {
   String get restartRide => 'Start again';
   String get settings => 'Settings';
   String get start => 'Start';
+  String get saveFailureMessage =>
+      'Your activity could not be saved. Please try again.';
+  String get retry => 'Try again';
 }

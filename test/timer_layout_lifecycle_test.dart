@@ -16,6 +16,7 @@ import 'package:timey_rider/widgets/vehicle_widget.dart';
 import 'support/timer_test_harness.dart';
 
 void main() {
+  setUp(() => SharedPreferences.setMockInitialValues({}));
   testWidgets('Timer screen keeps vehicle fixed when paused', (tester) async {
     tester.view.physicalSize = const Size(390, 844);
     tester.view.devicePixelRatio = 1.0;
@@ -527,8 +528,7 @@ void main() {
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 320));
     await tester.tap(find.text('그만하기'));
-    await tester.pump();
-    await tester.pump(const Duration(seconds: 1));
+    await tester.pumpAndSettle();
 
     expect(find.text('타이머 열기'), findsOneWidget);
     expect(find.text('오늘의 미션'), findsNothing);
