@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:shared_preferences/shared_preferences.dart';
@@ -12,6 +13,9 @@ import '../models/reward_item.dart';
 
 class LocalActivityProgressService {
   LocalActivityProgressService();
+
+  static Future<void>? _recordOperation;
+  static const _recordTransactionKey = 'activityRecordTransaction';
 
   static const _historyKey = 'activityHistory';
   // Migration fallback: old local keys are read once, then new saves use the
@@ -30,7 +34,7 @@ class LocalActivityProgressService {
   static const maxActiveRewardGoals = 2;
 
   Future<ActivityProgressSnapshot> loadSnapshot() async {
-    final preferences = await SharedPreferences.getInstance();
+    final preferences = await _preferences();
 
     return ActivityProgressSnapshot(
       history: _decodeList(
@@ -50,13 +54,13 @@ class LocalActivityProgressService {
   }
 
   Future<RewardGoal?> loadActiveRewardGoal() async {
-    final preferences = await SharedPreferences.getInstance();
+    final preferences = await _preferences();
     final goals = _loadActiveRewardGoals(preferences);
     return goals.isEmpty ? null : goals.first;
   }
 
   Future<List<RewardGoal>> loadActiveRewardGoals() async {
-    final preferences = await SharedPreferences.getInstance();
+    final preferences = await _preferences();
     return _loadActiveRewardGoals(preferences);
   }
 
@@ -69,7 +73,7 @@ class LocalActivityProgressService {
       throw ArgumentError.value(rewardText, 'rewardText');
     }
 
-    final preferences = await SharedPreferences.getInstance();
+    final preferences = await _preferences();
     final activeGoals = _loadActiveRewardGoals(preferences).toList();
     if (activeGoals.length >= maxActiveRewardGoals) {
       throw StateError('Up to two active reward goals are supported.');
@@ -101,7 +105,7 @@ class LocalActivityProgressService {
       throw ArgumentError.value(rewardText, 'rewardText');
     }
 
-    final preferences = await SharedPreferences.getInstance();
+    final preferences = await _preferences();
     final activeGoals = _loadActiveRewardGoals(preferences).toList();
     if (activeGoals.isEmpty) {
       return null;
@@ -153,7 +157,7 @@ class LocalActivityProgressService {
   }
 
   Future<RewardGoal?> cancelActiveRewardGoal({String? goalId}) async {
-    final preferences = await SharedPreferences.getInstance();
+    final preferences = await _preferences();
     final activeGoals = _loadActiveRewardGoals(preferences).toList();
     if (activeGoals.isEmpty) {
       return null;
@@ -178,7 +182,7 @@ class LocalActivityProgressService {
   }
 
   Future<RewardGoal?> useEarnedRewardGoal({String? goalId}) async {
-    final preferences = await SharedPreferences.getInstance();
+    final preferences = await _preferences();
     final earnedGoals = _loadEarnedRewardGoals(preferences).toList();
     if (earnedGoals.isEmpty) {
       return null;
@@ -209,14 +213,14 @@ class LocalActivityProgressService {
   }
 
   Future<void> clearActiveRewardGoal() async {
-    final preferences = await SharedPreferences.getInstance();
+    final preferences = await _preferences();
     await preferences.remove(_legacyActiveRewardGoalKey);
     await preferences.remove(_activeRewardGoalsKey);
     await preferences.remove(_legacyActiveRewardGoalsKey);
   }
 
   Future<bool> deleteActivityHistoryEntry(String entryId) async {
-    final preferences = await SharedPreferences.getInstance();
+    final preferences = await _preferences();
     final history = _decodeList(
       preferences.getStringList(_historyKey) ??
           preferences.getStringList(_legacyHistoryKey),
@@ -240,7 +244,26 @@ class LocalActivityProgressService {
     ActivitySessionResult result, {
     required String vehicleId,
   }) async {
+    final previous = _recordOperation;
+    final completed = Completer<void>();
+    _recordOperation = completed.future;
+    try {
+      if (previous != null) await previous;
+      return await _recordActivityResult(result, vehicleId: vehicleId);
+    } finally {
+      completed.complete();
+      if (identical(_recordOperation, completed.future)) {
+        _recordOperation = null;
+      }
+    }
+  }
+
+  Future<RecordedActivitySession> _recordActivityResult(
+    ActivitySessionResult result, {
+    required String vehicleId,
+  }) async {
     final preferences = await SharedPreferences.getInstance();
+    await _recoverRecordTransaction(preferences);
     final history = _decodeList(
       preferences.getStringList(_historyKey) ??
           preferences.getStringList(_legacyHistoryKey),
@@ -254,9 +277,25 @@ class LocalActivityProgressService {
     final activeRewardGoals = _loadActiveRewardGoals(preferences).toList();
     final earnedRewardGoals = _loadEarnedRewardGoals(preferences).toList();
 
+    final entryId =
+        result.sessionId ?? result.endedAt.microsecondsSinceEpoch.toString();
+    for (final existing in history) {
+      if (existing.id == entryId) {
+        return RecordedActivitySession(
+          entry: existing,
+          awardedRewards: existing.rewardIds
+              .map(RewardCatalog.findById)
+              .whereType<RewardDefinition>()
+              .toList(),
+          updatedRewardGoals: const [],
+          earnedRewardGoals: const [],
+          inventory: inventory,
+        );
+      }
+    }
     final awardedRewards = _selectRewards(result, vehicleId: vehicleId);
     final entry = ActivityHistoryEntry(
-      id: result.endedAt.microsecondsSinceEpoch.toString(),
+      id: entryId,
       activityId: result.activityId,
       startedAt: result.startedAt,
       endedAt: result.endedAt,
@@ -277,32 +316,30 @@ class LocalActivityProgressService {
       activitySessionId: entry.id,
     );
 
-    await preferences.setStringList(
-      _historyKey,
-      history.map((entry) => jsonEncode(entry.toJson())).toList(),
-    );
-    await preferences.remove(_legacyHistoryKey);
-    await preferences.setStringList(
-      _inventoryKey,
-      inventory.map((item) => jsonEncode(item.toJson())).toList(),
-    );
-    await preferences.remove(_legacyInventoryKey);
+    final writes = <String, List<String>>{
+      _historyKey: history.map((entry) => jsonEncode(entry.toJson())).toList(),
+      _inventoryKey: inventory
+          .map((item) => jsonEncode(item.toJson()))
+          .toList(),
+    };
     if (goalUpdate.changed) {
       earnedRewardGoals.insertAll(0, goalUpdate.earnedGoals);
-      await _saveRewardGoalList(
-        preferences,
-        _activeRewardGoalsKey,
-        goalUpdate.activeGoals,
-      );
-      await _saveRewardGoalList(
-        preferences,
-        _earnedRewardGoalsKey,
-        earnedRewardGoals,
-      );
-      await preferences.remove(_legacyActiveRewardGoalKey);
-      await preferences.remove(_legacyActiveRewardGoalsKey);
-      await preferences.remove(_legacyEarnedRewardGoalsKey);
+      writes[_activeRewardGoalsKey] = goalUpdate.activeGoals
+          .map((goal) => jsonEncode(goal.toJson()))
+          .toList();
+      writes[_earnedRewardGoalsKey] = earnedRewardGoals
+          .map((goal) => jsonEncode(goal.toJson()))
+          .toList();
     }
+    // Persist the complete update before applying individual keys. Replaying
+    // these exact values after a process death cannot award another sticker.
+    if (!await preferences.setString(
+      _recordTransactionKey,
+      jsonEncode(writes),
+    )) {
+      throw StateError('Unable to persist activity record transaction.');
+    }
+    await _recoverRecordTransaction(preferences);
 
     return RecordedActivitySession(
       entry: entry,
@@ -311,6 +348,38 @@ class LocalActivityProgressService {
       earnedRewardGoals: goalUpdate.earnedGoals,
       inventory: inventory,
     );
+  }
+
+  Future<SharedPreferences> _preferences() async {
+    await _recordOperation;
+    final preferences = await SharedPreferences.getInstance();
+    await _recoverRecordTransaction(preferences);
+    return preferences;
+  }
+
+  Future<void> _recoverRecordTransaction(SharedPreferences preferences) async {
+    final raw = preferences.getString(_recordTransactionKey);
+    if (raw == null) return;
+    final writes = Map<String, Object?>.from(jsonDecode(raw) as Map);
+    for (final entry in writes.entries) {
+      if (!await preferences.setStringList(
+        entry.key,
+        List<String>.from(entry.value as List),
+      )) {
+        throw StateError('Unable to save activity progress.');
+      }
+    }
+    for (final key in [_legacyHistoryKey, _legacyInventoryKey]) {
+      await preferences.remove(key);
+    }
+    if (writes.containsKey(_activeRewardGoalsKey)) {
+      await preferences.remove(_legacyActiveRewardGoalKey);
+      await preferences.remove(_legacyActiveRewardGoalsKey);
+      await preferences.remove(_legacyEarnedRewardGoalsKey);
+    }
+    if (!await preferences.remove(_recordTransactionKey)) {
+      throw StateError('Unable to finish activity record transaction.');
+    }
   }
 
   List<RewardDefinition> _selectRewards(
