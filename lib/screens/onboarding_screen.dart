@@ -288,7 +288,7 @@ class _OnboardingIllustrationSpec {
         fallback: _SoftTimeIllustration(),
       ),
       1 => const _OnboardingIllustrationSpec(
-        assetPath: 'assets/images/onboarding/onboarding_02_routine_ride.png',
+        assetPath: 'assets/images/onboarding/onboarding_02_routine_ride.webp',
         backgroundColor: AppColors.surfaceMint,
         fallback: _RideCourseIllustration(),
       ),
@@ -298,13 +298,13 @@ class _OnboardingIllustrationSpec {
         fallback: _VehicleChoiceIllustration(),
       ),
       3 => const _OnboardingIllustrationSpec(
-        assetPath: 'assets/images/onboarding/onboarding_04_course_markers.png',
+        assetPath: 'assets/images/onboarding/onboarding_04_course_markers.webp',
         backgroundColor: AppColors.surfacePink,
         fallback: _MarkerCourseIllustration(),
       ),
       _ => const _OnboardingIllustrationSpec(
         assetPath:
-            'assets/images/onboarding/onboarding_05_result_encouragement.png',
+            'assets/images/onboarding/onboarding_05_result_encouragement.webp',
         backgroundColor: AppColors.primarySoft,
         fallback: _GentleResultIllustration(),
       ),
@@ -449,42 +449,42 @@ class _VehicleChoiceIllustration extends StatelessWidget {
             Align(
               alignment: const Alignment(-0.86, -0.72),
               child: _VehicleImageChip(
-                assetPath: 'assets/images/vehicle_motorcycle_chip.png',
+                assetPath: 'assets/images/vehicle_motorcycle_chip.webp',
                 size: chipSize,
               ),
             ),
             Align(
               alignment: const Alignment(0.0, -0.78),
               child: _VehicleImageChip(
-                assetPath: 'assets/images/vehicle_shark_chip.png',
+                assetPath: 'assets/images/vehicle_shark_chip.webp',
                 size: chipSize,
               ),
             ),
             Align(
               alignment: const Alignment(0.86, -0.72),
               child: _VehicleImageChip(
-                assetPath: 'assets/images/vehicle_t_rex_chip.png',
+                assetPath: 'assets/images/vehicle_t_rex_chip.webp',
                 size: chipSize,
               ),
             ),
             Align(
               alignment: const Alignment(-0.86, 0.76),
               child: _VehicleImageChip(
-                assetPath: 'assets/images/vehicle_police_car_chip.png',
+                assetPath: 'assets/images/vehicle_police_car_chip.webp',
                 size: chipSize,
               ),
             ),
             Align(
               alignment: const Alignment(0.0, 0.82),
               child: _VehicleImageChip(
-                assetPath: 'assets/images/vehicle_excavator_chip.png',
+                assetPath: 'assets/images/vehicle_excavator_chip.webp',
                 size: chipSize,
               ),
             ),
             Align(
               alignment: const Alignment(0.86, 0.76),
               child: _VehicleImageChip(
-                assetPath: 'assets/images/vehicle_airplane_chip.png',
+                assetPath: 'assets/images/vehicle_airplane_chip.webp',
                 size: chipSize,
               ),
             ),

@@ -58,7 +58,7 @@ void main() {
 
     expect(find.text('오늘 활동을 기록했어!'), findsOneWidget);
     expect(
-      _assetImage('assets/images/result_success_bg_portrait.png'),
+      _assetImage('assets/images/result_success_bg_portrait.webp'),
       findsOneWidget,
     );
     expect(
@@ -346,7 +346,7 @@ void main() {
     expect(find.widgetWithText(OutlinedButton, '홈으로'), findsOneWidget);
     expect(find.text('이번 활동에는 시간이 조금 더 필요했어.'), findsOneWidget);
     expect(
-      _assetImage('assets/images/result_failed_bg_landscape.png'),
+      _assetImage('assets/images/result_failed_bg_landscape.webp'),
       findsOneWidget,
     );
     expect(
@@ -413,7 +413,7 @@ void main() {
     expect(rewardBox, findsOneWidget);
     expect(messageBox, findsOneWidget);
     expect(
-      _assetImage('assets/images/result_success_bg_landscape.png'),
+      _assetImage('assets/images/result_success_bg_landscape.webp'),
       findsOneWidget,
     );
     expect(

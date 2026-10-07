@@ -46,7 +46,7 @@ void main() {
       await _pumpCompositePreview(
         tester,
         avatarMode: AvatarImageMode.custom,
-        customAvatarImagePath: 'assets/images/jy_the_rider.png',
+        customAvatarImagePath: 'assets/images/jy_the_rider.webp',
       );
 
       expect(_assetImage(VehicleCatalog.motorcycle.assetPath), findsOneWidget);

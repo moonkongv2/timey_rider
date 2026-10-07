@@ -10,7 +10,7 @@ import '../theme/app_spacing.dart';
 import 'app/app_help_sheet.dart';
 
 const _courseMarkerGuideImageAssetPath =
-    'assets/images/onboarding/onboarding_04_course_markers.png';
+    'assets/images/onboarding/onboarding_04_course_markers.webp';
 
 sealed class ActivityMarkerPickerResult {
   const ActivityMarkerPickerResult();

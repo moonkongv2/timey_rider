@@ -47,10 +47,10 @@ import 'sticker_collection_screen.dart';
 import 'timer_screen.dart';
 import 'result_screen.dart';
 
-const _settingsIconAssetPath = 'assets/images/icon_setting_rgba.png';
-const _homeLogoAssetPath = 'assets/images/timey_rider_logo.png';
+const _settingsIconAssetPath = 'assets/images/icon_setting_rgba.webp';
+const _homeLogoAssetPath = 'assets/images/timey_rider_logo.webp';
 const _courseMarkerGuideImageAssetPath =
-    'assets/images/onboarding/onboarding_04_course_markers.png';
+    'assets/images/onboarding/onboarding_04_course_markers.webp';
 const _activeSessionMaxAge = Duration(hours: 24);
 const _minCustomActivityMinutes = 1;
 const _maxCustomActivityMinutes = 60;

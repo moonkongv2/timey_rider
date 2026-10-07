@@ -67,7 +67,7 @@ void main() {
     expect(find.text('조금 더 시간이 필요했어'), findsOneWidget);
     expect(find.text('이번 활동에는 시간이 조금 더 필요했어.'), findsOneWidget);
     expect(
-      _assetImage('assets/images/result_failed_bg_portrait.png'),
+      _assetImage('assets/images/result_failed_bg_portrait.webp'),
       findsOneWidget,
     );
     expect(

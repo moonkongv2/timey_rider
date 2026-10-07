@@ -1,0 +1,998 @@
+[
+  {
+    "kind": "image",
+    "original": "assets/images/icon_setting_rgba.png",
+    "runtime": "assets/images/icon_setting_rgba.webp",
+    "original_bytes": 1153866,
+    "optimized_bytes": 785328,
+    "original_sha256": "22e480750f3a4d81de736959482281282fdd6f03f4e83123b371e364e701d599",
+    "optimized_sha256": "1de75d50c807cf44f27443a285c95d90df0e9d2f8b65587451ff329010cc97c2",
+    "rgba_sha256": "86445605c8447b9fd2289c3c27b7808a1e9f5d8552364efc15d6cf938bab8a38",
+    "apply": true,
+    "source": "asset_sources/images/icon_setting_rgba.png"
+  },
+  {
+    "kind": "image",
+    "original": "assets/images/jy_the_rider.png",
+    "runtime": "assets/images/jy_the_rider.webp",
+    "original_bytes": 1072320,
+    "optimized_bytes": 708636,
+    "original_sha256": "6806e23c3105161c7e4728777f7e1631687415e6649ea39d36179e93ba9e3d60",
+    "optimized_sha256": "3bb98f09af8ad4e3f6586b78025978eb11f0d87f3f9adce3365c3c0876a92d62",
+    "rgba_sha256": "2b21da4f565055d74cdb8e4e2207fe0ca566de518efb450f5f9fce03bf5d2cdd",
+    "apply": true,
+    "source": "asset_sources/images/jy_the_rider.png"
+  },
+  {
+    "kind": "image",
+    "original": "assets/images/markers/egg.png",
+    "runtime": "assets/images/markers/egg.webp",
+    "original_bytes": 938639,
+    "optimized_bytes": 712054,
+    "original_sha256": "ae0f1600178a02fd79615dafb3b9876f57ab3de06ac4c1d5853d3b7655fb0c40",
+    "optimized_sha256": "748765ceef5d7e530fa9608290e1fb5168f19782d1de826045cf4966446a54d3",
+    "rgba_sha256": "0f06dca2737edc1b72543019e693f11f3962bb45394ecf4ab94f95173f066020",
+    "apply": true,
+    "source": "asset_sources/images/markers/egg.png"
+  },
+  {
+    "kind": "image",
+    "original": "assets/images/markers/footprints.png",
+    "runtime": "assets/images/markers/footprints.webp",
+    "original_bytes": 69425,
+    "optimized_bytes": 30002,
+    "original_sha256": "645a0baf30b9660d45177878bac8c019bcb81fbc9487db26c4ac55b3224335b4",
+    "optimized_sha256": "233e56eb43c12ad93f38eeca5e8572664dd061914619e7ab70de24b0bc8af366",
+    "rgba_sha256": "33babf0ef6731780837711850f227460204aadf1aaac4959608cd6e7576e53cf",
+    "apply": true,
+    "source": "asset_sources/images/markers/footprints.png"
+  },
+  {
+    "kind": "image",
+    "original": "assets/images/markers/radish.png",
+    "runtime": "assets/images/markers/radish.webp",
+    "original_bytes": 130972,
+    "optimized_bytes": 78030,
+    "original_sha256": "b59cfb2506656abadf2674ea644ea11e1e6f82b05ffeeb1b980df63c156bcdfd",
+    "optimized_sha256": "e6e3cd9c8f539b8d245a23c867659f56c010b0276451d19d7ad3847c58b2a3ab",
+    "rgba_sha256": "73b5f0a69f98ea4689b028d0817bb52b4fa30c0cc91eb825c8f8659f3e694775",
+    "apply": true,
+    "source": "asset_sources/images/markers/radish.png"
+  },
+  {
+    "kind": "image",
+    "original": "assets/images/markers/seaweed.png",
+    "runtime": "assets/images/markers/seaweed.webp",
+    "original_bytes": 812179,
+    "optimized_bytes": 581716,
+    "original_sha256": "a9131d8ac46bbe5a3c2c4fe8d517728bca2e47e4f496425ca18c344caa8b3356",
+    "optimized_sha256": "a568990002b772a6f2a04d8363ef27446ca7aa938b067e7de2e66bb67f0f7462",
+    "rgba_sha256": "6befbe0a3d413ff3f969aa221b826841fdd17fdb4032b1848c0100fea611802f",
+    "apply": true,
+    "source": "asset_sources/images/markers/seaweed.png"
+  },
+  {
+    "kind": "image",
+    "original": "assets/images/markers/tofu.png",
+    "runtime": "assets/images/markers/tofu.webp",
+    "original_bytes": 447032,
+    "optimized_bytes": 313326,
+    "original_sha256": "2be36d7a31077b19902fe531991572f0ca3a786cd30d3ba11a3af2946a469580",
+    "optimized_sha256": "6e2b6aa9070a70eb3012ec91534aaf350bf87cc9885746ef333e05a735b936e9",
+    "rgba_sha256": "bfa18e00a0ab52c8e1b400d5fd03bc8970a67a9bf5ab7f31216c5b5f3a55f1a3",
+    "apply": true,
+    "source": "asset_sources/images/markers/tofu.png"
+  },
+  {
+    "kind": "image",
+    "original": "assets/images/onboarding/onboarding_02_routine_ride.png",
+    "runtime": "assets/images/onboarding/onboarding_02_routine_ride.webp",
+    "original_bytes": 346383,
+    "optimized_bytes": 191350,
+    "original_sha256": "31ae4b7a403fe66a5837bc1d348bd1933f6c53aff7aed4fa28b2e71d5158d65b",
+    "optimized_sha256": "01e98035a5dfeb2ba7095a887215d95ddc4a7eb226fc8f3af20ba60c17fcd070",
+    "rgba_sha256": "3df759c7bc094ed6a3df564cb8a5bddda7b70a7a0f5894a32b860bf88296f9ba",
+    "apply": true,
+    "source": "asset_sources/images/onboarding/onboarding_02_routine_ride.png"
+  },
+  {
+    "kind": "image",
+    "original": "assets/images/onboarding/onboarding_04_course_markers.png",
+    "runtime": "assets/images/onboarding/onboarding_04_course_markers.webp",
+    "original_bytes": 108792,
+    "optimized_bytes": 55146,
+    "original_sha256": "e26e0ec12406b524955b6f8899a756d2c251e9f03825d7c962de68f744350f28",
+    "optimized_sha256": "25738df59bc49ad02738cd46b3efe40eebeec17c1e6b38e366e6c114e3c94943",
+    "rgba_sha256": "35cb4e7ccb76aff85bb07468c6858f951284665f9ec54d794272f838588931bf",
+    "apply": true,
+    "source": "asset_sources/images/onboarding/onboarding_04_course_markers.png"
+  },
+  {
+    "kind": "image",
+    "original": "assets/images/onboarding/onboarding_05_result_encouragement.png",
+    "runtime": "assets/images/onboarding/onboarding_05_result_encouragement.webp",
+    "original_bytes": 802234,
+    "optimized_bytes": 352316,
+    "original_sha256": "e9796ae9f5639b138c55e363dcc6f6196e5c5d19cec99dad8adbcfe8869e083b",
+    "optimized_sha256": "e21c82eef4ff139e3a84553cf12682513c6f5cd49513ce5c8ce8de1548013c46",
+    "rgba_sha256": "3eaaf595907bd0064584501124a97490da3b1461f7753552e4e1c19dae28023f",
+    "apply": true,
+    "source": "asset_sources/images/onboarding/onboarding_05_result_encouragement.png"
+  },
+  {
+    "kind": "image",
+    "original": "assets/images/result_failed_bg_landscape.png",
+    "runtime": "assets/images/result_failed_bg_landscape.webp",
+    "original_bytes": 1518518,
+    "optimized_bytes": 1206800,
+    "original_sha256": "59c81500301c13a047fd7dd1b8b4bf4bbcd14461ed5ba80bfd90c834a6b27f4d",
+    "optimized_sha256": "892fccd2c3e119ea4c1a5c790723afb356d0c2c0566ce640a11bceac75d355cc",
+    "rgba_sha256": "7c0247200929ac949b59bf22fcfad8888be3039cb470147501551a3f5f8db135",
+    "apply": true,
+    "source": "asset_sources/images/result_failed_bg_landscape.png"
+  },
+  {
+    "kind": "image",
+    "original": "assets/images/result_failed_bg_portrait.png",
+    "runtime": "assets/images/result_failed_bg_portrait.webp",
+    "original_bytes": 1321703,
+    "optimized_bytes": 1088582,
+    "original_sha256": "292dfc81e52eedb5349d475c19eb18f73e88ad06c386321816ea1378ccdf362c",
+    "optimized_sha256": "77d66c790b12e44c2216903aed974d4c393458dad86879e22106b0895df6ff0c",
+    "rgba_sha256": "176de1777968b55ce1bdf3969725939b74550a08b199592b31711d3170c923c3",
+    "apply": true,
+    "source": "asset_sources/images/result_failed_bg_portrait.png"
+  },
+  {
+    "kind": "image",
+    "original": "assets/images/result_success.png",
+    "runtime": "assets/images/result_success.webp",
+    "original_bytes": 2826839,
+    "optimized_bytes": 1890796,
+    "original_sha256": "86d77b7db877263ff078842c3a635d17bf0a92fe9d7f62d0eb54de8b65b42bf0",
+    "optimized_sha256": "bd1b03a55ac34791143002631e857c1b9eea6df216a22b7ffa37acc96576b8a9",
+    "rgba_sha256": "e0d9d83cb917d4477235d3d65785b6ba52846233917c4920f55c6e080b29834c",
+    "apply": true,
+    "source": "asset_sources/images/result_success.png"
+  },
+  {
+    "kind": "image",
+    "original": "assets/images/result_success_bg_landscape.png",
+    "runtime": "assets/images/result_success_bg_landscape.webp",
+    "original_bytes": 2340618,
+    "optimized_bytes": 1772586,
+    "original_sha256": "e3886504fdc66b1c644ea3c38a4c7bbc52c4f0c59fa9c51d44b34a0a99a8cde9",
+    "optimized_sha256": "1bce056bc274c03c6ba182beccbccfbeb2c613fdb47928f4ec1059d4833e7112",
+    "rgba_sha256": "605dfedb9bdeb921edc0e36c1211c631b9576395a394b25c3f048bf2bbb5c503",
+    "apply": true,
+    "source": "asset_sources/images/result_success_bg_landscape.png"
+  },
+  {
+    "kind": "image",
+    "original": "assets/images/result_success_bg_portrait.png",
+    "runtime": "assets/images/result_success_bg_portrait.webp",
+    "original_bytes": 2136468,
+    "optimized_bytes": 1648770,
+    "original_sha256": "634f95c2b0c13d983269752455bf38907cf63429aaf3c69717d902191ed43de1",
+    "optimized_sha256": "93f6e9551255298c9deb90dbd856582ef7c31157cf2ef5b8e163048b0479b43a",
+    "rgba_sha256": "15c1defc10c42ba303a1408077f3ef7ab225e7d659a9489b6502cd2af0c87700",
+    "apply": true,
+    "source": "asset_sources/images/result_success_bg_portrait.png"
+  },
+  {
+    "kind": "image",
+    "original": "assets/images/rider_sample.png",
+    "runtime": "assets/images/rider_sample.webp",
+    "original_bytes": 719026,
+    "optimized_bytes": 367696,
+    "original_sha256": "0a20650f80f87e678583a655dd44c9c040813a4b7fc0f9a49960380f1737633c",
+    "optimized_sha256": "f3328bfca9cf7cec2e4f17c6ef11657970a941720ad8cbbb001e5b2e99b9ee94",
+    "rgba_sha256": "aa4ce94ae9b645316bb96a265aec6988804850ab95d363aa491d472f039423a4",
+    "apply": true,
+    "source": "asset_sources/images/rider_sample.png"
+  },
+  {
+    "kind": "image",
+    "original": "assets/images/riders/rider_airplane.png",
+    "runtime": "assets/images/riders/rider_airplane.webp",
+    "original_bytes": 1151694,
+    "optimized_bytes": 752358,
+    "original_sha256": "de0385811e2513436f6174500003b960f4577607fc11b30713942e101ee6c6bc",
+    "optimized_sha256": "8cb62d586a0bfb3007305c625c4d4cec431b8c21cf8ded38ed044855e37964e1",
+    "rgba_sha256": "b8524f32dc74c9e3b47c36fd97a7a668ede1e2c68a9ffa1b4c6d1354d5e8c16c",
+    "apply": true,
+    "source": "asset_sources/images/riders/rider_airplane.png"
+  },
+  {
+    "kind": "image",
+    "original": "assets/images/riders/rider_brachio.png",
+    "runtime": "assets/images/riders/rider_brachio.webp",
+    "original_bytes": 1151706,
+    "optimized_bytes": 727790,
+    "original_sha256": "5b3a9eb6d0d65c66625d78b252e7bde92756135514e20fa9f1de30778b3f1633",
+    "optimized_sha256": "16b4183b1323159df2f6fb488c7e1fa72a13af5118df1c0f21f736eca266a3a5",
+    "rgba_sha256": "37f2278bc01217f759c4845c7da667275b00df4a01ba18229a0e26d415844df6",
+    "apply": true,
+    "source": "asset_sources/images/riders/rider_brachio.png"
+  },
+  {
+    "kind": "image",
+    "original": "assets/images/riders/rider_bus.png",
+    "runtime": "assets/images/riders/rider_bus.webp",
+    "original_bytes": 1309725,
+    "optimized_bytes": 836684,
+    "original_sha256": "6bcfb2e8b826439a2dfcdaa0e48ab26200c178b4d16e4cb5e5624e0838b9ea88",
+    "optimized_sha256": "19682da554591fbfb295f93f844acac14c515a8be31dcb7b3ab26520d18b00a0",
+    "rgba_sha256": "0357c29d6dfcdbd9bfe32fc938d90ef88330e43cb55d0b31d26e3ccb701c145c",
+    "apply": true,
+    "source": "asset_sources/images/riders/rider_bus.png"
+  },
+  {
+    "kind": "image",
+    "original": "assets/images/riders/rider_excavator.png",
+    "runtime": "assets/images/riders/rider_excavator.webp",
+    "original_bytes": 1032840,
+    "optimized_bytes": 694520,
+    "original_sha256": "ee5ded3839df11da1ca285a37ffcea6e6fe1d38f813dc6210fcea0406de68b55",
+    "optimized_sha256": "7db418bfd58eed7661e7e162c0784a959ce9d8a96ca64cd5941bf493fa730e3e",
+    "rgba_sha256": "bdd83336622a90b724d27cdcebad4cc3bd382c49b84c59f3bce8bef4c92c6244",
+    "apply": true,
+    "source": "asset_sources/images/riders/rider_excavator.png"
+  },
+  {
+    "kind": "image",
+    "original": "assets/images/riders/rider_fire_truck.png",
+    "runtime": "assets/images/riders/rider_fire_truck.webp",
+    "original_bytes": 1643068,
+    "optimized_bytes": 1078964,
+    "original_sha256": "2f67b45e83e09b1de22ee15be0e6774c12ad6d168e0a90a9bb92fb892b563f8e",
+    "optimized_sha256": "14618d1729542a803ca21160d74fb1faba94e6d560be4732fe2228a9058148ad",
+    "rgba_sha256": "d57f9c449aabb69d2318b52d2253cd53f5461e9dced67071887398faafcea3e6",
+    "apply": true,
+    "source": "asset_sources/images/riders/rider_fire_truck.png"
+  },
+  {
+    "kind": "image",
+    "original": "assets/images/riders/rider_motorcycle.png",
+    "runtime": "assets/images/riders/rider_motorcycle.webp",
+    "original_bytes": 852293,
+    "optimized_bytes": 536584,
+    "original_sha256": "c95d2a18457cfddd97e0ac357400db8cc1de21bfa2b5978736276aa9e98613e8",
+    "optimized_sha256": "7c8510dcbb0c3ff463a0b97926e41b583de073235baf359cc975d2d20909cd38",
+    "rgba_sha256": "27aee5a3e4bd893ec50aa6d2d281304398df521ae3acc1163438c2913b9028fb",
+    "apply": true,
+    "source": "asset_sources/images/riders/rider_motorcycle.png"
+  },
+  {
+    "kind": "image",
+    "original": "assets/images/riders/rider_police_car.png",
+    "runtime": "assets/images/riders/rider_police_car.webp",
+    "original_bytes": 965748,
+    "optimized_bytes": 625640,
+    "original_sha256": "5dc389e3107ca2d43dcd31ddd97873dc7349b26c62d55f8f3c7e7b6b162108f1",
+    "optimized_sha256": "d3942d5639c53cf2889f33f6dde7ffeabe79bf75810a7d1657f1c77d817b6070",
+    "rgba_sha256": "738e9e2ea9defb324d9687087cccba12218e9eb5af43e39a3a111bfd7f78432f",
+    "apply": true,
+    "source": "asset_sources/images/riders/rider_police_car.png"
+  },
+  {
+    "kind": "image",
+    "original": "assets/images/riders/rider_pteranodon.png",
+    "runtime": "assets/images/riders/rider_pteranodon.webp",
+    "original_bytes": 1003633,
+    "optimized_bytes": 659712,
+    "original_sha256": "751fe26afc1850de9f67b6f20f5b7792d862cb7ff12de79195aa02606e3d8acf",
+    "optimized_sha256": "9e3bf73b08bbca6cea649466b258758e2478c579a9c6dd528c6b832eed143ae5",
+    "rgba_sha256": "9c2ab60ed28491dcfa699a19f24b366c6bb6829612b75bc0152b3aaf793495a6",
+    "apply": true,
+    "source": "asset_sources/images/riders/rider_pteranodon.png"
+  },
+  {
+    "kind": "image",
+    "original": "assets/images/riders/rider_shark.png",
+    "runtime": "assets/images/riders/rider_shark.webp",
+    "original_bytes": 1241324,
+    "optimized_bytes": 830804,
+    "original_sha256": "b3fe4cf6e8235e55d958c0ae2cafa5b1dda17307f0b7fad12d77ff71e0477523",
+    "optimized_sha256": "604961aeff1e3b207209f5fa7ea9466b0deac02ca19f18c23e2a4995dbccbeca",
+    "rgba_sha256": "7cd7973674f40729cd64a5ccec8cf8ee157e41f059b7f0365eb048e74e214f5e",
+    "apply": true,
+    "source": "asset_sources/images/riders/rider_shark.png"
+  },
+  {
+    "kind": "image",
+    "original": "assets/images/riders/rider_supercar.png",
+    "runtime": "assets/images/riders/rider_supercar.webp",
+    "original_bytes": 1011537,
+    "optimized_bytes": 686924,
+    "original_sha256": "2a0c6e785a4fb0d440bc2206adb0b0f67997832f768ed7eb619186165542f881",
+    "optimized_sha256": "0586ab40a2bb14b2c64bbf4a82d193725cf481f73f14a9023c08af66ff00efd6",
+    "rgba_sha256": "d7dc13be3c7b0bd9213b7bcf3e465b592d08e13c0f5969b97a41ea6baaf99a94",
+    "apply": true,
+    "source": "asset_sources/images/riders/rider_supercar.png"
+  },
+  {
+    "kind": "image",
+    "original": "assets/images/riders/rider_t_rex.png",
+    "runtime": "assets/images/riders/rider_t_rex.webp",
+    "original_bytes": 1137088,
+    "optimized_bytes": 754468,
+    "original_sha256": "2eb7c08b8ce22373ff8b5cd207f3814a58d7920e7568d44f52e974f90c2f192f",
+    "optimized_sha256": "b15c082f1d6bd63cc7bc4215fcf5242397f9b0eca6265092a73322347cc798d6",
+    "rgba_sha256": "6cf140cea4afd5083cbbe0df1d091844613bfcdc6a447a79ffd5acc01604c20f",
+    "apply": true,
+    "source": "asset_sources/images/riders/rider_t_rex.png"
+  },
+  {
+    "kind": "image",
+    "original": "assets/images/riders/rider_train.png",
+    "runtime": "assets/images/riders/rider_train.webp",
+    "original_bytes": 1140124,
+    "optimized_bytes": 735996,
+    "original_sha256": "3d9a397c87d451e12453696b06264b26b7632eba6d73cf0a9a7a95fcbd71a524",
+    "optimized_sha256": "a61823664926d983055c3e647226af87780a5f8fffb04fa24c55e20773bb81c4",
+    "rgba_sha256": "8ce3cc2a1f65112fe26fd6819aa671c1aa9116a1771a0d3c2fc1c67e30b74455",
+    "apply": true,
+    "source": "asset_sources/images/riders/rider_train.png"
+  },
+  {
+    "kind": "image",
+    "original": "assets/images/timey_rider_logo.png",
+    "runtime": "assets/images/timey_rider_logo.webp",
+    "original_bytes": 836743,
+    "optimized_bytes": 553804,
+    "original_sha256": "78e9dedaff3e15b8878c6a1693e88bdfea8cd801c125b8a0f88b9f36231e5686",
+    "optimized_sha256": "c9aada87e24eaa094965ab12aab5d09e44f2f764cb4afef1e44f592419ac6473",
+    "rgba_sha256": "35868b597871198daa4ca3b4801d1fc0a55621f1252455ee07f417b34f908b8f",
+    "apply": true,
+    "source": "asset_sources/images/timey_rider_logo.png"
+  },
+  {
+    "kind": "image",
+    "original": "assets/images/vehicle_airplane.png",
+    "runtime": "assets/images/vehicle_airplane.webp",
+    "original_bytes": 1284976,
+    "optimized_bytes": 842104,
+    "original_sha256": "45ce10662b2228d823bab910c58fec513c335640f98d1d25c71697439f472be4",
+    "optimized_sha256": "06ec73bc9b4c0a07bcea5d94f1585152f6812b18c9b1de7e0d70ac5dff49000c",
+    "rgba_sha256": "de966f4c80d0044f29d51a1aead6a0e6cf91c3ac0046aa6f4ba11626e119566e",
+    "apply": true,
+    "source": "asset_sources/images/vehicle_airplane.png"
+  },
+  {
+    "kind": "image",
+    "original": "assets/images/vehicle_airplane_chip.png",
+    "runtime": "assets/images/vehicle_airplane_chip.webp",
+    "original_bytes": 860141,
+    "optimized_bytes": 566556,
+    "original_sha256": "cfdece940ebdffb2c23c1d8dea2543bce47adecab9c530553f1ab8c129b907c0",
+    "optimized_sha256": "d7de0b956c2feb214b955b955c0b39bdfc87a558c97e1a0ed066ee91d4ceafd8",
+    "rgba_sha256": "34e3df6ce48524b8c187748ede592edc48e9a4bc9cb9c304f5f4708ba52a72a7",
+    "apply": true,
+    "source": "asset_sources/images/vehicle_airplane_chip.png"
+  },
+  {
+    "kind": "image",
+    "original": "assets/images/vehicle_brachio.png",
+    "runtime": "assets/images/vehicle_brachio.webp",
+    "original_bytes": 842026,
+    "optimized_bytes": 524660,
+    "original_sha256": "7c5497cd35f4286a74c0f59b9c9a9e87907821fdc3fd4570771bd43988b497d7",
+    "optimized_sha256": "d3045c9bb84799fbc8592d2557caea90bdae4f39908390de5109aed3e7d6ff4b",
+    "rgba_sha256": "65a08cd7757dac3d92c06a1cdb4cc3f832a5038ca1f16b30f902bd0adda57a37",
+    "apply": true,
+    "source": "asset_sources/images/vehicle_brachio.png"
+  },
+  {
+    "kind": "image",
+    "original": "assets/images/vehicle_brachio_chip.png",
+    "runtime": "assets/images/vehicle_brachio_chip.webp",
+    "original_bytes": 876375,
+    "optimized_bytes": 561466,
+    "original_sha256": "b971ba9f0132f91dcbb7579756c9ac5ffcd92d5ece98f3abeb5147820a460aa8",
+    "optimized_sha256": "c8dbb14e951724d993e99b19e5b8051f2404c678596b8b3e4e50bb5840dd98d5",
+    "rgba_sha256": "48b79f515979cdd177eeed26fca84a1172a150417d26fceedf32c50f31162d2c",
+    "apply": true,
+    "source": "asset_sources/images/vehicle_brachio_chip.png"
+  },
+  {
+    "kind": "image",
+    "original": "assets/images/vehicle_bus.png",
+    "runtime": "assets/images/vehicle_bus.webp",
+    "original_bytes": 1061776,
+    "optimized_bytes": 722166,
+    "original_sha256": "1d7b4d163d12c52410adc9d61a4252667e3c69b602a51e4ed8c630c3997d2982",
+    "optimized_sha256": "21e9716a6fd823f8974d0b767509e0ff382a5e62e7b4be181c591c264f0fc8d1",
+    "rgba_sha256": "5b2a2746267a405606b846f0f99cc1772aa26f657a761898af83bf80c6698a4c",
+    "apply": true,
+    "source": "asset_sources/images/vehicle_bus.png"
+  },
+  {
+    "kind": "image",
+    "original": "assets/images/vehicle_bus_chip.png",
+    "runtime": "assets/images/vehicle_bus_chip.webp",
+    "original_bytes": 990841,
+    "optimized_bytes": 687944,
+    "original_sha256": "045615a13ca0427bf8c9f6ad065b62e53fcbeb0343cf0812e6e597c2c17e94d4",
+    "optimized_sha256": "db725bd0082f9819faf4e856d5431c793664a584c3d05f2dcc603b225629e7f2",
+    "rgba_sha256": "86866dcd5938803043ab40f78b7bbbb3a35af85444ee54f6f6fc07d08e8548ca",
+    "apply": true,
+    "source": "asset_sources/images/vehicle_bus_chip.png"
+  },
+  {
+    "kind": "image",
+    "original": "assets/images/vehicle_excavator.png",
+    "runtime": "assets/images/vehicle_excavator.webp",
+    "original_bytes": 1643843,
+    "optimized_bytes": 1087520,
+    "original_sha256": "45cd6f4ce5cc3f9df751f7ead877255503ad03ad5f8666a5a1af12c802bbe766",
+    "optimized_sha256": "2c0add2e36a8a6966120ea172ccfd1da5e5a15282b517a90d8cca2321a891345",
+    "rgba_sha256": "aafef9370d70d0a77e2b4e0074d9f1c9f98d50c674d37585da91df92c7317a1f",
+    "apply": true,
+    "source": "asset_sources/images/vehicle_excavator.png"
+  },
+  {
+    "kind": "image",
+    "original": "assets/images/vehicle_excavator_chip.png",
+    "runtime": "assets/images/vehicle_excavator_chip.webp",
+    "original_bytes": 1084630,
+    "optimized_bytes": 713956,
+    "original_sha256": "abf8eb57e0172e0de20cff31846d21a6a7a4dc5549742e6d5c06c23dbfbd5263",
+    "optimized_sha256": "4c8f7c2bf8fc6d0bf35034c223bd799744ff86c0dbfed79fe296f43299861c4a",
+    "rgba_sha256": "f9f5a371d9b6a1c3196efa1fd31bba637436def6c4e6f9420e57f56479022849",
+    "apply": true,
+    "source": "asset_sources/images/vehicle_excavator_chip.png"
+  },
+  {
+    "kind": "image",
+    "original": "assets/images/vehicle_fire_truck.png",
+    "runtime": "assets/images/vehicle_fire_truck.webp",
+    "original_bytes": 1533918,
+    "optimized_bytes": 1002618,
+    "original_sha256": "8629b18d0c5beb249589b64c77d203a991528046d581fb6d9a5b2da50262edb6",
+    "optimized_sha256": "e23b9fc36059966bcee3dd8b47acfee04d92398299a17c4fb2a96997a0154cbb",
+    "rgba_sha256": "1541682f9c0132349e85452191b848f62f6d53673e0976fb6002a45096bc08e2",
+    "apply": true,
+    "source": "asset_sources/images/vehicle_fire_truck.png"
+  },
+  {
+    "kind": "image",
+    "original": "assets/images/vehicle_fire_truck_chip.png",
+    "runtime": "assets/images/vehicle_fire_truck_chip.webp",
+    "original_bytes": 1004156,
+    "optimized_bytes": 660432,
+    "original_sha256": "8566b99e9b87b629444e0a12533f37877d1f8707156331e15765b14f92b5cfc5",
+    "optimized_sha256": "914f02530619e2a283d3ac0dd476c8484df45b0c8a6202dbf129833b65b9a0cc",
+    "rgba_sha256": "4031eefb33683832ba4723ae183e478ad295266d6d1c8654a169d9af22f2c431",
+    "apply": true,
+    "source": "asset_sources/images/vehicle_fire_truck_chip.png"
+  },
+  {
+    "kind": "image",
+    "original": "assets/images/vehicle_motorcycle.png",
+    "runtime": "assets/images/vehicle_motorcycle.webp",
+    "original_bytes": 858303,
+    "optimized_bytes": 537256,
+    "original_sha256": "b7ecec08c2a63134c92241c739c458f8ffdc9d2cd148557a075cc471ba418a1d",
+    "optimized_sha256": "ab9ce1600d1a8c4ee51a6486354d1eddc1d94c80494ecf00dd20e83c5a84c048",
+    "rgba_sha256": "c3b04428701204773675cad0b0d4bc846cdbd38707c45f2d718f4a9744601122",
+    "apply": true,
+    "source": "asset_sources/images/vehicle_motorcycle.png"
+  },
+  {
+    "kind": "image",
+    "original": "assets/images/vehicle_motorcycle_chip.png",
+    "runtime": "assets/images/vehicle_motorcycle_chip.webp",
+    "original_bytes": 671135,
+    "optimized_bytes": 425248,
+    "original_sha256": "cc85629bac940c46c6f172af67228b45fc1b4f467f94e79c14f0c1f67be1429d",
+    "optimized_sha256": "896619b05392681552f13dea2cd40377cdf52c612230a4d97702afc212fed2ff",
+    "rgba_sha256": "c80f2841fc4564a9d1692c3a8e5a1d5bb2cdf9269610a8e34c1b876a593c17f4",
+    "apply": true,
+    "source": "asset_sources/images/vehicle_motorcycle_chip.png"
+  },
+  {
+    "kind": "image",
+    "original": "assets/images/vehicle_police_car.png",
+    "runtime": "assets/images/vehicle_police_car.webp",
+    "original_bytes": 1078183,
+    "optimized_bytes": 702856,
+    "original_sha256": "66b9cd9f4381a62f054152a87c8633302618946e456bac84cb13e315cbef136d",
+    "optimized_sha256": "4a9a9d59da9d15f769e7b31f0cb19851e68adf5a836ce8e1a4e73cf17e58145c",
+    "rgba_sha256": "37ba6640e635fbe2022e32ae108e9aa5cd11fafb60195c8f8528bc70b3b11c91",
+    "apply": true,
+    "source": "asset_sources/images/vehicle_police_car.png"
+  },
+  {
+    "kind": "image",
+    "original": "assets/images/vehicle_police_car_chip.png",
+    "runtime": "assets/images/vehicle_police_car_chip.webp",
+    "original_bytes": 1105255,
+    "optimized_bytes": 720596,
+    "original_sha256": "ed34c966f269c1ab34c6e49fbb457abd63525a06d93e000ae230efa4a8980565",
+    "optimized_sha256": "d74709b95be2354f07c0045522ff9d447f0f859c7ef7bc474fd16425a9cc93d6",
+    "rgba_sha256": "763e854792407e58a55f9d8eca0d4d7a5d53a4a9f9d4932c48d13bb8b513e9ec",
+    "apply": true,
+    "source": "asset_sources/images/vehicle_police_car_chip.png"
+  },
+  {
+    "kind": "image",
+    "original": "assets/images/vehicle_pteranodon.png",
+    "runtime": "assets/images/vehicle_pteranodon.webp",
+    "original_bytes": 801764,
+    "optimized_bytes": 510354,
+    "original_sha256": "d730d4aae7adbb157542a523dbd4ae56505cc7ec5176c770c60a92a038d26ec8",
+    "optimized_sha256": "fb5777f8efb5174eaca23376a899c72ae4722e35ffb965a6505b82972d1cac92",
+    "rgba_sha256": "a8d76dededcbac05e83d4e35c573765c1d2478afdb86b9328a249ee245d67968",
+    "apply": true,
+    "source": "asset_sources/images/vehicle_pteranodon.png"
+  },
+  {
+    "kind": "image",
+    "original": "assets/images/vehicle_pteranodon_chip.png",
+    "runtime": "assets/images/vehicle_pteranodon_chip.webp",
+    "original_bytes": 690355,
+    "optimized_bytes": 441766,
+    "original_sha256": "02b204371c85a5cee77c9eaeb5323c21c6da7d34b988de95624539ac3b08f502",
+    "optimized_sha256": "abb066b584af1ee96e88d34c866e267f0d406b343eb6cd6d5d5c458c47fbc116",
+    "rgba_sha256": "012dad2b0dd8e8ea945f79c3c9c046a21a18a7a3db308f506c6e50168b34ad2a",
+    "apply": true,
+    "source": "asset_sources/images/vehicle_pteranodon_chip.png"
+  },
+  {
+    "kind": "image",
+    "original": "assets/images/vehicle_shark.png",
+    "runtime": "assets/images/vehicle_shark.webp",
+    "original_bytes": 782902,
+    "optimized_bytes": 482636,
+    "original_sha256": "bff7a301420eff58ced76a5977def4398b1de1c93867a592bd593fe43adcaeb3",
+    "optimized_sha256": "338a1ed72a9f9c2f014b6438976421f57f5eaaefbf1e36ecce2f8f32b9c0890d",
+    "rgba_sha256": "d7689303d5ff0c690579da6714d81681d78bbd62af52973b1b34ff0b53113204",
+    "apply": true,
+    "source": "asset_sources/images/vehicle_shark.png"
+  },
+  {
+    "kind": "image",
+    "original": "assets/images/vehicle_shark_chip.png",
+    "runtime": "assets/images/vehicle_shark_chip.webp",
+    "original_bytes": 796041,
+    "optimized_bytes": 508794,
+    "original_sha256": "21502462a539dab4d31dca1abc44451794cf599922a6b4112f715a8cff2874f7",
+    "optimized_sha256": "c213e858c4747897101aa65db129f91ed8bc8cd4150e5260bc99dcaff8d7b3ab",
+    "rgba_sha256": "90aaf94d34b5aaaefae32a337510dd69b9a17907a73d603b2c595cda2fc1627d",
+    "apply": true,
+    "source": "asset_sources/images/vehicle_shark_chip.png"
+  },
+  {
+    "kind": "image",
+    "original": "assets/images/vehicle_supercar.png",
+    "runtime": "assets/images/vehicle_supercar.webp",
+    "original_bytes": 1458976,
+    "optimized_bytes": 999188,
+    "original_sha256": "ff4b05ac1ad43d00cdf95706ac9cb63e340d282d6ff89fdaf02e664f88a20019",
+    "optimized_sha256": "cb5a9072d65af85334fa267abdf5d43ea339fa7b4be35bf46c0ad8fc4f0d66a8",
+    "rgba_sha256": "b1716b9ea9f84a03e14075424a256aa34bd57998a4801659926bf7c93749026e",
+    "apply": true,
+    "source": "asset_sources/images/vehicle_supercar.png"
+  },
+  {
+    "kind": "image",
+    "original": "assets/images/vehicle_supercar_chip.png",
+    "runtime": "assets/images/vehicle_supercar_chip.webp",
+    "original_bytes": 812557,
+    "optimized_bytes": 550472,
+    "original_sha256": "5257c96b02167d503868781e764607e603cd9c89849de91fb4831075d4e11e81",
+    "optimized_sha256": "02af1b02b6b5bf4e8fba769bf024edcc8dbdfe83330e6a52d00f481c85ee6b55",
+    "rgba_sha256": "03e0bd32b3089362edb0190653afcd0b7eeafb5a38b032c99448b6c6b6637da5",
+    "apply": true,
+    "source": "asset_sources/images/vehicle_supercar_chip.png"
+  },
+  {
+    "kind": "image",
+    "original": "assets/images/vehicle_t_rex.png",
+    "runtime": "assets/images/vehicle_t_rex.webp",
+    "original_bytes": 898496,
+    "optimized_bytes": 575238,
+    "original_sha256": "7db937084d66bb5e88e4337d585e0e780b1ee5c54adc411440b3d60fdcd9deed",
+    "optimized_sha256": "17e79627fad99b9720bf61527cf9c5d7db25108799d505f077dbbe6d57df206f",
+    "rgba_sha256": "ae5386d5f06a28735d0f936c76180b7d59b925be1e81ac9bd5eb8e334b24d6c1",
+    "apply": true,
+    "source": "asset_sources/images/vehicle_t_rex.png"
+  },
+  {
+    "kind": "image",
+    "original": "assets/images/vehicle_t_rex_chip.png",
+    "runtime": "assets/images/vehicle_t_rex_chip.webp",
+    "original_bytes": 906719,
+    "optimized_bytes": 582090,
+    "original_sha256": "ea7f2037b3f42faf9d0897bc8afa453492165aa8dc3b077321e9c885d078ae21",
+    "optimized_sha256": "5bf0e0a4dc83a5de9d9034f7a24e3df4432b39dbb040f9e6c98511186a831a7f",
+    "rgba_sha256": "c28163f0da3d6ffb8b2c1a1b8cf01c9583c92845d6dd8526c41e8bc94e62aefa",
+    "apply": true,
+    "source": "asset_sources/images/vehicle_t_rex_chip.png"
+  },
+  {
+    "kind": "image",
+    "original": "assets/images/vehicle_train.png",
+    "runtime": "assets/images/vehicle_train.webp",
+    "original_bytes": 1432446,
+    "optimized_bytes": 919110,
+    "original_sha256": "d46acc628171c8c9aac4c69eb2bbd95e4dde23c364f272f24c7cb619b2e86142",
+    "optimized_sha256": "1a6af8adfc4fac0bcc0b44858c77ea412e5c22ea786dc2435bf9406adf2f2059",
+    "rgba_sha256": "babb7a7b2ceea9e54348c4fa6e063efb33aa198b2d576cc11ed856ab8c2936e8",
+    "apply": true,
+    "source": "asset_sources/images/vehicle_train.png"
+  },
+  {
+    "kind": "image",
+    "original": "assets/images/vehicle_train_chip.png",
+    "runtime": "assets/images/vehicle_train_chip.webp",
+    "original_bytes": 1081377,
+    "optimized_bytes": 691022,
+    "original_sha256": "ee56a37984f644b15deb17d373305f402b7e293648c37a8e119679e2c56ac4c5",
+    "optimized_sha256": "cc6468b4ba20bf43f949d1380beed39bcce257b0267d881160348acd9473639c",
+    "rgba_sha256": "d75da5c2d8b030e76cac7b95ee79c1b0e415d771c70a1682fab365fd7add0150",
+    "apply": true,
+    "source": "asset_sources/images/vehicle_train_chip.png"
+  },
+  {
+    "kind": "video",
+    "original": "assets/videos/result_airplane_success.mp4",
+    "runtime": "assets/videos/result_airplane_success.mp4",
+    "original_bytes": 1784448,
+    "optimized_bytes": 414309,
+    "original_sha256": "6a5eaf57879e4fb124d11cead7eb46a8377705e65da48be9a44555c7d420ff49",
+    "optimized_sha256": "bfc63e78bf66eaae40fb86473664fd2bed99ca8870a66ce32a9672d4a4b347a2",
+    "crf": 21,
+    "ssim": 0.994678,
+    "media": {
+      "programs": [],
+      "stream_groups": [],
+      "streams": [
+        {
+          "codec_name": "h264",
+          "codec_type": "video",
+          "width": 406,
+          "height": 720,
+          "avg_frame_rate": "30/1",
+          "nb_read_frames": "151"
+        }
+      ],
+      "format": {
+        "duration": "5.033008"
+      }
+    },
+    "apply": true,
+    "source": "asset_sources/videos/result_airplane_success.mp4"
+  },
+  {
+    "kind": "video",
+    "original": "assets/videos/result_brachio_success.mp4",
+    "runtime": "assets/videos/result_brachio_success.mp4",
+    "original_bytes": 2719084,
+    "optimized_bytes": 767988,
+    "original_sha256": "6bb15aab25ab3e3075e84de0b64f019d1fc712097843050f70940a9d95484cb3",
+    "optimized_sha256": "3d60516d890558728aa75bfa45d9b872bfcb55b19dde44feb0103bba7cbcd870",
+    "crf": 21,
+    "ssim": 0.997346,
+    "media": {
+      "programs": [],
+      "stream_groups": [],
+      "streams": [
+        {
+          "codec_name": "h264",
+          "codec_type": "video",
+          "width": 720,
+          "height": 1280,
+          "avg_frame_rate": "24/1",
+          "nb_read_frames": "121"
+        }
+      ],
+      "format": {
+        "duration": "5.041667"
+      }
+    },
+    "apply": true,
+    "source": "asset_sources/videos/result_brachio_success.mp4"
+  },
+  {
+    "kind": "video",
+    "original": "assets/videos/result_bus_success.mp4",
+    "runtime": "assets/videos/result_bus_success.mp4",
+    "original_bytes": 4100258,
+    "optimized_bytes": 1439224,
+    "original_sha256": "80b2dbebe2f9bc47e3377b5481f06e9717243ffc1d0ce102dcd3e7567efeaf58",
+    "optimized_sha256": "a9d5e3254fa79ee910c5ea53ce0f15323bd8514aebbcbebbf012bc1bffddf21e",
+    "crf": 21,
+    "ssim": 0.994835,
+    "media": {
+      "programs": [],
+      "stream_groups": [],
+      "streams": [
+        {
+          "codec_name": "h264",
+          "codec_type": "video",
+          "width": 720,
+          "height": 1280,
+          "avg_frame_rate": "24/1",
+          "nb_read_frames": "121"
+        }
+      ],
+      "format": {
+        "duration": "5.041667"
+      }
+    },
+    "apply": true,
+    "source": "asset_sources/videos/result_bus_success.mp4"
+  },
+  {
+    "kind": "video",
+    "original": "assets/videos/result_excavator_success.mp4",
+    "runtime": "assets/videos/result_excavator_success.mp4",
+    "original_bytes": 4125703,
+    "optimized_bytes": 1372331,
+    "original_sha256": "b2290bb606363a79a485d59f82d6b344d4a24a735c7e0e6bd4428b8a8df2cc8f",
+    "optimized_sha256": "b870e46ce03c032b80f3cff11137630b47291fb8b5fcc4c2fec371e2d9103b43",
+    "crf": 21,
+    "ssim": 0.994762,
+    "media": {
+      "programs": [],
+      "stream_groups": [],
+      "streams": [
+        {
+          "codec_name": "h264",
+          "codec_type": "video",
+          "width": 720,
+          "height": 1280,
+          "avg_frame_rate": "24/1",
+          "nb_read_frames": "121"
+        }
+      ],
+      "format": {
+        "duration": "5.041667"
+      }
+    },
+    "apply": true,
+    "source": "asset_sources/videos/result_excavator_success.mp4"
+  },
+  {
+    "kind": "video",
+    "original": "assets/videos/result_fire_truck_success.mp4",
+    "runtime": "assets/videos/result_fire_truck_success.mp4",
+    "original_bytes": 4401634,
+    "optimized_bytes": 1469997,
+    "original_sha256": "5643a420a952b644734d913ff22e1138dafe351c34588980524f7abc30ccb734",
+    "optimized_sha256": "78625f5662cbb678a61d20b1b0abc9dd12906c38773f68e9d334c153171135ae",
+    "crf": 21,
+    "ssim": 0.994261,
+    "media": {
+      "programs": [],
+      "stream_groups": [],
+      "streams": [
+        {
+          "codec_name": "h264",
+          "codec_type": "video",
+          "width": 720,
+          "height": 1280,
+          "avg_frame_rate": "24/1",
+          "nb_read_frames": "121"
+        }
+      ],
+      "format": {
+        "duration": "5.041667"
+      }
+    },
+    "apply": true,
+    "source": "asset_sources/videos/result_fire_truck_success.mp4"
+  },
+  {
+    "kind": "video",
+    "original": "assets/videos/result_motorcycle_success.mp4",
+    "runtime": "assets/videos/result_motorcycle_success.mp4",
+    "original_bytes": 4512998,
+    "optimized_bytes": 1599798,
+    "original_sha256": "b2f75bb9766d2668b520761ef6824a6aa4f544b3a09d5058d57467e38e829e90",
+    "optimized_sha256": "7627fa92e58b1e4bdcd547f5abc1f83082bbf8347ddcddae4dd775292d4caa03",
+    "crf": 21,
+    "ssim": 0.995101,
+    "media": {
+      "programs": [],
+      "stream_groups": [],
+      "streams": [
+        {
+          "codec_name": "h264",
+          "codec_type": "video",
+          "width": 720,
+          "height": 1280,
+          "avg_frame_rate": "24/1",
+          "nb_read_frames": "121"
+        }
+      ],
+      "format": {
+        "duration": "5.041667"
+      }
+    },
+    "apply": true,
+    "source": "asset_sources/videos/result_motorcycle_success.mp4"
+  },
+  {
+    "kind": "video",
+    "original": "assets/videos/result_police_car_success.mp4",
+    "runtime": "assets/videos/result_police_car_success.mp4",
+    "original_bytes": 4287321,
+    "optimized_bytes": 1378758,
+    "original_sha256": "ea3a9dad4b6b8084d21fedca7a363689e595baac92503a2e0d21dfd55dd88658",
+    "optimized_sha256": "849649ee4ef03c7b6a366a2c5430d090d14ea36465df33cb7d7dbe12823da69e",
+    "crf": 21,
+    "ssim": 0.993931,
+    "media": {
+      "programs": [],
+      "stream_groups": [],
+      "streams": [
+        {
+          "codec_name": "h264",
+          "codec_type": "video",
+          "width": 720,
+          "height": 1280,
+          "avg_frame_rate": "24/1",
+          "nb_read_frames": "121"
+        }
+      ],
+      "format": {
+        "duration": "5.041667"
+      }
+    },
+    "apply": true,
+    "source": "asset_sources/videos/result_police_car_success.mp4"
+  },
+  {
+    "kind": "video",
+    "original": "assets/videos/result_pteranodon_success.mp4",
+    "runtime": "assets/videos/result_pteranodon_success.mp4",
+    "original_bytes": 3217144,
+    "optimized_bytes": 1038334,
+    "original_sha256": "192592aa1c0367f50995e786a674e0ca25f0643d18ff089d0e8344517c893aac",
+    "optimized_sha256": "3a1894cf158950b5df5c59742dafda470cccbb1a39194cf417eea7c0e00f4a39",
+    "crf": 21,
+    "ssim": 0.996986,
+    "media": {
+      "programs": [],
+      "stream_groups": [],
+      "streams": [
+        {
+          "codec_name": "h264",
+          "codec_type": "video",
+          "width": 720,
+          "height": 1280,
+          "avg_frame_rate": "24/1",
+          "nb_read_frames": "121"
+        }
+      ],
+      "format": {
+        "duration": "5.041667"
+      }
+    },
+    "apply": true,
+    "source": "asset_sources/videos/result_pteranodon_success.mp4"
+  },
+  {
+    "kind": "video",
+    "original": "assets/videos/result_shark_success.mp4",
+    "runtime": "assets/videos/result_shark_success.mp4",
+    "original_bytes": 2530928,
+    "optimized_bytes": 709601,
+    "original_sha256": "b2987a4199fab8c237d9b8cc24349801343105fc733cf8513ed3054e132cfb87",
+    "optimized_sha256": "00e002ef00d372ef843ca6a304a494cfaf9d0682bb64cb690c9c59566bd3c5a6",
+    "crf": 21,
+    "ssim": 0.997426,
+    "media": {
+      "programs": [],
+      "stream_groups": [],
+      "streams": [
+        {
+          "codec_name": "h264",
+          "codec_type": "video",
+          "width": 720,
+          "height": 1280,
+          "avg_frame_rate": "24/1",
+          "nb_read_frames": "121"
+        }
+      ],
+      "format": {
+        "duration": "5.041667"
+      }
+    },
+    "apply": true,
+    "source": "asset_sources/videos/result_shark_success.mp4"
+  },
+  {
+    "kind": "video",
+    "original": "assets/videos/result_supercar_success.mp4",
+    "runtime": "assets/videos/result_supercar_success.mp4",
+    "original_bytes": 4560183,
+    "optimized_bytes": 1553309,
+    "original_sha256": "f02c783d0d01b5a371ae7656991f7ac23614a79fb66d39ca560fd67480bb678f",
+    "optimized_sha256": "889679441a34a690b535cf48de85cc8bdd50ac08b377e7409bf2e47132340f61",
+    "crf": 21,
+    "ssim": 0.99512,
+    "media": {
+      "programs": [],
+      "stream_groups": [],
+      "streams": [
+        {
+          "codec_name": "h264",
+          "codec_type": "video",
+          "width": 720,
+          "height": 1280,
+          "avg_frame_rate": "24/1",
+          "nb_read_frames": "121"
+        }
+      ],
+      "format": {
+        "duration": "5.041667"
+      }
+    },
+    "apply": true,
+    "source": "asset_sources/videos/result_supercar_success.mp4"
+  },
+  {
+    "kind": "video",
+    "original": "assets/videos/result_t_rex_success.mp4",
+    "runtime": "assets/videos/result_t_rex_success.mp4",
+    "original_bytes": 2399731,
+    "optimized_bytes": 629985,
+    "original_sha256": "6a027f9d37df336a9b0a76679720950775518b22c1bcbb08a399befbd3504f23",
+    "optimized_sha256": "acf2da86514cea6d1e073e0a27f729cae9259d8bc76d18500b7b871d3b05972e",
+    "crf": 21,
+    "ssim": 0.997408,
+    "media": {
+      "programs": [],
+      "stream_groups": [],
+      "streams": [
+        {
+          "codec_name": "h264",
+          "codec_type": "video",
+          "width": 720,
+          "height": 1280,
+          "avg_frame_rate": "24/1",
+          "nb_read_frames": "121"
+        }
+      ],
+      "format": {
+        "duration": "5.041667"
+      }
+    },
+    "apply": true,
+    "source": "asset_sources/videos/result_t_rex_success.mp4"
+  },
+  {
+    "kind": "video",
+    "original": "assets/videos/result_train_success.mp4",
+    "runtime": "assets/videos/result_train_success.mp4",
+    "original_bytes": 4826734,
+    "optimized_bytes": 1582537,
+    "original_sha256": "12faf87bc0cde0531e4a5ffb584eae493bc0b1701fb2b70c09ca8daeb0e03e35",
+    "optimized_sha256": "8f3e608f6e15144b58ef8f9572f3b0d04829bd00b309be068088acff9d2070f4",
+    "crf": 21,
+    "ssim": 0.994139,
+    "media": {
+      "programs": [],
+      "stream_groups": [],
+      "streams": [
+        {
+          "codec_name": "h264",
+          "codec_type": "video",
+          "width": 720,
+          "height": 1280,
+          "avg_frame_rate": "24/1",
+          "nb_read_frames": "121"
+        }
+      ],
+      "format": {
+        "duration": "5.041667"
+      }
+    },
+    "apply": true,
+    "source": "asset_sources/videos/result_train_success.mp4"
+  }
+]

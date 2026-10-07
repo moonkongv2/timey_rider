@@ -11,7 +11,7 @@ void main() {
     (tester) async {
       final customConfig = ActivityTimerConfig.defaults().copyWith(
         avatarMode: AvatarImageMode.custom,
-        customAvatarImagePath: 'assets/images/jy_the_rider.png',
+        customAvatarImagePath: 'assets/images/jy_the_rider.webp',
         customAvatarVehicleId: 'motorcycle',
       );
 
@@ -65,7 +65,7 @@ void main() {
 
     final customConfig = ActivityTimerConfig.defaults().copyWith(
       avatarMode: AvatarImageMode.custom,
-      customAvatarImagePath: 'assets/images/jy_the_rider.png',
+      customAvatarImagePath: 'assets/images/jy_the_rider.webp',
       customAvatarVehicleId: 'motorcycle',
     );
     await _pumpAvatarSetup(tester, customConfig);

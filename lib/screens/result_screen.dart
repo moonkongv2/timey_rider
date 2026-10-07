@@ -29,13 +29,13 @@ import 'timer_screen.dart';
 
 const _fallbackSuccessVideoPath = 'assets/videos/result_motorcycle_success.mp4';
 const _failedResultBackgroundLandscapePath =
-    'assets/images/result_failed_bg_landscape.png';
+    'assets/images/result_failed_bg_landscape.webp';
 const _failedResultBackgroundPortraitPath =
-    'assets/images/result_failed_bg_portrait.png';
+    'assets/images/result_failed_bg_portrait.webp';
 const _successResultBackgroundLandscapePath =
-    'assets/images/result_success_bg_landscape.png';
+    'assets/images/result_success_bg_landscape.webp';
 const _successResultBackgroundPortraitPath =
-    'assets/images/result_success_bg_portrait.png';
+    'assets/images/result_success_bg_portrait.webp';
 const _failureRiderImageBasePath = 'assets/images/riders';
 const _compactLandscapeRewardWidth = 252.0;
 const _compactLandscapeMessageWidth = 420.0;
@@ -103,7 +103,7 @@ String resultVideoAssetPathForVehicle({required String vehicleId}) {
 }
 
 String failureRiderAssetPathForVehicle({required String vehicleId}) {
-  return '$_failureRiderImageBasePath/rider_$vehicleId.png';
+  return '$_failureRiderImageBasePath/rider_$vehicleId.webp';
 }
 
 BoxFit resultIntroMediaFitForSize(Size size) {
@@ -141,7 +141,7 @@ class ResultScreen extends StatefulWidget {
 
 class _ResultScreenState extends State<ResultScreen>
     with WidgetsBindingObserver, RouteAware {
-  static const _successImagePath = 'assets/images/result_success.png';
+  static const _successImagePath = 'assets/images/result_success.webp';
 
   VideoPlayerController? _introController;
   Future<RecordedActivitySession>? _recordedSession;

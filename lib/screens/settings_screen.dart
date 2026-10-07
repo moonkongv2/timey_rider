@@ -17,7 +17,7 @@ typedef SettingsUrlLauncher = Future<bool> Function(Uri uri);
 typedef SettingsAppVersionLoader = Future<String> Function();
 
 const _courseMarkerGuideImageAssetPath =
-    'assets/images/onboarding/onboarding_04_course_markers.png';
+    'assets/images/onboarding/onboarding_04_course_markers.webp';
 const _motivationVideoIntervalOptions = [
   Duration(minutes: 3),
   Duration(minutes: 5),

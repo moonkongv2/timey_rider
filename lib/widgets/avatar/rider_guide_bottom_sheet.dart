@@ -22,32 +22,43 @@ class RiderGuideBottomSheet extends StatelessWidget {
           children: [
             Text(
               texts.guidePopupTitle,
-              style: textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+              style: textTheme.titleLarge?.copyWith(
+                fontWeight: FontWeight.bold,
+              ),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: AppSpacing.xxl),
             ClipRRect(
               borderRadius: AppRadius.card,
-              child: Image.asset('assets/images/rider_sample.png', fit: BoxFit.contain),
+              child: Image.asset(
+                'assets/images/rider_sample.webp',
+                fit: BoxFit.contain,
+              ),
             ),
             const SizedBox(height: AppSpacing.xxl),
             Text(
               texts.guidePopupMethodTitle,
-              style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+              style: textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.bold,
+              ),
             ),
             const SizedBox(height: AppSpacing.sm),
             Text(texts.guidePopupMethodIntro, style: textTheme.bodyMedium),
             const SizedBox(height: AppSpacing.lg),
             Text(
               texts.guidePopupMethod1Title,
-              style: textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold),
+              style: textTheme.titleSmall?.copyWith(
+                fontWeight: FontWeight.bold,
+              ),
             ),
             const SizedBox(height: AppSpacing.xs),
             Text(texts.guidePopupMethod1Body, style: textTheme.bodyMedium),
             const SizedBox(height: AppSpacing.lg),
             Text(
               texts.guidePopupMethod2Title,
-              style: textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold),
+              style: textTheme.titleSmall?.copyWith(
+                fontWeight: FontWeight.bold,
+              ),
             ),
             const SizedBox(height: AppSpacing.xs),
             Text(texts.guidePopupMethod2Body, style: textTheme.bodyMedium),
@@ -63,7 +74,9 @@ class RiderGuideBottomSheet extends StatelessWidget {
                 children: [
                   Text(
                     texts.guidePopupPrivacyTitle,
-                    style: textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold),
+                    style: textTheme.titleSmall?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                   const SizedBox(height: AppSpacing.xs),
                   Text(texts.guidePopupPrivacyBody, style: textTheme.bodySmall),
