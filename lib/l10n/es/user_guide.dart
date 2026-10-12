@@ -7,7 +7,7 @@ class EsUserGuideTexts implements UserGuideTextSet {
 
   String get title => 'Guía para adultos';
   String get subtitle =>
-      'Revisa misiones, videos de ánimo y reglas de pegatinas.';
+      'Consulta las misiones, los marcadores de ruta y las reglas de las pegatinas.';
   String get introTitle => 'Guía para adultos';
   String get introBody =>
       'Usa esta guía para entender las misiones y reglas de Timey Rider antes de empezar. Está pensada para adultos que acompañan las rutinas diarias.';
@@ -31,6 +31,7 @@ class EsUserGuideTexts implements UserGuideTextSet {
     'Toca Crear temporizador en Inicio y elige misión, marcadores y duración.',
     'Usa Otro en el mismo flujo cuando la rutina no coincida con una misión predefinida.',
     'Pausar durante el temporizador no es un fracaso; la misión puede continuar cuando sea necesario.',
+    'Si cambias la fecha o la hora del dispositivo mientras el temporizador está en marcha, el tiempo restante puede cambiar.',
   ];
 
   String get courseMarkersTitle => 'Marcadores de ruta';

@@ -6,7 +6,8 @@ class UserGuideTexts implements UserGuideTextSet {
   const UserGuideTexts();
 
   String get title => '사용 안내';
-  String get subtitle => '활동 미션, 응원 영상, 차량 스티커 규칙을 확인해요.';
+  String get subtitle =>
+      '활동 미션, 코스 마커, 차량 스티커 규칙을 확인해요.';
   String get introTitle => '보호자 가이드';
   String get introBody =>
       'Timey Rider를 시작하기 전에 활동 미션 흐름과 앱 규칙을 한눈에 확인할 수 있어요. 부모님뿐 아니라 아이의 루틴을 함께 돕는 보호자도 참고할 수 있어요.';
@@ -30,6 +31,7 @@ class UserGuideTexts implements UserGuideTextSet {
     '홈에서 타이머 만들기를 눌러 미션 종류, 마커, 시간을 차례로 골라요.',
     '기타 미션도 같은 흐름에서 원하는 시간을 고른 뒤 시작해요.',
     '타이머 중 일시정지는 실패가 아니며, 필요하면 이어갈 수 있어요.',
+    '타이머 사용 중 기기의 날짜나 시간을 변경하면 남은 시간이 달라질 수 있어요.',
   ];
 
   String get courseMarkersTitle => '코스 마커';

@@ -6,7 +6,8 @@ class JaUserGuideTexts implements UserGuideTextSet {
   const JaUserGuideTexts();
 
   String get title => '保護者ガイド';
-  String get subtitle => '活動ミッション、応援動画、ステッカーのルールを確認できます。';
+  String get subtitle =>
+      '活動ミッション、コースマーカー、ステッカーのルールを確認できます。';
   String get introTitle => '保護者ガイド';
   String get introBody =>
       'ライドを始める前に、Timey Riderの活動ミッションとアプリのルールを確認するためのガイドです。毎日のルーティンを支える保護者向けです。';
@@ -30,6 +31,7 @@ class JaUserGuideTexts implements UserGuideTextSet {
     'ホームでタイマーを作るを押し、ミッション、マーカー、時間を選びます。',
     '用意されたミッションに合わないルーティンでは、同じ流れの中で「その他」を使います。',
     'タイマー中に一時停止しても失敗ではありません。必要なときにミッションを再開できます。',
+    'タイマーの使用中に端末の日付や時刻を変更すると、残り時間が変わることがあります。',
   ];
 
   String get courseMarkersTitle => 'コースマーカー';

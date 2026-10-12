@@ -79,7 +79,7 @@ void main() {
       'Motivation video guide',
       'They do not decide stickers or results.',
       'Short timers may skip some milestones so clips do not overlap.',
-      'Turns timer music, marker sounds, and encouragement voices on or off.',
+      'Turns timer music and sound effects on or off.',
       'Applies while the timer is running.',
       'Auto previews and uses picture markers that fit the activity. Only manually chosen picture markers are saved to activity records.',
       'Rider image settings',

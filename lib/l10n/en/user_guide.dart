@@ -7,7 +7,7 @@ class EnUserGuideTexts implements UserGuideTextSet {
 
   String get title => 'Parent Guide';
   String get subtitle =>
-      'Review activity missions, motivation videos, and sticker rules.';
+      'Review activity missions, course markers, and sticker rules.';
   String get introTitle => 'Parent Guide';
   String get introBody =>
       'Use this guide to understand Timey Rider activity missions and app rules before starting a ride. This guide is for parents and other caregivers helping with daily routines.';
@@ -31,6 +31,7 @@ class EnUserGuideTexts implements UserGuideTextSet {
     'Tap Create Timer on Home, then choose a mission, markers, and duration.',
     'Use Other in the same flow when the routine does not match a preset mission.',
     'Pausing during the timer is not a failure; the mission can resume when needed.',
+    'Changing your device’s date or time while a timer is running may change the time remaining.',
   ];
 
   String get courseMarkersTitle => 'Course markers';

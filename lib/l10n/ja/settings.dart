@@ -25,7 +25,8 @@ class JaSettingsTexts implements SettingsTextSet {
     '動画が頻繁に重なって出ないよう、アプリが間隔を空けます。',
   ];
   String get keepScreenAwake => '画面をオンのままにする';
-  String get savedOnlySubtitle => 'タイマー中の音楽、マーカー音、応援の声をオン/オフします。';
+  String get savedOnlySubtitle =>
+      'タイマーの音楽と効果音をオン/オフします。';
   String get keepScreenAwakeSubtitle => 'タイマー実行中に適用されます。';
   String get markerModeTitle => 'コースマーカー';
   String get markerModeOff => 'オフ';

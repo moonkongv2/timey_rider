@@ -28,7 +28,7 @@ class EsSettingsTexts implements SettingsTextSet {
   ];
   String get keepScreenAwake => 'Mantener pantalla encendida';
   String get savedOnlySubtitle =>
-      'Activa o desactiva la música, los sonidos de marcadores y las voces de ánimo del temporizador.';
+      'Activa o desactiva la música y los efectos de sonido del temporizador.';
   String get keepScreenAwakeSubtitle =>
       'Se aplica mientras el temporizador está en marcha.';
   String get markerModeTitle => 'Marcadores de ruta';

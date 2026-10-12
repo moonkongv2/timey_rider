@@ -88,7 +88,7 @@ void main() {
     expect(find.byKey(const ValueKey('userGuideSettingsTile')), findsOneWidget);
     expect(find.text('도움말 및 지원'), findsOneWidget);
     expect(find.text('사용 가이드'), findsOneWidget);
-    expect(find.text('활동 미션, 응원 영상, 차량 스티커 규칙을 확인해요.'), findsOneWidget);
+    expect(find.text('활동 미션, 코스 마커, 차량 스티커 규칙을 확인해요.'), findsOneWidget);
 
     await tester.tap(find.byKey(const ValueKey('userGuideSettingsTile')));
     await tester.pumpAndSettle();
@@ -519,7 +519,7 @@ void main() {
     expect(find.textContaining('parents and other caregivers'), findsOneWidget);
     expect(
       find.text(
-        'Review activity missions, motivation videos, and sticker rules.',
+        'Review activity missions, course markers, and sticker rules.',
       ),
       findsOneWidget,
     );

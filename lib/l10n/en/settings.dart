@@ -27,7 +27,7 @@ class EnSettingsTexts implements SettingsTextSet {
   ];
   String get keepScreenAwake => 'Keep screen awake';
   String get savedOnlySubtitle =>
-      'Turns timer music, marker sounds, and encouragement voices on or off.';
+      'Turns timer music and sound effects on or off.';
   String get keepScreenAwakeSubtitle => 'Applies while the timer is running.';
   String get markerModeTitle => 'Course markers';
   String get markerModeOff => 'Off';

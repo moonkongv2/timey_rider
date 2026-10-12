@@ -7,7 +7,7 @@ class PtBrUserGuideTexts implements UserGuideTextSet {
 
   String get title => 'Guia para responsáveis';
   String get subtitle =>
-      'Revise missões, vídeos de incentivo e regras dos adesivos.';
+      'Confira as missões, os marcadores de percurso e as regras dos adesivos.';
   String get introTitle => 'Guia para responsáveis';
   String get introBody =>
       'Use este guia para entender as missões e regras do Timey Rider antes de começar. Ele é feito para responsáveis que ajudam nas rotinas diárias.';
@@ -31,6 +31,7 @@ class PtBrUserGuideTexts implements UserGuideTextSet {
     'Toque em Criar timer no Início e escolha missão, marcadores e duração.',
     'Use Outro no mesmo fluxo quando a rotina não combinar com uma missão predefinida.',
     'Pausar durante o timer não é uma falha; a missão pode continuar quando necessário.',
+    'Alterar a data ou a hora do dispositivo enquanto o timer estiver em andamento pode mudar o tempo restante.',
   ];
 
   String get courseMarkersTitle => 'Marcadores da rota';

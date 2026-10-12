@@ -25,7 +25,8 @@ class SettingsTexts implements SettingsTextSet {
     '영상이 너무 자주 겹치지 않도록 앱이 표시 간격을 조절해요.',
   ];
   String get keepScreenAwake => '화면 계속 켜두기';
-  String get savedOnlySubtitle => '타이머 중 배경음악, 마커음, 응원 목소리를 켜고 꺼요.';
+  String get savedOnlySubtitle =>
+      '타이머 배경음악과 효과음을 켜고 꺼요.';
   String get keepScreenAwakeSubtitle => '타이머가 실행 중일 때 적용돼요';
   String get markerModeTitle => '코스 마커';
   String get markerModeOff => '사용 안 함';

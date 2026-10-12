@@ -28,7 +28,7 @@ class PtBrSettingsTexts implements SettingsTextSet {
   ];
   String get keepScreenAwake => 'Manter tela ligada';
   String get savedOnlySubtitle =>
-      'Ativa ou desativa a música, os sons dos marcadores e as vozes de incentivo do timer.';
+      'Ativa ou desativa a música e os efeitos sonoros do timer.';
   String get keepScreenAwakeSubtitle =>
       'Aplica-se enquanto o timer está em andamento.';
   String get markerModeTitle => 'Marcadores da rota';
