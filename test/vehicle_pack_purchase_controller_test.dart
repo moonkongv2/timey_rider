@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:timey_rider/catalogs/vehicle_unlock_catalog.dart';
 import 'package:timey_rider/models/purchase_entitlement.dart';
@@ -8,6 +9,103 @@ import 'package:timey_rider/services/local_purchase_entitlement_store.dart';
 import 'package:timey_rider/services/vehicle_pack_purchase_controller.dart';
 
 void main() {
+  tearDown(() {
+    debugDefaultTargetPlatformOverride = null;
+  });
+
+  for (final platform in [TargetPlatform.iOS, TargetPlatform.android]) {
+    final expectedId = platform == TargetPlatform.iOS
+        ? 'com.timeyrider.vehicle_pack'
+        : 'vehicle_pack';
+
+    test(
+      '${platform.name} queries and purchases the correct product',
+      () async {
+        debugDefaultTargetPlatformOverride = platform;
+        final client = _FakeIapPurchaseClient();
+        final controller = _controller(
+          client: client,
+          store: _FakePurchaseEntitlementStore(),
+        );
+        addTearDown(controller.dispose);
+
+        expect(VehicleUnlockCatalog.vehiclePackProductId, expectedId);
+        final product = await controller.loadVehiclePackProduct();
+        expect(client.queriedProductIds, [
+          {expectedId},
+        ]);
+        expect(product?.id, expectedId);
+        expect(await controller.buyVehiclePack(), isTrue);
+        expect(client.purchasedProductIds, [expectedId]);
+      },
+    );
+
+    for (final status in [
+      IapPurchaseStatus.purchased,
+      IapPurchaseStatus.restored,
+    ]) {
+      test('${platform.name} recognizes ${status.name} entitlement', () async {
+        debugDefaultTargetPlatformOverride = platform;
+        final client = _FakeIapPurchaseClient();
+        final store = _FakePurchaseEntitlementStore();
+        final controller = _controller(client: client, store: store);
+        addTearDown(controller.dispose);
+        final purchase = IapPurchaseUpdate(
+          productId: expectedId,
+          status: status,
+          pendingCompletePurchase: true,
+        );
+        if (status == IapPurchaseStatus.restored) {
+          client.restoreUpdates = [purchase];
+          await controller.restoreVehiclePack();
+          expect(client.restoreCallCount, 1);
+        } else {
+          client.emitPurchases([purchase]);
+          await pumpEventQueue();
+        }
+        expect(controller.state.vehiclePackUnlocked, isTrue);
+        expect(
+          controller.state.status,
+          status == IapPurchaseStatus.restored
+              ? VehiclePackPurchaseStatus.restored
+              : VehiclePackPurchaseStatus.purchased,
+        );
+        expect(
+          store.savedEntitlements.single.source,
+          status == IapPurchaseStatus.restored
+              ? PurchaseEntitlementSource.storeRestore
+              : PurchaseEntitlementSource.storePurchase,
+        );
+        expect(client.completedProductIds, [expectedId]);
+      });
+    }
+
+    test('${platform.name} ignores the other platform product', () async {
+      debugDefaultTargetPlatformOverride = platform;
+      final client = _FakeIapPurchaseClient();
+      final store = _FakePurchaseEntitlementStore();
+      final controller = _controller(client: client, store: store);
+      addTearDown(controller.dispose);
+      client.emitPurchases([
+        for (final status in [
+          IapPurchaseStatus.purchased,
+          IapPurchaseStatus.restored,
+        ])
+          IapPurchaseUpdate(
+            productId: platform == TargetPlatform.iOS
+                ? 'vehicle_pack'
+                : 'com.timeyrider.vehicle_pack',
+            status: status,
+            pendingCompletePurchase: true,
+          ),
+      ]);
+      await pumpEventQueue();
+      expect(controller.state.vehiclePackUnlocked, isFalse);
+      expect(store.savedEntitlements, isEmpty);
+      expect(client.completedProductIds, isEmpty);
+    });
+  }
+
   test(
     'failed acknowledgement is retried without losing entitlement',
     () async {
@@ -90,7 +188,10 @@ void main() {
     expect(client.completedProductIds, [
       VehicleUnlockCatalog.vehiclePackProductId,
     ]);
-    expect(events, ['save:storePurchase', 'complete:vehicle_pack']);
+    expect(events, [
+      'save:storePurchase',
+      'complete:${VehicleUnlockCatalog.vehiclePackProductId}',
+    ]);
 
     controller.dispose();
   });
@@ -259,7 +360,7 @@ void main() {
 
   test('loadVehiclePackProduct handles missing product details', () async {
     final client = _FakeIapPurchaseClient(
-      queryResult: const IapProductQueryResult(
+      queryResult: IapProductQueryResult(
         products: [],
         notFoundIds: [VehicleUnlockCatalog.vehiclePackProductId],
       ),
@@ -331,7 +432,7 @@ VehiclePackPurchaseController _controller({
 }
 
 IapProductDetails _product() {
-  return const IapProductDetails(
+  return IapProductDetails(
     id: VehicleUnlockCatalog.vehiclePackProductId,
     title: 'Vehicle Pack',
     description: 'Unlocks vehicles',
@@ -393,6 +494,8 @@ class _FakeIapPurchaseClient
   final Object? queryError;
   final _purchaseStreamController =
       StreamController<List<IapPurchaseUpdate>>.broadcast();
+  final queriedProductIds = <Set<String>>[];
+  List<IapPurchaseUpdate> restoreUpdates = [];
   final purchasedProductIds = <String>[];
   final completedProductIds = <String>[];
   final List<String> events;
@@ -433,6 +536,7 @@ class _FakeIapPurchaseClient
 
   @override
   Future<IapProductQueryResult> queryProducts(Set<String> productIds) async {
+    queriedProductIds.add(Set.of(productIds));
     final queryError = this.queryError;
     if (queryError != null) {
       throw queryError;
@@ -443,6 +547,7 @@ class _FakeIapPurchaseClient
   @override
   Future<void> restorePurchases() async {
     restoreCallCount += 1;
+    if (restoreUpdates.isNotEmpty) emitPurchases(restoreUpdates);
     events.add('restore');
   }
 

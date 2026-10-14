@@ -166,7 +166,7 @@ assets. See `assets/audio/README.md` for the expected layout and rules.
 
 - Timey Rider has no ads, analytics, account login, backend server, or remote config.
 - Normal app settings, timer progress, activity history, stickers, rewards, avatar settings, and the purchase entitlement cache are local-first.
-- The vehicle pack uses the non-consumable product ID `vehicle_pack` and unlocks all locked vehicles after a successful purchase or restore.
+- The vehicle pack uses the non-consumable product IDs `com.timeyrider.vehicle_pack` on iOS and `vehicle_pack` on Android and unlocks all locked vehicles after a successful purchase or restore.
 - Purchase and restore entry points are shown only after a parent/guardian check.
 - Custom rider image selection is optional and user-initiated. The selected image is imported from the device and stored locally by Timey Rider; the app does not upload rider images or child photos to a server.
 - Because there is no backend receipt validation, the app relies on the app store purchase result and local entitlement cache. Store restore is required for cross-device or reinstall recovery.

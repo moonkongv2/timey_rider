@@ -45,7 +45,7 @@
           "locale" : "pt_BR"
         }
       ],
-      "productID" : "vehicle_pack",
+      "productID" : "com.timeyrider.vehicle_pack",
       "referenceName" : "Vehicle Pack",
       "type" : "NonConsumable"
     }

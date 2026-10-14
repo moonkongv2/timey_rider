@@ -1,8 +1,16 @@
+import 'package:flutter/foundation.dart';
+
 import '../models/purchase_entitlement.dart';
 import 'vehicle_catalog.dart';
 
 abstract final class VehicleUnlockCatalog {
-  static const vehiclePackProductId = 'vehicle_pack';
+  static const androidVehiclePackProductId = 'vehicle_pack';
+  static const iosVehiclePackProductId = 'com.timeyrider.vehicle_pack';
+
+  static String get vehiclePackProductId =>
+      defaultTargetPlatform == TargetPlatform.iOS
+      ? iosVehiclePackProductId
+      : androidVehiclePackProductId;
 
   static const freeVehicleIds = {'motorcycle', 'supercar'};
 

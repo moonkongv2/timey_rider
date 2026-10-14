@@ -4,7 +4,7 @@ Timey Rider uses a client-only, non-consumable in-app purchase for the vehicle p
 
 ## Product
 
-- Product ID: `vehicle_pack`
+- Product IDs: iOS `com.timeyrider.vehicle_pack`; Android `vehicle_pack`
 - Type: non-consumable / one-time purchase
 - Unlock: all locked vehicles
 - Free vehicles: `motorcycle`, `supercar`
@@ -19,7 +19,7 @@ Timey Rider uses a client-only, non-consumable in-app purchase for the vehicle p
 Local simulator testing uses:
 
 - `ios/Runner/StoreKitConfiguration.storekit`
-- Product ID `vehicle_pack`
+- Product ID `com.timeyrider.vehicle_pack`
 - Type `NonConsumable`
 
 Open `ios/Runner.xcodeproj`, edit the Runner scheme, and set:
@@ -28,7 +28,7 @@ Open `ios/Runner.xcodeproj`, edit the Runner scheme, and set:
 
 Before App Store release, configure the real product in App Store Connect:
 
-- Product ID: `vehicle_pack`
+- Product ID: `com.timeyrider.vehicle_pack`
 - Type: Non-Consumable
 - Reference name: Vehicle Pack
 - Localized display name and description for English and Korean

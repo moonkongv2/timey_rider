@@ -43,10 +43,11 @@
   identities without explicit approval.
 
 ## In-app purchases
-- The non-consumable vehicle pack product ID is `vehicle_pack`.
-- `vehicle_pack` must remain consistent between the Flutter code,
-  Google Play Console, App Store Connect, and StoreKit test configuration.
-- The same product ID is used independently for this app on Android and iOS.
+- The non-consumable vehicle pack product IDs are `vehicle_pack` on Android
+  and `com.timeyrider.vehicle_pack` on iOS.
+- Keep the Android ID consistent with Google Play Console and the iOS ID
+  consistent with App Store Connect and the StoreKit test configuration.
+- Platform-specific IDs are centralized in `VehicleUnlockCatalog`.
 - Preserve purchase restoration and existing entitlement behavior.
 
 ## App identity
