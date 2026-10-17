@@ -73,9 +73,10 @@ class EsAvatarSetupTexts implements AvatarSetupTextSet {
   String get guidePopupPrivacyTitle =>
       '🔒 ¿Por qué la app no procesa las imágenes automáticamente?';
   String get guidePopupPrivacyBody =>
-      'Para recortar o procesar caras con precisión dentro de la app, técnicamente la foto original tendría que enviarse a un servidor externo. Para proteger estrictamente las fotos y la privacidad de tu peque, bloqueamos por completo las transmisiones a servidores y pedimos a los padres que preparen la imagen del rider ellos mismos.';
-  String get guidePopupSafetyTitle => '🛡️ Tu privacidad está protegida';
+      "La app importa la imagen del rider que prepares. No genera imágenes con IA ni envía fotos a nuestros servidores.";
+  String get guidePopupSafetyTitle =>
+      "🛡️ Imágenes y privacidad";
   String get guidePopupSafetyBody =>
-      'La imagen que prepares y añadas se guarda solo en tu dispositivo. Nunca se envía a un servidor externo.';
+      "Las imágenes elegidas se guardan en la app en tu dispositivo y no se suben a nuestros servidores. Las copias de seguridad dependen de los ajustes del dispositivo. Revisa la política de privacidad antes de proporcionar fotos a un servicio externo.";
   String get guidePopupConfirmButton => 'Confirmar';
 }
