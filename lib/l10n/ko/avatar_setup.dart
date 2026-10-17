@@ -65,9 +65,10 @@ class AvatarSetupTexts implements AvatarSetupTextSet {
   String get guidePopupMethod2Body => '“외부 AI 서비스에서 만든 정사각형 라이더 이미지를 선택해 주세요.”';
   String get guidePopupPrivacyTitle => '🔒 왜 앱에서 자동으로 이미지를 처리하지 않나요?';
   String get guidePopupPrivacyBody =>
-      '앱 내에서 사진을 정교하게 오려내거나 변환하려면, 기술적으로 원본 사진을 외부 서버로 전송해 처리해야 합니다. 저희는 소중한 아이의 사진과 프라이버시를 철저하게 보호하기 위해, 서버 전송을 완전히 차단하고 부모님께서 직접 라이더 이미지를 준비해 주시도록 안내하고 있습니다.';
-  String get guidePopupSafetyTitle => '🛡️ 안전하게 보호됩니다! 절대 안심하세요!';
+      "앱은 보호자가 준비한 라이더 이미지를 가져오는 방식입니다. AI 이미지를 직접 생성하거나 사진을 저희 서버로 전송하지 않습니다.";
+  String get guidePopupSafetyTitle =>
+      "🛡️ 이미지 저장과 개인정보";
   String get guidePopupSafetyBody =>
-      '부모님께서 준비해 이 앱에 등록하신 라이더 이미지는 오직 사용 중이신 스마트폰 기기 내부에만 안전하게 저장됩니다. 앱 외부의 어떤 서버로도 절대 전송되지 않으며, 개인정보가 유출될 위험은 전혀 없으니 안심하고 등록해 주세요.';
+      "선택한 라이더 이미지는 기기의 앱 저장 공간에 보관되며 저희 서버로 업로드되지 않습니다. 시스템 백업 여부는 기기 설정에 따라 달라집니다. 외부 서비스에 사진을 제공하기 전 해당 개인정보 처리방침을 확인해 주세요.";
   String get guidePopupConfirmButton => '확인';
 }
