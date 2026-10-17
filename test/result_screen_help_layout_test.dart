@@ -3,6 +3,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:timey_rider/catalogs/vehicle_catalog.dart';
+import 'package:timey_rider/l10n/app_texts.dart';
 import 'package:timey_rider/models/activity_timer_config.dart';
 import 'package:timey_rider/models/reward_item.dart';
 import 'package:timey_rider/screens/result_screen.dart';
@@ -453,6 +454,102 @@ void main() {
       lessThanOrEqualTo(tester.view.physicalSize.height),
     );
   });
+
+  for (final layoutCase in [
+    (size: const Size(852, 393), scale: 1.0, goals: false),
+    (size: const Size(852, 393), scale: 1.3, goals: true),
+    (size: const Size(568, 320), scale: 1.0, goals: false),
+    (size: const Size(568, 320), scale: 1.3, goals: true),
+  ]) {
+    testWidgets(
+      'Landscape sticker fits ${layoutCase.size} at ${layoutCase.scale}x '
+      'with goals ${layoutCase.goals}',
+      (tester) async {
+        SharedPreferences.setMockInitialValues({
+          'savedActivityTimerPresetsInitialized': true,
+        });
+        tester.view.physicalSize = layoutCase.size;
+        tester.view.devicePixelRatio = 1;
+        tester.view.padding = const FakeViewPadding(
+          left: 44,
+          right: 44,
+          bottom: 21,
+        );
+        addTearDown(() {
+          tester.view.resetPhysicalSize();
+          tester.view.resetDevicePixelRatio();
+          tester.view.resetPadding();
+        });
+        final service = LocalActivityProgressService();
+        if (layoutCase.goals) {
+          await service.createRewardGoal(
+            requiredStickerCount: 5,
+            rewardText: 'Reward',
+          );
+        }
+        await tester.pumpWidget(
+          MaterialApp(
+            localizationsDelegates: GlobalMaterialLocalizations.delegates,
+            supportedLocales: AppTexts.supportedLocales,
+            locale: const Locale('ko'),
+            builder: (context, child) => MediaQuery(
+              data: MediaQuery.of(
+                context,
+              ).copyWith(textScaler: TextScaler.linear(layoutCase.scale)),
+              child: child!,
+            ),
+            home: ResultScreen(
+              result: activityResult(completedBeforeEnd: true),
+              config: ActivityTimerConfig.defaults().copyWith(
+                vehicleId: 'airplane',
+              ),
+              activityProgressService: service,
+              resultAudioService: TestResultAudioService(),
+              onConfigChanged: (_) {},
+              introControllerFactory: (_) => VideoPlayerController.asset(
+                'assets/videos/missing_result_success.mp4',
+              ),
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+        final rewardBox = find.byKey(
+          const ValueKey('compactLandscapeRewardBox'),
+        );
+        final rewardRect = tester.getRect(rewardBox);
+        final name = find.descendant(
+          of: rewardBox,
+          matching: find.text('비행기 스티커'),
+        );
+        final sticker = find.descendant(
+          of: rewardBox,
+          matching: find.byKey(
+            ValueKey(
+              'resultRewardImage_${RewardCatalog.vehicleStickerIdForVehicle("airplane")}',
+            ),
+          ),
+        );
+        expect(name, findsOneWidget);
+        expect(sticker, findsOneWidget);
+        for (final element in [name, sticker]) {
+          final rect = tester.getRect(element);
+          expect(rect.top, greaterThanOrEqualTo(rewardRect.top));
+          expect(rect.bottom, lessThanOrEqualTo(rewardRect.bottom));
+          expect(rect.left, greaterThanOrEqualTo(rewardRect.left));
+          expect(rect.right, lessThanOrEqualTo(rewardRect.right));
+        }
+        final restartRect = tester.getRect(
+          find.widgetWithText(FilledButton, '다시 출발'),
+        );
+        expect(rewardRect.bottom, lessThan(restartRect.top));
+        expect(
+          restartRect.bottom,
+          lessThanOrEqualTo(layoutCase.size.height - 21),
+        );
+        expect(tester.takeException(), isNull);
+      },
+    );
+  }
 
   testWidgets('Result screen allows landscape until disposed', (tester) async {
     tester.view.physicalSize = const Size(390, 844);
