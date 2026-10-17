@@ -72,9 +72,10 @@ class PtBrAvatarSetupTexts implements AvatarSetupTextSet {
   String get guidePopupPrivacyTitle =>
       '🔒 Por que o app não processa as imagens automaticamente?';
   String get guidePopupPrivacyBody =>
-      'Para recortar ou converter rostos com precisão dentro do app, tecnicamente a foto original precisaria ser enviada para um servidor externo. Para proteger rigorosamente as fotos e a privacidade da criança, bloqueamos totalmente os envios para servidores e orientamos os pais a prepararem a imagem do rider por conta própria.';
-  String get guidePopupSafetyTitle => '🛡️ Sua privacidade está protegida';
+      "O app importa a imagem do rider que você preparar. Não gera imagens com IA nem envia fotos aos nossos servidores.";
+  String get guidePopupSafetyTitle =>
+      "🛡️ Imagens e privacidade";
   String get guidePopupSafetyBody =>
-      'A imagem que você prepara e adiciona fica salva apenas no dispositivo. Ela nunca é enviada a um servidor externo.';
+      "As imagens escolhidas ficam no armazenamento do app no dispositivo e não são enviadas aos nossos servidores. Os backups dependem das configurações do dispositivo. Consulte a política de privacidade antes de fornecer fotos a um serviço externo.";
   String get guidePopupConfirmButton => 'Confirmar';
 }
