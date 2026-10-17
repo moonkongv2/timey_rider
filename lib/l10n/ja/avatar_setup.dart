@@ -65,9 +65,10 @@ class JaAvatarSetupTexts implements AvatarSetupTextSet {
   String get guidePopupMethod2Body => '外部AIサービスで作成した正方形のライダー画像を選んでください。';
   String get guidePopupPrivacyTitle => '🔒 なぜアプリ内で自動処理しないの？';
   String get guidePopupPrivacyBody =>
-      'アプリ内で顔を正確に切り抜いたり変換したりするには、技術的に元の写真を外部サーバーに送信する必要があります。お子さまの写真とプライバシーを厳格に守るため、サーバーへの送信を一切行わず、保護者の方にライダー画像をご準備いただいています。';
-  String get guidePopupSafetyTitle => '🛡️ プライバシーを守ります';
+      "このアプリは保護者が用意したライダー画像を取り込みます。AI画像の生成や当社サーバーへの写真の送信は行いません。";
+  String get guidePopupSafetyTitle =>
+      "🛡️ 画像の保存とプライバシー";
   String get guidePopupSafetyBody =>
-      '準備して追加したライダー画像は、この端末内だけに保存されます。外部サーバーへ送信されないため、個人情報を守れます。';
+      "選択した画像は端末内のアプリ領域に保存され、当社サーバーにはアップロードされません。システムバックアップは端末の設定によります。外部サービスに写真を提供する前に、そのプライバシーポリシーをご確認ください。";
   String get guidePopupConfirmButton => '確認';
 }
