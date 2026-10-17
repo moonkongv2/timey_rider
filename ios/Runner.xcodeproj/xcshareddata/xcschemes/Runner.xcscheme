@@ -94,6 +94,9 @@
       <StoreKitConfigurationFileReference
          identifier = "../Runner/StoreKitConfiguration.storekit">
       </StoreKitConfigurationFileReference>
+      <MetalAPIValidationSettings
+         isEnabled = "No">
+      </MetalAPIValidationSettings>
    </LaunchAction>
    <ProfileAction
       buildConfiguration = "Profile"
