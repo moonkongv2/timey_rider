@@ -72,9 +72,10 @@ class EnAvatarSetupTexts implements AvatarSetupTextSet {
   String get guidePopupPrivacyTitle =>
       '🔒 Why doesn\'t the app process images automatically?';
   String get guidePopupPrivacyBody =>
-      'To precisely cut out or convert faces within the app, the original photo would technically need to be sent to an external server. To strictly protect your child\'s photos and privacy, we block server transmissions entirely and guide parents to prepare the rider image themselves.';
-  String get guidePopupSafetyTitle => '🛡️ Your privacy is protected!';
+      "The app imports a rider image that you prepare. It does not generate AI images or send photos to our servers.";
+  String get guidePopupSafetyTitle =>
+      "🛡️ Image storage and privacy";
   String get guidePopupSafetyBody =>
-      'The rider image you prepare and add to this app is stored only on your device. It is never sent to an external server, so your personal information stays safe.';
+      "Selected rider images are stored in the app on your device and are not uploaded to our servers. System backups depend on your device settings. Review the privacy policy before providing photos to an external service.";
   String get guidePopupConfirmButton => 'Confirm';
 }
