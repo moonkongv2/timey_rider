@@ -16,6 +16,7 @@ void main() {
         'assets/audio/final_drive_short.mp3',
         'assets/audio/final_drive_long.mp3',
         'assets/audio/finish_arrival.mp3',
+        'assets/audio/timer_end.mp3',
       }),
     );
     expect(
@@ -25,6 +26,7 @@ void main() {
         'assets/audio/sticker_collect.mp3',
       }),
     );
+    expect(TimerAudioAssetCatalog.timerEndAlarmVolume, 0.24);
     expect(TimerAudioAssetCatalog.bgmVolume, 0.22);
     expect(TimerAudioAssetCatalog.markerSfxVolume, 0.080);
     expect(TimerAudioAssetCatalog.courseLoadingVolume, 0.20);
@@ -61,12 +63,19 @@ void main() {
   });
 
   test('Timer audio playable validation ignores dot store files', () {
-    final dotStoreFiles = Directory('assets/audio')
-        .listSync(recursive: true)
+    final fixture = Directory.systemTemp.createTempSync('timey_audio_');
+    addTearDown(() => fixture.deleteSync(recursive: true));
+    File('${fixture.path}/.DS_Store').writeAsBytesSync([0]);
+    File(
+      TimerAudioAssetCatalog.timerEndAlarmPath,
+    ).copySync('${fixture.path}/timer_end.mp3');
+    final fixturePlayableFiles = fixture
+        .listSync()
         .whereType<File>()
-        .where((file) => file.uri.pathSegments.last == '.DS_Store')
+        .where((file) => file.path.endsWith('.mp3'))
+        .map((file) => file.uri.pathSegments.last)
         .toList();
-    expect(dotStoreFiles, isNotEmpty);
+    expect(fixturePlayableFiles, ['timer_end.mp3']);
 
     final playableFiles = Directory('assets/audio')
         .listSync(recursive: true)
@@ -82,6 +91,7 @@ void main() {
               path == TimerAudioAssetCatalog.finishDriveShortAssetPath ||
               path == TimerAudioAssetCatalog.finishDriveLongAssetPath ||
               path == TimerAudioAssetCatalog.finishArrivalAssetPath ||
+              path == TimerAudioAssetCatalog.timerEndAlarmPath ||
               path == ResultAudioAssetCatalog.crowdCheeringAssetPath ||
               path == ResultAudioAssetCatalog.stickerCollectAssetPath,
         )
@@ -124,6 +134,7 @@ void main() {
           path == TimerAudioAssetCatalog.finishDriveShortAssetPath ||
           path == TimerAudioAssetCatalog.finishDriveLongAssetPath ||
           path == TimerAudioAssetCatalog.finishArrivalAssetPath ||
+          path == TimerAudioAssetCatalog.timerEndAlarmPath ||
           path == ResultAudioAssetCatalog.crowdCheeringAssetPath ||
           path == ResultAudioAssetCatalog.stickerCollectAssetPath,
     );

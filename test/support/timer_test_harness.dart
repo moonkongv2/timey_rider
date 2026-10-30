@@ -154,6 +154,12 @@ class FakeTimerAudioService implements TimerAudioService {
       calls.add('playFinishArrivalSfx');
 
   @override
+  Future<void> startTimerEndAlarm() async => calls.add('startTimerEndAlarm');
+
+  @override
+  Future<void> stopTimerEndAlarm() async => calls.add('stopTimerEndAlarm');
+
+  @override
   Future<void> stopAll() async => calls.add('stopAll');
 
   @override

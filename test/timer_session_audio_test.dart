@@ -770,7 +770,7 @@ void main() {
     now = now.add(const Duration(seconds: 2));
     await tester.pump(const Duration(milliseconds: 250));
 
-    expect(timerAudioService.calls, ['stopBgm']);
+    expect(timerAudioService.calls, ['stopBgm', 'startTimerEndAlarm']);
 
     await tester.pumpWidget(const SizedBox.shrink());
     await tester.pump();

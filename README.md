@@ -98,29 +98,45 @@ assets/
 Timer audio is bundled separately from deferred motivation media. The active
 timer can play low-volume looping BGM during the ride, course preview and
 ready/start cues, finish-drive sounds, and a short marker sound when the rider
-passes a visible course marker.
+passes a visible course marker. When the timer reaches zero, `timer_end.mp3`
+loops while the app is active until the user chooses Done or Not Yet in the
+existing arrival panel (or the result button for time-ended activities). No
+separate alarm-dismiss button is shown.
 
 The existing `soundEnabled` setting controls all timer sounds. Turning it off
-stops timer BGM, suppresses marker sounds, and prevents motivation voice
+stops timer BGM and the end alarm, suppresses marker sounds, and prevents motivation voice
 playback when motivation media is explicitly enabled later. The runtime sound
 button on the timer screen updates the same setting and persists it with the
 active timer session.
 
+The end alarm stops whenever the app leaves the resumed state. Returning to
+the same timer screen restarts an unconfirmed alarm if sound is enabled;
+turning sound back on also restarts it. Relaunching the app with an already
+expired saved session shows the arrival panel without replaying the old alarm.
+This is an in-app alarm; it does not ring in the background or on the lock
+screen. Early completion keeps its existing finish-drive and arrival sounds.
+
+Choosing an arrival response stops the alarm before result saving and
+navigation. A save failure or retry does not restart an acknowledged alarm.
+
 Runtime timer audio assets are registered individually in `pubspec.yaml`:
 
 ```text
-assets/audio/timer_bgm/timer_bgm_01.mp3
+assets/audio/timer_bgm/timer_bgm_short.mp3
 assets/audio/marker/marker_01.mp3
 assets/audio/course_loading.mp3
 assets/audio/ready_start_beep_02.mp3
 assets/audio/final_drive_short.mp3
 assets/audio/final_drive_long.mp3
 assets/audio/finish_arrival.mp3
+assets/audio/timer_end.mp3
 ```
 
 The timer audio catalog lives in
 `lib/catalogs/timer_audio_asset_catalog.dart`, including the asset paths and
-default playback volumes.
+default playback volumes. See
+[`docs/TIMER_END_ALARM_IMPLEMENTATION_PLAN.md`](docs/TIMER_END_ALARM_IMPLEMENTATION_PLAN.md)
+for the end-alarm behavior, implementation details, tests, and manual checks.
 
 Result audio is also registered individually:
 
@@ -156,7 +172,7 @@ assets. See `assets/audio/README.md` for the expected layout and rules.
 - `shared_preferences` for local settings, progress, history, stickers, and rewards
 - `in_app_purchase` for the optional one-time vehicle pack purchase
 - `video_player` for splash, result, and flagged motivation videos
-- `audioplayers` for flagged motivation voice playback
+- `audioplayers` for timer BGM, effects, the looping end alarm, result audio, and flagged motivation voice playback
 - `image_picker`, `path_provider`, and `image` for custom avatar image import and normalization
 - `wakelock_plus` for the keep-screen-awake timer setting
 - `flutter_launcher_icons` for launcher icon generation
@@ -234,7 +250,7 @@ lib/
     motivation_audio_service.dart    # Motivation voice playback wrapper
     result_audio_service.dart        # Result crowd and sticker audio playback wrapper
     screen_awake_service.dart        # Wakelock wrapper
-    timer_audio_service.dart         # Timer BGM, marker, preview, and finish audio wrapper
+    timer_audio_service.dart         # Timer BGM, marker, preview, finish audio, and end alarm wrapper
     vehicle_pack_purchase_controller.dart # Vehicle pack product, purchase, and restore state
     orientation_service.dart         # Orientation lock wrapper
   theme/

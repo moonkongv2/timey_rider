@@ -7,6 +7,9 @@ abstract final class TimerAudioAssetCatalog {
   static const finishDriveLongAssetPath = 'assets/audio/final_drive_long.mp3';
   static const finishArrivalAssetPath = 'assets/audio/finish_arrival.mp3';
 
+  static const timerEndAlarmPath = 'assets/audio/timer_end.mp3';
+
+  static const timerEndAlarmVolume = 0.24;
   static const bgmVolume = 0.22;
   static const markerSfxVolume = 0.080;
   static const courseLoadingVolume = 0.20;
@@ -22,5 +25,6 @@ abstract final class TimerAudioAssetCatalog {
     finishDriveShortAssetPath,
     finishDriveLongAssetPath,
     finishArrivalAssetPath,
+    timerEndAlarmPath,
   ];
 }

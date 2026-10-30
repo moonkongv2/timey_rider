@@ -110,6 +110,7 @@ flutter:
     - assets/audio/final_drive_short.mp3
     - assets/audio/final_drive_long.mp3
     - assets/audio/finish_arrival.mp3
+    - assets/audio/timer_end.mp3
     - assets/audio/crowd_cheering.mp3
     - assets/audio/sticker_collect.mp3
     - assets/audio/sticker_popup.mp3

@@ -228,6 +228,12 @@ class _TimerScreenState extends State<TimerScreen>
   final math.Random _motivationRandom = math.Random();
   final Set<int> _shownMotivationMilestones = {};
   bool _arrivalPromptShown = false;
+  bool _timerEndAlarmPending = false;
+  bool _timerEndAlarmRequested = false;
+  int _timerEndAlarmRequest = 0;
+  Future<void> _motivationPlaybackOperation = Future.value();
+  Future<void> _arrivalAudioStopped = Future.value();
+  Future<void>? _timerEndAlarmStopped;
   bool _arrivalAcknowledged = false;
   bool _arrivalPanelVisible = false;
   bool _screenAwakeEnabled = false;
@@ -282,6 +288,9 @@ class _TimerScreenState extends State<TimerScreen>
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    _isAppResumed =
+        WidgetsBinding.instance.lifecycleState == null ||
+        WidgetsBinding.instance.lifecycleState == AppLifecycleState.resumed;
     _timerConfig = widget.config;
     _motivationAudioService =
         widget.motivationAudioService ??
@@ -689,7 +698,57 @@ class _TimerScreenState extends State<TimerScreen>
     }
   }
 
+  void _syncTimerEndAlarm() {
+    final shouldPlay =
+        _timerEndAlarmPending &&
+        _controller.state == ActivityTimerState.arrived &&
+        !_arrivalAcknowledged &&
+        _timerConfig.soundEnabled &&
+        _isAppResumed &&
+        !_isDisposing &&
+        !_activeSessionFinalized &&
+        !_exitPromptShown &&
+        !_isFinishDriving;
+    if (shouldPlay == _timerEndAlarmRequested) return;
+    _timerEndAlarmRequested = shouldPlay;
+    final request = ++_timerEndAlarmRequest;
+    if (shouldPlay) {
+      unawaited(_startTimerEndAlarmAfterAudioStops(request));
+    } else {
+      _timerEndAlarmStopped = _timerAudioService.stopTimerEndAlarm();
+      unawaited(_timerEndAlarmStopped);
+    }
+  }
+
+  Future<void> _startTimerEndAlarmAfterAudioStops(int request) async {
+    await _arrivalAudioStopped;
+    if (!mounted ||
+        !_timerEndAlarmRequested ||
+        request != _timerEndAlarmRequest) {
+      return;
+    }
+    await _timerAudioService.startTimerEndAlarm();
+  }
+
+  void _acknowledgeTimerEndAlarm() {
+    _timerEndAlarmPending = false;
+    _syncTimerEndAlarm();
+  }
+
+  Future<void> _stopArrivalMotivationAudio() async {
+    // A voice may already be loading. Stop after that operation as well so
+    // it cannot start playing over the alarm after a late platform response.
+    await _motivationPlaybackOperation;
+    try {
+      await _motivationAudioService.stop();
+    } catch (error, stackTrace) {
+      debugPrint('Unable to stop arrival motivation audio: $error');
+      debugPrintStack(stackTrace: stackTrace);
+    }
+  }
+
   void _syncTimerBgm() {
+    _syncTimerEndAlarm();
     final target = _timerBgmTarget();
     if (target == _lastTimerBgmTarget) {
       return;
@@ -743,7 +802,9 @@ class _TimerScreenState extends State<TimerScreen>
       return;
     }
 
-    _maybeShowMotivationVideo();
+    if (_controller.state != ActivityTimerState.arrived) {
+      _maybeShowMotivationVideo();
+    }
 
     if (_arrivalPromptShown ||
         _controller.state != ActivityTimerState.arrived ||
@@ -753,6 +814,12 @@ class _TimerScreenState extends State<TimerScreen>
 
     _cancelCourseOverviewPreview();
     _arrivalPromptShown = true;
+    _timerEndAlarmPending = true;
+    _motivationVoiceTimer?.cancel();
+    _activeMotivationMilestone = null;
+    _activeMotivationVideoPath = null;
+    _arrivalAudioStopped = _stopArrivalMotivationAudio();
+    _syncTimerEndAlarm();
     _captureArrivalSnapshot();
     unawaited(_persistActiveSession());
     _arrivalPromptTimer?.cancel();
@@ -772,6 +839,7 @@ class _TimerScreenState extends State<TimerScreen>
   void _maybeShowMotivationVideo() {
     if (!widget.motivationMediaAvailable ||
         !mounted ||
+        _controller.state != ActivityTimerState.running ||
         _isFinishDriving ||
         _activeMotivationMilestone != null) {
       return;
@@ -833,7 +901,10 @@ class _TimerScreenState extends State<TimerScreen>
   }
 
   void _maybePlayMotivationVoice() {
-    if (!widget.motivationMediaAvailable || !_timerConfig.soundEnabled) {
+    if (!widget.motivationMediaAvailable ||
+        !_timerConfig.soundEnabled ||
+        _controller.state != ActivityTimerState.running ||
+        !_isAppResumed) {
       return;
     }
 
@@ -847,7 +918,8 @@ class _TimerScreenState extends State<TimerScreen>
     if (voicePath == null) {
       return;
     }
-    unawaited(_playMotivationVoice(voicePath));
+    _motivationPlaybackOperation = _playMotivationVoice(voicePath);
+    unawaited(_motivationPlaybackOperation);
   }
 
   Future<void> _playMotivationVoice(String voicePath) async {
@@ -1098,6 +1170,9 @@ class _TimerScreenState extends State<TimerScreen>
       return;
     }
 
+    if (confirmed != null && _controller.state == ActivityTimerState.arrived) {
+      _acknowledgeTimerEndAlarm();
+    }
     if (confirmed != true) {
       return;
     }
@@ -1108,6 +1183,11 @@ class _TimerScreenState extends State<TimerScreen>
     _activeSessionFinalized = true;
     final result = _controller.complete(completionStatus: completionStatus);
     _syncTimerBgm();
+    final alarmStopped = _timerEndAlarmStopped;
+    if (alarmStopped != null) {
+      await alarmStopped;
+      if (!mounted) return;
+    }
     if (!await _persistCompletedResult(result)) return;
     if (!mounted) return;
     if (result.completedBeforeEnd) {
@@ -1133,6 +1213,7 @@ class _TimerScreenState extends State<TimerScreen>
       return;
     }
 
+    _acknowledgeTimerEndAlarm();
     _cancelCourseOverviewPreview();
     _arrivalPromptTimer?.cancel();
     _captureArrivalSnapshot();
@@ -1150,6 +1231,11 @@ class _TimerScreenState extends State<TimerScreen>
     _activeSessionFinalized = true;
     final result = _completeArrival(completionStatus: completionStatus);
     _syncTimerBgm();
+    final alarmStopped = _timerEndAlarmStopped;
+    if (alarmStopped != null) {
+      await alarmStopped;
+      if (!mounted) return;
+    }
     if (!await _persistCompletedResult(result)) return;
     if (!mounted) return;
     _openResult(result);
@@ -1295,6 +1381,7 @@ class _TimerScreenState extends State<TimerScreen>
   }
 
   void _openResult(ActivitySessionResult result) {
+    _acknowledgeTimerEndAlarm();
     final recordableResult = _resultWithSelectedMarkers(
       result,
     ).copyWith(sessionId: _activeSessionId);

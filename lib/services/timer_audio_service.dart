@@ -30,6 +30,10 @@ abstract interface class TimerAudioService {
 
   Future<void> playFinishArrivalSfx();
 
+  Future<void> startTimerEndAlarm();
+
+  Future<void> stopTimerEndAlarm();
+
   Future<void> stopAll();
 
   Future<void> dispose();
@@ -75,6 +79,12 @@ class NoopTimerAudioService implements TimerAudioService {
   Future<void> playFinishArrivalSfx() async {}
 
   @override
+  Future<void> startTimerEndAlarm() async {}
+
+  @override
+  Future<void> stopTimerEndAlarm() async {}
+
+  @override
   Future<void> stopAll() async {}
 
   @override
@@ -89,6 +99,7 @@ class AudioplayersTimerAudioService implements TimerAudioService {
       _readyStartBeepPlayer = AudioPlayer(),
       _finishDrivePlayer = AudioPlayer(),
       _finishArrivalPlayer = AudioPlayer(),
+      _timerEndAlarmPlayer = AudioPlayer(),
       _audioContext = AudioContextConfig(
         focus: AudioContextConfigFocus.gain,
         respectSilence: false,
@@ -100,12 +111,17 @@ class AudioplayersTimerAudioService implements TimerAudioService {
   final AudioPlayer _readyStartBeepPlayer;
   final AudioPlayer _finishDrivePlayer;
   final AudioPlayer _finishArrivalPlayer;
+  final AudioPlayer _timerEndAlarmPlayer;
   final AudioContext _audioContext;
 
   bool _bgmSourceLoaded = false;
   bool _bgmPlaying = false;
   bool _disposed = false;
   Future<void> _bgmOperation = Future.value();
+  Future<void> _alarmOperation = Future.value();
+  bool _alarmRequested = false;
+  bool _alarmPlaying = false;
+  bool _disposing = false;
 
   @override
   Future<void> startOrResumeBgm() {
@@ -310,9 +326,56 @@ class AudioplayersTimerAudioService implements TimerAudioService {
   }
 
   @override
+  Future<void> startTimerEndAlarm() {
+    if (_disposed || _disposing || _alarmRequested) {
+      return _alarmOperation;
+    }
+    _alarmRequested = true;
+    _alarmOperation = _alarmOperation.then((_) async {
+      if (!_alarmRequested || _disposed || _disposing || _alarmPlaying) return;
+      try {
+        await stopBgm();
+        if (!_alarmRequested || _disposing) return;
+        await _timerEndAlarmPlayer.setReleaseMode(ReleaseMode.loop);
+        if (!_alarmRequested || _disposing) return;
+        await _timerEndAlarmPlayer.play(
+          AssetSource(
+            _assetSourcePath(TimerAudioAssetCatalog.timerEndAlarmPath),
+          ),
+          volume: TimerAudioAssetCatalog.timerEndAlarmVolume,
+          ctx: _audioContext,
+          mode: PlayerMode.mediaPlayer,
+        );
+        _alarmPlaying = true;
+      } catch (error, stackTrace) {
+        debugPrint('Timer end alarm playback failed: $error');
+        debugPrintStack(stackTrace: stackTrace);
+      }
+    });
+    return _alarmOperation;
+  }
+
+  @override
+  Future<void> stopTimerEndAlarm() {
+    _alarmRequested = false;
+    _alarmOperation = _alarmOperation.then((_) async {
+      if (_disposed) return;
+      try {
+        await _timerEndAlarmPlayer.stop();
+        _alarmPlaying = false;
+      } catch (error, stackTrace) {
+        debugPrint('Timer end alarm stop failed: $error');
+        debugPrintStack(stackTrace: stackTrace);
+      }
+    });
+    return _alarmOperation;
+  }
+
+  @override
   Future<void> stopAll() async {
     await Future.wait([
       stopBgm(),
+      stopTimerEndAlarm(),
       _stopMarkerSfx(),
       stopCourseLoading(),
       stopReadyStartBeep(),
@@ -323,12 +386,17 @@ class AudioplayersTimerAudioService implements TimerAudioService {
 
   @override
   Future<void> dispose() async {
-    if (_disposed) {
+    if (_disposed || _disposing) {
       return;
     }
+    _disposing = true;
     await stopAll();
     await Future.wait([
       _disposePlayer(_bgmPlayer, 'Timer BGM player dispose failed'),
+      _disposePlayer(
+        _timerEndAlarmPlayer,
+        'Timer end alarm player dispose failed',
+      ),
       _disposePlayer(_markerPlayer, 'Timer marker player dispose failed'),
       _disposePlayer(
         _courseLoadingPlayer,

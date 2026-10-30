@@ -787,6 +787,7 @@ void main() {
           now: () => now,
           onConfigChanged: (_) {},
           orientationService: orientationService,
+          timerAudioService: FakeTimerAudioService(),
         ),
       ),
     );
