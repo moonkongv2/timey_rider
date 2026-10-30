@@ -1,3 +1,4 @@
+import '../widgets/activity_progress_error.dart';
 import 'dart:async';
 import 'dart:io';
 
@@ -757,6 +758,18 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
             FutureBuilder<ActivityProgressSnapshot>(
               future: _progressSnapshotFuture,
               builder: (context, snapshot) {
+                if (snapshot.hasError) {
+                  return ActivityProgressError(
+                    error: snapshot.error,
+                    onRetry: () => setState(() {
+                      _progressSnapshotFuture = widget.activityProgressService
+                          .loadSnapshot();
+                    }),
+                  );
+                }
+                if (!snapshot.hasData) {
+                  return const Center(child: CircularProgressIndicator());
+                }
                 return _ProgressSummary(
                   childName: childName,
                   snapshot: snapshot.data,
@@ -3204,6 +3217,8 @@ class _ActiveRewardGoalsCta extends StatelessWidget {
                 ),
                 const SizedBox(height: AppSpacing.xs),
               ],
+              if (goals.length > 2)
+                Text(texts.activityHistory.additionalGoals(goals.length - 2)),
               if (earnedRewardCount > 0)
                 Text(
                   '${texts.rewards.earnedRewardGoalsTitle} $earnedRewardCount',

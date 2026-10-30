@@ -6,8 +6,7 @@ class UserGuideTexts implements UserGuideTextSet {
   const UserGuideTexts();
 
   String get title => '사용 안내';
-  String get subtitle =>
-      '활동 미션, 코스 마커, 차량 스티커 규칙을 확인해요.';
+  String get subtitle => '활동 미션, 코스 마커, 차량 스티커 규칙을 확인해요.';
   String get introTitle => '보호자 가이드';
   String get introBody =>
       'Timey Rider를 시작하기 전에 활동 미션 흐름과 앱 규칙을 한눈에 확인할 수 있어요. 부모님뿐 아니라 아이의 루틴을 함께 돕는 보호자도 참고할 수 있어요.';
@@ -64,6 +63,8 @@ class UserGuideTexts implements UserGuideTextSet {
 
   String get historyRewardsTitle => '활동 기록과 보상 목표';
   List<String> get historyRewardsItems => const [
+    '기록만 삭제한 뒤에는 이 활동의 스티커를 연동 삭제할 수 없어요.',
+    '받은 스티커와 미사용 보상판의 연결 칸을 제거해요. 목표에 못 미치게 된 보상은 진행 중으로 돌아가요. 사용한 보상은 유지돼요.',
     '활동 기록에서 활동 이름, 목표 시간, 실제 시간, 완료 상태를 볼 수 있어요.',
     '받은 차량 스티커와 직접 고른 그림 마커도 함께 확인할 수 있어요.',
     '받은 차량 스티커는 차량 스티커 보관함에 쌓여요.',

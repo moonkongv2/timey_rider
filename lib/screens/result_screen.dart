@@ -8,7 +8,6 @@ import '../l10n/text_sets.dart';
 import '../models/activity_completion_status.dart';
 import '../models/activity_progress_snapshot.dart';
 import '../models/activity_session_result.dart';
-import '../models/pending_activity_result.dart';
 import '../models/activity_timer_config.dart';
 import '../models/reward_goal.dart';
 import '../models/reward_item.dart';
@@ -21,6 +20,7 @@ import '../theme/app_colors.dart';
 import '../theme/app_radius.dart';
 import '../theme/app_spacing.dart';
 import '../widgets/app/app_help_sheet.dart';
+import '../widgets/activity_progress_error.dart';
 import '../widgets/flying_sticker_animation.dart';
 import '../widgets/result_sticker_album_button.dart';
 import '../widgets/result_sticker_album_sheet.dart';
@@ -147,6 +147,12 @@ class _ResultScreenState extends State<ResultScreen>
   Future<RecordedActivitySession>? _recordedSession;
   ActivitySessionResult? _resultForRecording;
   bool _recordFailed = false;
+  bool _checking = true;
+  bool _saving = false;
+  bool _deleted = false;
+  Object? _recordError;
+  RecordedActivitySession? _savedRecord;
+  int _operationGeneration = 0;
   bool? _receiveSticker;
   bool _introFinished = false;
   bool _introFallback = false;
@@ -165,9 +171,7 @@ class _ResultScreenState extends State<ResultScreen>
         widget.resultAudioService ?? AudioplayersResultAudioService();
     _ownsResultAudioService = widget.resultAudioService == null;
     unawaited(widget.orientationService.allowTimerOrientations());
-    if (!_needsStickerChoice) {
-      _recordResult(widget.result);
-    }
+    unawaited(_prepareResult());
   }
 
   @override
@@ -184,57 +188,157 @@ class _ResultScreenState extends State<ResultScreen>
         activityCompletionStatusIsCompleted(widget.result.completionStatus);
   }
 
+  String get _entryId =>
+      widget.result.sessionId ??
+      widget.result.endedAt.microsecondsSinceEpoch.toString();
+
+  Future<void> _prepareResult() async {
+    final generation = ++_operationGeneration;
+    setState(() {
+      _checking = true;
+      _recordFailed = false;
+    });
+    try {
+      if (await widget.activityProgressService.isActivitySessionDeleted(
+        _entryId,
+      )) {
+        if (!mounted || generation != _operationGeneration) return;
+        _deleted = true;
+        await _cleanDeletedResult();
+        return;
+      }
+      final snapshot = await widget.activityProgressService.loadSnapshot();
+      if (!mounted || generation != _operationGeneration) return;
+      final existing = snapshot.history
+          .where((entry) => entry.id == _entryId)
+          .firstOrNull;
+      setState(() => _checking = false);
+      if (existing != null) {
+        _recordResult(
+          widget.result.copyWith(receiveSticker: existing.rewardIds.isNotEmpty),
+        );
+      } else if (!_needsStickerChoice) {
+        _recordResult(widget.result);
+      }
+    } catch (error) {
+      if (!mounted || generation != _operationGeneration) return;
+      setState(() {
+        _checking = false;
+        _recordFailed = true;
+        _recordError = error;
+      });
+    }
+  }
+
+  Future<void> _cleanDeletedResult() async {
+    try {
+      final sessionId = widget.result.sessionId;
+      if (sessionId != null) {
+        await widget.activeSessionStore.clearPendingResult(sessionId);
+      }
+      if (mounted) {
+        setState(() {
+          _checking = false;
+          _saving = false;
+          _recordFailed = false;
+        });
+      }
+    } catch (error) {
+      if (mounted) {
+        setState(() {
+          _checking = false;
+          _saving = false;
+          _recordFailed = true;
+          _recordError = error;
+        });
+      }
+    }
+  }
+
   void _recordResult(ActivitySessionResult result) {
-    final receiveSticker =
+    if (_saving) return;
+    final generation = ++_operationGeneration;
+    _receiveSticker =
         result.receiveSticker ??
         activityCompletionStatusCanReceiveSticker(result.completionStatus);
-    _receiveSticker = receiveSticker;
     _resultForRecording = result;
-    _recordFailed = false;
+    setState(() {
+      _recordFailed = false;
+      _saving = true;
+    });
     _recordedSession = _persistResult(result);
     _recordedSession!.then<void>(
-      (_) {},
-      onError: (Object error, StackTrace stackTrace) {
-        debugPrint('Unable to save activity result: $error');
-        if (mounted) setState(() => _recordFailed = true);
+      (_) {
+        if (!mounted || generation != _operationGeneration) return;
+        setState(() => _saving = false);
+        _startResultMedia();
+      },
+      onError: (Object error, StackTrace stackTrace) async {
+        if (!mounted || generation != _operationGeneration) return;
+        if (error is DeletedActivitySessionException) {
+          setState(() {
+            _deleted = true;
+            _saving = false;
+            _checking = true;
+          });
+          await _cleanDeletedResult();
+        } else {
+          setState(() {
+            _saving = false;
+            _recordFailed = true;
+            _recordError = error;
+          });
+        }
       },
     );
-    if (!receiveSticker) {
-      _introFinished = true;
+  }
+
+  void _startResultMedia() {
+    if (!mounted || _deleted) return;
+    if (_receiveSticker != true) {
+      setState(() => _introFinished = true);
       return;
     }
-
-    final oldController = _introController;
-    oldController?.removeListener(_handleIntroChanged);
-    unawaited(oldController?.dispose());
-    final introControllerFactory =
+    if (_introController != null) return;
+    final factory =
         widget.introControllerFactory ?? VideoPlayerController.asset;
-    final introController = introControllerFactory(_introVideoPath);
-    _introController = introController;
-    introController.addListener(_handleIntroChanged);
-    _initializeIntroVideo();
+    final controller = factory(_introVideoPath);
+    _introController = controller;
+    controller.addListener(_handleIntroChanged);
+    unawaited(_initializeIntroVideo());
   }
 
   Future<RecordedActivitySession> _persistResult(
     ActivitySessionResult result,
   ) async {
-    final sessionId = result.sessionId;
-    if (sessionId != null) {
-      final pending = await widget.activeSessionStore.loadPendingResult();
-      if (pending != null && pending.session.sessionId == sessionId) {
-        await widget.activeSessionStore.savePendingResult(
-          PendingActivityResult(session: pending.session, result: result),
-        );
-      }
+    // A cleanup retry never writes progress again, but deletion always wins.
+    if (await widget.activityProgressService.isActivitySessionDeleted(_entryId)) {
+      throw DeletedActivitySessionException(_entryId);
     }
-    final recorded = await widget.activityProgressService.recordActivityResult(
-      result,
-      vehicleId: widget.config.vehicleId,
-    );
+    final sessionId = result.sessionId;
+    if (_savedRecord == null) {
+      if (sessionId != null) {
+        final updated = await widget.activeSessionStore
+            .updatePendingResultIfSessionMatches(sessionId, result);
+        if (!updated) {
+          final pending = await widget.activeSessionStore.loadPendingResult();
+          if (pending != null && pending.session.sessionId != sessionId) {
+            throw StateError('A newer activity is pending.');
+          }
+        }
+      }
+      _savedRecord = await widget.activityProgressService.recordActivityResult(
+        result,
+        vehicleId: widget.config.vehicleId,
+      );
+    }
     if (sessionId != null) {
       await widget.activeSessionStore.clearPendingResult(sessionId);
     }
-    return recorded;
+    if (await widget.activityProgressService.isActivitySessionDeleted(_entryId)) {
+      throw DeletedActivitySessionException(_entryId);
+    }
+    return _savedRecord!;
   }
 
   void _chooseSticker(bool receiveSticker) {
@@ -247,6 +351,7 @@ class _ResultScreenState extends State<ResultScreen>
       resultVideoAssetPathForVehicle(vehicleId: widget.config.vehicleId);
 
   void _handleIntroChanged() {
+    if (!mounted) return;
     final controller = _introController;
     if (controller == null) {
       return;
@@ -273,8 +378,11 @@ class _ResultScreenState extends State<ResultScreen>
 
     try {
       await controller.initialize();
+      if (!mounted || !identical(controller, _introController)) return;
       await controller.setLooping(false);
+      if (!mounted || !identical(controller, _introController)) return;
       await controller.play();
+      if (!mounted || !identical(controller, _introController)) return;
       if (widget.config.soundEnabled && _isAppResumed) {
         unawaited(_resultAudioService.playCrowdCheering());
       }
@@ -282,6 +390,7 @@ class _ResultScreenState extends State<ResultScreen>
         setState(() {});
       }
     } catch (_) {
+      if (!mounted || !identical(controller, _introController)) return;
       unawaited(_resultAudioService.stop());
       if (mounted) {
         setState(() {
@@ -315,6 +424,7 @@ class _ResultScreenState extends State<ResultScreen>
 
   @override
   void dispose() {
+    _operationGeneration++;
     WidgetsBinding.instance.removeObserver(this);
     appRouteObserver.unsubscribe(this);
     final controller = _introController;
@@ -367,23 +477,60 @@ class _ResultScreenState extends State<ResultScreen>
 
   @override
   Widget build(BuildContext context) {
-    if (_recordFailed) {
-      final texts = AppTexts.of(context).common;
+    if (_checking || _saving) {
+      return const Scaffold(
+        body: SafeArea(child: Center(child: CircularProgressIndicator())),
+      );
+    }
+    if (_deleted || _recordFailed) {
+      final texts = AppTexts.of(context);
       return Scaffold(
         body: SafeArea(
           child: Center(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(texts.saveFailureMessage, textAlign: TextAlign.center),
-                FilledButton(
-                  onPressed: () {
-                    _recordResult(_resultForRecording!);
-                    setState(() {});
-                  },
-                  child: Text(texts.retry),
-                ),
-              ],
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(AppSpacing.xl),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    _deleted
+                        ? texts.activityHistory.deletedActivityMessage
+                        : activityProgressErrorMessage(
+                            context,
+                            _recordError,
+                            saving: true,
+                          ),
+                    textAlign: TextAlign.center,
+                  ),
+                  if (_deleted && _recordFailed)
+                    Text(
+                      activityProgressErrorMessage(
+                        context,
+                        _recordError,
+                        saving: true,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  if (_recordFailed)
+                    FilledButton(
+                      onPressed: () {
+                        if (_deleted) {
+                          setState(() => _checking = true);
+                          unawaited(_cleanDeletedResult());
+                        } else if (_resultForRecording != null) {
+                          _recordResult(_resultForRecording!);
+                        } else {
+                          unawaited(_prepareResult());
+                        }
+                      },
+                      child: Text(texts.common.retry),
+                    ),
+                  TextButton(
+                    onPressed: () => _goHome(context),
+                    child: Text(texts.activityHistory.goHomeLabel),
+                  ),
+                ],
+              ),
             ),
           ),
         ),

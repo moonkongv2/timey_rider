@@ -13,7 +13,7 @@ class EsRewardTexts implements RewardTextSet {
   String get createRewardGoal => 'Crear meta';
   String get rewardGoalEmptyTitle => 'Crear una nueva meta';
   String get rewardGoalEmptyBody =>
-      'Cada actividad completada añade la pegatina elegida y llena un espacio del tablero.';
+      'Cada actividad que recibe una pegatina llena una casilla de todos los tableros en curso.';
   String get rewardGoalRewardFieldLabel => 'Recompensa';
   String get rewardGoalRequiredStickerCountLabel => 'Pegatinas necesarias';
   String get rewardGoalSaveButton => 'Guardar meta';
@@ -32,7 +32,7 @@ class EsRewardTexts implements RewardTextSet {
   String get earnedRewardGoalsTitle => 'Recompensas ganadas';
   String get usedRewardGoalsTitle => 'Recompensas usadas';
   String get maxActiveRewardGoalsMessage =>
-      'Puedes tener hasta 2 metas activas.';
+      'Puedes crear una meta cuando haya menos de 2 metas en curso.';
   String get editRewardGoal => 'Editar meta';
   String get cancelRewardGoal => 'Cancelar meta';
   String get rewardGoalHistoryTitle => 'Historial de recompensas';

@@ -15,6 +15,86 @@ class LocalActivityProgressService {
   LocalActivityProgressService();
 
   static Future<void>? _recordOperation;
+  static const _deletedIdsKey = 'deletedActivitySessionIds';
+  // Journal metadata, never a preferences data key. Explicit provenance makes
+  // legacy used-source cleanup replayable without deleting shadowed fallbacks.
+  static const _legacyUsedCleanup = 'legacyUsedSourceToRemove';
+
+  Future<T> _serialized<T>(Future<T> Function() operation) async {
+    final previous = _recordOperation;
+    final completed = Completer<void>();
+    _recordOperation = completed.future;
+    try {
+      if (previous != null) await previous;
+      return await operation();
+    } finally {
+      completed.complete();
+      if (identical(_recordOperation, completed.future)) {
+        _recordOperation = null;
+      }
+    }
+  }
+
+  Future<ActivityProgressSnapshot> loadSnapshot() => _serialized(_loadSnapshot);
+  Future<RewardGoal?> loadActiveRewardGoal() =>
+      _serialized(_loadActiveRewardGoal);
+  Future<List<RewardGoal>> loadActiveRewardGoals() =>
+      _serialized(_loadActiveRewardGoalsPublic);
+  Future<RewardGoal> createRewardGoal({
+    required int requiredStickerCount,
+    required String rewardText,
+  }) => _serialized(
+    () => _createRewardGoal(
+      requiredStickerCount: requiredStickerCount,
+      rewardText: rewardText,
+    ),
+  );
+  Future<RewardGoal?> updateActiveRewardGoal({
+    String? goalId,
+    required int requiredStickerCount,
+    required String rewardText,
+  }) => _serialized(
+    () => _updateActiveRewardGoal(
+      goalId: goalId,
+      requiredStickerCount: requiredStickerCount,
+      rewardText: rewardText,
+    ),
+  );
+  Future<RewardGoal?> cancelActiveRewardGoal({String? goalId}) =>
+      _serialized(() => _cancelActiveRewardGoal(goalId: goalId));
+  Future<RewardGoal?> useEarnedRewardGoal({String? goalId}) =>
+      _serialized(() => _useEarnedRewardGoal(goalId: goalId));
+  Future<void> clearActiveRewardGoal() => _serialized(_clearActiveRewardGoal);
+  Future<bool> deleteActivityHistoryEntry(
+    String entryId, {
+    bool deleteLinkedRewards = false,
+  }) => _serialized(
+    () => _deleteActivityHistoryEntry(
+      entryId,
+      deleteLinkedRewards: deleteLinkedRewards,
+    ),
+  );
+  Future<bool> isActivitySessionDeleted(String sessionId) =>
+      _serialized(() async {
+        final preferences = await _preferences();
+        return _deletedIds(preferences).contains(sessionId);
+      });
+  Future<bool> hasLinkedRewards(String entryId) => _serialized(() async {
+    final preferences = await _preferences();
+    final history = _rawList(preferences, _historyKey, _legacyHistoryKey);
+    final index = _historyIndex(history, entryId);
+    if (index < 0) return false;
+    if (_rewardIds(_json(history[index])).isNotEmpty) return true;
+    return _mutationGoals(preferences).values
+        .expand((goals) => goals)
+        .any(
+          (raw) => (_json(raw)['filledSlots'] as List).any(
+            (slot) =>
+                (slot['activitySessionId'] ?? slot['mealSessionId']) == entryId,
+          ),
+        );
+  });
+
   static const _recordTransactionKey = 'activityRecordTransaction';
 
   static const _historyKey = 'activityHistory';
@@ -33,7 +113,7 @@ class LocalActivityProgressService {
   static const _legacyUsedRewardGoalsKey = 'usedRewardGoals';
   static const maxActiveRewardGoals = 2;
 
-  Future<ActivityProgressSnapshot> loadSnapshot() async {
+  Future<ActivityProgressSnapshot> _loadSnapshot() async {
     final preferences = await _preferences();
 
     return ActivityProgressSnapshot(
@@ -53,18 +133,18 @@ class LocalActivityProgressService {
     );
   }
 
-  Future<RewardGoal?> loadActiveRewardGoal() async {
+  Future<RewardGoal?> _loadActiveRewardGoal() async {
     final preferences = await _preferences();
     final goals = _loadActiveRewardGoals(preferences);
     return goals.isEmpty ? null : goals.first;
   }
 
-  Future<List<RewardGoal>> loadActiveRewardGoals() async {
+  Future<List<RewardGoal>> _loadActiveRewardGoalsPublic() async {
     final preferences = await _preferences();
     return _loadActiveRewardGoals(preferences);
   }
 
-  Future<RewardGoal> createRewardGoal({
+  Future<RewardGoal> _createRewardGoal({
     required int requiredStickerCount,
     required String rewardText,
   }) async {
@@ -74,7 +154,11 @@ class LocalActivityProgressService {
     }
 
     final preferences = await _preferences();
-    final activeGoals = _loadActiveRewardGoals(preferences).toList();
+    _deletedIds(preferences);
+    final activeGoals = _loadMutationGoalModels(
+      preferences,
+      _activeRewardGoalsKey,
+    ).toList();
     if (activeGoals.length >= maxActiveRewardGoals) {
       throw StateError('Up to two active reward goals are supported.');
     }
@@ -89,13 +173,11 @@ class LocalActivityProgressService {
       status: RewardGoalStatus.active,
     );
     activeGoals.add(goal);
-    await _saveRewardGoalList(preferences, _activeRewardGoalsKey, activeGoals);
-    await preferences.remove(_legacyActiveRewardGoalKey);
-    await preferences.remove(_legacyActiveRewardGoalsKey);
+    await _commitGoals(preferences, active: activeGoals);
     return goal;
   }
 
-  Future<RewardGoal?> updateActiveRewardGoal({
+  Future<RewardGoal?> _updateActiveRewardGoal({
     String? goalId,
     required int requiredStickerCount,
     required String rewardText,
@@ -106,7 +188,11 @@ class LocalActivityProgressService {
     }
 
     final preferences = await _preferences();
-    final activeGoals = _loadActiveRewardGoals(preferences).toList();
+    _deletedIds(preferences);
+    final activeGoals = _loadMutationGoalModels(
+      preferences,
+      _activeRewardGoalsKey,
+    ).toList();
     if (activeGoals.isEmpty) {
       return null;
     }
@@ -130,35 +216,25 @@ class LocalActivityProgressService {
     );
     if (isEarned) {
       activeGoals.removeAt(targetIndex);
-      final earnedGoals = _loadEarnedRewardGoals(preferences).toList()
-        ..insert(0, updatedGoal);
-      await _saveRewardGoalList(
-        preferences,
-        _activeRewardGoalsKey,
-        activeGoals,
-      );
-      await _saveRewardGoalList(
+      final earnedGoals = _loadMutationGoalModels(
         preferences,
         _earnedRewardGoalsKey,
-        earnedGoals,
-      );
-      await preferences.remove(_legacyEarnedRewardGoalsKey);
+      ).toList()..insert(0, updatedGoal);
+      await _commitGoals(preferences, active: activeGoals, earned: earnedGoals);
     } else {
       activeGoals[targetIndex] = updatedGoal;
-      await _saveRewardGoalList(
-        preferences,
-        _activeRewardGoalsKey,
-        activeGoals,
-      );
+      await _commitGoals(preferences, active: activeGoals);
     }
-    await preferences.remove(_legacyActiveRewardGoalKey);
-    await preferences.remove(_legacyActiveRewardGoalsKey);
     return updatedGoal;
   }
 
-  Future<RewardGoal?> cancelActiveRewardGoal({String? goalId}) async {
+  Future<RewardGoal?> _cancelActiveRewardGoal({String? goalId}) async {
     final preferences = await _preferences();
-    final activeGoals = _loadActiveRewardGoals(preferences).toList();
+    _deletedIds(preferences);
+    final activeGoals = _loadMutationGoalModels(
+      preferences,
+      _activeRewardGoalsKey,
+    ).toList();
     if (activeGoals.isEmpty) {
       return null;
     }
@@ -171,9 +247,7 @@ class LocalActivityProgressService {
     }
 
     final canceledGoal = activeGoals.removeAt(targetIndex);
-    await _saveRewardGoalList(preferences, _activeRewardGoalsKey, activeGoals);
-    await preferences.remove(_legacyActiveRewardGoalKey);
-    await preferences.remove(_legacyActiveRewardGoalsKey);
+    await _commitGoals(preferences, active: activeGoals);
     return canceledGoal;
   }
 
@@ -181,9 +255,13 @@ class LocalActivityProgressService {
     return useEarnedRewardGoal();
   }
 
-  Future<RewardGoal?> useEarnedRewardGoal({String? goalId}) async {
+  Future<RewardGoal?> _useEarnedRewardGoal({String? goalId}) async {
     final preferences = await _preferences();
-    final earnedGoals = _loadEarnedRewardGoals(preferences).toList();
+    _deletedIds(preferences);
+    final earnedGoals = _loadMutationGoalModels(
+      preferences,
+      _earnedRewardGoalsKey,
+    ).toList();
     if (earnedGoals.isEmpty) {
       return null;
     }
@@ -201,42 +279,122 @@ class LocalActivityProgressService {
       usedAt: DateTime.now(),
       redeemedAt: DateTime.now(),
     );
-    final usedGoals = _loadUsedRewardGoals(preferences).toList()
-      ..insert(0, usedGoal);
-
-    await _saveRewardGoalList(preferences, _earnedRewardGoalsKey, earnedGoals);
-    await _saveRewardGoalList(preferences, _usedRewardGoalsKey, usedGoals);
-    await preferences.remove(_legacyEarnedRewardGoalsKey);
-    await preferences.remove(_legacyUsedRewardGoalsKey);
-    await preferences.remove(_legacyRedeemedRewardGoalsKey);
+    final usedSource = preferences.containsKey(_usedRewardGoalsKey)
+        ? null
+        : preferences.containsKey(_legacyUsedRewardGoalsKey)
+        ? _legacyUsedRewardGoalsKey
+        : _legacyRedeemedRewardGoalsKey;
+    final usedGoals = _rawUsedGoals(preferences);
+    final sourceGoals = _mutationGoals(preferences);
+    final usedRaw = _encodeGoal(
+      usedGoal,
+      sourceGoals.values.expand((items) => items).toList(),
+    );
+    await _commit(preferences, {
+      ...sourceGoals,
+      _earnedRewardGoalsKey: _encodeGoals(earnedGoals, sourceGoals),
+      _usedRewardGoalsKey: [usedRaw, ...usedGoals],
+      if (usedSource != null) _legacyUsedCleanup: [usedSource],
+    });
     return usedGoal;
   }
 
-  Future<void> clearActiveRewardGoal() async {
+  Future<void> _clearActiveRewardGoal() async {
     final preferences = await _preferences();
-    await preferences.remove(_legacyActiveRewardGoalKey);
-    await preferences.remove(_activeRewardGoalsKey);
-    await preferences.remove(_legacyActiveRewardGoalsKey);
+    _deletedIds(preferences);
+    await _commitGoals(preferences, active: []);
   }
 
-  Future<bool> deleteActivityHistoryEntry(String entryId) async {
+  Future<bool> _deleteActivityHistoryEntry(
+    String entryId, {
+    required bool deleteLinkedRewards,
+  }) async {
     final preferences = await _preferences();
-    final history = _decodeList(
-      preferences.getStringList(_historyKey) ??
-          preferences.getStringList(_legacyHistoryKey),
-      ActivityHistoryEntry.fromJson,
-    ).toList();
-    final index = history.indexWhere((entry) => entry.id == entryId);
-    if (index == -1) {
-      return false;
+    final history = _rawList(preferences, _historyKey, _legacyHistoryKey);
+    final index = _historyIndex(history, entryId);
+    if (index < 0) return false;
+    final deletedIds = _deletedIds(preferences)..add(entryId);
+    final writes = <String, List<String>>{};
+    if (deleteLinkedRewards) {
+      final counts = <String, int>{};
+      for (final id in _rewardIds(_json(history[index]))) {
+        counts[id] = (counts[id] ?? 0) + 1;
+      }
+      final inventory = _rawList(
+        preferences,
+        _inventoryKey,
+        _legacyInventoryKey,
+      );
+      final seen = <String>{};
+      final nextInventory = <String>[];
+      for (final raw in inventory) {
+        final item = _json(raw);
+        final id = item['rewardId'];
+        final count = item['count'];
+        if (id is! String ||
+            id.trim().isEmpty ||
+            !seen.add(id) ||
+            count is! int ||
+            count < 1 ||
+            item['acquiredAt'] is! String ||
+            DateTime.tryParse(item['acquiredAt'] as String) == null) {
+          throw const ActivityProgressDataException();
+        }
+        final removed = counts[id] ?? 0;
+        if (removed == 0) {
+          nextInventory.add(raw);
+          continue;
+        }
+        if (count > removed) {
+          item['count'] = count - removed;
+          nextInventory.add(jsonEncode(item));
+        }
+      }
+      writes[_inventoryKey] = nextInventory;
+      final goals = _mutationGoals(preferences);
+      final active = <String>[];
+      final earned = <String>[];
+      final returned = <String>[];
+      for (final key in [_activeRewardGoalsKey, _earnedRewardGoalsKey]) {
+        for (final raw in goals[key]!) {
+          final goal = _json(raw);
+          final slots = goal['filledSlots'] as List;
+          final kept = slots
+              .where(
+                (slot) =>
+                    (slot['activitySessionId'] ?? slot['mealSessionId']) !=
+                    entryId,
+              )
+              .toList();
+          var next = raw;
+          var returnsToActive = false;
+          if (kept.length != slots.length) {
+            goal['filledSlots'] = kept;
+            if (key == _earnedRewardGoalsKey &&
+                kept.length < (goal['requiredStickerCount'] as int)) {
+              goal['status'] = 'active';
+              goal['earnedAt'] = null;
+              goal['readyAt'] = null;
+              returnsToActive = true;
+            }
+            next = jsonEncode(goal);
+          }
+          if (returnsToActive) {
+            returned.add(next);
+          } else if (key == _activeRewardGoalsKey) {
+            active.add(next);
+          } else {
+            earned.add(next);
+          }
+        }
+      }
+      writes[_activeRewardGoalsKey] = [...active, ...returned];
+      writes[_earnedRewardGoalsKey] = earned;
     }
-
     history.removeAt(index);
-    await preferences.setStringList(
-      _historyKey,
-      history.map((entry) => jsonEncode(entry.toJson())).toList(),
-    );
-    await preferences.remove(_legacyHistoryKey);
+    writes[_historyKey] = history;
+    writes[_deletedIdsKey] = deletedIds.toList();
+    await _commit(preferences, writes);
     return true;
   }
 
@@ -244,18 +402,9 @@ class LocalActivityProgressService {
     ActivitySessionResult result, {
     required String vehicleId,
   }) async {
-    final previous = _recordOperation;
-    final completed = Completer<void>();
-    _recordOperation = completed.future;
-    try {
-      if (previous != null) await previous;
-      return await _recordActivityResult(result, vehicleId: vehicleId);
-    } finally {
-      completed.complete();
-      if (identical(_recordOperation, completed.future)) {
-        _recordOperation = null;
-      }
-    }
+    return _serialized(
+      () => _recordActivityResult(result, vehicleId: vehicleId),
+    );
   }
 
   Future<RecordedActivitySession> _recordActivityResult(
@@ -264,18 +413,28 @@ class LocalActivityProgressService {
   }) async {
     final preferences = await SharedPreferences.getInstance();
     await _recoverRecordTransaction(preferences);
+    final deletedEntryId =
+        result.sessionId ?? result.endedAt.microsecondsSinceEpoch.toString();
+    if (deletedEntryId.trim().isEmpty) {
+      throw const ActivityProgressDataException();
+    }
+    if (_deletedIds(preferences).contains(deletedEntryId)) {
+      throw DeletedActivitySessionException(deletedEntryId);
+    }
     final history = _decodeList(
       preferences.getStringList(_historyKey) ??
           preferences.getStringList(_legacyHistoryKey),
       ActivityHistoryEntry.fromJson,
     ).toList();
-    final inventory = _decodeList(
-      preferences.getStringList(_inventoryKey) ??
-          preferences.getStringList(_legacyInventoryKey),
-      RewardInventoryItem.fromJson,
+    final inventory = _loadInventoryForMutation(preferences);
+    final activeRewardGoals = _loadMutationGoalModels(
+      preferences,
+      _activeRewardGoalsKey,
     ).toList();
-    final activeRewardGoals = _loadActiveRewardGoals(preferences).toList();
-    final earnedRewardGoals = _loadEarnedRewardGoals(preferences).toList();
+    final earnedRewardGoals = _loadMutationGoalModels(
+      preferences,
+      _earnedRewardGoalsKey,
+    ).toList();
 
     final entryId =
         result.sessionId ?? result.endedAt.microsecondsSinceEpoch.toString();
@@ -317,29 +476,24 @@ class LocalActivityProgressService {
     );
 
     final writes = <String, List<String>>{
-      _historyKey: history.map((entry) => jsonEncode(entry.toJson())).toList(),
-      _inventoryKey: inventory
-          .map((item) => jsonEncode(item.toJson()))
-          .toList(),
+      _historyKey: [
+        jsonEncode(entry.toJson()),
+        ..._rawList(preferences, _historyKey, _legacyHistoryKey),
+      ],
+      _inventoryKey: _encodeInventory(preferences, inventory),
     };
     if (goalUpdate.changed) {
       earnedRewardGoals.insertAll(0, goalUpdate.earnedGoals);
-      writes[_activeRewardGoalsKey] = goalUpdate.activeGoals
-          .map((goal) => jsonEncode(goal.toJson()))
-          .toList();
-      writes[_earnedRewardGoalsKey] = earnedRewardGoals
-          .map((goal) => jsonEncode(goal.toJson()))
-          .toList();
+      writes[_activeRewardGoalsKey] = _encodeGoals(
+        goalUpdate.activeGoals,
+        _mutationGoals(preferences),
+      );
+      writes[_earnedRewardGoalsKey] = _encodeGoals(
+        earnedRewardGoals,
+        _mutationGoals(preferences),
+      );
     }
-    // Persist the complete update before applying individual keys. Replaying
-    // these exact values after a process death cannot award another sticker.
-    if (!await preferences.setString(
-      _recordTransactionKey,
-      jsonEncode(writes),
-    )) {
-      throw StateError('Unable to persist activity record transaction.');
-    }
-    await _recoverRecordTransaction(preferences);
+    await _commit(preferences, writes);
 
     return RecordedActivitySession(
       entry: entry,
@@ -351,34 +505,121 @@ class LocalActivityProgressService {
   }
 
   Future<SharedPreferences> _preferences() async {
-    await _recordOperation;
     final preferences = await SharedPreferences.getInstance();
     await _recoverRecordTransaction(preferences);
     return preferences;
   }
 
-  Future<void> _recoverRecordTransaction(SharedPreferences preferences) async {
-    final raw = preferences.getString(_recordTransactionKey);
-    if (raw == null) return;
-    final writes = Map<String, Object?>.from(jsonDecode(raw) as Map);
-    for (final entry in writes.entries) {
-      if (!await preferences.setStringList(
-        entry.key,
-        List<String>.from(entry.value as List),
+  Future<void> _commit(
+    SharedPreferences preferences,
+    Map<String, List<String>> writes,
+  ) async {
+    _validateWrites(writes);
+    try {
+      if (!await preferences.setString(
+        _recordTransactionKey,
+        jsonEncode(writes),
       )) {
-        throw StateError('Unable to save activity progress.');
+        throw const ActivityProgressStorageException();
       }
+      await _recoverRecordTransaction(preferences);
+    } on ActivityProgressDataException {
+      rethrow;
+    } catch (_) {
+      await preferences.reload();
+      throw const ActivityProgressStorageException();
     }
-    for (final key in [_legacyHistoryKey, _legacyInventoryKey]) {
-      await preferences.remove(key);
+  }
+
+  Map<String, List<String>> _validateWrites(Object? value) {
+    const supported = {
+      _historyKey,
+      _inventoryKey,
+      _activeRewardGoalsKey,
+      _earnedRewardGoalsKey,
+      _usedRewardGoalsKey,
+      _deletedIdsKey,
+      _legacyUsedCleanup,
+    };
+    if (value is! Map || value.isEmpty) {
+      throw const ActivityProgressDataException();
     }
-    if (writes.containsKey(_activeRewardGoalsKey)) {
-      await preferences.remove(_legacyActiveRewardGoalKey);
-      await preferences.remove(_legacyActiveRewardGoalsKey);
-      await preferences.remove(_legacyEarnedRewardGoalsKey);
+    final writes = <String, List<String>>{};
+    for (final entry in value.entries) {
+      if (!supported.contains(entry.key) ||
+          entry.value is! List ||
+          (entry.value as List).any((item) => item is! String)) {
+        throw const ActivityProgressDataException();
+      }
+      final items = List<String>.from(entry.value as List);
+      if (entry.key == _deletedIdsKey && items.any((id) => id.trim().isEmpty)) {
+        throw const ActivityProgressDataException();
+      }
+      writes[entry.key as String] = items;
     }
-    if (!await preferences.remove(_recordTransactionKey)) {
-      throw StateError('Unable to finish activity record transaction.');
+    final cleanup = writes[_legacyUsedCleanup];
+    if (cleanup != null &&
+        (cleanup.length != 1 ||
+            !{
+              _legacyUsedRewardGoalsKey,
+              _legacyRedeemedRewardGoalsKey,
+            }.contains(cleanup.single) ||
+            !writes.containsKey(_usedRewardGoalsKey))) {
+      throw const ActivityProgressDataException();
+    }
+    return writes;
+  }
+
+  Future<void> _remove(SharedPreferences preferences, String key) async {
+    if (preferences.containsKey(key) && !await preferences.remove(key)) {
+      throw const ActivityProgressStorageException();
+    }
+  }
+
+  Future<void> _recoverRecordTransaction(SharedPreferences preferences) async {
+    if (!preferences.containsKey(_recordTransactionKey)) return;
+    late Map<String, List<String>> writes;
+    try {
+      writes = _validateWrites(
+        jsonDecode(preferences.getString(_recordTransactionKey)!),
+      );
+    } catch (_) {
+      throw const ActivityProgressDataException();
+    }
+    try {
+      // Tombstones must be durable before a history entry disappears.
+      for (final key in [
+        _deletedIdsKey,
+        ...writes.keys.where(
+          (key) => key != _deletedIdsKey && key != _legacyUsedCleanup,
+        ),
+      ]) {
+        if (writes.containsKey(key) &&
+            !await preferences.setStringList(key, writes[key]!)) {
+          throw const ActivityProgressStorageException();
+        }
+      }
+      for (final pair in {
+        _historyKey: _legacyHistoryKey,
+        _inventoryKey: _legacyInventoryKey,
+        _activeRewardGoalsKey: _legacyActiveRewardGoalsKey,
+        _earnedRewardGoalsKey: _legacyEarnedRewardGoalsKey,
+      }.entries) {
+        if (writes.containsKey(pair.key)) {
+          await _remove(preferences, pair.value);
+        }
+      }
+      if (writes.containsKey(_activeRewardGoalsKey) &&
+          writes.containsKey(_earnedRewardGoalsKey)) {
+        await _remove(preferences, _legacyActiveRewardGoalKey);
+      }
+      for (final key in writes[_legacyUsedCleanup] ?? <String>[]) {
+        await _remove(preferences, key);
+      }
+      await _remove(preferences, _recordTransactionKey);
+    } catch (_) {
+      await preferences.reload();
+      throw const ActivityProgressStorageException();
     }
   }
 
@@ -503,10 +744,9 @@ class LocalActivityProgressService {
         preferences.getStringList(_activeRewardGoalsKey) ??
         preferences.getStringList(_legacyActiveRewardGoalsKey);
     if (rawGoals != null) {
-      return _decodeRewardGoalList(rawGoals)
-          .where((goal) => goal.status == RewardGoalStatus.active)
-          .take(maxActiveRewardGoals)
-          .toList();
+      return _decodeRewardGoalList(
+        rawGoals,
+      ).where((goal) => goal.status == RewardGoalStatus.active).toList();
     }
 
     final legacyGoal = _decodeRewardGoal(
@@ -575,7 +815,11 @@ class LocalActivityProgressService {
     try {
       final decoded = jsonDecode(rawGoal);
       if (decoded is Map) {
-        return RewardGoal.tryFromJson(Map<String, Object?>.from(decoded));
+        try {
+          return _strictGoal(rawGoal);
+        } catch (_) {
+          return RewardGoal.tryFromJson(Map<String, Object?>.from(decoded));
+        }
       }
     } catch (_) {
       return null;
@@ -597,7 +841,11 @@ class LocalActivityProgressService {
             Map<String, Object?>.from(decoded),
           );
           if (goal != null) {
-            goals.add(goal);
+            try {
+              goals.add(_strictGoal(rawItem));
+            } catch (_) {
+              goals.add(goal);
+            }
           }
         }
       } catch (_) {
@@ -607,15 +855,303 @@ class LocalActivityProgressService {
     return goals;
   }
 
-  Future<void> _saveRewardGoalList(
+  Map<String, Object?> _json(String raw) {
+    try {
+      final value = jsonDecode(raw);
+      if (value is! Map) throw const ActivityProgressDataException();
+      return Map<String, Object?>.from(value);
+    } catch (_) {
+      throw const ActivityProgressDataException();
+    }
+  }
+
+  List<String> _rawList(
     SharedPreferences preferences,
     String key,
-    List<RewardGoal> goals,
+    String legacy,
   ) {
-    return preferences.setStringList(
-      key,
-      goals.map((goal) => jsonEncode(goal.toJson())).toList(),
-    );
+    try {
+      return List.of(
+        preferences.getStringList(key) ??
+            preferences.getStringList(legacy) ??
+            <String>[],
+      );
+    } catch (_) {
+      throw const ActivityProgressDataException();
+    }
+  }
+
+  Set<String> _deletedIds(SharedPreferences preferences) {
+    try {
+      if (!preferences.containsKey(_deletedIdsKey)) return <String>{};
+      final ids = preferences.getStringList(_deletedIdsKey)!;
+      if (ids.any((id) => id.trim().isEmpty)) {
+        throw const ActivityProgressDataException();
+      }
+      return ids.toSet();
+    } catch (_) {
+      throw const ActivityProgressDataException();
+    }
+  }
+
+  int _historyIndex(List<String> history, String entryId) {
+    var index = -1;
+    for (var i = 0; i < history.length; i++) {
+      // An unreadable ID cannot safely be assumed to belong to another session.
+      final id = _json(history[i])['id'];
+      if (id is! String || id.trim().isEmpty) {
+        throw const ActivityProgressDataException();
+      }
+      if (id == entryId) {
+        if (index != -1) throw const ActivityProgressDataException();
+        index = i;
+      }
+    }
+    return index;
+  }
+
+  List<String> _rewardIds(Map<String, Object?> history) {
+    final ids = history['rewardIds'];
+    if (ids is! List || ids.any((id) => id is! String || id.trim().isEmpty)) {
+      throw const ActivityProgressDataException();
+    }
+    return List<String>.from(ids);
+  }
+
+  RewardGoal _strictGoal(String raw, {Set<RewardGoalStatus>? allowed}) {
+    try {
+      return _decodeStrictGoal(raw, allowed: allowed);
+    } catch (_) {
+      throw const ActivityProgressDataException();
+    }
+  }
+
+  RewardGoal _decodeStrictGoal(String raw, {Set<RewardGoalStatus>? allowed}) {
+    final json = _json(raw);
+    final status = json['status'];
+    final slots = json['filledSlots'];
+    final count = json['requiredStickerCount'];
+    final model = RewardGoal.tryFromJson(json);
+    if (model == null ||
+        model.id.trim().isEmpty ||
+        status is! String ||
+        !RewardGoalStatus.values.any((value) => value.name == status) ||
+        count is! int ||
+        count < 1 ||
+        count > 20 ||
+        slots is! List ||
+        (allowed != null && !allowed.contains(model.status))) {
+      throw const ActivityProgressDataException();
+    }
+    for (final key in ['earnedAt', 'readyAt', 'usedAt', 'redeemedAt']) {
+      final value = json[key];
+      if (value != null &&
+          (value is! String || DateTime.tryParse(value) == null)) {
+        throw const ActivityProgressDataException();
+      }
+    }
+    final decodedSlots = <RewardGoalSlot>[];
+    for (final slot in slots) {
+      if (slot is! Map) throw const ActivityProgressDataException();
+      final decoded = RewardGoalSlot.tryFromJson(
+        Map<String, Object?>.from(slot),
+      );
+      if (decoded == null ||
+          decoded.rewardId.trim().isEmpty ||
+          decoded.activitySessionId.trim().isEmpty) {
+        throw const ActivityProgressDataException();
+      }
+      decodedSlots.add(decoded);
+    }
+    return model.copyWith(filledSlots: decodedSlots);
+  }
+
+  Map<String, List<String>> _mutationGoals(SharedPreferences preferences) {
+    final result = <String, List<String>>{};
+    String? single;
+    if (preferences.containsKey(_legacyActiveRewardGoalKey)) {
+      try {
+        single = preferences.getString(_legacyActiveRewardGoalKey);
+      } catch (_) {
+        throw const ActivityProgressDataException();
+      }
+      if (single == null) throw const ActivityProgressDataException();
+      _strictGoal(
+        single,
+        allowed: {RewardGoalStatus.active, RewardGoalStatus.earned},
+      );
+    }
+    for (final pair in {
+      _activeRewardGoalsKey: _legacyActiveRewardGoalsKey,
+      _earnedRewardGoalsKey: _legacyEarnedRewardGoalsKey,
+    }.entries) {
+      if (preferences.containsKey(pair.key) ||
+          preferences.containsKey(pair.value)) {
+        result[pair.key] = _rawList(preferences, pair.key, pair.value);
+      } else {
+        try {
+          single ??= preferences.getString(_legacyActiveRewardGoalKey);
+        } catch (_) {
+          throw const ActivityProgressDataException();
+        }
+        if (single == null) {
+          result[pair.key] = [];
+          continue;
+        }
+        final model = _strictGoal(
+          single,
+          allowed: {RewardGoalStatus.active, RewardGoalStatus.earned},
+        );
+        result[pair.key] =
+            (model.status == RewardGoalStatus.active) ==
+                (pair.key == _activeRewardGoalsKey)
+            ? [single]
+            : [];
+      }
+    }
+    final seen = <String>{};
+    for (final entry in result.entries) {
+      for (final raw in entry.value) {
+        final goal = _strictGoal(
+          raw,
+          allowed: {
+            entry.key == _activeRewardGoalsKey
+                ? RewardGoalStatus.active
+                : RewardGoalStatus.earned,
+          },
+        );
+        if (!seen.add(goal.id)) throw const ActivityProgressDataException();
+      }
+    }
+    return result;
+  }
+
+  List<RewardGoal> _loadMutationGoalModels(
+    SharedPreferences preferences,
+    String key,
+  ) =>
+      _mutationGoals(preferences)[key]!.map((raw) => _strictGoal(raw)).toList();
+
+  List<String> _rawUsedGoals(SharedPreferences preferences) {
+    final selected = preferences.containsKey(_usedRewardGoalsKey)
+        ? _usedRewardGoalsKey
+        : preferences.containsKey(_legacyUsedRewardGoalsKey)
+        ? _legacyUsedRewardGoalsKey
+        : _legacyRedeemedRewardGoalsKey;
+    final raw = _rawList(preferences, selected, selected);
+    final seen = <String>{};
+    return raw.map((item) {
+      final goal = _strictGoal(
+        item,
+        allowed: selected == _legacyRedeemedRewardGoalsKey
+            ? null
+            : {RewardGoalStatus.used},
+      );
+      if (!seen.add(goal.id)) throw const ActivityProgressDataException();
+      if (selected != _legacyRedeemedRewardGoalsKey) return item;
+      final json = _json(item);
+      json['status'] = 'used';
+      json['usedAt'] = json['usedAt'] ?? json['redeemedAt'];
+      return jsonEncode(json);
+    }).toList();
+  }
+
+  String _encodeGoal(RewardGoal goal, List<String> originals) {
+    for (final raw in originals) {
+      final json = _json(raw);
+      if (json['id'] != goal.id) continue;
+      final before = _strictGoal(raw);
+      if (jsonEncode(before.toJson()) == jsonEncode(goal.toJson())) return raw;
+      final beforeJson = before.toJson();
+      final afterJson = goal.toJson();
+      for (final key in afterJson.keys) {
+        if (jsonEncode(beforeJson[key]) != jsonEncode(afterJson[key])) {
+          json[key] = afterJson[key];
+        }
+      }
+      // Append-only completion and edits retain each original slot, including
+      // distinct extension fields on slots with identical session/reward IDs.
+      if (jsonEncode(beforeJson['filledSlots']) !=
+          jsonEncode(afterJson['filledSlots'])) {
+        final oldSlots = _json(raw)['filledSlots'] as List;
+        final consumed = <int>{};
+        json['filledSlots'] = goal.filledSlots.map((slot) {
+          for (var i = 0; i < oldSlots.length; i++) {
+            if (consumed.contains(i)) continue;
+            final old = oldSlots[i];
+            if ((old['activitySessionId'] ?? old['mealSessionId']) ==
+                    slot.activitySessionId &&
+                old['rewardId'] == slot.rewardId &&
+                DateTime.tryParse(old['filledAt'] as String) == slot.filledAt) {
+              consumed.add(i);
+              return old;
+            }
+          }
+          return slot.toJson();
+        }).toList();
+      }
+      return jsonEncode(json);
+    }
+    return jsonEncode(goal.toJson());
+  }
+
+  List<String> _encodeGoals(
+    List<RewardGoal> goals,
+    Map<String, List<String>> source,
+  ) => goals
+      .map(
+        (goal) =>
+            _encodeGoal(goal, source.values.expand((items) => items).toList()),
+      )
+      .toList();
+
+  Future<void> _commitGoals(
+    SharedPreferences preferences, {
+    List<RewardGoal>? active,
+    List<RewardGoal>? earned,
+  }) async {
+    final source = _mutationGoals(preferences);
+    await _commit(preferences, {
+      ...source,
+      if (active != null) _activeRewardGoalsKey: _encodeGoals(active, source),
+      if (earned != null) _earnedRewardGoalsKey: _encodeGoals(earned, source),
+    });
+  }
+
+  List<RewardInventoryItem> _loadInventoryForMutation(
+    SharedPreferences preferences,
+  ) {
+    final seen = <String>{};
+    return _rawList(preferences, _inventoryKey, _legacyInventoryKey).map((raw) {
+      try {
+        final item = RewardInventoryItem.fromJson(_json(raw));
+        if (item.rewardId.trim().isEmpty ||
+            item.count < 1 ||
+            !seen.add(item.rewardId)) {
+          throw const ActivityProgressDataException();
+        }
+        return item;
+      } catch (_) {
+        throw const ActivityProgressDataException();
+      }
+    }).toList();
+  }
+
+  List<String> _encodeInventory(
+    SharedPreferences preferences,
+    List<RewardInventoryItem> items,
+  ) {
+    final originals = _rawList(preferences, _inventoryKey, _legacyInventoryKey);
+    return items.map((item) {
+      for (final raw in originals) {
+        final json = _json(raw);
+        if (json['rewardId'] != item.rewardId) continue;
+        if (json['count'] == item.count) return raw;
+        json['count'] = item.count;
+        return jsonEncode(json);
+      }
+      return jsonEncode(item.toJson());
+    }).toList();
   }
 
   List<T> _decodeList<T>(
@@ -653,4 +1189,17 @@ class _RewardGoalUpdate {
   final List<RewardGoal> updatedGoals;
   final List<RewardGoal> earnedGoals;
   final bool changed;
+}
+
+class ActivityProgressDataException implements Exception {
+  const ActivityProgressDataException();
+}
+
+class ActivityProgressStorageException implements Exception {
+  const ActivityProgressStorageException();
+}
+
+class DeletedActivitySessionException implements Exception {
+  const DeletedActivitySessionException(this.sessionId);
+  final String sessionId;
 }

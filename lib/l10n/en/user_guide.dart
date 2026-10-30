@@ -64,6 +64,8 @@ class EnUserGuideTexts implements UserGuideTextSet {
 
   String get historyRewardsTitle => 'Activity history and reward goals';
   List<String> get historyRewardsItems => const [
+    'After deleting only the record, you cannot remove its linked stickers through this activity.',
+    'Removes its stickers and linked slots on unused reward boards. Rewards that fall below their goal return to in progress. Used rewards stay unchanged.',
     'Activity history shows activity name, target time, actual time, and completion status.',
     'Earned stickers and manually chosen picture markers can appear with the record.',
     'Earned stickers collect in the sticker collection screen.',

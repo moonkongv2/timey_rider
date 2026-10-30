@@ -13,6 +13,7 @@ import '../theme/app_radius.dart';
 import '../theme/app_spacing.dart';
 import '../utils/duration_format.dart';
 import '../widgets/reward_sticker_image.dart';
+import '../widgets/activity_progress_error.dart';
 
 class ActivityHistoryScreen extends StatefulWidget {
   const ActivityHistoryScreen({
@@ -28,6 +29,7 @@ class ActivityHistoryScreen extends StatefulWidget {
 
 class _ActivityHistoryScreenState extends State<ActivityHistoryScreen> {
   late Future<ActivityProgressSnapshot> _snapshotFuture;
+  bool _deleting = false;
 
   @override
   void initState() {
@@ -44,42 +46,92 @@ class _ActivityHistoryScreenState extends State<ActivityHistoryScreen> {
   Future<void> _confirmDeleteActivityHistoryEntry(
     ActivityHistoryEntry entry,
   ) async {
+    if (_deleting) return;
+    _deleting = true;
     final texts = AppTexts.of(context);
-    final shouldDelete = await showDialog<bool>(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: Text(texts.activityHistory.deleteRecordDialogTitle),
-          content: Text(texts.activityHistory.deleteRecordDialogBody),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(false),
-              child: Text(texts.common.cancel),
+    var linked = false;
+    try {
+      final hasLinked = await widget.activityProgressService.hasLinkedRewards(
+        entry.id,
+      );
+      if (!mounted) return;
+      final confirmed = await showDialog<bool>(
+        context: context,
+        builder: (context) => StatefulBuilder(
+          builder: (context, setDialogState) => AlertDialog(
+            scrollable: true,
+            title: Text(texts.activityHistory.deleteRecordDialogTitle),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  linked
+                      ? texts.activityHistory.deleteLinkedRewardsBody
+                      : texts.activityHistory.deleteRecordDialogBody,
+                ),
+                if (hasLinked)
+                  CheckboxListTile(
+                    key: const ValueKey('deleteLinkedRewards'),
+                    contentPadding: EdgeInsets.zero,
+                    value: linked,
+                    onChanged: (value) =>
+                        setDialogState(() => linked = value ?? false),
+                    title: Text(texts.activityHistory.deleteLinkedRewardsLabel),
+                    controlAffinity: ListTileControlAffinity.leading,
+                  ),
+                if (!linked)
+                  Text(texts.activityHistory.deleteRecordOnlyWarning),
+              ],
             ),
-            FilledButton(
-              onPressed: () => Navigator.of(context).pop(true),
-              child: Text(texts.activityHistory.deleteRecordConfirmLabel),
-            ),
-          ],
-        );
-      },
-    );
-    if (shouldDelete != true) {
-      return;
-    }
-
-    final deleted = await widget.activityProgressService
-        .deleteActivityHistoryEntry(entry.id);
-    if (!mounted) {
-      return;
-    }
-    if (deleted) {
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(false),
+                child: Text(texts.common.cancel),
+              ),
+              FilledButton(
+                onPressed: () => Navigator.of(context).pop(true),
+                child: Text(
+                  linked
+                      ? texts.activityHistory.deleteWithRewardsLabel
+                      : texts.activityHistory.deleteRecordOnlyLabel,
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+      if (confirmed != true) return;
+      await widget.activityProgressService.deleteActivityHistoryEntry(
+        entry.id,
+        deleteLinkedRewards: linked,
+      );
+      if (!mounted) return;
       _reloadSnapshot();
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(texts.activityHistory.deleteRecordSuccessMessage),
         ),
       );
+    } catch (error) {
+      if (!mounted) return;
+      _reloadSnapshot();
+      await showDialog<void>(
+        context: context,
+        builder: (context) => AlertDialog(
+          scrollable: true,
+          content: Text(
+            activityProgressErrorMessage(context, error, saving: true),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: Text(texts.common.cancel),
+            ),
+          ],
+        ),
+      );
+    } finally {
+      _deleting = false;
     }
   }
 
@@ -93,6 +145,12 @@ class _ActivityHistoryScreenState extends State<ActivityHistoryScreen> {
         child: FutureBuilder<ActivityProgressSnapshot>(
           future: _snapshotFuture,
           builder: (context, snapshot) {
+            if (snapshot.hasError) {
+              return ActivityProgressError(
+                error: snapshot.error,
+                onRetry: _reloadSnapshot,
+              );
+            }
             final history = snapshot.data?.history ?? const [];
             if (!snapshot.hasData) {
               return const Center(child: CircularProgressIndicator());
@@ -299,11 +357,6 @@ class _ActivityHistoryCard extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(width: AppSpacing.sm),
-                _StatusChip(
-                  label: historyTexts.completedStatus(entry.completionStatus),
-                  isIncomplete: !entry.activityCompleted,
-                ),
-                const SizedBox(width: AppSpacing.xs),
                 IconButton(
                   key: ValueKey('deleteActivityHistoryEntry-${entry.id}'),
                   tooltip: historyTexts.deleteRecordLabel,
@@ -312,6 +365,10 @@ class _ActivityHistoryCard extends StatelessWidget {
                   color: AppColors.textSecondary,
                 ),
               ],
+            ),
+            _StatusChip(
+              label: historyTexts.completedStatus(entry.completionStatus),
+              isIncomplete: !entry.activityCompleted,
             ),
             const SizedBox(height: AppSpacing.xs),
             Row(
@@ -652,11 +709,13 @@ class _RewardPill extends StatelessWidget {
           children: [
             RewardStickerImage(reward: reward, semanticLabel: label, size: 28),
             const SizedBox(width: AppSpacing.xs),
-            Text(
-              label,
-              style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                color: AppColors.textStrong,
-                fontWeight: FontWeight.w900,
+            Flexible(
+              child: Text(
+                label,
+                style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                  color: AppColors.textStrong,
+                  fontWeight: FontWeight.w900,
+                ),
               ),
             ),
           ],

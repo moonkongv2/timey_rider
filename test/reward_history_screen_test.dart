@@ -317,7 +317,7 @@ void main() {
     expect(find.text('이 활동 기록을 삭제할까요?'), findsOneWidget);
     expect(find.text('기록만 삭제되고 받은 차량 스티커는 유지돼요.'), findsOneWidget);
 
-    await tester.tap(find.text('삭제'));
+    await tester.tap(find.text('기록만 삭제'));
     await tester.pumpAndSettle();
 
     expect(find.text('활동 기록을 삭제했어요.'), findsOneWidget);

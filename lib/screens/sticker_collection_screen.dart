@@ -1,3 +1,4 @@
+import '../widgets/activity_progress_error.dart';
 import 'package:flutter/material.dart';
 
 import '../l10n/app_texts.dart';
@@ -10,13 +11,30 @@ import '../theme/app_spacing.dart';
 import '../widgets/reward_sticker_image.dart';
 import '../widgets/sticker_fountain_animation.dart';
 
-class StickerCollectionScreen extends StatelessWidget {
+class StickerCollectionScreen extends StatefulWidget {
   const StickerCollectionScreen({
     super.key,
     required this.activityProgressService,
   });
 
   final LocalActivityProgressService activityProgressService;
+
+  @override
+  State<StickerCollectionScreen> createState() =>
+      _StickerCollectionScreenState();
+}
+
+class _StickerCollectionScreenState extends State<StickerCollectionScreen> {
+  late Future<ActivityProgressSnapshot> _snapshotFuture;
+  @override
+  void initState() {
+    super.initState();
+    _snapshotFuture = widget.activityProgressService.loadSnapshot();
+  }
+
+  void _reload() => setState(() {
+    _snapshotFuture = widget.activityProgressService.loadSnapshot();
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -26,8 +44,17 @@ class StickerCollectionScreen extends StatelessWidget {
       appBar: AppBar(title: Text(texts.rewards.collectionTitle)),
       body: SafeArea(
         child: FutureBuilder<ActivityProgressSnapshot>(
-          future: activityProgressService.loadSnapshot(),
+          future: _snapshotFuture,
           builder: (context, snapshot) {
+            if (snapshot.hasError) {
+              return ActivityProgressError(
+                error: snapshot.error,
+                onRetry: _reload,
+              );
+            }
+            if (!snapshot.hasData) {
+              return const Center(child: CircularProgressIndicator());
+            }
             final inventory = snapshot.data?.inventory ?? const [];
 
             return GridView.builder(
@@ -103,10 +130,7 @@ class _StickerCard extends StatelessWidget {
               top: 4,
               child: Transform.rotate(
                 angle: -0.25,
-                child: Opacity(
-                  opacity: 0.6,
-                  child: stickerImage,
-                ),
+                child: Opacity(opacity: 0.6, child: stickerImage),
               ),
             ),
           if (count >= 2)
@@ -115,10 +139,7 @@ class _StickerCard extends StatelessWidget {
               top: -6,
               child: Transform.rotate(
                 angle: 0.18,
-                child: Opacity(
-                  opacity: 0.8,
-                  child: stickerImage,
-                ),
+                child: Opacity(opacity: 0.8, child: stickerImage),
               ),
             ),
           stickerImage,
@@ -151,58 +172,59 @@ class _StickerCard extends StatelessWidget {
         child: Padding(
           padding: const EdgeInsets.all(AppSpacing.lg),
           child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Expanded(
-              child: FittedBox(
-                fit: BoxFit.scaleDown,
-                child: _buildStickerStack(
-                  _isCollected
-                      ? stickerName
-                      : texts.rewards.uncollectedSemanticLabel,
-                ),
-              ),
-            ),
-            const SizedBox(height: AppSpacing.md),
-            Text(
-              _isCollected ? stickerName : texts.rewards.lockedSticker,
-              textAlign: TextAlign.center,
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-              style: textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.w900,
-                color: _isCollected
-                    ? AppColors.textStrong
-                    : AppColors.textSecondary,
-              ),
-            ),
-            const SizedBox(height: AppSpacing.sm),
-            DecoratedBox(
-              decoration: BoxDecoration(
-                color: _isCollected
-                    ? AppColors.surfaceYellow
-                    : AppColors.borderSoft,
-                borderRadius: AppRadius.pill,
-              ),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: AppSpacing.md,
-                  vertical: AppSpacing.xs,
-                ),
-                child: Text(
-                  _isCollected
-                      ? texts.rewards.stickerCount(count)
-                      : texts.rewards.lockedStatus,
-                  style: textTheme.labelLarge?.copyWith(
-                    fontWeight: FontWeight.w900,
-                    color: AppColors.textPrimary,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Expanded(
+                child: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  child: _buildStickerStack(
+                    _isCollected
+                        ? stickerName
+                        : texts.rewards.uncollectedSemanticLabel,
                   ),
                 ),
               ),
-            ),
-          ],
+              const SizedBox(height: AppSpacing.md),
+              Text(
+                _isCollected ? stickerName : texts.rewards.lockedSticker,
+                textAlign: TextAlign.center,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.w900,
+                  color: _isCollected
+                      ? AppColors.textStrong
+                      : AppColors.textSecondary,
+                ),
+              ),
+              const SizedBox(height: AppSpacing.sm),
+              DecoratedBox(
+                decoration: BoxDecoration(
+                  color: _isCollected
+                      ? AppColors.surfaceYellow
+                      : AppColors.borderSoft,
+                  borderRadius: AppRadius.pill,
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppSpacing.md,
+                    vertical: AppSpacing.xs,
+                  ),
+                  child: Text(
+                    _isCollected
+                        ? texts.rewards.stickerCount(count)
+                        : texts.rewards.lockedStatus,
+                    style: textTheme.labelLarge?.copyWith(
+                      fontWeight: FontWeight.w900,
+                      color: AppColors.textPrimary,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
-    ));
+    );
   }
 }

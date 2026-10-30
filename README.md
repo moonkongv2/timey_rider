@@ -45,6 +45,22 @@ The app is designed around one simple goal: make daily routines feel like cozy j
 8. Review the result and earned stickers.
 9. Track activity history, sticker inventory, and reward goals from the home screen.
 
+## Activity history deletion
+
+Activity History offers **Delete record only** by default. When a record has
+awarded stickers or linked slots on unused reward boards, parents can select
+**Also remove stickers earned from this activity**. This removes the actual
+stickers awarded by that record and its slots on unused boards. Rewards below
+their goal return to in progress; used rewards remain unchanged. All active
+boards are retained, and a new goal can be created when fewer than two are active.
+Only activities that earn a sticker fill reward boards. Choosing no sticker
+leaves a record without a sticker award.
+
+After deleting only the record, its stickers cannot later be removed through
+that record. Deleted session IDs remain locally to prevent stale pending results
+from awarding stickers again. This operation is separate from purchase restore
+and does not erase used reward history.
+
 ## Motivation Media
 
 Motivation videos and voice playback are temporarily deferred from launch builds

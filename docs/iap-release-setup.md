@@ -75,6 +75,25 @@ Use wording that matches the actual client-only implementation:
 - The purchase sheet may show price only after the parent gate passes.
 - There are no ads, analytics, login, backend server, or remote config in this IAP flow.
 
+Activity History review procedure (implemented behavior; device QA pending):
+
+1. Complete an activity and choose to receive a sticker. Open Activity History
+   from Home, then tap the record delete icon.
+2. **Delete record only** is the default. Earned stickers and reward boards stay.
+3. Select **Also remove stickers earned from this activity**, then **Delete with
+   stickers**, to subtract that record's stickers and unused board slots.
+4. Unused rewards return to in progress if they fall below their goal. Used
+   rewards retain their board and dates. All returned active boards remain
+   available, including when more than two are active.
+5. Cancel or dismiss the dialog to keep everything. A deleted pending result
+   shows a deletion notice and offers **Go home** without replaying rewards.
+
+Deletion retains local session IDs to prevent re-awards and leaves used reward
+history intact. It does not affect vehicle pack entitlement or purchase restore.
+See `ACTIVITY_HISTORY_LINKED_DELETE_VERIFICATION.md` for source and validation
+scope; automated feature tests are not Sandbox purchase/restore or Organizer
+validation evidence.
+
 ## Release QA Checklist
 
 - Locked premium vehicles stay visible with the lock icon and cannot be selected directly.
@@ -86,3 +105,10 @@ Use wording that matches the actual client-only implementation:
 - After a successful purchase or restore has been cached locally, locked vehicles remain available while offline.
 - Avatar setup uses the same locked vehicle policy as the Home vehicle picker.
 - Settings, onboarding, timer resume, recent/favorite timer presets, marker selection, stickers, rewards, history, and avatar image import still work after the IAP changes.
+
+- For history deletion, check record-only and linked deletion, last sticker,
+  unused reward returning to active, three or more active boards, unchanged used
+  rewards, Home refresh, force quit/restart, a new timer, and both sticker choices.
+- Check the delete dialog, deletion notice, and recovery buttons on small iPhone
+  portrait/landscape, supported iPad, large text, and VoiceOver. Verify all five
+  supported languages. Record device/OS and any unverified combinations.

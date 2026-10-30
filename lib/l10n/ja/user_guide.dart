@@ -6,8 +6,7 @@ class JaUserGuideTexts implements UserGuideTextSet {
   const JaUserGuideTexts();
 
   String get title => '保護者ガイド';
-  String get subtitle =>
-      '活動ミッション、コースマーカー、ステッカーのルールを確認できます。';
+  String get subtitle => '活動ミッション、コースマーカー、ステッカーのルールを確認できます。';
   String get introTitle => '保護者ガイド';
   String get introBody =>
       'ライドを始める前に、Timey Riderの活動ミッションとアプリのルールを確認するためのガイドです。毎日のルーティンを支える保護者向けです。';
@@ -64,6 +63,8 @@ class JaUserGuideTexts implements UserGuideTextSet {
 
   String get historyRewardsTitle => '活動記録とごほうび目標';
   List<String> get historyRewardsItems => const [
+    '記録のみを削除すると、この活動からステッカーを連動削除できなくなります。',
+    'この活動のステッカーと未使用のごほうびボードの該当マスを削除します。目標を下回ったごほうびは進行中に戻ります。使用済みのごほうびは変わりません。',
     '活動記録には、活動名、目標時間、実際の時間、完了状況が表示されます。',
     'もらったステッカーや手動で選んだ絵マーカーが、記録と一緒に表示されることがあります。',
     'もらったステッカーは、ステッカーコレクション画面に集まります。',

@@ -13,7 +13,7 @@ class EnRewardTexts implements RewardTextSet {
   String get createRewardGoal => 'Create Reward Goal';
   String get rewardGoalEmptyTitle => 'Create a new reward goal';
   String get rewardGoalEmptyBody =>
-      'Each completed activity adds the selected sticker and fills one spot on the reward board.';
+      'Each activity that earns a sticker fills one spot on every active reward board.';
   String get rewardGoalRewardFieldLabel => 'Reward';
   String get rewardGoalRequiredStickerCountLabel => 'Stickers needed';
   String get rewardGoalSaveButton => 'Save Goal';
@@ -32,7 +32,7 @@ class EnRewardTexts implements RewardTextSet {
   String get earnedRewardGoalsTitle => 'Earned Rewards';
   String get usedRewardGoalsTitle => 'Used Rewards';
   String get maxActiveRewardGoalsMessage =>
-      'You can keep up to 2 active reward goals.';
+      'You can create a goal when fewer than 2 reward goals are active.';
   String get editRewardGoal => 'Edit Goal';
   String get cancelRewardGoal => 'Cancel Goal';
   String get rewardGoalHistoryTitle => 'Reward History';

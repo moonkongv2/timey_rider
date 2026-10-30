@@ -12,8 +12,7 @@ class RewardTexts implements RewardTextSet {
   String get rewardGoalTitle => '보상 약속';
   String get createRewardGoal => '보상 약속 만들기';
   String get rewardGoalEmptyTitle => '새 보상 약속을 만들어 주세요';
-  String get rewardGoalEmptyBody =>
-      '활동 미션을 완료할 때마다 선택한 차량 스티커가 쌓이고 보상판이 한 칸씩 채워져요.';
+  String get rewardGoalEmptyBody => '스티커를 받은 활동마다 진행 중인 모든 보상판이 한 칸씩 채워져요.';
   String get rewardGoalRewardFieldLabel => '받을 보상';
   String get rewardGoalRequiredStickerCountLabel => '필요한 차량 스티커 수';
   String get rewardGoalSaveButton => '약속 저장';
@@ -31,7 +30,8 @@ class RewardTexts implements RewardTextSet {
   String get activeRewardGoalsTitle => '진행 중인 보상 약속';
   String get earnedRewardGoalsTitle => '받은 보상';
   String get usedRewardGoalsTitle => '사용한 보상';
-  String get maxActiveRewardGoalsMessage => '진행 중인 보상 약속은 최대 2개까지 만들 수 있어요.';
+  String get maxActiveRewardGoalsMessage =>
+      '진행 중인 보상 목표가 2개 미만일 때 새 목표를 만들 수 있어요.';
   String get editRewardGoal => '약속 수정';
   String get cancelRewardGoal => '약속 취소';
   String get rewardGoalHistoryTitle => '지급 완료 이력';

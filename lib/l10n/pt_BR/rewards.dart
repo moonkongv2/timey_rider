@@ -13,7 +13,7 @@ class PtBrRewardTexts implements RewardTextSet {
   String get createRewardGoal => 'Criar meta';
   String get rewardGoalEmptyTitle => 'Criar uma nova meta';
   String get rewardGoalEmptyBody =>
-      'Cada atividade concluída adiciona o adesivo escolhido e preenche um espaço no quadro.';
+      'Cada atividade que ganha um adesivo preenche uma casa em todos os quadros em andamento.';
   String get rewardGoalRewardFieldLabel => 'Recompensa';
   String get rewardGoalRequiredStickerCountLabel => 'Adesivos necessários';
   String get rewardGoalSaveButton => 'Salvar meta';
@@ -32,7 +32,7 @@ class PtBrRewardTexts implements RewardTextSet {
   String get earnedRewardGoalsTitle => 'Recompensas ganhas';
   String get usedRewardGoalsTitle => 'Recompensas usadas';
   String get maxActiveRewardGoalsMessage =>
-      'Você pode manter até 2 metas ativas.';
+      'Você pode criar uma meta quando houver menos de 2 metas em andamento.';
   String get editRewardGoal => 'Editar meta';
   String get cancelRewardGoal => 'Cancelar meta';
   String get rewardGoalHistoryTitle => 'Histórico de recompensas';

@@ -10,7 +10,9 @@ class EnActivityHistoryTexts implements ActivityHistoryTextSet {
   String get emptyTitle => 'No activity records yet.';
   String get emptyBody => 'Completed mission timers will appear here.';
   String get helpTitle => 'Activity history guide';
-  List<String> get helpBulletItems => const [
+  List<String> get helpBulletItems => [
+    deleteRecordOnlyWarning,
+    deleteLinkedRewardsBody,
     'Activity history shows the mission, target time, actual time, completion status, and earned stickers.',
     'Manually chosen picture markers appear when they were saved with the activity.',
     'Auto-selected markers appear on the road only and are not saved in history.',
@@ -28,6 +30,25 @@ class EnActivityHistoryTexts implements ActivityHistoryTextSet {
       'Only the record will be removed. Earned stickers will stay.';
   String get deleteRecordConfirmLabel => 'Delete';
   String get deleteRecordSuccessMessage => 'Activity record deleted.';
+
+  String get deleteLinkedRewardsLabel =>
+      'Also remove stickers earned from this activity';
+  String get deleteLinkedRewardsBody =>
+      'Removes its stickers and linked slots on unused reward boards. Rewards that fall below their goal return to in progress. Used rewards stay unchanged.';
+  String get deleteRecordOnlyLabel => 'Delete record only';
+  String get deleteWithRewardsLabel => 'Delete with stickers';
+  String get loadFailureMessage =>
+      'Unable to load your progress. Please try again.';
+  String get storageFailureMessage =>
+      'Saving could not be completed. Try again to recover the saved state.';
+  String get dataFailureMessage =>
+      'There is a problem with the saved data. If it persists after retrying, please contact support.';
+  String get deletedActivityMessage =>
+      'This activity was deleted. Its stickers will not be awarded again.';
+  String get goHomeLabel => 'Go home';
+  String additionalGoals(int count) => '$count more';
+  String get deleteRecordOnlyWarning =>
+      'After deleting only the record, you cannot remove its linked stickers through this activity.';
 
   String completedStatus(ActivityCompletionStatus completionStatus) {
     return switch (completionStatus) {

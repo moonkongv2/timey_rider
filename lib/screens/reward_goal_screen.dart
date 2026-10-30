@@ -1,3 +1,4 @@
+import '../widgets/activity_progress_error.dart';
 import 'package:flutter/material.dart';
 
 import '../l10n/app_texts.dart';
@@ -93,13 +94,23 @@ class _RewardGoalScreenState extends State<RewardGoalScreen> {
         requiredStickerCount: _requiredStickerCount,
         rewardText: rewardText,
       );
-      _rewardTextController.clear();
       if (mounted) {
+        _rewardTextController.clear();
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(texts.rewards.rewardGoalCreatedMessage)),
         );
         _stopEditingGoal();
         _refresh();
+      }
+    } catch (error) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              activityProgressErrorMessage(context, error, saving: true),
+            ),
+          ),
+        );
       }
     } finally {
       if (mounted) {
@@ -129,6 +140,16 @@ class _RewardGoalScreenState extends State<RewardGoalScreen> {
         );
         _stopEditingGoal();
         _refresh();
+      }
+    } catch (error) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              activityProgressErrorMessage(context, error, saving: true),
+            ),
+          ),
+        );
       }
     } finally {
       if (mounted) {
@@ -167,6 +188,16 @@ class _RewardGoalScreenState extends State<RewardGoalScreen> {
         _stopEditingGoal();
         _refresh();
       }
+    } catch (error) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              activityProgressErrorMessage(context, error, saving: true),
+            ),
+          ),
+        );
+      }
     } finally {
       if (mounted) {
         setState(() => _isSaving = false);
@@ -204,6 +235,16 @@ class _RewardGoalScreenState extends State<RewardGoalScreen> {
         _stopEditingGoal();
         _refresh();
       }
+    } catch (error) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              activityProgressErrorMessage(context, error, saving: true),
+            ),
+          ),
+        );
+      }
     } finally {
       if (mounted) {
         setState(() => _isSaving = false);
@@ -223,6 +264,7 @@ class _RewardGoalScreenState extends State<RewardGoalScreen> {
       builder: (context) {
         return AlertDialog(
           title: Text(title),
+          scrollable: true,
           content: Text(message),
           actions: [
             TextButton(
@@ -256,6 +298,15 @@ class _RewardGoalScreenState extends State<RewardGoalScreen> {
         child: FutureBuilder<ActivityProgressSnapshot>(
           future: _snapshotFuture,
           builder: (context, snapshot) {
+            if (snapshot.hasError) {
+              return ActivityProgressError(
+                error: snapshot.error,
+                onRetry: _refresh,
+              );
+            }
+            if (!snapshot.hasData) {
+              return const Center(child: CircularProgressIndicator());
+            }
             final activeGoals =
                 snapshot.data?.activeRewardGoals ?? const <RewardGoal>[];
             final earnedRewardGoals =

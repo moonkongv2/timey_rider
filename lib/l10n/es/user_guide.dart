@@ -64,6 +64,8 @@ class EsUserGuideTexts implements UserGuideTextSet {
 
   String get historyRewardsTitle => 'Historial y metas de recompensa';
   List<String> get historyRewardsItems => const [
+    'Si eliminas solo el registro, ya no podrás eliminar sus pegatinas vinculadas desde esta actividad.',
+    'Se eliminan sus pegatinas y las casillas vinculadas de tableros sin usar. Las recompensas que ya no alcancen la meta vuelven a estar en curso. Las recompensas usadas se conservan.',
     'El historial muestra el nombre de la actividad, el tiempo objetivo, el tiempo real y el estado de finalización.',
     'Las pegatinas ganadas y los marcadores con imágenes elegidos manualmente pueden aparecer con el registro.',
     'Las pegatinas ganadas se reúnen en la pantalla de colección de pegatinas.',

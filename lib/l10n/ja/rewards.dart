@@ -12,7 +12,8 @@ class JaRewardTexts implements RewardTextSet {
   String get rewardGoalTitle => 'ごほうび目標';
   String get createRewardGoal => 'ごほうび目標を作る';
   String get rewardGoalEmptyTitle => '新しいごほうび目標を作る';
-  String get rewardGoalEmptyBody => '活動を完了するたびに、選んだステッカーがごほうびボードの枠を1つ埋めます。';
+  String get rewardGoalEmptyBody =>
+      'ステッカーをもらった活動ごとに、進行中のすべてのごほうびボードが1マスずつ埋まります。';
   String get rewardGoalRewardFieldLabel => 'ごほうび';
   String get rewardGoalRequiredStickerCountLabel => '必要なステッカー';
   String get rewardGoalSaveButton => '目標を保存';
@@ -30,7 +31,7 @@ class JaRewardTexts implements RewardTextSet {
   String get activeRewardGoalsTitle => '進行中のごほうび目標';
   String get earnedRewardGoalsTitle => 'もらえるごほうび';
   String get usedRewardGoalsTitle => '使ったごほうび';
-  String get maxActiveRewardGoalsMessage => '進行中のごほうび目標は2つまでです。';
+  String get maxActiveRewardGoalsMessage => '進行中のごほうび目標が2つ未満のとき、新しい目標を作れます。';
   String get editRewardGoal => '目標を編集';
   String get cancelRewardGoal => '目標をキャンセル';
   String get rewardGoalHistoryTitle => 'ごほうび履歴';

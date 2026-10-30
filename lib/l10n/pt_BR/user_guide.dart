@@ -64,6 +64,8 @@ class PtBrUserGuideTexts implements UserGuideTextSet {
 
   String get historyRewardsTitle => 'Histórico e metas de recompensa';
   List<String> get historyRewardsItems => const [
+    'Ao excluir só o registro, você não poderá mais remover os adesivos vinculados por esta atividade.',
+    'Remove os adesivos e as casas vinculadas nos quadros de recompensas não usadas. Recompensas abaixo da meta voltam a ficar em andamento. Recompensas usadas são mantidas.',
     'O histórico mostra o nome da atividade, o tempo previsto, o tempo real e o status de conclusão.',
     'Adesivos ganhos e marcadores com imagens escolhidos manualmente podem aparecer com o registro.',
     'Os adesivos ganhos ficam reunidos na tela de coleção de adesivos.',

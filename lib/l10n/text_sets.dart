@@ -223,6 +223,17 @@ abstract interface class ActivityHistoryTextSet {
   String get deleteRecordDialogBody;
   String get deleteRecordConfirmLabel;
   String get deleteRecordSuccessMessage;
+  String get deleteLinkedRewardsLabel;
+  String get deleteLinkedRewardsBody;
+  String get deleteRecordOnlyLabel;
+  String get deleteWithRewardsLabel;
+  String get loadFailureMessage;
+  String get storageFailureMessage;
+  String get dataFailureMessage;
+  String get deletedActivityMessage;
+  String get goHomeLabel;
+  String additionalGoals(int count);
+  String get deleteRecordOnlyWarning;
 
   String completedStatus(ActivityCompletionStatus completionStatus);
   String dateLabel(DateTime dateTime);
