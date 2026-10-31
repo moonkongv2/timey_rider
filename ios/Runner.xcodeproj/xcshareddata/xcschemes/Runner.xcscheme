@@ -92,7 +92,7 @@
          </BuildableReference>
       </BuildableProductRunnable>
       <StoreKitConfigurationFileReference
-         identifier = "../Runner/StoreKitConfiguration.storekit">
+         identifier = "../../Runner/StoreKitConfiguration.storekit">
       </StoreKitConfigurationFileReference>
       <MetalAPIValidationSettings
          isEnabled = "No">
