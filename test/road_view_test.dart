@@ -14,6 +14,80 @@ import 'package:timey_rider/widgets/vehicle_widget.dart';
 import 'support/road_test_fixtures.dart';
 
 void main() {
+  for (final size in const [
+    Size(350, 348),
+    Size(351, 350),
+    Size(352, 350),
+    Size(362, 360),
+    Size(350, 460),
+    Size(700, 350),
+  ]) {
+    for (final mode in ['road', 'roadWithVideo', 'videoLayer']) {
+      testWidgets('$mode fits a road viewport of $size', (tester) async {
+        tester.view.physicalSize = const Size(800, 900);
+        tester.view.devicePixelRatio = 1;
+        addTearDown(tester.view.resetPhysicalSize);
+        addTearDown(tester.view.resetDevicePixelRatio);
+        await tester.pumpWidget(
+          MaterialApp(
+            home: Scaffold(
+              body: Align(
+                alignment: Alignment.topLeft,
+                child: SizedBox(
+                  width: size.width,
+                  height: size.height,
+                  child: mode == 'videoLayer'
+                      ? RoadMotivationVideoLayer(
+                          assetPath: MotivationAssetCatalog.fallbackVideoPath,
+                          milestone: 10,
+                        )
+                      : RoadView(
+                          progress: 1,
+                          vehicle: VehicleCatalog.fireTruck,
+                          motivationVideoAssetPath: mode == 'roadWithVideo'
+                              ? MotivationAssetCatalog.fallbackVideoPath
+                              : null,
+                          motivationVideoMilestone: mode == 'roadWithVideo'
+                              ? 10
+                              : null,
+                        ),
+                ),
+              ),
+            ),
+          ),
+        );
+        await tester.pump();
+
+        expect(tester.takeException(), isNull);
+        expect(find.byType(ErrorWidget), findsNothing);
+        if (mode != 'videoLayer') {
+          expect(find.byType(VehicleWidget), findsOneWidget);
+          expect(
+            tester
+                .widgetList<CustomPaint>(find.byType(CustomPaint))
+                .map((widget) => widget.painter)
+                .whereType<RoadPainter>(),
+            hasLength(1),
+          );
+        }
+        if (mode != 'road') {
+          final video = tester.getRect(
+            find.byKey(const ValueKey('motivationVideoBubble_10')),
+          );
+          expect(video.left, greaterThanOrEqualTo(16));
+          expect(video.right, lessThanOrEqualTo(size.width - 16));
+          if (size.width > size.height) {
+            final expectedWidth = size.width < 352 ? size.width - 32 : 320.0;
+            expect(video.width, closeTo(expectedWidth, 0.01));
+            expect(video.width / video.height, closeTo(16 / 9, 0.01));
+          }
+        }
+        await tester.pumpWidget(const SizedBox.shrink());
+        await tester.pump();
+      });
+    }
+  }
+
   testWidgets('Road view shows winding route markers and vehicle', (
     tester,
   ) async {

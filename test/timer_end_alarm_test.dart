@@ -11,6 +11,9 @@ import 'package:timey_rider/screens/timer_screen.dart';
 import 'package:timey_rider/services/active_activity_timer_session_store.dart';
 import 'package:timey_rider/services/local_activity_progress_service.dart';
 import 'package:timey_rider/widgets/timer_control_bar.dart';
+import 'package:timey_rider/widgets/road_painter.dart';
+import 'package:timey_rider/widgets/road_view.dart';
+import 'package:timey_rider/widgets/vehicle_widget.dart';
 
 import 'support/timer_test_harness.dart';
 
@@ -43,15 +46,26 @@ class _TimerHarness {
     duration: const Duration(seconds: 100),
   );
 
-  Future<void> mount(WidgetTester tester) async {
-    tester.view.physicalSize = const Size(600, 900);
+  Future<void> mount(
+    WidgetTester tester, {
+    Size size = const Size(600, 900),
+    Locale locale = const Locale('ko'),
+    double textScale = 1,
+  }) async {
+    tester.view.physicalSize = size;
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.resetPhysicalSize);
     addTearDown(tester.view.resetDevicePixelRatio);
     await tester.pumpWidget(
       MaterialApp(
-        locale: const Locale('ko'),
-        supportedLocales: const [Locale('ko')],
+        locale: locale,
+        supportedLocales: const [Locale('ko'), Locale('en')],
+        builder: (context, child) => MediaQuery(
+          data: MediaQuery.of(
+            context,
+          ).copyWith(textScaler: TextScaler.linear(textScale)),
+          child: child!,
+        ),
         localizationsDelegates: GlobalMaterialLocalizations.delegates,
         home: TimerScreen(
           config: config,
@@ -112,6 +126,60 @@ class _DelayedAlarmStop extends FakeTimerAudioService {
 
 void main() {
   setUp(() => SharedPreferences.setMockInitialValues({}));
+
+  for (final language in ['en', 'ko']) {
+    for (final textScale in [1.0, 1.3]) {
+      for (final button in ['arrivalPrimaryButton', 'arrivalSecondaryButton']) {
+        testWidgets(
+          'Small phone arrival stays visible: $language scale $textScale $button',
+          (tester) async {
+            final h = _TimerHarness();
+            h.config = h.config.copyWith(activityId: 'brushing');
+            await h.mount(
+              tester,
+              size: const Size(390, 844),
+              locale: Locale(language),
+              textScale: textScale,
+            );
+            final road = find.byType(RoadView);
+            final runningHeight = tester.getSize(road).height;
+            await h.expire(tester);
+            expect(
+              find.byKey(const ValueKey('arrivalActionPanel')),
+              findsNothing,
+            );
+            await tester.pump(const Duration(milliseconds: 900));
+            expect(
+              find.byKey(const ValueKey('arrivalActionPanel')),
+              findsOneWidget,
+            );
+            expect(tester.getSize(road).height, lessThan(runningHeight));
+            expect(find.byType(VehicleWidget), findsOneWidget);
+            expect(
+              tester
+                  .widgetList<CustomPaint>(find.byType(CustomPaint))
+                  .map((widget) => widget.painter)
+                  .whereType<RoadPainter>(),
+              hasLength(1),
+            );
+            expect(find.byType(ErrorWidget), findsNothing);
+            expect(tester.takeException(), isNull);
+            await tester.pump(const Duration(seconds: 30));
+            expect(
+              h.audio.calls.where((v) => v == 'startTimerEndAlarm'),
+              hasLength(1),
+            );
+            await tester.tap(find.byKey(ValueKey(button)));
+            await tester.pump();
+            expect(h.audio.calls.last, 'stopTimerEndAlarm');
+            expect(h.store.attempts, 1);
+            expect(tester.takeException(), isNull);
+            await h.close(tester);
+          },
+        );
+      }
+    }
+  }
 
   testWidgets('Alarm starts at zero before panel, without repeated starts', (
     tester,

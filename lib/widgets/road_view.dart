@@ -82,10 +82,17 @@ class RoadView extends StatelessWidget {
             )
             .toDouble();
         const videoMargin = 16.0;
+        final availableVideoWidth = math.max(
+          0.0,
+          viewportSize.width - (videoMargin * 2),
+        );
         final videoFrameWidth = isLandscape
             ? math
                   .min(viewportSize.width * 0.36, 460.0)
-                  .clamp(320.0, viewportSize.width - (videoMargin * 2))
+                  .clamp(
+                    math.min(320.0, availableVideoWidth),
+                    availableVideoWidth,
+                  )
                   .toDouble()
             : math.max(0.0, viewportSize.width - (videoMargin * 2));
         final videoFrameHeight = isLandscape
@@ -696,10 +703,17 @@ class RoadMotivationVideoLayer extends StatelessWidget {
           final size = Size(constraints.maxWidth, constraints.maxHeight);
           final isLandscape = size.width > size.height;
           const videoMargin = 16.0;
+          final availableVideoWidth = math.max(
+            0.0,
+            size.width - (videoMargin * 2),
+          );
           final videoFrameWidth = isLandscape
               ? math
                     .min(size.width * 0.36, 460.0)
-                    .clamp(320.0, size.width - (videoMargin * 2))
+                    .clamp(
+                      math.min(320.0, availableVideoWidth),
+                      availableVideoWidth,
+                    )
                     .toDouble()
               : math.max(0.0, size.width - (videoMargin * 2));
           final videoFrameHeight = isLandscape
