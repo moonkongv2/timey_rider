@@ -1,0 +1,13 @@
+00:00 +0: loading /private/tmp/timey-p0-20261114/sqlite_smoke/integration_test/sqlite_smoke_test.dart
+Running Gradle task 'assembleDebug'...                          
+WARNING: Your Android app project: app located at: /private/tmp/timey-p0-20261114/sqlite_smoke/android/app/build.gradle.kts
+applies the Kotlin Gradle Plugin, which will cause build failures in future versions of Flutter. 
+Please migrate your app to Built-in Kotlin using this guide: https://docs.flutter.dev/release/breaking-changes/migrate-to-built-in-kotlin/for-app-developers
+
+Running Gradle task 'assembleDebug'...                             34.8s
+✓ Built build/app/outputs/flutter-apk/app-debug.apk
+Installing build/app/outputs/flutter-apk/app-debug.apk...          280ms
+00:00 +0: native initialization, commit, rollback and reopen
+P0 VERIFIED: SQLite [{sqlite_version(): 3.50.6}]; create=1, commit=2 rows, rollback=0 partial rows, reopen=preserved, journal=DELETE, synchronous=FULL, integrity=ok
+00:00 +1: (tearDownAll)
+00:00 +1: All tests passed!

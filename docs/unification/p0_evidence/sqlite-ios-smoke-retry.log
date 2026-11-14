@@ -1,0 +1,7 @@
+00:00 +0: loading /private/tmp/timey-p0-20261114/sqlite_smoke/integration_test/sqlite_smoke_test.dart
+Running Xcode build...                                          
+Xcode build done.                                           15.6s
+00:00 +0: native initialization, commit, rollback and reopen
+P0 VERIFIED: SQLite [{sqlite_version(): 3.43.2}]; create=1, commit=2 rows, rollback=0 partial rows, reopen=preserved, journal=DELETE, synchronous=FULL, integrity=ok
+00:00 +1: (tearDownAll)
+00:00 +1: All tests passed!

@@ -1,0 +1,17 @@
+00:00 +0: loading /private/tmp/timey-p0-20261114/sqlite_smoke/integration_test/sqlite_smoke_test.dart
+Warning: Missing build name (CFBundleShortVersionString).
+Warning: Missing build number (CFBundleVersion).
+Action Required: You must set a build name and number in the pubspec.yaml file version field before submitting to the App Store.
+Running Xcode build...                                          
+Xcode build done.                                            6.2s
+Failed to build iOS app
+Target Integrity (Xcode): The iOS Simulator deployment target 'IPHONEOS_DEPLOYMENT_TARGET' is set to 13.0, but the range of supported deployment target versions is 15.0 to 27.2.x.
+/tmp/timey-p0-20261114/sqlite_smoke/ios/Runner.xcodeproj
+
+Could not build the application for the simulator.
+00:00 +0 -1: loading /private/tmp/timey-p0-20261114/sqlite_smoke/integration_test/sqlite_smoke_test.dart [E]
+  Failed to load "/private/tmp/timey-p0-20261114/sqlite_smoke/integration_test/sqlite_smoke_test.dart": Unable to start the app on the device.
+00:00 +0 -1: Some tests failed.
+
+Failing tests:
+  /private/tmp/timey-p0-20261114/sqlite_smoke/integration_test/sqlite_smoke_test.dart: loading /private/tmp/timey-p0-20261114/sqlite_smoke/integration_test/sqlite_smoke_test.dart

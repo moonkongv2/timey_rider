@@ -1,0 +1,2 @@
+# P0 verification evidence intentionally retained despite root *.log rule.
+!*.log

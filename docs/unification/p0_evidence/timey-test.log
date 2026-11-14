@@ -1,0 +1,690 @@
+00:00 +0: loading /private/tmp/timey-p0-20261114/timey_rider/test/avatar_setup_purchase_test.dart
+00:00 +0: /private/tmp/timey-p0-20261114/timey_rider/test/local_recent_timer_service_test.dart: LocalRecentTimerService saves and loads the latest timer preset
+00:00 +1: /private/tmp/timey-p0-20261114/timey_rider/test/local_recent_timer_service_test.dart: LocalRecentTimerService replaces the saved timer preset
+00:00 +2: /private/tmp/timey-p0-20261114/timey_rider/test/local_recent_timer_service_test.dart: LocalRecentTimerService ignores malformed saved data
+00:00 +3: /private/tmp/timey-p0-20261114/timey_rider/test/local_recent_timer_service_test.dart: LocalRecentTimerService ignores invalid timer preset json
+00:00 +4: /private/tmp/timey-p0-20261114/timey_rider/test/local_recent_timer_service_test.dart: LocalRecentTimerService clears the saved timer preset
+00:00 +5: /private/tmp/timey-p0-20261114/timey_rider/test/pending_activity_result_storage_test.dart: pending parser rejects missing or blank session ID: null
+00:00 +6: /private/tmp/timey-p0-20261114/timey_rider/test/pending_activity_result_storage_test.dart: pending parser rejects missing or blank session ID: 
+00:00 +7: /private/tmp/timey-p0-20261114/timey_rider/test/pending_activity_result_storage_test.dart: pending parser rejects missing or blank session ID:    
+00:00 +8: /private/tmp/timey-p0-20261114/timey_rider/test/pending_activity_result_storage_test.dart: conditional choice update and cleanup of A preserve newer pending and active B
+00:00 +9: /private/tmp/timey-p0-20261114/timey_rider/test/pending_activity_result_storage_test.dart: conditional update persists choice without recreating absent pending or removing active
+00:00 +10: /private/tmp/timey-p0-20261114/timey_rider/test/pending_activity_result_storage_test.dart: pending persisted but residual active removal failure is reported and can be retried
+00:00 +11: /private/tmp/timey-p0-20261114/timey_rider/test/pending_activity_result_storage_test.dart: completed result survives store recreation and stale timer saves
+00:00 +12: /private/tmp/timey-p0-20261114/timey_rider/test/pending_activity_result_storage_test.dart: concurrent and replayed result awards record sticker and goal once
+00:00 +13: /private/tmp/timey-p0-20261114/timey_rider/test/pending_activity_result_storage_test.dart: unfinished multi-key record transaction replays before duplicate result
+00:00 +14: /private/tmp/timey-p0-20261114/timey_rider/test/avatar_setup_purchase_test.dart: Avatar setup does not select locked premium vehicles
+00:01 +15: /private/tmp/timey-p0-20261114/timey_rider/test/avatar_setup_purchase_test.dart: Avatar setup selects locked vehicle after successful purchase
+00:02 +16: /private/tmp/timey-p0-20261114/timey_rider/test/vehicle_catalog_test.dart: Every catalog vehicle defines an avatar slot
+00:02 +17: /private/tmp/timey-p0-20261114/timey_rider/test/vehicle_catalog_test.dart: Catalog vehicles define the expected course kind
+00:02 +18: /private/tmp/timey-p0-20261114/timey_rider/test/vehicle_catalog_test.dart: Catalog vehicles use success result videos or the motorcycle fallback
+00:02 +19: /private/tmp/timey-p0-20261114/timey_rider/test/home_screen_test.dart: Home screen shows activity timer actions
+00:02 +20: /private/tmp/timey-p0-20261114/timey_rider/test/home_screen_test.dart: Home screen shows activity timer actions
+00:02 +21: /private/tmp/timey-p0-20261114/timey_rider/test/home_screen_test.dart: Home screen shows activity timer actions
+00:02 +22: /private/tmp/timey-p0-20261114/timey_rider/test/home_screen_test.dart: Home screen shows activity timer actions
+00:02 +23: /private/tmp/timey-p0-20261114/timey_rider/test/home_screen_test.dart: Home screen shows activity timer actions
+00:02 +24: /private/tmp/timey-p0-20261114/timey_rider/test/home_screen_test.dart: Home screen shows activity timer actions
+00:02 +25: /private/tmp/timey-p0-20261114/timey_rider/test/home_screen_test.dart: Home screen shows activity timer actions
+00:02 +26: /private/tmp/timey-p0-20261114/timey_rider/test/home_screen_test.dart: Home screen shows activity timer actions
+00:02 +27: /private/tmp/timey-p0-20261114/timey_rider/test/home_screen_test.dart: Home screen shows activity timer actions
+00:02 +28: /private/tmp/timey-p0-20261114/timey_rider/test/home_screen_test.dart: Home screen shows activity timer actions
+00:02 +29: /private/tmp/timey-p0-20261114/timey_rider/test/home_screen_test.dart: Home screen shows activity timer actions
+00:02 +30: /private/tmp/timey-p0-20261114/timey_rider/test/home_screen_test.dart: Home screen shows activity timer actions
+00:02 +31: /private/tmp/timey-p0-20261114/timey_rider/test/home_screen_test.dart: Home screen shows activity timer actions
+00:02 +32: /private/tmp/timey-p0-20261114/timey_rider/test/home_screen_test.dart: Home screen shows activity timer actions
+00:02 +33: /private/tmp/timey-p0-20261114/timey_rider/test/home_screen_test.dart: Home screen shows activity timer actions
+00:02 +34: /private/tmp/timey-p0-20261114/timey_rider/test/home_screen_test.dart: Home screen shows activity timer actions
+00:02 +35: /private/tmp/timey-p0-20261114/timey_rider/test/home_screen_test.dart: Home screen shows activity timer actions
+00:02 +36: /private/tmp/timey-p0-20261114/timey_rider/test/home_screen_test.dart: Home screen shows activity timer actions
+00:02 +37: /private/tmp/timey-p0-20261114/timey_rider/test/home_screen_test.dart: Home screen shows activity timer actions
+00:02 +38: /private/tmp/timey-p0-20261114/timey_rider/test/home_screen_test.dart: Home screen shows activity timer actions
+00:02 +39: /private/tmp/timey-p0-20261114/timey_rider/test/home_screen_test.dart: Home screen shows activity timer actions
+00:02 +40: /private/tmp/timey-p0-20261114/timey_rider/test/home_screen_test.dart: Home screen shows activity timer actions
+00:02 +41: /private/tmp/timey-p0-20261114/timey_rider/test/home_screen_test.dart: Home screen shows activity timer actions
+00:02 +42: /private/tmp/timey-p0-20261114/timey_rider/test/home_screen_test.dart: Home screen shows activity timer actions
+00:02 +43: /private/tmp/timey-p0-20261114/timey_rider/test/home_screen_test.dart: Home screen shows activity timer actions
+00:02 +44: /private/tmp/timey-p0-20261114/timey_rider/test/home_screen_test.dart: Home screen shows activity timer actions
+00:02 +45: /private/tmp/timey-p0-20261114/timey_rider/test/home_screen_test.dart: Home screen shows activity timer actions
+00:02 +46: /private/tmp/timey-p0-20261114/timey_rider/test/home_screen_test.dart: Home screen shows activity timer actions
+00:02 +47: /private/tmp/timey-p0-20261114/timey_rider/test/home_screen_test.dart: Home screen shows activity timer actions
+00:02 +48: /private/tmp/timey-p0-20261114/timey_rider/test/home_screen_test.dart: Home screen shows activity timer actions
+00:02 +49: /private/tmp/timey-p0-20261114/timey_rider/test/home_screen_test.dart: Home screen shows activity timer actions
+00:02 +50: /private/tmp/timey-p0-20261114/timey_rider/test/home_screen_test.dart: Home screen shows activity timer actions
+00:02 +51: /private/tmp/timey-p0-20261114/timey_rider/test/home_screen_test.dart: Home screen shows activity timer actions
+00:03 +52: /private/tmp/timey-p0-20261114/timey_rider/test/home_screen_test.dart: Home screen shows activity timer actions
+00:03 +53: /private/tmp/timey-p0-20261114/timey_rider/test/result_screen_media_test.dart: Completed-before-arrival result shows intro video screen
+00:03 +54: /private/tmp/timey-p0-20261114/timey_rider/test/result_screen_media_test.dart: Completed-before-arrival result shows intro video screen
+00:03 +55: /private/tmp/timey-p0-20261114/timey_rider/test/timer_motivation_test.dart: Timer screen plays motivation voice after video starts
+00:03 +56: /private/tmp/timey-p0-20261114/timey_rider/test/timer_motivation_test.dart: Timer screen plays motivation voice after video starts
+00:03 +57: /private/tmp/timey-p0-20261114/timey_rider/test/timer_motivation_test.dart: Timer screen plays motivation voice after video starts
+00:03 +58: /private/tmp/timey-p0-20261114/timey_rider/test/timer_motivation_test.dart: Timer screen plays motivation voice after video starts
+00:03 +59: /private/tmp/timey-p0-20261114/timey_rider/test/timer_motivation_test.dart: Timer screen plays motivation voice after video starts
+00:03 +60: /private/tmp/timey-p0-20261114/timey_rider/test/timer_motivation_test.dart: Timer screen plays motivation voice after video starts
+00:03 +61: /private/tmp/timey-p0-20261114/timey_rider/test/timer_motivation_test.dart: Timer screen plays motivation voice after video starts
+00:03 +61: /private/tmp/timey-p0-20261114/timey_rider/test/timer_end_alarm_service_test.dart: Playback failure does not break stop or later restart
+Timer end alarm playback failed: PlatformException(test-playback-failure, null, null, null)
+00:03 +62: /private/tmp/timey-p0-20261114/timey_rider/test/timer_motivation_test.dart: Timer screen plays motivation voice after video starts
+00:03 +63: /private/tmp/timey-p0-20261114/timey_rider/test/timer_motivation_test.dart: Timer screen plays motivation voice after video starts
+00:03 +63: /private/tmp/timey-p0-20261114/timey_rider/test/timer_end_alarm_service_test.dart: Playback failure does not break stop or later restart
+#0      StandardMethodCodec.decodeEnvelope (package:flutter/src/services/message_codecs.dart:653:7)
+#1      MethodChannel._invokeMethod (package:flutter/src/services/platform_channel.dart:366:18)
+<asynchronous suspension>
+#2      AudioPlayer.play (package:audioplayers/src/audioplayer.dart:206:7)
+<asynchronous suspension>
+#3      AudioplayersTimerAudioService.startTimerEndAlarm.<anonymous closure> (package:timey_rider/services/timer_audio_service.dart:341:9)
+<asynchronous suspension>
+#4      main.<anonymous closure> (file:///private/tmp/timey-p0-20261114/timey_rider/test/timer_end_alarm_service_test.dart:173:5)
+<asynchronous suspension>
+#5      Declarer.test.<anonymous closure>.<anonymous closure> (package:test_api/src/backend/declarer.dart:253:15)
+<asynchronous suspension>
+#6      Declarer.test.<anonymous closure> (package:test_api/src/backend/declarer.dart:250:11)
+<asynchronous suspension>
+#7      Invoker._waitForOutstandingCallbacks.<anonymous closure> (package:test_api/src/backend/invoker.dart:318:9)
+<asynchronous suspension>
+00:03 +64: /private/tmp/timey-p0-20261114/timey_rider/test/timer_motivation_test.dart: Timer screen plays motivation voice after video starts
+00:03 +65: /private/tmp/timey-p0-20261114/timey_rider/test/timer_motivation_test.dart: Timer screen plays motivation voice after video starts
+00:03 +66: /private/tmp/timey-p0-20261114/timey_rider/test/timer_motivation_test.dart: Timer screen plays motivation voice after video starts
+00:03 +67: /private/tmp/timey-p0-20261114/timey_rider/test/timer_motivation_test.dart: Timer screen plays motivation voice after video starts
+00:03 +68: /private/tmp/timey-p0-20261114/timey_rider/test/timer_motivation_test.dart: Timer screen plays motivation voice after video starts
+00:03 +69: /private/tmp/timey-p0-20261114/timey_rider/test/timer_motivation_test.dart: Timer screen plays motivation voice after video starts
+00:03 +70: /private/tmp/timey-p0-20261114/timey_rider/test/timer_motivation_test.dart: Timer screen plays motivation voice after video starts
+00:04 +71: /private/tmp/timey-p0-20261114/timey_rider/test/timer_motivation_test.dart: Timer screen plays motivation voice after video starts
+00:04 +72: /private/tmp/timey-p0-20261114/timey_rider/test/timer_motivation_test.dart: Timer screen plays motivation voice after video starts
+00:04 +73: /private/tmp/timey-p0-20261114/timey_rider/test/timer_motivation_test.dart: Timer screen plays motivation voice after video starts
+00:04 +74: /private/tmp/timey-p0-20261114/timey_rider/test/timer_motivation_test.dart: Timer screen plays motivation voice after video starts
+00:04 +75: /private/tmp/timey-p0-20261114/timey_rider/test/timer_motivation_test.dart: Timer screen plays motivation voice after video starts
+00:04 +76: /private/tmp/timey-p0-20261114/timey_rider/test/timer_motivation_test.dart: Timer screen plays motivation voice after video starts
+00:04 +77: /private/tmp/timey-p0-20261114/timey_rider/test/timer_motivation_test.dart: Timer screen plays motivation voice after video starts
+00:04 +78: /private/tmp/timey-p0-20261114/timey_rider/test/home_active_session_test.dart: Home screen opens a saved active timer session
+00:04 +79: /private/tmp/timey-p0-20261114/timey_rider/test/home_active_session_test.dart: Home screen opens a saved active timer session
+00:04 +80: /private/tmp/timey-p0-20261114/timey_rider/test/locale_smoke_test.dart: English locale shows English home copy
+00:04 +81: /private/tmp/timey-p0-20261114/timey_rider/test/locale_smoke_test.dart: English locale shows English home copy
+00:04 +82: /private/tmp/timey-p0-20261114/timey_rider/test/locale_smoke_test.dart: English locale shows English home copy
+00:05 +83: /private/tmp/timey-p0-20261114/timey_rider/test/locale_smoke_test.dart: English locale shows English home copy
+00:05 +84: /private/tmp/timey-p0-20261114/timey_rider/test/locale_smoke_test.dart: English locale shows English home copy
+00:05 +85: /private/tmp/timey-p0-20261114/timey_rider/test/locale_smoke_test.dart: English locale shows English home copy
+00:05 +86: /private/tmp/timey-p0-20261114/timey_rider/test/locale_smoke_test.dart: English locale shows English home copy
+00:05 +87: /private/tmp/timey-p0-20261114/timey_rider/test/locale_smoke_test.dart: English locale shows English home copy
+00:05 +88: /private/tmp/timey-p0-20261114/timey_rider/test/locale_smoke_test.dart: English locale shows English home copy
+00:05 +89: /private/tmp/timey-p0-20261114/timey_rider/test/locale_smoke_test.dart: English locale shows English home copy
+00:05 +90: /private/tmp/timey-p0-20261114/timey_rider/test/locale_smoke_test.dart: English locale shows English home copy
+00:05 +91: /private/tmp/timey-p0-20261114/timey_rider/test/locale_smoke_test.dart: English locale shows English home copy
+00:05 +92: /private/tmp/timey-p0-20261114/timey_rider/test/locale_smoke_test.dart: English locale shows English home copy
+00:05 +93: /private/tmp/timey-p0-20261114/timey_rider/test/locale_smoke_test.dart: English locale shows English home copy
+00:05 +94: /private/tmp/timey-p0-20261114/timey_rider/test/locale_smoke_test.dart: English locale shows English home copy
+00:05 +95: /private/tmp/timey-p0-20261114/timey_rider/test/locale_smoke_test.dart: English locale shows English home copy
+00:05 +96: /private/tmp/timey-p0-20261114/timey_rider/test/locale_smoke_test.dart: English locale shows English home copy
+00:05 +97: /private/tmp/timey-p0-20261114/timey_rider/test/locale_smoke_test.dart: English locale shows English home copy
+00:05 +98: /private/tmp/timey-p0-20261114/timey_rider/test/timer_motivation_test.dart: Timer screen uses three-minute motivation cadence for long timer
+00:05 +99: /private/tmp/timey-p0-20261114/timey_rider/test/timer_motivation_test.dart: Timer screen uses three-minute motivation cadence for long timer
+00:05 +100: /private/tmp/timey-p0-20261114/timey_rider/test/timer_motivation_test.dart: Timer screen uses three-minute motivation cadence for long timer
+00:05 +101: /private/tmp/timey-p0-20261114/timey_rider/test/timer_builder_test.dart: Timer builder shows all manual marker choices
+00:05 +102: /private/tmp/timey-p0-20261114/timey_rider/test/timer_builder_test.dart: Timer builder shows all manual marker choices
+00:05 +103: /private/tmp/timey-p0-20261114/timey_rider/test/timer_builder_test.dart: Timer builder shows all manual marker choices
+00:05 +104: /private/tmp/timey-p0-20261114/timey_rider/test/timer_builder_test.dart: Timer builder shows all manual marker choices
+00:05 +105: /private/tmp/timey-p0-20261114/timey_rider/test/timer_builder_test.dart: Timer builder shows all manual marker choices
+00:06 +106: /private/tmp/timey-p0-20261114/timey_rider/test/timer_builder_test.dart: Timer builder shows all manual marker choices
+00:06 +107: /private/tmp/timey-p0-20261114/timey_rider/test/timer_builder_test.dart: Timer builder shows all manual marker choices
+00:06 +108: /private/tmp/timey-p0-20261114/timey_rider/test/timer_builder_test.dart: Timer builder shows all manual marker choices
+00:06 +109: /private/tmp/timey-p0-20261114/timey_rider/test/timer_builder_test.dart: Timer builder shows all manual marker choices
+00:06 +110: /private/tmp/timey-p0-20261114/timey_rider/test/timer_builder_test.dart: Timer builder shows all manual marker choices
+00:06 +111: /private/tmp/timey-p0-20261114/timey_rider/test/timer_builder_test.dart: Timer builder shows all manual marker choices
+00:06 +112: /private/tmp/timey-p0-20261114/timey_rider/test/timer_builder_test.dart: Timer builder shows all manual marker choices
+00:06 +113: /private/tmp/timey-p0-20261114/timey_rider/test/timer_builder_test.dart: Timer builder shows all manual marker choices
+00:06 +114: /private/tmp/timey-p0-20261114/timey_rider/test/timer_motivation_test.dart: Timer screen closes active motivation video when disabled
+00:06 +115: /private/tmp/timey-p0-20261114/timey_rider/test/timer_motivation_test.dart: Timer screen closes active motivation video when disabled
+00:06 +116: /private/tmp/timey-p0-20261114/timey_rider/test/timer_motivation_test.dart: Timer screen closes active motivation video when disabled
+00:06 +117: /private/tmp/timey-p0-20261114/timey_rider/test/timer_motivation_test.dart: Timer screen closes active motivation video when disabled
+00:06 +118: /private/tmp/timey-p0-20261114/timey_rider/test/timer_motivation_test.dart: Timer screen closes active motivation video when disabled
+00:06 +119: /private/tmp/timey-p0-20261114/timey_rider/test/timer_motivation_test.dart: Timer screen closes active motivation video when disabled
+00:06 +120: /private/tmp/timey-p0-20261114/timey_rider/test/timer_motivation_test.dart: Timer screen closes active motivation video when disabled
+00:06 +121: /private/tmp/timey-p0-20261114/timey_rider/test/timer_motivation_test.dart: Timer screen closes active motivation video when disabled
+00:06 +122: /private/tmp/timey-p0-20261114/timey_rider/test/timer_motivation_test.dart: Timer screen closes active motivation video when disabled
+00:06 +123: /private/tmp/timey-p0-20261114/timey_rider/test/timer_motivation_test.dart: Timer screen closes active motivation video when disabled
+00:06 +124: /private/tmp/timey-p0-20261114/timey_rider/test/timer_motivation_test.dart: Timer screen closes active motivation video when disabled
+00:06 +125: /private/tmp/timey-p0-20261114/timey_rider/test/timer_motivation_test.dart: Timer screen closes active motivation video when disabled
+00:06 +126: /private/tmp/timey-p0-20261114/timey_rider/test/timer_motivation_test.dart: Timer screen closes active motivation video when disabled
+00:06 +127: /private/tmp/timey-p0-20261114/timey_rider/test/timer_motivation_test.dart: Timer screen closes active motivation video when disabled
+00:06 +128: /private/tmp/timey-p0-20261114/timey_rider/test/timer_motivation_test.dart: Timer screen closes active motivation video when disabled
+00:06 +129: /private/tmp/timey-p0-20261114/timey_rider/test/timer_motivation_test.dart: Timer screen closes active motivation video when disabled
+00:06 +130: /private/tmp/timey-p0-20261114/timey_rider/test/timer_motivation_test.dart: Timer screen closes active motivation video when disabled
+00:07 +131: /private/tmp/timey-p0-20261114/timey_rider/test/timer_motivation_test.dart: Timer screen closes active motivation video when disabled
+00:07 +132: /private/tmp/timey-p0-20261114/timey_rider/test/timer_motivation_test.dart: Timer screen closes active motivation video when disabled
+00:07 +133: /private/tmp/timey-p0-20261114/timey_rider/test/timer_motivation_test.dart: Timer screen closes active motivation video when disabled
+00:07 +134: /private/tmp/timey-p0-20261114/timey_rider/test/timer_builder_test.dart: Timer builder auto marker starts timer without manual choices
+00:07 +135: /private/tmp/timey-p0-20261114/timey_rider/test/timer_builder_test.dart: Timer builder auto marker starts timer without manual choices
+00:07 +136: /private/tmp/timey-p0-20261114/timey_rider/test/activity_history_linked_delete_screen_test.dart: real route observer refreshes home history stickers and returned goal after linked delete
+00:07 +137: /private/tmp/timey-p0-20261114/timey_rider/test/activity_history_linked_delete_screen_test.dart: real route observer refreshes home history stickers and returned goal after linked delete
+00:07 +138: /private/tmp/timey-p0-20261114/timey_rider/test/app_onboarding_flow_test.dart: unseen onboarding starts on OnboardingScreen
+00:07 +139: /private/tmp/timey-p0-20261114/timey_rider/test/app_onboarding_flow_test.dart: unseen onboarding starts on OnboardingScreen
+00:07 +140: /private/tmp/timey-p0-20261114/timey_rider/test/app_onboarding_flow_test.dart: unseen onboarding starts on OnboardingScreen
+00:07 +141: /private/tmp/timey-p0-20261114/timey_rider/test/app_onboarding_flow_test.dart: unseen onboarding starts on OnboardingScreen
+00:07 +142: /private/tmp/timey-p0-20261114/timey_rider/test/app_onboarding_flow_test.dart: unseen onboarding starts on OnboardingScreen
+00:07 +143: /private/tmp/timey-p0-20261114/timey_rider/test/app_onboarding_flow_test.dart: unseen onboarding starts on OnboardingScreen
+00:07 +144: /private/tmp/timey-p0-20261114/timey_rider/test/timer_motivation_test.dart: Timer motivation settings dismiss keeps pending changes unapplied
+00:07 +145: /private/tmp/timey-p0-20261114/timey_rider/test/timer_motivation_test.dart: Timer motivation settings dismiss keeps pending changes unapplied
+00:07 +146: /private/tmp/timey-p0-20261114/timey_rider/test/timer_motivation_test.dart: Timer motivation settings dismiss keeps pending changes unapplied
+00:07 +147: /private/tmp/timey-p0-20261114/timey_rider/test/timer_motivation_test.dart: Timer motivation settings dismiss keeps pending changes unapplied
+00:07 +148: /private/tmp/timey-p0-20261114/timey_rider/test/timer_motivation_test.dart: Timer motivation settings dismiss keeps pending changes unapplied
+00:07 +149: /private/tmp/timey-p0-20261114/timey_rider/test/timer_motivation_test.dart: Timer motivation settings dismiss keeps pending changes unapplied
+00:07 +150: /private/tmp/timey-p0-20261114/timey_rider/test/timer_builder_preset_test.dart: Timer builder saves the latest started timer preset
+00:07 +151: /private/tmp/timey-p0-20261114/timey_rider/test/timer_builder_preset_test.dart: Timer builder saves the latest started timer preset
+00:07 +152: /private/tmp/timey-p0-20261114/timey_rider/test/timer_builder_preset_test.dart: Timer builder saves the latest started timer preset
+00:08 +153: /private/tmp/timey-p0-20261114/timey_rider/test/timer_builder_preset_test.dart: Timer builder saves the latest started timer preset
+00:08 +154: /private/tmp/timey-p0-20261114/timey_rider/test/timer_builder_preset_test.dart: Timer builder saves the latest started timer preset
+00:08 +155: /private/tmp/timey-p0-20261114/timey_rider/test/timer_builder_preset_test.dart: Timer builder saves the latest started timer preset
+00:08 +156: /private/tmp/timey-p0-20261114/timey_rider/test/timer_builder_preset_test.dart: Timer builder saves the latest started timer preset
+00:08 +157: /private/tmp/timey-p0-20261114/timey_rider/test/timer_builder_preset_test.dart: Timer builder saves the latest started timer preset
+00:08 +158: /private/tmp/timey-p0-20261114/timey_rider/test/timer_builder_preset_test.dart: Timer builder saves the latest started timer preset
+00:08 +159: /private/tmp/timey-p0-20261114/timey_rider/test/timer_motivation_test.dart: Timer screen skips motivation videos when disabled
+00:08 +160: /private/tmp/timey-p0-20261114/timey_rider/test/timer_motivation_test.dart: Timer screen skips motivation videos when disabled
+00:08 +161: /private/tmp/timey-p0-20261114/timey_rider/test/timer_builder_preset_test.dart: Timer builder saves a reusable timer preset
+00:08 +162: /private/tmp/timey-p0-20261114/timey_rider/test/timer_motivation_test.dart: Timer screen hides portrait motivation entry point when unavailable
+00:09 +163: /private/tmp/timey-p0-20261114/timey_rider/test/timer_builder_preset_test.dart: Timer builder shows the saved timer preset limit
+00:09 +164: /private/tmp/timey-p0-20261114/timey_rider/test/timer_motivation_test.dart: Timer screen hides landscape motivation entry point when unavailable
+00:09 +165: /private/tmp/timey-p0-20261114/timey_rider/test/timer_motivation_test.dart: Timer screen hides landscape motivation entry point when unavailable
+00:09 +166: /private/tmp/timey-p0-20261114/timey_rider/test/timer_builder_preset_test.dart: Timer builder shows the home favorite limit message
+00:09 +167: /private/tmp/timey-p0-20261114/timey_rider/test/timer_motivation_test.dart: Timer screen hides compact landscape motivation entry point when unavailable
+00:09 +168: /private/tmp/timey-p0-20261114/timey_rider/test/timer_motivation_test.dart: Timer screen hides compact landscape motivation entry point when unavailable
+00:09 +169: /private/tmp/timey-p0-20261114/timey_rider/test/timer_builder_preset_test.dart: Timer builder saves a named custom timer preset
+00:09 +170: /private/tmp/timey-p0-20261114/timey_rider/test/timer_builder_preset_test.dart: Timer builder saves a named custom timer preset
+00:09 +171: /private/tmp/timey-p0-20261114/timey_rider/test/timer_motivation_test.dart: Timer screen blocks restored motivation-enabled session when unavailable
+00:09 +172: /private/tmp/timey-p0-20261114/timey_rider/test/timer_builder_preset_test.dart: Timer builder can save a custom timer as Other without a name
+00:09 +173: /private/tmp/timey-p0-20261114/timey_rider/test/timer_builder_preset_test.dart: Timer builder applies and deletes a saved timer preset
+00:11 +174: /private/tmp/timey-p0-20261114/timey_rider/test/vehicle_avatar_presentation_test.dart: Default presentation uses default image mode without an image path
+00:11 +175: /private/tmp/timey-p0-20261114/timey_rider/test/vehicle_avatar_presentation_test.dart: fromConfig returns custom presentation for a vehicle avatar
+00:11 +176: /private/tmp/timey-p0-20261114/timey_rider/test/vehicle_avatar_presentation_test.dart: fromConfig returns default presentation without a vehicle avatar
+00:11 +177: /private/tmp/timey-p0-20261114/timey_rider/test/local_settings_service_test.dart: Local settings saves and loads onboarding completion
+00:11 +178: /private/tmp/timey-p0-20261114/timey_rider/test/local_settings_service_test.dart: Local settings treats existing child name as seen onboarding
+00:11 +179: /private/tmp/timey-p0-20261114/timey_rider/test/local_settings_service_test.dart: Local settings treats missing child name as unseen onboarding
+00:11 +180: /private/tmp/timey-p0-20261114/timey_rider/test/local_settings_service_test.dart: Local settings keeps explicit onboarding preference
+00:11 +181: /private/tmp/timey-p0-20261114/timey_rider/test/local_settings_service_test.dart: Local settings saves and loads avatar settings
+00:11 +182: /private/tmp/timey-p0-20261114/timey_rider/test/local_settings_service_test.dart: Local settings saves and loads motivation video settings
+00:11 +183: /private/tmp/timey-p0-20261114/timey_rider/test/local_settings_service_test.dart: Local settings saves and loads marker mode
+00:11 +184: /private/tmp/timey-p0-20261114/timey_rider/test/local_settings_service_test.dart: Local settings falls back for invalid marker mode
+00:11 +185: /private/tmp/timey-p0-20261114/timey_rider/test/local_settings_service_test.dart: Local settings falls back for invalid motivation video interval
+00:11 +186: /private/tmp/timey-p0-20261114/timey_rider/test/local_settings_service_test.dart: Local settings saves and loads vehicle avatar maps
+00:11 +187: /private/tmp/timey-p0-20261114/timey_rider/test/local_settings_service_test.dart: Custom avatar image path can be cleared to null
+00:11 +188: /private/tmp/timey-p0-20261114/timey_rider/test/local_settings_service_test.dart: Existing child name and vehicle settings load without avatar keys
+00:11 +189: /private/tmp/timey-p0-20261114/timey_rider/test/local_settings_service_test.dart: Existing custom avatar settings infer vehicle id when missing
+00:11 +190: /private/tmp/timey-p0-20261114/timey_rider/test/local_settings_service_test.dart: Malformed vehicle avatar map falls back to legacy avatar keys
+00:11 +191: /private/tmp/timey-p0-20261114/timey_rider/test/avatar_setup_guide_test.dart: Custom avatar guide explains phone and AI methods before prompt
+00:11 +192: /private/tmp/timey-p0-20261114/timey_rider/test/avatar_setup_guide_test.dart: Custom avatar guide explains phone and AI methods before prompt
+00:11 +193: /private/tmp/timey-p0-20261114/timey_rider/test/avatar_setup_guide_test.dart: Custom avatar guide explains phone and AI methods before prompt
+00:11 +194: /private/tmp/timey-p0-20261114/timey_rider/test/avatar_setup_guide_test.dart: Custom avatar guide explains phone and AI methods before prompt
+00:11 +195: /private/tmp/timey-p0-20261114/timey_rider/test/avatar_setup_guide_test.dart: Custom avatar guide explains phone and AI methods before prompt
+00:11 +196: /private/tmp/timey-p0-20261114/timey_rider/test/avatar_setup_guide_test.dart: Custom avatar guide explains phone and AI methods before prompt
+00:11 +197: /private/tmp/timey-p0-20261114/timey_rider/test/avatar_setup_guide_test.dart: Custom avatar guide explains phone and AI methods before prompt
+00:11 +198: /private/tmp/timey-p0-20261114/timey_rider/test/avatar_setup_guide_test.dart: Custom avatar guide explains phone and AI methods before prompt
+00:11 +199: /private/tmp/timey-p0-20261114/timey_rider/test/avatar_setup_guide_test.dart: Custom avatar guide explains phone and AI methods before prompt
+00:11 +200: /private/tmp/timey-p0-20261114/timey_rider/test/avatar_setup_guide_test.dart: Custom avatar guide explains phone and AI methods before prompt
+00:11 +201: /private/tmp/timey-p0-20261114/timey_rider/test/avatar_setup_guide_test.dart: Custom avatar guide explains phone and AI methods before prompt
+00:11 +201: /private/tmp/timey-p0-20261114/timey_rider/test/vehicle_pack_purchase_controller_test.dart: offline recovery preserves cached unlocked entitlement
+Unable to recover purchases: Bad state: offline
+00:11 +202: /private/tmp/timey-p0-20261114/timey_rider/test/avatar_setup_guide_test.dart: Custom avatar guide explains phone and AI methods before prompt
+00:11 +203: /private/tmp/timey-p0-20261114/timey_rider/test/avatar_setup_guide_test.dart: Custom avatar guide explains phone and AI methods before prompt
+00:11 +204: /private/tmp/timey-p0-20261114/timey_rider/test/avatar_setup_guide_test.dart: Custom avatar guide explains phone and AI methods before prompt
+00:11 +205: /private/tmp/timey-p0-20261114/timey_rider/test/avatar_setup_guide_test.dart: Custom avatar guide explains phone and AI methods before prompt
+00:11 +206: /private/tmp/timey-p0-20261114/timey_rider/test/avatar_setup_guide_test.dart: Custom avatar guide explains phone and AI methods before prompt
+00:11 +207: /private/tmp/timey-p0-20261114/timey_rider/test/avatar_setup_guide_test.dart: Custom avatar guide explains phone and AI methods before prompt
+00:11 +208: /private/tmp/timey-p0-20261114/timey_rider/test/avatar_setup_guide_test.dart: Custom avatar guide explains phone and AI methods before prompt
+00:11 +209: /private/tmp/timey-p0-20261114/timey_rider/test/avatar_setup_guide_test.dart: Custom avatar guide explains phone and AI methods before prompt
+00:11 +210: /private/tmp/timey-p0-20261114/timey_rider/test/avatar_setup_guide_test.dart: Custom avatar guide explains phone and AI methods before prompt
+00:11 +211: /private/tmp/timey-p0-20261114/timey_rider/test/avatar_setup_guide_test.dart: Custom avatar guide explains phone and AI methods before prompt
+00:11 +212: /private/tmp/timey-p0-20261114/timey_rider/test/avatar_setup_guide_test.dart: Custom avatar guide explains phone and AI methods before prompt
+00:11 +213: /private/tmp/timey-p0-20261114/timey_rider/test/avatar_setup_guide_test.dart: Custom avatar guide explains phone and AI methods before prompt
+00:11 +214: /private/tmp/timey-p0-20261114/timey_rider/test/avatar_setup_guide_test.dart: Custom avatar guide explains phone and AI methods before prompt
+00:12 +215: /private/tmp/timey-p0-20261114/timey_rider/test/avatar_setup_guide_test.dart: Custom avatar guide explains phone and AI methods before prompt
+00:12 +216: /private/tmp/timey-p0-20261114/timey_rider/test/home_avatar_vehicle_test.dart: Home screen vehicle sections render confirmed custom avatar
+00:12 +217: /private/tmp/timey-p0-20261114/timey_rider/test/home_avatar_vehicle_test.dart: Home screen vehicle sections render confirmed custom avatar
+00:12 +218: /private/tmp/timey-p0-20261114/timey_rider/test/home_avatar_vehicle_test.dart: Home screen vehicle sections render confirmed custom avatar
+00:12 +219: /private/tmp/timey-p0-20261114/timey_rider/test/home_avatar_vehicle_test.dart: Home screen vehicle sections render confirmed custom avatar
+00:12 +220: /private/tmp/timey-p0-20261114/timey_rider/test/home_avatar_vehicle_test.dart: Home screen vehicle sections render confirmed custom avatar
+00:12 +221: /private/tmp/timey-p0-20261114/timey_rider/test/home_avatar_vehicle_test.dart: Home screen vehicle sections render confirmed custom avatar
+00:12 +222: /private/tmp/timey-p0-20261114/timey_rider/test/home_avatar_vehicle_test.dart: Home screen vehicle sections render confirmed custom avatar
+00:12 +223: /private/tmp/timey-p0-20261114/timey_rider/test/home_avatar_vehicle_test.dart: Home screen vehicle sections render confirmed custom avatar
+00:12 +224: /private/tmp/timey-p0-20261114/timey_rider/test/home_avatar_vehicle_test.dart: Home screen vehicle sections render confirmed custom avatar
+00:12 +225: /private/tmp/timey-p0-20261114/timey_rider/test/home_avatar_vehicle_test.dart: Home screen vehicle sections render confirmed custom avatar
+00:12 +226: /private/tmp/timey-p0-20261114/timey_rider/test/home_avatar_vehicle_test.dart: Home screen vehicle sections render confirmed custom avatar
+00:12 +227: /private/tmp/timey-p0-20261114/timey_rider/test/home_avatar_vehicle_test.dart: Home screen vehicle sections render confirmed custom avatar
+00:12 +228: /private/tmp/timey-p0-20261114/timey_rider/test/home_avatar_vehicle_test.dart: Home screen vehicle sections render confirmed custom avatar
+00:12 +229: /private/tmp/timey-p0-20261114/timey_rider/test/home_avatar_vehicle_test.dart: Home screen vehicle sections render confirmed custom avatar
+00:12 +230: /private/tmp/timey-p0-20261114/timey_rider/test/home_avatar_vehicle_test.dart: Home screen vehicle sections render confirmed custom avatar
+00:12 +231: /private/tmp/timey-p0-20261114/timey_rider/test/home_avatar_vehicle_test.dart: Home screen vehicle sections render confirmed custom avatar
+00:13 +232: /private/tmp/timey-p0-20261114/timey_rider/test/home_avatar_vehicle_test.dart: Home screen vehicle sections render confirmed custom avatar
+00:13 +233: /private/tmp/timey-p0-20261114/timey_rider/test/home_avatar_vehicle_test.dart: Home screen vehicle sections render confirmed custom avatar
+00:13 +234: /private/tmp/timey-p0-20261114/timey_rider/test/home_avatar_vehicle_test.dart: Home screen vehicle sections render confirmed custom avatar
+00:13 +235: /private/tmp/timey-p0-20261114/timey_rider/test/home_avatar_vehicle_test.dart: Home screen vehicle sections render confirmed custom avatar
+00:13 +236: /private/tmp/timey-p0-20261114/timey_rider/test/home_avatar_vehicle_test.dart: Home screen vehicle sections render confirmed custom avatar
+00:13 +237: /private/tmp/timey-p0-20261114/timey_rider/test/home_avatar_vehicle_test.dart: Home screen vehicle sections render confirmed custom avatar
+00:13 +238: /private/tmp/timey-p0-20261114/timey_rider/test/home_avatar_vehicle_test.dart: Home screen vehicle sections render confirmed custom avatar
+00:13 +239: /private/tmp/timey-p0-20261114/timey_rider/test/home_avatar_vehicle_test.dart: Home screen vehicle sections render confirmed custom avatar
+00:13 +240: /private/tmp/timey-p0-20261114/timey_rider/test/timer_course_overview_test.dart: TimerScreen course overview scrolls back to vehicle progress
+00:13 +241: /private/tmp/timey-p0-20261114/timey_rider/test/timer_course_overview_test.dart: TimerScreen course overview scrolls back to vehicle progress
+00:13 +242: /private/tmp/timey-p0-20261114/timey_rider/test/timer_course_overview_test.dart: TimerScreen course overview scrolls back to vehicle progress
+00:13 +243: /private/tmp/timey-p0-20261114/timey_rider/test/timer_course_overview_test.dart: TimerScreen course overview scrolls back to vehicle progress
+00:13 +244: /private/tmp/timey-p0-20261114/timey_rider/test/timer_course_overview_test.dart: TimerScreen course overview scrolls back to vehicle progress
+00:13 +245: /private/tmp/timey-p0-20261114/timey_rider/test/timer_course_overview_test.dart: TimerScreen course overview scrolls back to vehicle progress
+00:13 +246: /private/tmp/timey-p0-20261114/timey_rider/test/timer_course_overview_test.dart: TimerScreen course overview scrolls back to vehicle progress
+00:13 +247: /private/tmp/timey-p0-20261114/timey_rider/test/timer_course_overview_test.dart: TimerScreen course overview scrolls back to vehicle progress
+00:13 +248: /private/tmp/timey-p0-20261114/timey_rider/test/timer_course_overview_test.dart: TimerScreen course overview scrolls back to vehicle progress
+00:13 +249: /private/tmp/timey-p0-20261114/timey_rider/test/timer_course_overview_test.dart: TimerScreen course overview scrolls back to vehicle progress
+00:13 +250: /private/tmp/timey-p0-20261114/timey_rider/test/timer_course_overview_test.dart: TimerScreen course overview scrolls back to vehicle progress
+00:13 +251: /private/tmp/timey-p0-20261114/timey_rider/test/timer_course_overview_test.dart: TimerScreen course overview scrolls back to vehicle progress
+00:13 +252: /private/tmp/timey-p0-20261114/timey_rider/test/timer_course_overview_test.dart: TimerScreen course overview scrolls back to vehicle progress
+00:13 +253: /private/tmp/timey-p0-20261114/timey_rider/test/timer_course_overview_test.dart: TimerScreen course overview scrolls back to vehicle progress
+00:13 +254: /private/tmp/timey-p0-20261114/timey_rider/test/timer_course_overview_test.dart: TimerScreen course overview scrolls back to vehicle progress
+00:13 +255: /private/tmp/timey-p0-20261114/timey_rider/test/timer_course_overview_test.dart: TimerScreen course overview scrolls back to vehicle progress
+00:13 +256: /private/tmp/timey-p0-20261114/timey_rider/test/timer_course_overview_test.dart: TimerScreen course overview scrolls back to vehicle progress
+00:13 +257: /private/tmp/timey-p0-20261114/timey_rider/test/timer_course_overview_test.dart: TimerScreen course overview scrolls back to vehicle progress
+00:13 +258: /private/tmp/timey-p0-20261114/timey_rider/test/timer_course_overview_test.dart: TimerScreen course overview scrolls back to vehicle progress
+00:13 +259: /private/tmp/timey-p0-20261114/timey_rider/test/timer_course_overview_test.dart: TimerScreen course overview scrolls back to vehicle progress
+00:13 +260: /private/tmp/timey-p0-20261114/timey_rider/test/timer_course_overview_test.dart: TimerScreen course overview scrolls back to vehicle progress
+00:13 +261: /private/tmp/timey-p0-20261114/timey_rider/test/timer_course_overview_test.dart: TimerScreen course overview scrolls back to vehicle progress
+00:13 +262: /private/tmp/timey-p0-20261114/timey_rider/test/timer_course_overview_test.dart: TimerScreen course overview scrolls back to vehicle progress
+00:13 +263: /private/tmp/timey-p0-20261114/timey_rider/test/timer_course_overview_test.dart: TimerScreen course overview scrolls back to vehicle progress
+00:13 +264: /private/tmp/timey-p0-20261114/timey_rider/test/timer_course_overview_test.dart: TimerScreen course overview scrolls back to vehicle progress
+00:13 +265: /private/tmp/timey-p0-20261114/timey_rider/test/timer_course_overview_test.dart: TimerScreen course overview scrolls back to vehicle progress
+00:13 +266: /private/tmp/timey-p0-20261114/timey_rider/test/timer_course_overview_test.dart: TimerScreen course overview scrolls back to vehicle progress
+00:13 +267: /private/tmp/timey-p0-20261114/timey_rider/test/timer_course_overview_test.dart: TimerScreen course overview scrolls back to vehicle progress
+00:13 +268: /private/tmp/timey-p0-20261114/timey_rider/test/home_avatar_vehicle_test.dart: Home screen shows saved avatar only on its vehicle choice
+00:13 +269: /private/tmp/timey-p0-20261114/timey_rider/test/home_avatar_vehicle_test.dart: Home screen shows saved avatar only on its vehicle choice
+00:13 +270: /private/tmp/timey-p0-20261114/timey_rider/test/home_avatar_vehicle_test.dart: Home screen shows saved avatar only on its vehicle choice
+00:13 +271: /private/tmp/timey-p0-20261114/timey_rider/test/home_avatar_vehicle_test.dart: Home screen shows saved avatar only on its vehicle choice
+00:13 +272: /private/tmp/timey-p0-20261114/timey_rider/test/home_avatar_vehicle_test.dart: Home screen shows saved avatar only on its vehicle choice
+00:13 +273: /private/tmp/timey-p0-20261114/timey_rider/test/home_avatar_vehicle_test.dart: Home screen shows saved avatar only on its vehicle choice
+00:13 +274: /private/tmp/timey-p0-20261114/timey_rider/test/home_avatar_vehicle_test.dart: Home screen shows saved avatar only on its vehicle choice
+00:13 +275: /private/tmp/timey-p0-20261114/timey_rider/test/home_avatar_vehicle_test.dart: Home screen shows saved avatar only on its vehicle choice
+00:13 +276: /private/tmp/timey-p0-20261114/timey_rider/test/home_avatar_vehicle_test.dart: Home screen shows saved avatar only on its vehicle choice
+00:13 +277: /private/tmp/timey-p0-20261114/timey_rider/test/home_avatar_vehicle_test.dart: Home screen shows saved avatar only on its vehicle choice
+00:13 +278: /private/tmp/timey-p0-20261114/timey_rider/test/home_avatar_vehicle_test.dart: Home screen shows saved avatar only on its vehicle choice
+00:13 +279: /private/tmp/timey-p0-20261114/timey_rider/test/home_avatar_vehicle_test.dart: Home screen shows saved avatar only on its vehicle choice
+00:13 +280: /private/tmp/timey-p0-20261114/timey_rider/test/home_avatar_vehicle_test.dart: Home screen shows saved avatar only on its vehicle choice
+00:13 +281: /private/tmp/timey-p0-20261114/timey_rider/test/home_avatar_vehicle_test.dart: Home screen shows saved avatar only on its vehicle choice
+00:13 +282: /private/tmp/timey-p0-20261114/timey_rider/test/home_avatar_vehicle_test.dart: Home screen shows saved avatar only on its vehicle choice
+00:13 +283: /private/tmp/timey-p0-20261114/timey_rider/test/home_avatar_vehicle_test.dart: Home screen shows saved avatar only on its vehicle choice
+00:13 +284: /private/tmp/timey-p0-20261114/timey_rider/test/home_avatar_vehicle_test.dart: Home screen shows saved avatar only on its vehicle choice
+00:13 +285: /private/tmp/timey-p0-20261114/timey_rider/test/home_avatar_vehicle_test.dart: Home screen shows saved avatar only on its vehicle choice
+00:13 +286: /private/tmp/timey-p0-20261114/timey_rider/test/home_avatar_vehicle_test.dart: Home screen shows saved avatar only on its vehicle choice
+00:13 +287: /private/tmp/timey-p0-20261114/timey_rider/test/home_avatar_vehicle_test.dart: Home screen shows saved avatar only on its vehicle choice
+00:13 +288: /private/tmp/timey-p0-20261114/timey_rider/test/home_avatar_vehicle_test.dart: Home screen shows saved avatar only on its vehicle choice
+00:13 +289: /private/tmp/timey-p0-20261114/timey_rider/test/home_avatar_vehicle_test.dart: Home screen shows saved avatar only on its vehicle choice
+00:13 +290: /private/tmp/timey-p0-20261114/timey_rider/test/home_avatar_vehicle_test.dart: Home screen shows saved avatar only on its vehicle choice
+00:13 +291: /private/tmp/timey-p0-20261114/timey_rider/test/home_avatar_vehicle_test.dart: Home screen shows saved avatar only on its vehicle choice
+00:13 +292: /private/tmp/timey-p0-20261114/timey_rider/test/home_avatar_vehicle_test.dart: Home screen shows saved avatar only on its vehicle choice
+00:13 +293: /private/tmp/timey-p0-20261114/timey_rider/test/home_avatar_vehicle_test.dart: Home screen shows saved avatar only on its vehicle choice
+00:13 +294: /private/tmp/timey-p0-20261114/timey_rider/test/home_avatar_vehicle_test.dart: Home screen shows saved avatar only on its vehicle choice
+00:13 +295: /private/tmp/timey-p0-20261114/timey_rider/test/home_avatar_vehicle_test.dart: Home screen shows saved avatar only on its vehicle choice
+00:13 +296: /private/tmp/timey-p0-20261114/timey_rider/test/home_avatar_vehicle_test.dart: Home screen shows saved avatar only on its vehicle choice
+00:13 +297: /private/tmp/timey-p0-20261114/timey_rider/test/home_avatar_vehicle_test.dart: Home screen shows saved avatar only on its vehicle choice
+00:13 +298: /private/tmp/timey-p0-20261114/timey_rider/test/home_avatar_vehicle_test.dart: Home screen shows saved avatar only on its vehicle choice
+00:13 +299: /private/tmp/timey-p0-20261114/timey_rider/test/home_avatar_vehicle_test.dart: Home screen shows saved avatar only on its vehicle choice
+00:13 +300: /private/tmp/timey-p0-20261114/timey_rider/test/home_avatar_vehicle_test.dart: Home screen shows saved avatar only on its vehicle choice
+00:13 +301: /private/tmp/timey-p0-20261114/timey_rider/test/home_avatar_vehicle_test.dart: Home screen shows saved avatar only on its vehicle choice
+00:13 +302: /private/tmp/timey-p0-20261114/timey_rider/test/home_avatar_vehicle_test.dart: Home screen shows saved avatar only on its vehicle choice
+00:13 +303: /private/tmp/timey-p0-20261114/timey_rider/test/home_avatar_vehicle_test.dart: Home screen shows saved avatar only on its vehicle choice
+00:13 +304: /private/tmp/timey-p0-20261114/timey_rider/test/home_avatar_vehicle_test.dart: Home screen shows saved avatar only on its vehicle choice
+00:13 +305: /private/tmp/timey-p0-20261114/timey_rider/test/home_avatar_vehicle_test.dart: Home screen shows saved avatar only on its vehicle choice
+00:13 +306: /private/tmp/timey-p0-20261114/timey_rider/test/home_avatar_vehicle_test.dart: Home screen shows saved avatar only on its vehicle choice
+00:13 +307: /private/tmp/timey-p0-20261114/timey_rider/test/home_avatar_vehicle_test.dart: Home screen shows saved avatar only on its vehicle choice
+00:13 +308: /private/tmp/timey-p0-20261114/timey_rider/test/home_avatar_vehicle_test.dart: Home screen shows saved avatar only on its vehicle choice
+00:13 +309: /private/tmp/timey-p0-20261114/timey_rider/test/home_avatar_vehicle_test.dart: Home screen shows saved avatar only on its vehicle choice
+00:13 +310: /private/tmp/timey-p0-20261114/timey_rider/test/home_avatar_vehicle_test.dart: Home screen shows saved avatar only on its vehicle choice
+00:13 +311: /private/tmp/timey-p0-20261114/timey_rider/test/home_avatar_vehicle_test.dart: Home screen shows saved avatar only on its vehicle choice
+00:13 +312: /private/tmp/timey-p0-20261114/timey_rider/test/home_avatar_vehicle_test.dart: Home screen shows saved avatar only on its vehicle choice
+00:13 +313: /private/tmp/timey-p0-20261114/timey_rider/test/home_avatar_vehicle_test.dart: Home screen shows saved avatar only on its vehicle choice
+00:13 +314: /private/tmp/timey-p0-20261114/timey_rider/test/home_avatar_vehicle_test.dart: Home screen shows saved avatar only on its vehicle choice
+00:13 +315: /private/tmp/timey-p0-20261114/timey_rider/test/home_avatar_vehicle_test.dart: Home screen shows saved avatar only on its vehicle choice
+00:13 +316: /private/tmp/timey-p0-20261114/timey_rider/test/home_avatar_vehicle_test.dart: Home screen shows saved avatar only on its vehicle choice
+00:13 +317: /private/tmp/timey-p0-20261114/timey_rider/test/home_avatar_vehicle_test.dart: Home screen shows saved avatar only on its vehicle choice
+00:13 +318: /private/tmp/timey-p0-20261114/timey_rider/test/home_avatar_vehicle_test.dart: Home screen shows saved avatar only on its vehicle choice
+00:13 +319: /private/tmp/timey-p0-20261114/timey_rider/test/home_avatar_vehicle_test.dart: Home screen shows saved avatar only on its vehicle choice
+00:13 +320: /private/tmp/timey-p0-20261114/timey_rider/test/home_avatar_vehicle_test.dart: Home screen shows saved avatar only on its vehicle choice
+00:13 +321: /private/tmp/timey-p0-20261114/timey_rider/test/home_avatar_vehicle_test.dart: Home screen shows saved avatar only on its vehicle choice
+00:13 +322: /private/tmp/timey-p0-20261114/timey_rider/test/home_avatar_vehicle_test.dart: Home screen shows saved avatar only on its vehicle choice
+00:13 +323: /private/tmp/timey-p0-20261114/timey_rider/test/home_avatar_vehicle_test.dart: Home screen shows saved avatar only on its vehicle choice
+00:13 +324: /private/tmp/timey-p0-20261114/timey_rider/test/home_avatar_vehicle_test.dart: Home screen shows saved avatar only on its vehicle choice
+00:13 +325: /private/tmp/timey-p0-20261114/timey_rider/test/home_avatar_vehicle_test.dart: Home screen shows saved avatar only on its vehicle choice
+00:13 +326: /private/tmp/timey-p0-20261114/timey_rider/test/home_avatar_vehicle_test.dart: Home screen shows saved avatar only on its vehicle choice
+00:13 +327: /private/tmp/timey-p0-20261114/timey_rider/test/home_avatar_vehicle_test.dart: Home screen shows saved avatar only on its vehicle choice
+00:13 +328: /private/tmp/timey-p0-20261114/timey_rider/test/home_avatar_vehicle_test.dart: Home screen shows saved avatar only on its vehicle choice
+00:13 +329: /private/tmp/timey-p0-20261114/timey_rider/test/home_avatar_vehicle_test.dart: Home screen shows saved avatar only on its vehicle choice
+00:13 +330: /private/tmp/timey-p0-20261114/timey_rider/test/home_avatar_vehicle_test.dart: Home screen shows saved avatar only on its vehicle choice
+00:13 +331: /private/tmp/timey-p0-20261114/timey_rider/test/home_avatar_vehicle_test.dart: Home screen shows saved avatar only on its vehicle choice
+00:13 +332: /private/tmp/timey-p0-20261114/timey_rider/test/home_avatar_vehicle_test.dart: Home screen shows saved avatar only on its vehicle choice
+00:13 +333: /private/tmp/timey-p0-20261114/timey_rider/test/home_avatar_vehicle_test.dart: Home screen shows saved avatar only on its vehicle choice
+00:13 +334: /private/tmp/timey-p0-20261114/timey_rider/test/home_avatar_vehicle_test.dart: Home screen shows saved avatar only on its vehicle choice
+00:13 +335: /private/tmp/timey-p0-20261114/timey_rider/test/home_avatar_vehicle_test.dart: Home screen shows saved avatar only on its vehicle choice
+00:13 +336: /private/tmp/timey-p0-20261114/timey_rider/test/home_avatar_vehicle_test.dart: Home screen shows saved avatar only on its vehicle choice
+00:13 +337: /private/tmp/timey-p0-20261114/timey_rider/test/home_avatar_vehicle_test.dart: Home screen shows saved avatar only on its vehicle choice
+00:13 +338: /private/tmp/timey-p0-20261114/timey_rider/test/home_avatar_vehicle_test.dart: Home screen shows saved avatar only on its vehicle choice
+00:13 +339: /private/tmp/timey-p0-20261114/timey_rider/test/home_avatar_vehicle_test.dart: Home screen shows saved avatar only on its vehicle choice
+00:13 +340: /private/tmp/timey-p0-20261114/timey_rider/test/home_avatar_vehicle_test.dart: Home screen shows saved avatar only on its vehicle choice
+00:13 +341: /private/tmp/timey-p0-20261114/timey_rider/test/home_avatar_vehicle_test.dart: Home screen shows saved avatar only on its vehicle choice
+00:13 +342: /private/tmp/timey-p0-20261114/timey_rider/test/home_avatar_vehicle_test.dart: Home screen shows saved avatar only on its vehicle choice
+00:13 +343: /private/tmp/timey-p0-20261114/timey_rider/test/home_avatar_vehicle_test.dart: Home screen shows saved avatar only on its vehicle choice
+00:13 +344: /private/tmp/timey-p0-20261114/timey_rider/test/home_avatar_vehicle_test.dart: Home screen shows saved avatar only on its vehicle choice
+00:13 +345: /private/tmp/timey-p0-20261114/timey_rider/test/home_avatar_vehicle_test.dart: Home screen shows saved avatar only on its vehicle choice
+00:13 +346: /private/tmp/timey-p0-20261114/timey_rider/test/home_avatar_vehicle_test.dart: Home screen shows saved avatar only on its vehicle choice
+00:13 +347: /private/tmp/timey-p0-20261114/timey_rider/test/home_avatar_vehicle_test.dart: Home screen shows saved avatar only on its vehicle choice
+00:13 +348: /private/tmp/timey-p0-20261114/timey_rider/test/home_avatar_vehicle_test.dart: Home screen shows saved avatar only on its vehicle choice
+00:13 +349: /private/tmp/timey-p0-20261114/timey_rider/test/home_avatar_vehicle_test.dart: Home screen shows saved avatar only on its vehicle choice
+00:13 +350: /private/tmp/timey-p0-20261114/timey_rider/test/home_avatar_vehicle_test.dart: Home screen shows saved avatar only on its vehicle choice
+00:13 +351: /private/tmp/timey-p0-20261114/timey_rider/test/home_avatar_vehicle_test.dart: Home screen shows saved avatar only on its vehicle choice
+00:13 +352: /private/tmp/timey-p0-20261114/timey_rider/test/timer_course_overview_test.dart: TimerScreen course overview cancels on pause
+00:14 +353: /private/tmp/timey-p0-20261114/timey_rider/test/home_avatar_vehicle_test.dart: Home avatar CTA opens avatar setup screen
+00:14 +354: /private/tmp/timey-p0-20261114/timey_rider/test/home_avatar_vehicle_test.dart: Home avatar CTA opens avatar setup screen
+00:14 +355: /private/tmp/timey-p0-20261114/timey_rider/test/home_avatar_vehicle_test.dart: Home avatar CTA opens avatar setup screen
+00:14 +356: /private/tmp/timey-p0-20261114/timey_rider/test/home_avatar_vehicle_test.dart: Home avatar CTA opens avatar setup screen
+00:14 +357: /private/tmp/timey-p0-20261114/timey_rider/test/home_avatar_vehicle_test.dart: Home avatar CTA opens avatar setup screen
+00:14 +358: /private/tmp/timey-p0-20261114/timey_rider/test/home_avatar_vehicle_test.dart: Home avatar CTA opens avatar setup screen
+00:14 +359: /private/tmp/timey-p0-20261114/timey_rider/test/home_avatar_vehicle_test.dart: Home avatar CTA opens avatar setup screen
+00:14 +360: /private/tmp/timey-p0-20261114/timey_rider/test/home_avatar_vehicle_test.dart: Home avatar CTA opens avatar setup screen
+00:14 +361: /private/tmp/timey-p0-20261114/timey_rider/test/home_avatar_vehicle_test.dart: Home avatar CTA opens avatar setup screen
+00:14 +362: /private/tmp/timey-p0-20261114/timey_rider/test/home_avatar_vehicle_test.dart: Home avatar CTA opens avatar setup screen
+00:14 +363: /private/tmp/timey-p0-20261114/timey_rider/test/home_avatar_vehicle_test.dart: Home avatar CTA opens avatar setup screen
+00:14 +364: /private/tmp/timey-p0-20261114/timey_rider/test/home_avatar_vehicle_test.dart: Home avatar CTA opens avatar setup screen
+00:14 +365: /private/tmp/timey-p0-20261114/timey_rider/test/home_avatar_vehicle_test.dart: Home avatar CTA opens avatar setup screen
+00:14 +366: /private/tmp/timey-p0-20261114/timey_rider/test/home_avatar_vehicle_test.dart: Home avatar CTA opens avatar setup screen
+00:14 +367: /private/tmp/timey-p0-20261114/timey_rider/test/home_avatar_vehicle_test.dart: Home avatar CTA opens avatar setup screen
+00:14 +368: /private/tmp/timey-p0-20261114/timey_rider/test/home_avatar_vehicle_test.dart: Home avatar CTA opens avatar setup screen
+00:14 +369: /private/tmp/timey-p0-20261114/timey_rider/test/home_avatar_vehicle_test.dart: Home avatar CTA opens avatar setup screen
+00:14 +370: /private/tmp/timey-p0-20261114/timey_rider/test/home_avatar_vehicle_test.dart: Home avatar CTA opens avatar setup screen
+00:14 +371: /private/tmp/timey-p0-20261114/timey_rider/test/home_avatar_vehicle_test.dart: Home avatar CTA opens avatar setup screen
+00:14 +372: /private/tmp/timey-p0-20261114/timey_rider/test/parent_gate_sheet_test.dart: parent gate shows an error before accepting the answer
+00:15 +373: /private/tmp/timey-p0-20261114/timey_rider/test/parent_gate_sheet_test.dart: parent gate shows an error before accepting the answer
+00:15 +374: /private/tmp/timey-p0-20261114/timey_rider/test/parent_gate_sheet_test.dart: parent gate shows an error before accepting the answer
+00:15 +375: /private/tmp/timey-p0-20261114/timey_rider/test/parent_gate_sheet_test.dart: parent gate shows an error before accepting the answer
+00:15 +376: /private/tmp/timey-p0-20261114/timey_rider/test/parent_gate_sheet_test.dart: parent gate shows an error before accepting the answer
+00:15 +377: /private/tmp/timey-p0-20261114/timey_rider/test/parent_gate_sheet_test.dart: parent gate shows an error before accepting the answer
+00:15 +378: /private/tmp/timey-p0-20261114/timey_rider/test/parent_gate_sheet_test.dart: parent gate shows an error before accepting the answer
+00:15 +379: /private/tmp/timey-p0-20261114/timey_rider/test/parent_gate_sheet_test.dart: parent gate shows an error before accepting the answer
+00:15 +380: /private/tmp/timey-p0-20261114/timey_rider/test/parent_gate_sheet_test.dart: parent gate shows an error before accepting the answer
+00:15 +381: /private/tmp/timey-p0-20261114/timey_rider/test/parent_gate_sheet_test.dart: parent gate shows an error before accepting the answer
+00:15 +382: /private/tmp/timey-p0-20261114/timey_rider/test/vehicle_pack_info_sheet_test.dart: vehicle pack info sheet continues with guardian flow
+00:15 +383: /private/tmp/timey-p0-20261114/timey_rider/test/vehicle_pack_info_sheet_test.dart: vehicle pack info sheet continues with guardian flow
+00:15 +384: /private/tmp/timey-p0-20261114/timey_rider/test/vehicle_pack_info_sheet_test.dart: vehicle pack info sheet continues with guardian flow
+00:15 +385: /private/tmp/timey-p0-20261114/timey_rider/test/reward_sticker_ui_test.dart: Result sticker album uses bounded three-column landscape grid
+00:15 +386: /private/tmp/timey-p0-20261114/timey_rider/test/timer_course_overview_test.dart: TimerScreen course overview exit waits for session clear
+00:15 +387: /private/tmp/timey-p0-20261114/timey_rider/test/timer_end_alarm_test.dart: Small phone arrival stays visible: en scale 1.0 arrivalPrimaryButton
+00:16 +388: /private/tmp/timey-p0-20261114/timey_rider/test/timer_end_alarm_test.dart: Small phone arrival stays visible: en scale 1.0 arrivalPrimaryButton
+00:16 +389: /private/tmp/timey-p0-20261114/timey_rider/test/timer_end_alarm_test.dart: Small phone arrival stays visible: en scale 1.0 arrivalPrimaryButton
+00:16 +390: /private/tmp/timey-p0-20261114/timey_rider/test/timer_end_alarm_test.dart: Small phone arrival stays visible: en scale 1.0 arrivalPrimaryButton
+00:16 +391: /private/tmp/timey-p0-20261114/timey_rider/test/timer_end_alarm_test.dart: Small phone arrival stays visible: en scale 1.0 arrivalPrimaryButton
+00:16 +392: /private/tmp/timey-p0-20261114/timey_rider/test/timer_end_alarm_test.dart: Small phone arrival stays visible: en scale 1.0 arrivalPrimaryButton
+00:16 +393: /private/tmp/timey-p0-20261114/timey_rider/test/timer_end_alarm_test.dart: Small phone arrival stays visible: en scale 1.0 arrivalPrimaryButton
+00:16 +394: /private/tmp/timey-p0-20261114/timey_rider/test/timer_end_alarm_test.dart: Small phone arrival stays visible: en scale 1.0 arrivalPrimaryButton
+00:16 +395: /private/tmp/timey-p0-20261114/timey_rider/test/timer_end_alarm_test.dart: Small phone arrival stays visible: en scale 1.0 arrivalPrimaryButton
+00:16 +396: /private/tmp/timey-p0-20261114/timey_rider/test/timer_end_alarm_test.dart: Small phone arrival stays visible: en scale 1.0 arrivalPrimaryButton
+00:16 +397: /private/tmp/timey-p0-20261114/timey_rider/test/timer_end_alarm_test.dart: Small phone arrival stays visible: en scale 1.0 arrivalPrimaryButton
+00:16 +398: /private/tmp/timey-p0-20261114/timey_rider/test/timer_end_alarm_test.dart: Small phone arrival stays visible: en scale 1.0 arrivalPrimaryButton
+00:16 +399: /private/tmp/timey-p0-20261114/timey_rider/test/timer_end_alarm_test.dart: Small phone arrival stays visible: en scale 1.0 arrivalPrimaryButton
+00:16 +400: /private/tmp/timey-p0-20261114/timey_rider/test/timer_end_alarm_test.dart: Small phone arrival stays visible: en scale 1.0 arrivalPrimaryButton
+00:16 +401: /private/tmp/timey-p0-20261114/timey_rider/test/timer_end_alarm_test.dart: Small phone arrival stays visible: en scale 1.0 arrivalPrimaryButton
+00:16 +402: /private/tmp/timey-p0-20261114/timey_rider/test/timer_end_alarm_test.dart: Small phone arrival stays visible: en scale 1.0 arrivalPrimaryButton
+00:16 +403: /private/tmp/timey-p0-20261114/timey_rider/test/timer_end_alarm_test.dart: Small phone arrival stays visible: en scale 1.0 arrivalPrimaryButton
+00:16 +404: /private/tmp/timey-p0-20261114/timey_rider/test/timer_end_alarm_test.dart: Small phone arrival stays visible: en scale 1.0 arrivalPrimaryButton
+00:16 +405: /private/tmp/timey-p0-20261114/timey_rider/test/timer_end_alarm_test.dart: Small phone arrival stays visible: en scale 1.0 arrivalPrimaryButton
+00:16 +406: /private/tmp/timey-p0-20261114/timey_rider/test/avatar_composite_preview_test.dart: Composite preview renders vehicle image in default mode
+00:17 +407: /private/tmp/timey-p0-20261114/timey_rider/test/avatar_composite_preview_test.dart: Composite preview renders vehicle image in default mode
+00:17 +408: /private/tmp/timey-p0-20261114/timey_rider/test/onboarding_screen_test.dart: Korean onboarding first card shows localized copy
+00:17 +409: /private/tmp/timey-p0-20261114/timey_rider/test/onboarding_screen_test.dart: Korean onboarding first card shows localized copy
+00:17 +410: /private/tmp/timey-p0-20261114/timey_rider/test/onboarding_screen_test.dart: Korean onboarding first card shows localized copy
+00:17 +411: /private/tmp/timey-p0-20261114/timey_rider/test/onboarding_screen_test.dart: Korean onboarding first card shows localized copy
+00:17 +412: /private/tmp/timey-p0-20261114/timey_rider/test/release_asset_bundle_test.dart: optimized assets load while preserved originals stay outside bundle
+00:17 +413: /private/tmp/timey-p0-20261114/timey_rider/test/release_asset_bundle_test.dart: optimized assets load while preserved originals stay outside bundle
+00:17 +414: /private/tmp/timey-p0-20261114/timey_rider/test/release_asset_bundle_test.dart: optimized assets load while preserved originals stay outside bundle
+00:17 +415: /private/tmp/timey-p0-20261114/timey_rider/test/release_asset_bundle_test.dart: optimized assets load while preserved originals stay outside bundle
+00:17 +416: /private/tmp/timey-p0-20261114/timey_rider/test/release_asset_bundle_test.dart: optimized assets load while preserved originals stay outside bundle
+00:17 +417: /private/tmp/timey-p0-20261114/timey_rider/test/result_screen_test.dart: Needs-more-time result screen skips the intro video
+00:17 +418: /private/tmp/timey-p0-20261114/timey_rider/test/result_screen_test.dart: Needs-more-time result screen skips the intro video
+00:17 +419: /private/tmp/timey-p0-20261114/timey_rider/test/result_screen_test.dart: Needs-more-time result screen skips the intro video
+00:17 +420: /private/tmp/timey-p0-20261114/timey_rider/test/result_screen_test.dart: Needs-more-time result screen skips the intro video
+00:17 +421: /private/tmp/timey-p0-20261114/timey_rider/test/result_screen_test.dart: Needs-more-time result screen skips the intro video
+00:18 +422: /private/tmp/timey-p0-20261114/timey_rider/test/result_screen_test.dart: Needs-more-time result screen skips the intro video
+00:18 +423: /private/tmp/timey-p0-20261114/timey_rider/test/result_screen_test.dart: Needs-more-time result screen skips the intro video
+00:18 +424: /private/tmp/timey-p0-20261114/timey_rider/test/result_screen_test.dart: Needs-more-time result screen skips the intro video
+00:18 +425: /private/tmp/timey-p0-20261114/timey_rider/test/result_screen_test.dart: Needs-more-time result screen skips the intro video
+00:18 +426: /private/tmp/timey-p0-20261114/timey_rider/test/result_screen_test.dart: Needs-more-time result screen skips the intro video
+00:18 +427: /private/tmp/timey-p0-20261114/timey_rider/test/result_screen_test.dart: Needs-more-time result screen skips the intro video
+00:18 +428: /private/tmp/timey-p0-20261114/timey_rider/test/result_screen_test.dart: Needs-more-time result screen skips the intro video
+00:18 +429: /private/tmp/timey-p0-20261114/timey_rider/test/result_screen_test.dart: Needs-more-time result screen skips the intro video
+00:18 +430: /private/tmp/timey-p0-20261114/timey_rider/test/result_screen_test.dart: Needs-more-time result screen skips the intro video
+00:18 +431: /private/tmp/timey-p0-20261114/timey_rider/test/result_screen_test.dart: Needs-more-time result screen skips the intro video
+00:18 +431: /private/tmp/timey-p0-20261114/timey_rider/test/timer_end_alarm_test.dart: Save failure and retry do not restart acknowledged alarm
+Unable to persist completed activity: Bad state: Test save failure
+00:18 +432: /private/tmp/timey-p0-20261114/timey_rider/test/home_vehicle_selection_test.dart: Home screen shows vehicle summary above timer builder
+00:18 +432: /private/tmp/timey-p0-20261114/timey_rider/test/timer_end_alarm_test.dart: Save failure and retry do not restart acknowledged alarm
+Unable to persist completed activity: Bad state: Test save failure
+00:18 +433: /private/tmp/timey-p0-20261114/timey_rider/test/home_vehicle_selection_test.dart: Home screen shows vehicle summary above timer builder
+00:18 +434: /private/tmp/timey-p0-20261114/timey_rider/test/home_vehicle_selection_test.dart: Home screen shows vehicle summary above timer builder
+00:18 +435: /private/tmp/timey-p0-20261114/timey_rider/test/home_vehicle_selection_test.dart: Home screen shows vehicle summary above timer builder
+00:19 +436: /private/tmp/timey-p0-20261114/timey_rider/test/home_vehicle_selection_test.dart: Home screen shows vehicle summary above timer builder
+00:19 +437: /private/tmp/timey-p0-20261114/timey_rider/test/home_vehicle_selection_test.dart: Home screen shows vehicle summary above timer builder
+00:19 +438: /private/tmp/timey-p0-20261114/timey_rider/test/home_vehicle_selection_test.dart: Home screen shows vehicle summary above timer builder
+00:19 +439: /private/tmp/timey-p0-20261114/timey_rider/test/home_vehicle_selection_test.dart: Home screen shows vehicle summary above timer builder
+00:19 +440: /private/tmp/timey-p0-20261114/timey_rider/test/home_vehicle_selection_test.dart: Home screen shows vehicle summary above timer builder
+00:19 +441: /private/tmp/timey-p0-20261114/timey_rider/test/home_vehicle_selection_test.dart: Home screen shows vehicle summary above timer builder
+00:19 +442: /private/tmp/timey-p0-20261114/timey_rider/test/reward_history_screen_test.dart: Home screen shows reward goal CTA
+00:19 +443: /private/tmp/timey-p0-20261114/timey_rider/test/reward_history_screen_test.dart: Home screen shows reward goal CTA
+00:19 +444: /private/tmp/timey-p0-20261114/timey_rider/test/reward_history_screen_test.dart: Home screen shows reward goal CTA
+00:19 +445: /private/tmp/timey-p0-20261114/timey_rider/test/timer_session_audio_test.dart: TimerScreen passes marker ids to road markers
+00:19 +446: /private/tmp/timey-p0-20261114/timey_rider/test/timer_session_audio_test.dart: TimerScreen passes marker ids to road markers
+00:19 +447: /private/tmp/timey-p0-20261114/timey_rider/test/timer_session_audio_test.dart: TimerScreen passes marker ids to road markers
+00:19 +448: /private/tmp/timey-p0-20261114/timey_rider/test/timer_session_audio_test.dart: TimerScreen passes marker ids to road markers
+00:19 +449: /private/tmp/timey-p0-20261114/timey_rider/test/timer_session_audio_test.dart: TimerScreen passes marker ids to road markers
+00:19 +450: /private/tmp/timey-p0-20261114/timey_rider/test/timer_session_audio_test.dart: TimerScreen passes marker ids to road markers
+00:19 +451: /private/tmp/timey-p0-20261114/timey_rider/test/timer_session_audio_test.dart: TimerScreen passes marker ids to road markers
+00:19 +452: /private/tmp/timey-p0-20261114/timey_rider/test/timer_session_audio_test.dart: TimerScreen passes marker ids to road markers
+00:19 +453: /private/tmp/timey-p0-20261114/timey_rider/test/timer_session_audio_test.dart: TimerScreen passes marker ids to road markers
+00:20 +454: /private/tmp/timey-p0-20261114/timey_rider/test/timer_session_audio_test.dart: TimerScreen passes marker ids to road markers
+00:20 +455: /private/tmp/timey-p0-20261114/timey_rider/test/timer_session_audio_test.dart: TimerScreen passes marker ids to road markers
+00:20 +456: /private/tmp/timey-p0-20261114/timey_rider/test/timer_session_audio_test.dart: TimerScreen passes marker ids to road markers
+00:20 +457: /private/tmp/timey-p0-20261114/timey_rider/test/timer_session_audio_test.dart: TimerScreen passes marker ids to road markers
+00:20 +458: /private/tmp/timey-p0-20261114/timey_rider/test/timer_session_audio_test.dart: TimerScreen passes marker ids to road markers
+00:20 +459: /private/tmp/timey-p0-20261114/timey_rider/test/timer_session_audio_test.dart: TimerScreen passes marker ids to road markers
+00:20 +460: /private/tmp/timey-p0-20261114/timey_rider/test/timer_session_audio_test.dart: TimerScreen passes marker ids to road markers
+00:20 +461: /private/tmp/timey-p0-20261114/timey_rider/test/timer_session_audio_test.dart: TimerScreen passes marker ids to road markers
+00:20 +462: /private/tmp/timey-p0-20261114/timey_rider/test/timer_session_audio_test.dart: TimerScreen passes marker ids to road markers
+00:20 +463: /private/tmp/timey-p0-20261114/timey_rider/test/timer_session_audio_test.dart: TimerScreen passes marker ids to road markers
+00:20 +464: /private/tmp/timey-p0-20261114/timey_rider/test/timer_session_audio_test.dart: TimerScreen passes marker ids to road markers
+00:20 +465: /private/tmp/timey-p0-20261114/timey_rider/test/timer_session_audio_test.dart: TimerScreen passes marker ids to road markers
+00:20 +466: /private/tmp/timey-p0-20261114/timey_rider/test/timer_session_audio_test.dart: TimerScreen passes marker ids to road markers
+00:20 +467: /private/tmp/timey-p0-20261114/timey_rider/test/timer_session_audio_test.dart: TimerScreen passes marker ids to road markers
+00:20 +468: /private/tmp/timey-p0-20261114/timey_rider/test/timer_session_audio_test.dart: TimerScreen passes marker ids to road markers
+00:20 +469: /private/tmp/timey-p0-20261114/timey_rider/test/timer_layout_lifecycle_test.dart: Timer screen keeps vehicle fixed when paused
+00:20 +470: /private/tmp/timey-p0-20261114/timey_rider/test/timer_layout_lifecycle_test.dart: Timer screen keeps vehicle fixed when paused
+00:20 +471: /private/tmp/timey-p0-20261114/timey_rider/test/timer_layout_lifecycle_test.dart: Timer screen keeps vehicle fixed when paused
+00:21 +472: /private/tmp/timey-p0-20261114/timey_rider/test/timer_layout_lifecycle_test.dart: Timer screen keeps vehicle fixed when paused
+00:21 +473: /private/tmp/timey-p0-20261114/timey_rider/test/timer_layout_lifecycle_test.dart: Timer screen keeps vehicle fixed when paused
+00:21 +474: /private/tmp/timey-p0-20261114/timey_rider/test/timer_layout_lifecycle_test.dart: Timer screen keeps vehicle fixed when paused
+00:21 +475: /private/tmp/timey-p0-20261114/timey_rider/test/timer_layout_lifecycle_test.dart: Timer screen keeps vehicle fixed when paused
+00:21 +476: /private/tmp/timey-p0-20261114/timey_rider/test/timer_layout_lifecycle_test.dart: Timer screen keeps vehicle fixed when paused
+00:21 +477: /private/tmp/timey-p0-20261114/timey_rider/test/timer_layout_lifecycle_test.dart: Timer screen keeps vehicle fixed when paused
+00:21 +478: /private/tmp/timey-p0-20261114/timey_rider/test/timer_layout_lifecycle_test.dart: Timer screen keeps vehicle fixed when paused
+00:21 +479: /private/tmp/timey-p0-20261114/timey_rider/test/timer_layout_lifecycle_test.dart: Timer screen keeps vehicle fixed when paused
+00:21 +480: /private/tmp/timey-p0-20261114/timey_rider/test/timer_layout_lifecycle_test.dart: Timer screen keeps vehicle fixed when paused
+00:21 +481: /private/tmp/timey-p0-20261114/timey_rider/test/timer_layout_lifecycle_test.dart: Timer screen keeps vehicle fixed when paused
+00:21 +482: /private/tmp/timey-p0-20261114/timey_rider/test/timer_layout_lifecycle_test.dart: Timer screen keeps vehicle fixed when paused
+00:21 +483: /private/tmp/timey-p0-20261114/timey_rider/test/home_vehicle_selection_test.dart: Vehicle widget falls back to emoji for missing assets
+00:21 +484: /private/tmp/timey-p0-20261114/timey_rider/test/timer_session_audio_test.dart: TimerScreen cancels preview safely when disposed
+00:21 +485: /private/tmp/timey-p0-20261114/timey_rider/test/timer_layout_lifecycle_test.dart: Timer screen gives the route primary space in landscape
+00:22 +486: /private/tmp/timey-p0-20261114/timey_rider/test/timer_layout_lifecycle_test.dart: Timer screen gives the route primary space in landscape
+00:22 +487: /private/tmp/timey-p0-20261114/timey_rider/test/timer_layout_lifecycle_test.dart: Timer screen gives the route primary space in landscape
+00:22 +488: /private/tmp/timey-p0-20261114/timey_rider/test/timer_layout_lifecycle_test.dart: Timer screen gives the route primary space in landscape
+00:22 +489: /private/tmp/timey-p0-20261114/timey_rider/test/timer_layout_lifecycle_test.dart: Timer screen gives the route primary space in landscape
+00:22 +490: /private/tmp/timey-p0-20261114/timey_rider/test/timer_layout_lifecycle_test.dart: Timer screen gives the route primary space in landscape
+00:22 +491: /private/tmp/timey-p0-20261114/timey_rider/test/timer_layout_lifecycle_test.dart: Timer screen gives the route primary space in landscape
+00:22 +492: /private/tmp/timey-p0-20261114/timey_rider/test/timer_layout_lifecycle_test.dart: Timer screen gives the route primary space in landscape
+00:22 +493: /private/tmp/timey-p0-20261114/timey_rider/test/timer_layout_lifecycle_test.dart: Timer screen gives the route primary space in landscape
+00:22 +494: /private/tmp/timey-p0-20261114/timey_rider/test/timer_layout_lifecycle_test.dart: Timer screen gives the route primary space in landscape
+00:22 +495: /private/tmp/timey-p0-20261114/timey_rider/test/timer_layout_lifecycle_test.dart: Timer screen gives the route primary space in landscape
+00:22 +496: /private/tmp/timey-p0-20261114/timey_rider/test/timer_layout_lifecycle_test.dart: Timer screen gives the route primary space in landscape
+00:22 +497: /private/tmp/timey-p0-20261114/timey_rider/test/timer_layout_lifecycle_test.dart: Timer screen gives the route primary space in landscape
+00:22 +498: /private/tmp/timey-p0-20261114/timey_rider/test/timer_layout_lifecycle_test.dart: Timer screen gives the route primary space in landscape
+00:22 +499: /private/tmp/timey-p0-20261114/timey_rider/test/timer_layout_lifecycle_test.dart: Timer screen gives the route primary space in landscape
+00:22 +500: /private/tmp/timey-p0-20261114/timey_rider/test/timer_layout_lifecycle_test.dart: Timer screen gives the route primary space in landscape
+00:22 +501: /private/tmp/timey-p0-20261114/timey_rider/test/timer_layout_lifecycle_test.dart: Timer screen gives the route primary space in landscape
+00:22 +502: /private/tmp/timey-p0-20261114/timey_rider/test/timer_layout_lifecycle_test.dart: Timer screen gives the route primary space in landscape
+00:22 +503: /private/tmp/timey-p0-20261114/timey_rider/test/timer_layout_lifecycle_test.dart: Timer screen gives the route primary space in landscape
+00:22 +504: /private/tmp/timey-p0-20261114/timey_rider/test/timer_layout_lifecycle_test.dart: Timer screen gives the route primary space in landscape
+00:22 +505: /private/tmp/timey-p0-20261114/timey_rider/test/timer_layout_lifecycle_test.dart: Timer screen gives the route primary space in landscape
+00:22 +506: /private/tmp/timey-p0-20261114/timey_rider/test/timer_layout_lifecycle_test.dart: Timer screen gives the route primary space in landscape
+00:22 +507: /private/tmp/timey-p0-20261114/timey_rider/test/timer_layout_lifecycle_test.dart: Timer screen gives the route primary space in landscape
+00:22 +508: /private/tmp/timey-p0-20261114/timey_rider/test/timer_layout_lifecycle_test.dart: Timer screen gives the route primary space in landscape
+00:22 +509: /private/tmp/timey-p0-20261114/timey_rider/test/timer_layout_lifecycle_test.dart: Timer screen gives the route primary space in landscape
+00:22 +510: /private/tmp/timey-p0-20261114/timey_rider/test/timer_layout_lifecycle_test.dart: Timer screen gives the route primary space in landscape
+00:22 +511: /private/tmp/timey-p0-20261114/timey_rider/test/home_vehicle_selection_test.dart: Timer screen does not apply avatar saved for another vehicle
+00:22 +512: /private/tmp/timey-p0-20261114/timey_rider/test/home_vehicle_selection_test.dart: Timer screen does not apply avatar saved for another vehicle
+00:22 +513: /private/tmp/timey-p0-20261114/timey_rider/test/home_vehicle_selection_test.dart: Timer screen does not apply avatar saved for another vehicle
+00:22 +514: /private/tmp/timey-p0-20261114/timey_rider/test/home_vehicle_selection_test.dart: Timer screen does not apply avatar saved for another vehicle
+00:22 +515: /private/tmp/timey-p0-20261114/timey_rider/test/home_vehicle_selection_test.dart: Timer screen does not apply avatar saved for another vehicle
+00:22 +516: /private/tmp/timey-p0-20261114/timey_rider/test/home_vehicle_selection_test.dart: Timer screen does not apply avatar saved for another vehicle
+00:22 +517: /private/tmp/timey-p0-20261114/timey_rider/test/home_vehicle_selection_test.dart: Timer screen does not apply avatar saved for another vehicle
+00:22 +518: /private/tmp/timey-p0-20261114/timey_rider/test/home_vehicle_selection_test.dart: Timer screen does not apply avatar saved for another vehicle
+00:22 +519: /private/tmp/timey-p0-20261114/timey_rider/test/home_vehicle_selection_test.dart: Timer screen does not apply avatar saved for another vehicle
+00:22 +520: /private/tmp/timey-p0-20261114/timey_rider/test/timer_session_audio_test.dart: TimerScreen saves an active session when started
+00:22 +521: /private/tmp/timey-p0-20261114/timey_rider/test/pending_activity_result_test.dart: failed completion persistence keeps active session and can retry
+00:22 +522: /private/tmp/timey-p0-20261114/timey_rider/test/pending_activity_result_test.dart: failed completion persistence keeps active session and can retry
+00:23 +523: /private/tmp/timey-p0-20261114/timey_rider/test/pending_activity_result_test.dart: failed completion persistence keeps active session and can retry
+00:23 +524: /private/tmp/timey-p0-20261114/timey_rider/test/pending_activity_result_test.dart: failed completion persistence keeps active session and can retry
+00:23 +525: /private/tmp/timey-p0-20261114/timey_rider/test/pending_activity_result_test.dart: failed completion persistence keeps active session and can retry
+Unable to persist completed activity: Bad state: storage unavailable
+00:23 +526: /private/tmp/timey-p0-20261114/timey_rider/test/pending_activity_result_test.dart: failed completion persistence keeps active session and can retry
+00:23 +527: /private/tmp/timey-p0-20261114/timey_rider/test/pending_activity_result_test.dart: failed completion persistence keeps active session and can retry
+00:23 +528: /private/tmp/timey-p0-20261114/timey_rider/test/timer_session_audio_test.dart: TimerScreen does not start timer BGM when sound is disabled
+00:23 +529: /private/tmp/timey-p0-20261114/timey_rider/test/timer_layout_lifecycle_test.dart: Timer motivation settings sheet scrolls in compact landscape
+00:23 +530: /private/tmp/timey-p0-20261114/timey_rider/test/timer_layout_lifecycle_test.dart: Timer motivation settings sheet scrolls in compact landscape
+00:23 +531: /private/tmp/timey-p0-20261114/timey_rider/test/timer_layout_lifecycle_test.dart: Timer motivation settings sheet scrolls in compact landscape
+00:23 +532: /private/tmp/timey-p0-20261114/timey_rider/test/timer_layout_lifecycle_test.dart: Timer motivation settings sheet scrolls in compact landscape
+00:23 +533: /private/tmp/timey-p0-20261114/timey_rider/test/timer_session_audio_test.dart: TimerScreen does not repeatedly start BGM while running
+00:23 +534: /private/tmp/timey-p0-20261114/timey_rider/test/timer_completion_lifecycle_test.dart: TimerScreen refreshes elapsed time when app resumes
+00:23 +535: /private/tmp/timey-p0-20261114/timey_rider/test/timer_completion_lifecycle_test.dart: TimerScreen refreshes elapsed time when app resumes
+00:24 +536: /private/tmp/timey-p0-20261114/timey_rider/test/timer_completion_lifecycle_test.dart: TimerScreen refreshes elapsed time when app resumes
+00:24 +537: /private/tmp/timey-p0-20261114/timey_rider/test/timer_completion_lifecycle_test.dart: TimerScreen refreshes elapsed time when app resumes
+00:24 +538: /private/tmp/timey-p0-20261114/timey_rider/test/timer_completion_lifecycle_test.dart: TimerScreen refreshes elapsed time when app resumes
+00:24 +539: /private/tmp/timey-p0-20261114/timey_rider/test/timer_completion_lifecycle_test.dart: TimerScreen refreshes elapsed time when app resumes
+00:24 +540: /private/tmp/timey-p0-20261114/timey_rider/test/timer_layout_lifecycle_test.dart: Timer screen keeps screen awake only when setting is enabled
+00:24 +541: /private/tmp/timey-p0-20261114/timey_rider/test/timer_layout_lifecycle_test.dart: Timer screen keeps screen awake only when setting is enabled
+00:24 +542: /private/tmp/timey-p0-20261114/timey_rider/test/timer_completion_lifecycle_test.dart: Activity done before arrival does not immediately push result
+00:24 +543: /private/tmp/timey-p0-20261114/timey_rider/test/timer_completion_lifecycle_test.dart: Activity done before arrival does not immediately push result
+00:24 +544: /private/tmp/timey-p0-20261114/timey_rider/test/timer_completion_lifecycle_test.dart: Activity done before arrival does not immediately push result
+00:24 +545: /private/tmp/timey-p0-20261114/timey_rider/test/timer_session_audio_test.dart: TimerScreen toggles sound and syncs timer BGM
+00:24 +546: /private/tmp/timey-p0-20261114/timey_rider/test/timer_session_audio_test.dart: TimerScreen toggles sound and syncs timer BGM
+00:24 +547: /private/tmp/timey-p0-20261114/timey_rider/test/road_view_test.dart: road fits a road viewport of Size(350.0, 348.0)
+00:24 +548: /private/tmp/timey-p0-20261114/timey_rider/test/road_view_test.dart: road fits a road viewport of Size(350.0, 348.0)
+00:25 +549: /private/tmp/timey-p0-20261114/timey_rider/test/road_view_test.dart: road fits a road viewport of Size(350.0, 348.0)
+00:25 +550: /private/tmp/timey-p0-20261114/timey_rider/test/road_view_test.dart: road fits a road viewport of Size(350.0, 348.0)
+00:25 +551: /private/tmp/timey-p0-20261114/timey_rider/test/timer_layout_lifecycle_test.dart: Timer exit waits for active session clear before returning home
+00:25 +552: /private/tmp/timey-p0-20261114/timey_rider/test/timer_layout_lifecycle_test.dart: Timer exit waits for active session clear before returning home
+00:25 +553: /private/tmp/timey-p0-20261114/timey_rider/test/timer_layout_lifecycle_test.dart: Timer exit waits for active session clear before returning home
+00:25 +554: /private/tmp/timey-p0-20261114/timey_rider/test/timer_layout_lifecycle_test.dart: Timer exit waits for active session clear before returning home
+00:25 +555: /private/tmp/timey-p0-20261114/timey_rider/test/timer_layout_lifecycle_test.dart: Timer exit waits for active session clear before returning home
+00:25 +556: /private/tmp/timey-p0-20261114/timey_rider/test/timer_layout_lifecycle_test.dart: Timer exit waits for active session clear before returning home
+00:25 +557: /private/tmp/timey-p0-20261114/timey_rider/test/timer_layout_lifecycle_test.dart: Timer exit waits for active session clear before returning home
+00:25 +558: /private/tmp/timey-p0-20261114/timey_rider/test/timer_layout_lifecycle_test.dart: Timer exit waits for active session clear before returning home
+00:25 +559: /private/tmp/timey-p0-20261114/timey_rider/test/timer_layout_lifecycle_test.dart: Timer exit waits for active session clear before returning home
+00:25 +560: /private/tmp/timey-p0-20261114/timey_rider/test/timer_layout_lifecycle_test.dart: Timer exit waits for active session clear before returning home
+00:25 +561: /private/tmp/timey-p0-20261114/timey_rider/test/timer_layout_lifecycle_test.dart: Timer exit waits for active session clear before returning home
+00:25 +562: /private/tmp/timey-p0-20261114/timey_rider/test/timer_layout_lifecycle_test.dart: Timer exit waits for active session clear before returning home
+00:25 +563: /private/tmp/timey-p0-20261114/timey_rider/test/timer_layout_lifecycle_test.dart: Timer exit waits for active session clear before returning home
+00:25 +564: /private/tmp/timey-p0-20261114/timey_rider/test/timer_layout_lifecycle_test.dart: Timer exit waits for active session clear before returning home
+00:25 +565: /private/tmp/timey-p0-20261114/timey_rider/test/timer_layout_lifecycle_test.dart: Timer exit waits for active session clear before returning home
+00:25 +566: /private/tmp/timey-p0-20261114/timey_rider/test/timer_layout_lifecycle_test.dart: Timer exit waits for active session clear before returning home
+00:25 +567: /private/tmp/timey-p0-20261114/timey_rider/test/timer_layout_lifecycle_test.dart: Timer exit waits for active session clear before returning home
+00:25 +568: /private/tmp/timey-p0-20261114/timey_rider/test/timer_layout_lifecycle_test.dart: Timer exit waits for active session clear before returning home
+00:25 +569: /private/tmp/timey-p0-20261114/timey_rider/test/timer_layout_lifecycle_test.dart: Timer exit waits for active session clear before returning home
+00:25 +570: /private/tmp/timey-p0-20261114/timey_rider/test/timer_layout_lifecycle_test.dart: Timer exit waits for active session clear before returning home
+00:25 +571: /private/tmp/timey-p0-20261114/timey_rider/test/timer_layout_lifecycle_test.dart: Timer exit waits for active session clear before returning home
+00:25 +572: /private/tmp/timey-p0-20261114/timey_rider/test/timer_audio_asset_catalog_test.dart: Timer audio playable validation ignores dot store files
+00:25 +573: /private/tmp/timey-p0-20261114/timey_rider/test/timer_audio_asset_catalog_test.dart: Timer audio playable validation ignores dot store files
+00:25 +574: /private/tmp/timey-p0-20261114/timey_rider/test/timer_audio_asset_catalog_test.dart: Timer audio playable validation ignores dot store files
+00:25 +575: /private/tmp/timey-p0-20261114/timey_rider/test/timer_audio_asset_catalog_test.dart: Timer audio playable validation ignores dot store files
+00:25 +576: /private/tmp/timey-p0-20261114/timey_rider/test/timer_audio_asset_catalog_test.dart: Timer audio playable validation ignores dot store files
+00:25 +577: /private/tmp/timey-p0-20261114/timey_rider/test/timer_audio_asset_catalog_test.dart: Timer audio playable validation ignores dot store files
+00:25 +578: /private/tmp/timey-p0-20261114/timey_rider/test/timer_audio_asset_catalog_test.dart: Timer audio playable validation ignores dot store files
+00:25 +579: /private/tmp/timey-p0-20261114/timey_rider/test/timer_audio_asset_catalog_test.dart: Timer audio playable validation ignores dot store files
+00:25 +580: /private/tmp/timey-p0-20261114/timey_rider/test/timer_audio_asset_catalog_test.dart: Timer audio playable validation ignores dot store files
+00:25 +581: /private/tmp/timey-p0-20261114/timey_rider/test/timer_audio_asset_catalog_test.dart: Timer audio playable validation ignores dot store files
+00:25 +582: /private/tmp/timey-p0-20261114/timey_rider/test/timer_audio_asset_catalog_test.dart: Timer audio playable validation ignores dot store files
+00:25 +583: /private/tmp/timey-p0-20261114/timey_rider/test/timer_audio_asset_catalog_test.dart: Timer audio playable validation ignores dot store files
+00:25 +584: /private/tmp/timey-p0-20261114/timey_rider/test/timer_audio_asset_catalog_test.dart: Timer audio playable validation ignores dot store files
+00:26 +585: /private/tmp/timey-p0-20261114/timey_rider/test/timer_audio_asset_catalog_test.dart: Timer audio playable validation ignores dot store files
+00:26 +586: /private/tmp/timey-p0-20261114/timey_rider/test/timer_session_audio_test.dart: TimerScreen updates active session when paused and resumed
+00:26 +587: /private/tmp/timey-p0-20261114/timey_rider/test/timer_session_audio_test.dart: TimerScreen updates active session when paused and resumed
+00:26 +588: /private/tmp/timey-p0-20261114/timey_rider/test/timer_session_audio_test.dart: TimerScreen updates active session when paused and resumed
+00:26 +589: /private/tmp/timey-p0-20261114/timey_rider/test/timer_session_audio_test.dart: TimerScreen updates active session when paused and resumed
+00:26 +590: /private/tmp/timey-p0-20261114/timey_rider/test/timer_session_audio_test.dart: TimerScreen updates active session when paused and resumed
+00:26 +591: /private/tmp/timey-p0-20261114/timey_rider/test/timer_session_audio_test.dart: TimerScreen updates active session when paused and resumed
+00:26 +592: /private/tmp/timey-p0-20261114/timey_rider/test/timer_session_audio_test.dart: TimerScreen updates active session when paused and resumed
+00:26 +593: /private/tmp/timey-p0-20261114/timey_rider/test/timer_session_audio_test.dart: TimerScreen updates active session when paused and resumed
+00:26 +594: /private/tmp/timey-p0-20261114/timey_rider/test/timer_session_audio_test.dart: TimerScreen updates active session when paused and resumed
+00:26 +595: /private/tmp/timey-p0-20261114/timey_rider/test/timer_session_audio_test.dart: TimerScreen updates active session when paused and resumed
+00:26 +596: /private/tmp/timey-p0-20261114/timey_rider/test/timer_session_audio_test.dart: TimerScreen updates active session when paused and resumed
+00:26 +597: /private/tmp/timey-p0-20261114/timey_rider/test/timer_session_audio_test.dart: TimerScreen updates active session when paused and resumed
+00:26 +598: /private/tmp/timey-p0-20261114/timey_rider/test/timer_session_audio_test.dart: TimerScreen updates active session when paused and resumed
+00:26 +599: /private/tmp/timey-p0-20261114/timey_rider/test/timer_completion_lifecycle_test.dart: Time-ended activity opens result after arrival acknowledgement
+00:26 +600: /private/tmp/timey-p0-20261114/timey_rider/test/road_view_test.dart: RoadView keeps long-course vehicle inside viewport
+00:26 +601: /private/tmp/timey-p0-20261114/timey_rider/test/road_view_test.dart: RoadView keeps long-course vehicle inside viewport
+00:26 +602: /private/tmp/timey-p0-20261114/timey_rider/test/timer_session_audio_test.dart: TimerScreen clears active session after completion
+00:26 +603: /private/tmp/timey-p0-20261114/timey_rider/test/timer_session_audio_test.dart: TimerScreen clears active session after completion
+00:26 +604: /private/tmp/timey-p0-20261114/timey_rider/test/timer_session_audio_test.dart: TimerScreen clears active session after completion
+00:26 +605: /private/tmp/timey-p0-20261114/timey_rider/test/timer_session_audio_test.dart: TimerScreen clears active session after completion
+00:26 +606: /private/tmp/timey-p0-20261114/timey_rider/test/timer_session_audio_test.dart: TimerScreen clears active session after completion
+00:26 +607: /private/tmp/timey-p0-20261114/timey_rider/test/timer_session_audio_test.dart: TimerScreen clears active session after completion
+00:26 +608: /private/tmp/timey-p0-20261114/timey_rider/test/road_view_test.dart: RoadView keeps motivation video fixed while long road scrolls
+00:26 +609: /private/tmp/timey-p0-20261114/timey_rider/test/timer_session_audio_test.dart: TimerScreen restores progress from an active session
+00:27 +610: /private/tmp/timey-p0-20261114/timey_rider/test/timer_session_audio_test.dart: TimerScreen restores progress from an active session
+00:27 +611: /private/tmp/timey-p0-20261114/timey_rider/test/timer_session_audio_test.dart: TimerScreen restores progress from an active session
+00:27 +612: /private/tmp/timey-p0-20261114/timey_rider/test/avatar_setup_screen_test.dart: Avatar setup screen shows guide text and prompt copy button
+00:27 +613: /private/tmp/timey-p0-20261114/timey_rider/test/avatar_setup_screen_test.dart: Avatar setup screen shows guide text and prompt copy button
+00:28 +614: /private/tmp/timey-p0-20261114/timey_rider/test/settings_screen_test.dart: Remaining time setting can be turned off
+00:28 +615: /private/tmp/timey-p0-20261114/timey_rider/test/settings_screen_test.dart: Remaining time setting can be turned off
+00:28 +616: /private/tmp/timey-p0-20261114/timey_rider/test/settings_screen_test.dart: Remaining time setting can be turned off
+00:28 +617: /private/tmp/timey-p0-20261114/timey_rider/test/settings_screen_test.dart: Remaining time setting can be turned off
+00:28 +618: /private/tmp/timey-p0-20261114/timey_rider/test/settings_screen_test.dart: Remaining time setting can be turned off
+00:28 +619: /private/tmp/timey-p0-20261114/timey_rider/test/settings_screen_test.dart: Remaining time setting can be turned off
+00:28 +620: /private/tmp/timey-p0-20261114/timey_rider/test/avatar_setup_screen_test.dart: Avatar setup picker cancellation does not update config
+00:29 +621: /private/tmp/timey-p0-20261114/timey_rider/test/avatar_setup_screen_test.dart: Avatar setup picker cancellation does not update config
+00:29 +622: /private/tmp/timey-p0-20261114/timey_rider/test/settings_screen_test.dart: Settings screen opens vehicle pack purchase after parent gate
+00:29 +623: /private/tmp/timey-p0-20261114/timey_rider/test/settings_screen_test.dart: Settings screen opens vehicle pack purchase after parent gate
+00:29 +624: /private/tmp/timey-p0-20261114/timey_rider/test/settings_screen_test.dart: Settings screen opens vehicle pack purchase after parent gate
+00:29 +625: /private/tmp/timey-p0-20261114/timey_rider/test/settings_screen_test.dart: Settings screen opens vehicle pack purchase after parent gate
+00:29 +626: /private/tmp/timey-p0-20261114/timey_rider/test/settings_screen_test.dart: Settings screen opens vehicle pack purchase after parent gate
+00:29 +627: /private/tmp/timey-p0-20261114/timey_rider/test/avatar_setup_screen_test.dart: Avatar setup successful upload shows pending preview
+00:29 +628: /private/tmp/timey-p0-20261114/timey_rider/test/avatar_setup_screen_test.dart: Avatar setup successful upload shows pending preview
+00:29 +629: /private/tmp/timey-p0-20261114/timey_rider/test/avatar_setup_screen_test.dart: Avatar setup successful upload shows pending preview
+00:29 +630: /private/tmp/timey-p0-20261114/timey_rider/test/avatar_setup_screen_test.dart: Avatar setup successful upload shows pending preview
+00:29 +631: /private/tmp/timey-p0-20261114/timey_rider/test/avatar_setup_screen_test.dart: Avatar setup successful upload shows pending preview
+00:29 +632: /private/tmp/timey-p0-20261114/timey_rider/test/avatar_setup_screen_test.dart: Avatar setup successful upload shows pending preview
+00:29 +633: /private/tmp/timey-p0-20261114/timey_rider/test/avatar_setup_screen_test.dart: Avatar setup successful upload shows pending preview
+00:29 +634: /private/tmp/timey-p0-20261114/timey_rider/test/avatar_setup_screen_test.dart: Avatar setup successful upload shows pending preview
+00:29 +635: /private/tmp/timey-p0-20261114/timey_rider/test/settings_screen_test.dart: Settings screen opens support link after parent gate
+00:29 +636: /private/tmp/timey-p0-20261114/timey_rider/test/avatar_setup_screen_test.dart: Avatar setup initializes from custom config
+00:29 +637: /private/tmp/timey-p0-20261114/timey_rider/test/settings_screen_test.dart: Settings screen opens privacy link after parent gate
+00:29 +638: /private/tmp/timey-p0-20261114/timey_rider/test/avatar_setup_screen_test.dart: Avatar setup warns when saved custom file is missing
+00:29 +639: /private/tmp/timey-p0-20261114/timey_rider/test/avatar_setup_screen_test.dart: Avatar setup warns when saved custom file is missing
+00:29 +640: /private/tmp/timey-p0-20261114/timey_rider/test/settings_screen_test.dart: Settings screen shows link failure message
+00:29 +641: /private/tmp/timey-p0-20261114/timey_rider/test/avatar_setup_screen_test.dart: Avatar setup size slider updates local adjustment state
+00:29 +642: /private/tmp/timey-p0-20261114/timey_rider/test/avatar_setup_screen_test.dart: Avatar setup size slider updates local adjustment state
+00:29 +643: /private/tmp/timey-p0-20261114/timey_rider/test/settings_screen_test.dart: User guide uses English localization
+00:29 +644: /private/tmp/timey-p0-20261114/timey_rider/test/avatar_setup_screen_test.dart: Avatar setup reset button resets adjustment controls
+00:29 +645: /private/tmp/timey-p0-20261114/timey_rider/test/avatar_setup_screen_test.dart: Avatar setup reset button resets adjustment controls
+00:29 +646: /private/tmp/timey-p0-20261114/timey_rider/test/avatar_setup_screen_test.dart: Avatar setup reset button resets adjustment controls
+00:29 +647: /private/tmp/timey-p0-20261114/timey_rider/test/avatar_setup_screen_test.dart: Avatar setup reset button resets adjustment controls
+00:29 +648: /private/tmp/timey-p0-20261114/timey_rider/test/settings_screen_test.dart: Settings screen opens course marker help sheet
+00:29 +649: /private/tmp/timey-p0-20261114/timey_rider/test/avatar_setup_screen_test.dart: Avatar setup confirm saves custom avatar adjustment
+00:29 +650: /private/tmp/timey-p0-20261114/timey_rider/test/avatar_setup_screen_test.dart: Avatar setup confirm saves custom avatar adjustment
+00:30 +651: /private/tmp/timey-p0-20261114/timey_rider/test/avatar_setup_screen_test.dart: Avatar setup confirm saves custom avatar adjustment
+00:30 +652: /private/tmp/timey-p0-20261114/timey_rider/test/settings_screen_test.dart: Settings screen shows motivation section when available
+00:30 +653: /private/tmp/timey-p0-20261114/timey_rider/test/avatar_setup_screen_test.dart: Avatar setup default image button saves default avatar mode
+00:30 +654: /private/tmp/timey-p0-20261114/timey_rider/test/avatar_setup_screen_test.dart: Avatar setup default image button saves default avatar mode
+00:30 +655: /private/tmp/timey-p0-20261114/timey_rider/test/settings_screen_test.dart: Settings screen opens motivation video help sheet
+00:30 +656: /private/tmp/timey-p0-20261114/timey_rider/test/avatar_setup_screen_test.dart: Avatar setup stores custom avatars per vehicle
+00:30 +657: /private/tmp/timey-p0-20261114/timey_rider/test/settings_screen_test.dart: Home settings apply motivation video settings to new timers
+00:30 +658: /private/tmp/timey-p0-20261114/timey_rider/test/avatar_setup_screen_test.dart: Avatar setup default image clears only selected vehicle avatar
+00:30 +659: /private/tmp/timey-p0-20261114/timey_rider/test/settings_screen_test.dart: Settings screen keeps vehicle and avatar actions on home
+00:30 +660: /private/tmp/timey-p0-20261114/timey_rider/test/settings_screen_test.dart: Settings screen keeps vehicle and avatar actions on home
+00:30 +661: /private/tmp/timey-p0-20261114/timey_rider/test/avatar_setup_screen_test.dart: Avatar setup confirm without image is disabled and safe
+00:31 +662: /private/tmp/timey-p0-20261114/timey_rider/test/settings_screen_test.dart: Settings screen hides custom avatar state when active
+00:31 +663: All tests passed!

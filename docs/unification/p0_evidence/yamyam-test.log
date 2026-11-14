@@ -1,0 +1,734 @@
+00:00 +0: loading /private/tmp/timey-p0-20261114/jy_yamyam/test/iap_purchase_client_fake_test.dart
+00:00 +0: /private/tmp/timey-p0-20261114/jy_yamyam/test/iap_purchase_client_fake_test.dart: Fake IAP purchase client records product queries and purchases
+00:00 +1: /private/tmp/timey-p0-20261114/jy_yamyam/test/iap_purchase_client_fake_test.dart: Fake IAP purchase client emits purchase stream updates
+00:00 +2: /private/tmp/timey-p0-20261114/jy_yamyam/test/iap_purchase_client_fake_test.dart: Fake IAP purchase client records restore calls
+00:00 +3: /private/tmp/timey-p0-20261114/jy_yamyam/test/reward_goal_screen_test.dart: Reward goal creation form saves a goal
+00:01 +4: /private/tmp/timey-p0-20261114/jy_yamyam/test/reward_goal_screen_test.dart: Earned reward use flow asks for confirmation
+00:07 +5: /private/tmp/timey-p0-20261114/jy_yamyam/test/meal_history_screen_test.dart: Home meal records summary opens meal history screen
+00:07 +6: /private/tmp/timey-p0-20261114/jy_yamyam/test/meal_history_screen_test.dart: Home meal records summary opens meal history screen
+00:07 +7: /private/tmp/timey-p0-20261114/jy_yamyam/test/meal_history_screen_test.dart: Home meal records summary opens meal history screen
+00:07 +8: /private/tmp/timey-p0-20261114/jy_yamyam/test/meal_history_screen_test.dart: Home meal records summary opens meal history screen
+00:07 +9: /private/tmp/timey-p0-20261114/jy_yamyam/test/meal_history_screen_test.dart: Home meal records summary opens meal history screen
+00:07 +10: /private/tmp/timey-p0-20261114/jy_yamyam/test/meal_history_screen_test.dart: Home meal records summary opens meal history screen
+00:07 +11: /private/tmp/timey-p0-20261114/jy_yamyam/test/meal_history_screen_test.dart: Home meal records summary opens meal history screen
+00:08 +12: /private/tmp/timey-p0-20261114/jy_yamyam/test/meal_history_screen_test.dart: Home meal records summary opens meal history screen
+00:08 +13: /private/tmp/timey-p0-20261114/jy_yamyam/test/meal_history_screen_test.dart: Home meal records summary opens meal history screen
+00:08 +14: /private/tmp/timey-p0-20261114/jy_yamyam/test/meal_history_screen_test.dart: Home meal records summary opens meal history screen
+00:08 +15: /private/tmp/timey-p0-20261114/jy_yamyam/test/meal_history_screen_test.dart: Home meal records summary opens meal history screen
+00:08 +16: /private/tmp/timey-p0-20261114/jy_yamyam/test/meal_history_screen_test.dart: Home meal records summary opens meal history screen
+00:08 +17: /private/tmp/timey-p0-20261114/jy_yamyam/test/home_screen_test.dart: Home screen vehicle sections render confirmed custom avatar
+00:08 +18: /private/tmp/timey-p0-20261114/jy_yamyam/test/home_screen_test.dart: Home screen vehicle sections render confirmed custom avatar
+00:08 +19: /private/tmp/timey-p0-20261114/jy_yamyam/test/home_screen_test.dart: Home screen vehicle sections render confirmed custom avatar
+00:08 +20: /private/tmp/timey-p0-20261114/jy_yamyam/test/home_screen_test.dart: Home screen vehicle sections render confirmed custom avatar
+00:08 +21: /private/tmp/timey-p0-20261114/jy_yamyam/test/home_screen_test.dart: Home screen vehicle sections render confirmed custom avatar
+00:08 +22: /private/tmp/timey-p0-20261114/jy_yamyam/test/meal_history_screen_test.dart: Meal history screen deletes a record after confirmation
+00:08 +23: /private/tmp/timey-p0-20261114/jy_yamyam/test/meal_history_screen_test.dart: Meal history screen deletes a record after confirmation
+00:08 +24: /private/tmp/timey-p0-20261114/jy_yamyam/test/home_screen_test.dart: Home screen falls back when selected custom avatar is missing
+00:08 +25: /private/tmp/timey-p0-20261114/jy_yamyam/test/home_screen_test.dart: Home screen falls back when selected custom avatar is missing
+00:08 +26: /private/tmp/timey-p0-20261114/jy_yamyam/test/home_screen_test.dart: Home screen falls back when selected custom avatar is missing
+00:08 +27: /private/tmp/timey-p0-20261114/jy_yamyam/test/home_screen_test.dart: Home screen falls back when selected custom avatar is missing
+00:08 +28: /private/tmp/timey-p0-20261114/jy_yamyam/test/home_screen_test.dart: Home screen falls back when selected custom avatar is missing
+00:08 +28: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_end_alarm_service_test.dart: Playback failure does not break stop or later restart
+Timer end alarm playback failed: PlatformException(test-playback-failure, null, null, null)
+#0      StandardMethodCodec.decodeEnvelope (package:flutter/src/services/message_codecs.dart:653:7)
+#1      MethodChannel._invokeMethod (package:flutter/src/services/platform_channel.dart:366:18)
+<asynchronous suspension>
+#2      AudioPlayer.play (package:audioplayers/src/audioplayer.dart:206:7)
+<asynchronous suspension>
+#3      AudioplayersTimerAudioService.startTimerEndAlarm.<anonymous closure> (package:jy_yamyam/services/timer_audio_service.dart:396:9)
+<asynchronous suspension>
+#4      main.<anonymous closure> (file:///private/tmp/timey-p0-20261114/jy_yamyam/test/timer_end_alarm_service_test.dart:173:5)
+<asynchronous suspension>
+#5      Declarer.test.<anonymous closure>.<anonymous closure> (package:test_api/src/backend/declarer.dart:253:15)
+<asynchronous suspension>
+#6      Declarer.test.<anonymous closure> (package:test_api/src/backend/declarer.dart:250:11)
+<asynchronous suspension>
+#7      Invoker._waitForOutstandingCallbacks.<anonymous closure> (package:test_api/src/backend/invoker.dart:318:9)
+<asynchronous suspension>
+00:08 +29: /private/tmp/timey-p0-20261114/jy_yamyam/test/home_screen_test.dart: Home screen falls back when selected custom avatar is missing
+00:08 +30: /private/tmp/timey-p0-20261114/jy_yamyam/test/home_screen_test.dart: Home screen falls back when selected custom avatar is missing
+00:08 +31: /private/tmp/timey-p0-20261114/jy_yamyam/test/home_screen_test.dart: Home screen falls back when selected custom avatar is missing
+00:08 +32: /private/tmp/timey-p0-20261114/jy_yamyam/test/home_rewards_test.dart: Home screen shows reward goal CTA
+00:08 +33: /private/tmp/timey-p0-20261114/jy_yamyam/test/home_rewards_test.dart: Home screen shows reward goal CTA
+00:08 +34: /private/tmp/timey-p0-20261114/jy_yamyam/test/home_rewards_test.dart: Home screen shows reward goal CTA
+00:08 +35: /private/tmp/timey-p0-20261114/jy_yamyam/test/home_rewards_test.dart: Home screen shows reward goal CTA
+00:09 +36: /private/tmp/timey-p0-20261114/jy_yamyam/test/home_rewards_test.dart: Home screen shows reward goal CTA
+00:09 +37: /private/tmp/timey-p0-20261114/jy_yamyam/test/home_rewards_test.dart: Home screen shows reward goal CTA
+00:09 +38: /private/tmp/timey-p0-20261114/jy_yamyam/test/home_rewards_test.dart: Home screen shows reward goal CTA
+00:09 +39: /private/tmp/timey-p0-20261114/jy_yamyam/test/home_rewards_test.dart: Home screen shows reward goal CTA
+00:09 +40: /private/tmp/timey-p0-20261114/jy_yamyam/test/home_rewards_test.dart: Home screen shows reward goal CTA
+00:09 +41: /private/tmp/timey-p0-20261114/jy_yamyam/test/home_rewards_test.dart: Home screen shows reward goal CTA
+00:09 +42: /private/tmp/timey-p0-20261114/jy_yamyam/test/home_screen_test.dart: Home avatar CTA opens avatar setup screen
+00:09 +43: /private/tmp/timey-p0-20261114/jy_yamyam/test/home_active_session_test.dart: Home recovers stale completed session before loading progress
+00:10 +44: /private/tmp/timey-p0-20261114/jy_yamyam/test/guardian_gate_sheet_test.dart: Guardian gate keeps continue disabled until an answer is entered
+00:10 +45: /private/tmp/timey-p0-20261114/jy_yamyam/test/home_rewards_test.dart: Home reward summary refreshes after returning from reward goal
+00:10 +46: /private/tmp/timey-p0-20261114/jy_yamyam/test/vehicle_pack_intro_sheet_test.dart: Vehicle pack intro sheet is informational before guardian gate
+00:10 +47: /private/tmp/timey-p0-20261114/jy_yamyam/test/home_screen_test.dart: Home settings apply motivation video settings to new timers
+00:10 +48: /private/tmp/timey-p0-20261114/jy_yamyam/test/home_screen_test.dart: Home settings apply motivation video settings to new timers
+00:10 +49: /private/tmp/timey-p0-20261114/jy_yamyam/test/home_screen_test.dart: Home settings apply motivation video settings to new timers
+00:10 +50: /private/tmp/timey-p0-20261114/jy_yamyam/test/home_screen_test.dart: Home settings apply motivation video settings to new timers
+00:10 +51: /private/tmp/timey-p0-20261114/jy_yamyam/test/home_screen_test.dart: Home settings apply motivation video settings to new timers
+00:10 +52: /private/tmp/timey-p0-20261114/jy_yamyam/test/home_screen_test.dart: Home settings apply motivation video settings to new timers
+00:10 +53: /private/tmp/timey-p0-20261114/jy_yamyam/test/home_screen_test.dart: Home settings apply motivation video settings to new timers
+00:10 +54: /private/tmp/timey-p0-20261114/jy_yamyam/test/home_screen_test.dart: Home settings apply motivation video settings to new timers
+00:10 +55: /private/tmp/timey-p0-20261114/jy_yamyam/test/home_screen_test.dart: Home settings apply motivation video settings to new timers
+00:10 +56: /private/tmp/timey-p0-20261114/jy_yamyam/test/home_screen_test.dart: Home settings apply motivation video settings to new timers
+00:10 +57: /private/tmp/timey-p0-20261114/jy_yamyam/test/home_screen_test.dart: Home settings apply motivation video settings to new timers
+00:11 +58: /private/tmp/timey-p0-20261114/jy_yamyam/test/home_screen_test.dart: Home settings apply motivation video settings to new timers
+00:11 +59: /private/tmp/timey-p0-20261114/jy_yamyam/test/home_active_session_test.dart: Home screen opens a saved active timer session
+00:11 +60: /private/tmp/timey-p0-20261114/jy_yamyam/test/home_active_session_test.dart: Home screen opens a saved active timer session
+00:11 +61: /private/tmp/timey-p0-20261114/jy_yamyam/test/home_active_session_test.dart: Home screen opens a saved active timer session
+00:11 +62: /private/tmp/timey-p0-20261114/jy_yamyam/test/home_active_session_test.dart: Home screen opens a saved active timer session
+00:11 +63: /private/tmp/timey-p0-20261114/jy_yamyam/test/home_active_session_test.dart: Home screen opens a saved active timer session
+00:11 +64: /private/tmp/timey-p0-20261114/jy_yamyam/test/home_active_session_test.dart: Home screen opens a saved active timer session
+00:11 +65: /private/tmp/timey-p0-20261114/jy_yamyam/test/home_active_session_test.dart: Home screen opens a saved active timer session
+00:11 +66: /private/tmp/timey-p0-20261114/jy_yamyam/test/home_screen_test.dart: Settings screen keeps vehicle and avatar actions on home
+00:11 +67: /private/tmp/timey-p0-20261114/jy_yamyam/test/app_bootstrap_test.dart: First launch asks for child name before home
+00:11 +68: /private/tmp/timey-p0-20261114/jy_yamyam/test/app_bootstrap_test.dart: First launch asks for child name before home
+00:11 +69: /private/tmp/timey-p0-20261114/jy_yamyam/test/app_bootstrap_test.dart: First launch asks for child name before home
+00:11 +70: /private/tmp/timey-p0-20261114/jy_yamyam/test/app_bootstrap_test.dart: First launch asks for child name before home
+00:11 +71: /private/tmp/timey-p0-20261114/jy_yamyam/test/app_bootstrap_test.dart: First launch asks for child name before home
+00:12 +72: /private/tmp/timey-p0-20261114/jy_yamyam/test/app_bootstrap_test.dart: First launch asks for child name before home
+00:12 +73: /private/tmp/timey-p0-20261114/jy_yamyam/test/app_bootstrap_test.dart: First launch asks for child name before home
+00:12 +74: /private/tmp/timey-p0-20261114/jy_yamyam/test/app_bootstrap_test.dart: First launch asks for child name before home
+00:12 +75: /private/tmp/timey-p0-20261114/jy_yamyam/test/app_bootstrap_test.dart: First launch asks for child name before home
+00:12 +76: /private/tmp/timey-p0-20261114/jy_yamyam/test/app_bootstrap_test.dart: First launch asks for child name before home
+00:12 +77: /private/tmp/timey-p0-20261114/jy_yamyam/test/app_bootstrap_test.dart: First launch asks for child name before home
+00:12 +78: /private/tmp/timey-p0-20261114/jy_yamyam/test/app_bootstrap_test.dart: First launch asks for child name before home
+00:12 +79: /private/tmp/timey-p0-20261114/jy_yamyam/test/app_bootstrap_test.dart: First launch asks for child name before home
+00:12 +80: /private/tmp/timey-p0-20261114/jy_yamyam/test/app_bootstrap_test.dart: First launch asks for child name before home
+00:12 +81: /private/tmp/timey-p0-20261114/jy_yamyam/test/app_bootstrap_test.dart: First launch asks for child name before home
+00:12 +82: /private/tmp/timey-p0-20261114/jy_yamyam/test/app_bootstrap_test.dart: First launch asks for child name before home
+00:12 +83: /private/tmp/timey-p0-20261114/jy_yamyam/test/app_bootstrap_test.dart: First launch asks for child name before home
+00:12 +84: /private/tmp/timey-p0-20261114/jy_yamyam/test/app_bootstrap_test.dart: First launch asks for child name before home
+00:12 +85: /private/tmp/timey-p0-20261114/jy_yamyam/test/app_bootstrap_test.dart: First launch asks for child name before home
+00:12 +86: /private/tmp/timey-p0-20261114/jy_yamyam/test/app_bootstrap_test.dart: First launch asks for child name before home
+00:12 +87: /private/tmp/timey-p0-20261114/jy_yamyam/test/app_bootstrap_test.dart: First launch asks for child name before home
+00:12 +88: /private/tmp/timey-p0-20261114/jy_yamyam/test/app_bootstrap_test.dart: First launch asks for child name before home
+00:12 +89: /private/tmp/timey-p0-20261114/jy_yamyam/test/app_bootstrap_test.dart: First launch asks for child name before home
+00:12 +90: /private/tmp/timey-p0-20261114/jy_yamyam/test/app_bootstrap_test.dart: First launch asks for child name before home
+00:12 +91: /private/tmp/timey-p0-20261114/jy_yamyam/test/app_bootstrap_test.dart: First launch asks for child name before home
+00:12 +92: /private/tmp/timey-p0-20261114/jy_yamyam/test/app_bootstrap_test.dart: First launch asks for child name before home
+00:12 +93: /private/tmp/timey-p0-20261114/jy_yamyam/test/app_bootstrap_test.dart: First launch asks for child name before home
+00:12 +94: /private/tmp/timey-p0-20261114/jy_yamyam/test/app_bootstrap_test.dart: First launch asks for child name before home
+00:12 +95: /private/tmp/timey-p0-20261114/jy_yamyam/test/app_bootstrap_test.dart: First launch asks for child name before home
+00:12 +96: /private/tmp/timey-p0-20261114/jy_yamyam/test/app_bootstrap_test.dart: First launch asks for child name before home
+00:12 +97: /private/tmp/timey-p0-20261114/jy_yamyam/test/app_bootstrap_test.dart: First launch asks for child name before home
+00:12 +98: /private/tmp/timey-p0-20261114/jy_yamyam/test/app_bootstrap_test.dart: First launch asks for child name before home
+00:12 +99: /private/tmp/timey-p0-20261114/jy_yamyam/test/app_bootstrap_test.dart: First launch asks for child name before home
+00:12 +100: /private/tmp/timey-p0-20261114/jy_yamyam/test/app_bootstrap_test.dart: First launch asks for child name before home
+00:12 +101: /private/tmp/timey-p0-20261114/jy_yamyam/test/app_bootstrap_test.dart: First launch asks for child name before home
+00:12 +102: /private/tmp/timey-p0-20261114/jy_yamyam/test/home_active_session_test.dart: Home screen resumes finished active sessions at the finish
+00:12 +103: /private/tmp/timey-p0-20261114/jy_yamyam/test/home_active_session_test.dart: Home screen resumes finished active sessions at the finish
+00:12 +104: /private/tmp/timey-p0-20261114/jy_yamyam/test/home_active_session_test.dart: Home screen resumes finished active sessions at the finish
+00:12 +105: /private/tmp/timey-p0-20261114/jy_yamyam/test/home_active_session_test.dart: Home screen resumes finished active sessions at the finish
+00:12 +106: /private/tmp/timey-p0-20261114/jy_yamyam/test/home_active_session_test.dart: Home screen resumes finished active sessions at the finish
+00:12 +107: /private/tmp/timey-p0-20261114/jy_yamyam/test/home_active_session_test.dart: Home screen resumes finished active sessions at the finish
+00:12 +108: /private/tmp/timey-p0-20261114/jy_yamyam/test/home_active_session_test.dart: Home screen resumes finished active sessions at the finish
+00:12 +109: /private/tmp/timey-p0-20261114/jy_yamyam/test/app_bootstrap_test.dart: Child name setup limits input length
+00:13 +110: /private/tmp/timey-p0-20261114/jy_yamyam/test/app_bootstrap_test.dart: Child name setup limits input length
+00:13 +111: /private/tmp/timey-p0-20261114/jy_yamyam/test/app_bootstrap_test.dart: First-run onboarding appears before child name setup
+00:13 +112: /private/tmp/timey-p0-20261114/jy_yamyam/test/user_guide_screen_test.dart: Settings screen opens Korean parent guide
+00:13 +113: /private/tmp/timey-p0-20261114/jy_yamyam/test/user_guide_screen_test.dart: Settings screen opens Korean parent guide
+00:13 +114: /private/tmp/timey-p0-20261114/jy_yamyam/test/user_guide_screen_test.dart: Settings screen opens Korean parent guide
+00:13 +115: /private/tmp/timey-p0-20261114/jy_yamyam/test/user_guide_screen_test.dart: Settings screen opens Korean parent guide
+00:13 +116: /private/tmp/timey-p0-20261114/jy_yamyam/test/user_guide_screen_test.dart: Settings screen opens Korean parent guide
+00:13 +117: /private/tmp/timey-p0-20261114/jy_yamyam/test/user_guide_screen_test.dart: Settings screen opens Korean parent guide
+00:14 +118: /private/tmp/timey-p0-20261114/jy_yamyam/test/user_guide_screen_test.dart: Settings screen opens Korean parent guide
+00:14 +119: /private/tmp/timey-p0-20261114/jy_yamyam/test/user_guide_screen_test.dart: Settings screen opens Korean parent guide
+00:14 +120: /private/tmp/timey-p0-20261114/jy_yamyam/test/user_guide_screen_test.dart: Settings screen opens Korean parent guide
+00:14 +121: /private/tmp/timey-p0-20261114/jy_yamyam/test/user_guide_screen_test.dart: Settings screen opens Korean parent guide
+00:14 +122: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_motivation_test.dart: Timer screen plays motivation voice after video starts
+00:14 +123: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_motivation_test.dart: Timer screen plays motivation voice after video starts
+00:14 +124: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_motivation_test.dart: Timer screen plays motivation voice after video starts
+00:14 +125: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_motivation_test.dart: Timer screen plays motivation voice after video starts
+00:14 +126: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_motivation_test.dart: Timer screen plays motivation voice after video starts
+00:14 +127: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_motivation_test.dart: Timer screen plays motivation voice after video starts
+00:14 +128: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_motivation_test.dart: Timer screen plays motivation voice after video starts
+00:14 +129: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_motivation_test.dart: Timer screen plays motivation voice after video starts
+00:14 +130: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_motivation_test.dart: Timer screen plays motivation voice after video starts
+00:14 +131: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_motivation_test.dart: Timer screen plays motivation voice after video starts
+00:14 +132: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_motivation_test.dart: Timer screen plays motivation voice after video starts
+00:14 +133: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_motivation_test.dart: Timer screen plays motivation voice after video starts
+00:15 +134: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_motivation_test.dart: Timer screen plays motivation voice after video starts
+00:15 +135: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_motivation_test.dart: Timer screen plays motivation voice after video starts
+00:15 +136: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_motivation_test.dart: Timer screen plays motivation voice after video starts
+00:15 +137: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_motivation_test.dart: Timer screen plays motivation voice after video starts
+00:15 +138: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_motivation_test.dart: Timer screen plays motivation voice after video starts
+00:15 +139: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_motivation_test.dart: Timer screen plays motivation voice after video starts
+00:15 +140: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_motivation_test.dart: Timer screen plays motivation voice after video starts
+00:15 +141: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_motivation_test.dart: Timer screen plays motivation voice after video starts
+00:15 +142: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_motivation_test.dart: Timer screen plays motivation voice after video starts
+00:15 +143: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_motivation_test.dart: Timer screen plays motivation voice after video starts
+00:15 +144: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_motivation_test.dart: Timer screen plays motivation voice after video starts
+00:15 +145: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_motivation_test.dart: Timer screen plays motivation voice after video starts
+00:15 +146: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_motivation_test.dart: Timer screen plays motivation voice after video starts
+00:15 +147: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_motivation_test.dart: Timer screen plays motivation voice after video starts
+00:15 +148: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_motivation_test.dart: Timer screen plays motivation voice after video starts
+00:15 +149: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_motivation_test.dart: Timer screen plays motivation voice after video starts
+00:15 +150: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_motivation_test.dart: Timer screen plays motivation voice after video starts
+00:15 +151: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_motivation_test.dart: Timer screen plays motivation voice after video starts
+00:15 +152: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_motivation_test.dart: Timer screen plays motivation voice after video starts
+00:15 +153: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_motivation_test.dart: Timer screen plays motivation voice after video starts
+00:15 +154: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_motivation_test.dart: Timer screen plays motivation voice after video starts
+00:15 +155: /private/tmp/timey-p0-20261114/jy_yamyam/test/home_course_start_test.dart: rapid course taps open one picker and allow retry after dismissal
+00:15 +156: /private/tmp/timey-p0-20261114/jy_yamyam/test/home_course_start_test.dart: rapid course taps open one picker and allow retry after dismissal
+00:15 +157: /private/tmp/timey-p0-20261114/jy_yamyam/test/home_course_start_test.dart: rapid course taps open one picker and allow retry after dismissal
+00:15 +158: /private/tmp/timey-p0-20261114/jy_yamyam/test/home_course_start_test.dart: rapid course taps open one picker and allow retry after dismissal
+00:15 +159: /private/tmp/timey-p0-20261114/jy_yamyam/test/home_course_start_test.dart: rapid course taps open one picker and allow retry after dismissal
+00:15 +160: /private/tmp/timey-p0-20261114/jy_yamyam/test/home_course_start_test.dart: rapid course taps open one picker and allow retry after dismissal
+00:15 +161: /private/tmp/timey-p0-20261114/jy_yamyam/test/home_course_start_test.dart: rapid course taps open one picker and allow retry after dismissal
+00:15 +162: /private/tmp/timey-p0-20261114/jy_yamyam/test/home_course_start_test.dart: rapid course taps open one picker and allow retry after dismissal
+00:15 +163: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_motivation_test.dart: Timer screen uses three-minute motivation cadence for long timer
+00:15 +164: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_motivation_test.dart: Timer screen uses three-minute motivation cadence for long timer
+00:15 +165: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_motivation_test.dart: Timer screen uses three-minute motivation cadence for long timer
+00:16 +166: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_motivation_test.dart: Timer screen uses three-minute motivation cadence for long timer
+00:16 +167: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_motivation_test.dart: Timer screen uses three-minute motivation cadence for long timer
+00:16 +168: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_motivation_test.dart: Timer screen uses three-minute motivation cadence for long timer
+00:16 +169: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_motivation_test.dart: Timer screen uses three-minute motivation cadence for long timer
+00:16 +170: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_motivation_test.dart: Timer screen uses three-minute motivation cadence for long timer
+00:16 +171: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_motivation_test.dart: Timer screen uses three-minute motivation cadence for long timer
+00:16 +172: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_motivation_test.dart: Timer screen uses three-minute motivation cadence for long timer
+00:16 +173: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_motivation_test.dart: Timer screen uses three-minute motivation cadence for long timer
+00:16 +174: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_motivation_test.dart: Timer screen uses three-minute motivation cadence for long timer
+00:16 +175: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_motivation_test.dart: Timer screen uses three-minute motivation cadence for long timer
+00:16 +176: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_motivation_test.dart: Timer screen uses three-minute motivation cadence for long timer
+00:16 +177: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_motivation_test.dart: Timer screen uses three-minute motivation cadence for long timer
+00:16 +178: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_motivation_test.dart: Timer screen uses three-minute motivation cadence for long timer
+00:16 +179: /private/tmp/timey-p0-20261114/jy_yamyam/test/home_course_start_test.dart: Meal ingredient picker help opens ingredient help text
+00:16 +180: /private/tmp/timey-p0-20261114/jy_yamyam/test/home_course_start_test.dart: Meal ingredient picker help opens ingredient help text
+00:16 +181: /private/tmp/timey-p0-20261114/jy_yamyam/test/home_course_start_test.dart: Meal ingredient picker help opens ingredient help text
+00:16 +182: /private/tmp/timey-p0-20261114/jy_yamyam/test/home_course_start_test.dart: Meal ingredient picker help opens ingredient help text
+00:16 +183: /private/tmp/timey-p0-20261114/jy_yamyam/test/motivation_media_availability_test.dart: Settings hides motivation section when unavailable
+00:16 +184: /private/tmp/timey-p0-20261114/jy_yamyam/test/motivation_media_availability_test.dart: Settings hides motivation section when unavailable
+00:16 +185: /private/tmp/timey-p0-20261114/jy_yamyam/test/motivation_media_availability_test.dart: Settings hides motivation section when unavailable
+00:16 +186: /private/tmp/timey-p0-20261114/jy_yamyam/test/motivation_media_availability_test.dart: Settings hides motivation section when unavailable
+00:16 +187: /private/tmp/timey-p0-20261114/jy_yamyam/test/motivation_media_availability_test.dart: Settings hides motivation section when unavailable
+00:16 +188: /private/tmp/timey-p0-20261114/jy_yamyam/test/motivation_media_availability_test.dart: Settings hides motivation section when unavailable
+00:16 +189: /private/tmp/timey-p0-20261114/jy_yamyam/test/motivation_media_availability_test.dart: Settings hides motivation section when unavailable
+00:16 +190: /private/tmp/timey-p0-20261114/jy_yamyam/test/motivation_media_availability_test.dart: Settings hides motivation section when unavailable
+00:16 +191: /private/tmp/timey-p0-20261114/jy_yamyam/test/motivation_media_availability_test.dart: Settings hides motivation section when unavailable
+00:16 +192: /private/tmp/timey-p0-20261114/jy_yamyam/test/motivation_media_availability_test.dart: Settings hides motivation section when unavailable
+00:16 +193: /private/tmp/timey-p0-20261114/jy_yamyam/test/motivation_media_availability_test.dart: Settings hides motivation section when unavailable
+00:16 +194: /private/tmp/timey-p0-20261114/jy_yamyam/test/motivation_media_availability_test.dart: Settings hides motivation section when unavailable
+00:16 +195: /private/tmp/timey-p0-20261114/jy_yamyam/test/motivation_media_availability_test.dart: Settings hides motivation section when unavailable
+00:16 +196: /private/tmp/timey-p0-20261114/jy_yamyam/test/motivation_media_availability_test.dart: Settings hides motivation section when unavailable
+00:16 +197: /private/tmp/timey-p0-20261114/jy_yamyam/test/motivation_media_availability_test.dart: Settings hides motivation section when unavailable
+00:16 +198: /private/tmp/timey-p0-20261114/jy_yamyam/test/motivation_media_availability_test.dart: Settings hides motivation section when unavailable
+00:17 +199: /private/tmp/timey-p0-20261114/jy_yamyam/test/motivation_media_availability_test.dart: Settings hides motivation section when unavailable
+00:17 +200: /private/tmp/timey-p0-20261114/jy_yamyam/test/motivation_media_availability_test.dart: Settings hides motivation section when unavailable
+00:17 +201: /private/tmp/timey-p0-20261114/jy_yamyam/test/motivation_media_availability_test.dart: Settings hides motivation section when unavailable
+00:17 +202: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_motivation_test.dart: Timer screen closes active motivation video when disabled
+00:17 +203: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_motivation_test.dart: Timer screen closes active motivation video when disabled
+00:17 +204: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_motivation_test.dart: Timer screen closes active motivation video when disabled
+00:17 +205: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_motivation_test.dart: Timer screen closes active motivation video when disabled
+00:17 +206: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_motivation_test.dart: Timer screen closes active motivation video when disabled
+00:17 +207: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_motivation_test.dart: Timer screen closes active motivation video when disabled
+00:17 +208: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_motivation_test.dart: Timer screen closes active motivation video when disabled
+00:17 +209: /private/tmp/timey-p0-20261114/jy_yamyam/test/motivation_media_availability_test.dart: Timer portrait hides motivation settings when unavailable
+00:17 +210: /private/tmp/timey-p0-20261114/jy_yamyam/test/motivation_media_availability_test.dart: Timer portrait hides motivation settings when unavailable
+00:17 +211: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_motivation_test.dart: Timer motivation settings dismiss keeps pending changes unapplied
+00:17 +212: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_motivation_test.dart: Timer motivation settings dismiss keeps pending changes unapplied
+00:17 +213: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_motivation_test.dart: Timer motivation settings dismiss keeps pending changes unapplied
+00:18 +214: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_motivation_test.dart: Timer motivation settings dismiss keeps pending changes unapplied
+00:18 +215: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_motivation_test.dart: Timer motivation settings dismiss keeps pending changes unapplied
+00:18 +216: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_motivation_test.dart: Timer motivation settings dismiss keeps pending changes unapplied
+00:18 +217: /private/tmp/timey-p0-20261114/jy_yamyam/test/motivation_media_availability_test.dart: Timer does not activate cues or audio when unavailable
+00:18 +218: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_motivation_test.dart: Timer screen restarts custom motivation interval from change time
+00:18 +219: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_motivation_test.dart: Timer screen restarts custom motivation interval from change time
+00:19 +220: /private/tmp/timey-p0-20261114/jy_yamyam/test/app_purchase_wiring_test.dart: YamyamRiderApp exposes initial purchase entitlement
+00:19 +221: /private/tmp/timey-p0-20261114/jy_yamyam/test/home_vehicle_entitlement_test.dart: Home starts timer with free fallback for locked premium vehicle
+00:19 +222: /private/tmp/timey-p0-20261114/jy_yamyam/test/home_vehicle_entitlement_test.dart: Home starts timer with free fallback for locked premium vehicle
+00:19 +223: /private/tmp/timey-p0-20261114/jy_yamyam/test/home_vehicle_entitlement_test.dart: Home starts timer with free fallback for locked premium vehicle
+00:19 +224: /private/tmp/timey-p0-20261114/jy_yamyam/test/home_vehicle_entitlement_test.dart: Home starts timer with free fallback for locked premium vehicle
+00:19 +225: /private/tmp/timey-p0-20261114/jy_yamyam/test/home_vehicle_entitlement_test.dart: Home starts timer with free fallback for locked premium vehicle
+00:19 +226: /private/tmp/timey-p0-20261114/jy_yamyam/test/home_vehicle_entitlement_test.dart: Home starts timer with free fallback for locked premium vehicle
+00:19 +227: /private/tmp/timey-p0-20261114/jy_yamyam/test/home_vehicle_entitlement_test.dart: Home starts timer with free fallback for locked premium vehicle
+00:19 +228: /private/tmp/timey-p0-20261114/jy_yamyam/test/home_vehicle_entitlement_test.dart: Home starts timer with free fallback for locked premium vehicle
+00:19 +229: /private/tmp/timey-p0-20261114/jy_yamyam/test/motivation_media_availability_test.dart: Timer motivation remains available when explicitly enabled
+00:19 +230: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_motivation_test.dart: Timer screen skips motivation videos when disabled
+00:19 +231: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_motivation_test.dart: Timer screen skips motivation videos when disabled
+00:19 +232: /private/tmp/timey-p0-20261114/jy_yamyam/test/home_vehicle_entitlement_test.dart: Home normalizes below-minimum duration before starting timer
+00:19 +233: /private/tmp/timey-p0-20261114/jy_yamyam/test/home_vehicle_entitlement_test.dart: Home custom duration slider starts at policy minimum
+00:19 +234: /private/tmp/timey-p0-20261114/jy_yamyam/test/home_vehicle_entitlement_test.dart: Home resumes active session with free fallback
+00:20 +235: /private/tmp/timey-p0-20261114/jy_yamyam/test/home_vehicle_entitlement_test.dart: Home shows locked vehicles and blocks locked selection
+00:20 +236: /private/tmp/timey-p0-20261114/jy_yamyam/test/home_vehicle_entitlement_test.dart: Home does not show vehicle locks when vehicle pack is unlocked
+00:20 +237: /private/tmp/timey-p0-20261114/jy_yamyam/test/home_vehicle_entitlement_test.dart: Home locked vehicle opens guardian gate and purchase sheet
+00:20 +238: /private/tmp/timey-p0-20261114/jy_yamyam/test/home_vehicle_entitlement_test.dart: Home locked vehicle opens guardian gate and purchase sheet
+00:20 +239: /private/tmp/timey-p0-20261114/jy_yamyam/test/home_vehicle_entitlement_test.dart: Home locked vehicle opens guardian gate and purchase sheet
+00:20 +240: /private/tmp/timey-p0-20261114/jy_yamyam/test/home_vehicle_entitlement_test.dart: Home locked vehicle opens guardian gate and purchase sheet
+00:20 +241: /private/tmp/timey-p0-20261114/jy_yamyam/test/home_vehicle_entitlement_test.dart: Home locked vehicle opens guardian gate and purchase sheet
+00:20 +242: /private/tmp/timey-p0-20261114/jy_yamyam/test/meal_history_linked_delete_test.dart: Deletion linked=false cannot be replayed by late completion
+00:20 +243: /private/tmp/timey-p0-20261114/jy_yamyam/test/meal_history_linked_delete_test.dart: Deletion linked=true cannot be replayed by late completion
+00:20 +244: /private/tmp/timey-p0-20261114/jy_yamyam/test/meal_history_linked_delete_test.dart: Legacy result without sessionId is also blocked after deletion
+00:20 +245: /private/tmp/timey-p0-20261114/jy_yamyam/test/meal_history_linked_delete_test.dart: Only selected meal is deducted, repeated concurrent delete is harmless
+00:20 +246: /private/tmp/timey-p0-20261114/jy_yamyam/test/meal_history_linked_delete_test.dart: Earned reversals preserve used rewards and more than two active goals
+00:20 +247: /private/tmp/timey-p0-20261114/jy_yamyam/test/meal_history_linked_delete_test.dart: Empty reward ids can still remove legacy linked slots
+00:20 +248: /private/tmp/timey-p0-20261114/jy_yamyam/test/meal_history_linked_delete_test.dart: Unknown/duplicate reward ids and missing inventory never go negative
+00:20 +249: /private/tmp/timey-p0-20261114/jy_yamyam/test/meal_history_linked_delete_test.dart: History-only delete preserves opaque unrelated lists and legacy used data
+00:20 +250: /private/tmp/timey-p0-20261114/jy_yamyam/test/meal_history_linked_delete_test.dart: Goal id collisions fail before writing, history-only delete remains available
+00:20 +251: /private/tmp/timey-p0-20261114/jy_yamyam/test/meal_history_linked_delete_test.dart: Corrupt deleted IDs 42 block mutation without blocking snapshots
+00:20 +252: /private/tmp/timey-p0-20261114/jy_yamyam/test/meal_history_linked_delete_test.dart: Corrupt deleted IDs [] block mutation without blocking snapshots
+00:20 +253: /private/tmp/timey-p0-20261114/jy_yamyam/test/meal_history_linked_delete_test.dart: Corrupt deleted IDs invalid block mutation without blocking snapshots
+00:20 +254: /private/tmp/timey-p0-20261114/jy_yamyam/test/meal_history_linked_delete_test.dart: Malformed journal is validated before any recovery write
+00:20 +255: /private/tmp/timey-p0-20261114/jy_yamyam/test/meal_history_linked_delete_test.dart: Old journal and normal completions preserve deleted IDs
+00:20 +256: /private/tmp/timey-p0-20261114/jy_yamyam/test/meal_history_linked_delete_test.dart: Deletion recovers failure mealCompletionJournal throws=false linked=false without double deduction
+00:20 +257: /private/tmp/timey-p0-20261114/jy_yamyam/test/meal_history_linked_delete_test.dart: Deletion recovers failure deletedMealSessionIds throws=false linked=false without double deduction
+00:20 +258: /private/tmp/timey-p0-20261114/jy_yamyam/test/meal_history_linked_delete_test.dart: Deletion recovers failure mealHistory throws=false linked=false without double deduction
+00:20 +259: /private/tmp/timey-p0-20261114/jy_yamyam/test/meal_history_linked_delete_test.dart: Deletion recovers failure rewardInventory throws=false linked=false without double deduction
+00:20 +260: /private/tmp/timey-p0-20261114/jy_yamyam/test/meal_history_linked_delete_test.dart: Deletion recovers failure activeRewardGoals throws=false linked=false without double deduction
+00:20 +261: /private/tmp/timey-p0-20261114/jy_yamyam/test/meal_history_linked_delete_test.dart: Deletion recovers failure earnedRewardGoals throws=false linked=false without double deduction
+00:20 +262: /private/tmp/timey-p0-20261114/jy_yamyam/test/meal_history_linked_delete_test.dart: Deletion recovers failure remove:activeRewardGoal throws=false linked=false without double deduction
+00:20 +263: /private/tmp/timey-p0-20261114/jy_yamyam/test/meal_history_linked_delete_test.dart: Deletion recovers failure remove:mealCompletionJournal throws=false linked=false without double deduction
+00:20 +264: /private/tmp/timey-p0-20261114/jy_yamyam/test/meal_history_linked_delete_test.dart: Deletion recovers failure mealCompletionJournal throws=true linked=false without double deduction
+00:20 +265: /private/tmp/timey-p0-20261114/jy_yamyam/test/meal_history_linked_delete_test.dart: Deletion recovers failure deletedMealSessionIds throws=true linked=false without double deduction
+00:20 +266: /private/tmp/timey-p0-20261114/jy_yamyam/test/meal_history_linked_delete_test.dart: Deletion recovers failure mealHistory throws=true linked=false without double deduction
+00:20 +267: /private/tmp/timey-p0-20261114/jy_yamyam/test/meal_history_linked_delete_test.dart: Deletion recovers failure rewardInventory throws=true linked=false without double deduction
+00:20 +268: /private/tmp/timey-p0-20261114/jy_yamyam/test/meal_history_linked_delete_test.dart: Deletion recovers failure activeRewardGoals throws=true linked=false without double deduction
+00:20 +269: /private/tmp/timey-p0-20261114/jy_yamyam/test/meal_history_linked_delete_test.dart: Deletion recovers failure earnedRewardGoals throws=true linked=false without double deduction
+00:20 +270: /private/tmp/timey-p0-20261114/jy_yamyam/test/meal_history_linked_delete_test.dart: Deletion recovers failure remove:activeRewardGoal throws=true linked=false without double deduction
+00:20 +271: /private/tmp/timey-p0-20261114/jy_yamyam/test/meal_history_linked_delete_test.dart: Deletion recovers failure remove:mealCompletionJournal throws=true linked=false without double deduction
+00:20 +272: /private/tmp/timey-p0-20261114/jy_yamyam/test/meal_history_linked_delete_test.dart: Deletion recovers failure mealCompletionJournal throws=false linked=true without double deduction
+00:20 +273: /private/tmp/timey-p0-20261114/jy_yamyam/test/meal_history_linked_delete_test.dart: Deletion recovers failure deletedMealSessionIds throws=false linked=true without double deduction
+00:20 +274: /private/tmp/timey-p0-20261114/jy_yamyam/test/meal_history_linked_delete_test.dart: Deletion recovers failure mealHistory throws=false linked=true without double deduction
+00:20 +275: /private/tmp/timey-p0-20261114/jy_yamyam/test/meal_history_linked_delete_test.dart: Deletion recovers failure rewardInventory throws=false linked=true without double deduction
+00:20 +276: /private/tmp/timey-p0-20261114/jy_yamyam/test/meal_history_linked_delete_test.dart: Deletion recovers failure activeRewardGoals throws=false linked=true without double deduction
+00:20 +277: /private/tmp/timey-p0-20261114/jy_yamyam/test/meal_history_linked_delete_test.dart: Deletion recovers failure earnedRewardGoals throws=false linked=true without double deduction
+00:20 +278: /private/tmp/timey-p0-20261114/jy_yamyam/test/meal_history_linked_delete_test.dart: Deletion recovers failure remove:activeRewardGoal throws=false linked=true without double deduction
+00:20 +279: /private/tmp/timey-p0-20261114/jy_yamyam/test/meal_history_linked_delete_test.dart: Deletion recovers failure remove:mealCompletionJournal throws=false linked=true without double deduction
+00:20 +280: /private/tmp/timey-p0-20261114/jy_yamyam/test/meal_history_linked_delete_test.dart: Deletion recovers failure mealCompletionJournal throws=true linked=true without double deduction
+00:20 +281: /private/tmp/timey-p0-20261114/jy_yamyam/test/meal_history_linked_delete_test.dart: Deletion recovers failure deletedMealSessionIds throws=true linked=true without double deduction
+00:20 +282: /private/tmp/timey-p0-20261114/jy_yamyam/test/meal_history_linked_delete_test.dart: Deletion recovers failure mealHistory throws=true linked=true without double deduction
+00:20 +283: /private/tmp/timey-p0-20261114/jy_yamyam/test/meal_history_linked_delete_test.dart: Deletion recovers failure rewardInventory throws=true linked=true without double deduction
+00:20 +284: /private/tmp/timey-p0-20261114/jy_yamyam/test/meal_history_linked_delete_test.dart: Deletion recovers failure activeRewardGoals throws=true linked=true without double deduction
+00:20 +285: /private/tmp/timey-p0-20261114/jy_yamyam/test/meal_history_linked_delete_test.dart: Deletion recovers failure earnedRewardGoals throws=true linked=true without double deduction
+00:20 +286: /private/tmp/timey-p0-20261114/jy_yamyam/test/meal_history_linked_delete_test.dart: Deletion recovers failure remove:activeRewardGoal throws=true linked=true without double deduction
+00:20 +287: /private/tmp/timey-p0-20261114/jy_yamyam/test/meal_history_linked_delete_test.dart: Deletion recovers failure remove:mealCompletionJournal throws=true linked=true without double deduction
+00:20 +288: /private/tmp/timey-p0-20261114/jy_yamyam/test/meal_history_linked_delete_test.dart: Linked delete rejects undecodable unrelated data without discarding it
+00:20 +289: /private/tmp/timey-p0-20261114/jy_yamyam/test/meal_history_linked_delete_test.dart: Unrelated zero-count inventory is retained
+00:20 +290: /private/tmp/timey-p0-20261114/jy_yamyam/test/meal_history_linked_delete_test.dart: Legacy earned goal is preserved by history-only delete and reversed by linked delete
+00:20 +291: /private/tmp/timey-p0-20261114/jy_yamyam/test/meal_history_linked_delete_test.dart: Deleting a meal unrelated to an earned goal does not revoke it
+00:20 +292: /private/tmp/timey-p0-20261114/jy_yamyam/test/meal_history_linked_delete_test.dart: Journal can restore a corrupt deleted-ID key before mutation
+00:20 +293: /private/tmp/timey-p0-20261114/jy_yamyam/test/meal_history_linked_delete_test.dart: Multi-year deleted IDs retain replay protection across another deletion
+00:21 +294: /private/tmp/timey-p0-20261114/jy_yamyam/test/meal_timer_config_test.dart: Default config uses default avatar image settings
+00:21 +295: /private/tmp/timey-p0-20261114/jy_yamyam/test/meal_timer_config_test.dart: MealTimerConfig copyWith preserves and updates course ingredient ids
+00:21 +296: /private/tmp/timey-p0-20261114/jy_yamyam/test/meal_timer_config_test.dart: MealTimerConfig copyWith updates motivation video settings
+00:21 +297: /private/tmp/timey-p0-20261114/jy_yamyam/test/meal_timer_config_test.dart: MealTimerConfig copyWith updates course ingredient mode
+00:22 +298: /private/tmp/timey-p0-20261114/jy_yamyam/test/sticker_collection_screen_test.dart: Sticker collection shows motorcycle and supercar first
+00:22 +299: /private/tmp/timey-p0-20261114/jy_yamyam/test/sticker_collection_screen_test.dart: Sticker collection shows motorcycle and supercar first
+00:22 +300: /private/tmp/timey-p0-20261114/jy_yamyam/test/sticker_collection_screen_test.dart: Sticker collection shows motorcycle and supercar first
+00:22 +301: /private/tmp/timey-p0-20261114/jy_yamyam/test/sticker_collection_screen_test.dart: Sticker collection shows motorcycle and supercar first
+00:22 +302: /private/tmp/timey-p0-20261114/jy_yamyam/test/sticker_collection_screen_test.dart: Sticker collection shows motorcycle and supercar first
+00:22 +303: /private/tmp/timey-p0-20261114/jy_yamyam/test/sticker_collection_screen_test.dart: Sticker collection shows motorcycle and supercar first
+00:22 +304: /private/tmp/timey-p0-20261114/jy_yamyam/test/sticker_collection_screen_test.dart: Sticker collection shows motorcycle and supercar first
+00:22 +305: /private/tmp/timey-p0-20261114/jy_yamyam/test/sticker_collection_screen_test.dart: Sticker collection shows motorcycle and supercar first
+00:23 +306: /private/tmp/timey-p0-20261114/jy_yamyam/test/sticker_collection_screen_test.dart: Sticker collection shows motorcycle and supercar first
+00:23 +307: /private/tmp/timey-p0-20261114/jy_yamyam/test/sticker_collection_screen_test.dart: Collection fits width 240.0, scale 1.0, en
+00:23 +308: /private/tmp/timey-p0-20261114/jy_yamyam/test/sticker_collection_screen_test.dart: Collection fits width 240.0, scale 1.3, ko
+00:23 +309: /private/tmp/timey-p0-20261114/jy_yamyam/test/sticker_collection_screen_test.dart: Collection fits width 240.0, scale 2.0, ja
+00:23 +310: /private/tmp/timey-p0-20261114/jy_yamyam/test/sticker_collection_screen_test.dart: Collection fits width 240.0, scale 3.0, es
+00:23 +311: /private/tmp/timey-p0-20261114/jy_yamyam/test/sticker_collection_screen_test.dart: Collection fits width 320.0, scale 1.0, ko
+00:23 +312: /private/tmp/timey-p0-20261114/jy_yamyam/test/sticker_collection_screen_test.dart: Collection fits width 320.0, scale 1.3, ja
+00:23 +313: /private/tmp/timey-p0-20261114/jy_yamyam/test/sticker_collection_screen_test.dart: Collection fits width 320.0, scale 2.0, es
+00:23 +314: /private/tmp/timey-p0-20261114/jy_yamyam/test/sticker_collection_screen_test.dart: Collection fits width 320.0, scale 3.0, pt_BR
+00:23 +315: /private/tmp/timey-p0-20261114/jy_yamyam/test/sticker_collection_screen_test.dart: Collection fits width 360.0, scale 1.0, ja
+00:23 +316: /private/tmp/timey-p0-20261114/jy_yamyam/test/sticker_collection_screen_test.dart: Collection fits width 360.0, scale 1.3, es
+00:23 +317: /private/tmp/timey-p0-20261114/jy_yamyam/test/sticker_collection_screen_test.dart: Collection fits width 360.0, scale 2.0, pt_BR
+00:23 +318: /private/tmp/timey-p0-20261114/jy_yamyam/test/sticker_collection_screen_test.dart: Collection fits width 360.0, scale 3.0, en
+00:23 +319: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_end_alarm_test.dart: Small English phone keeps road behind expiry dialog: true
+00:24 +320: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_end_alarm_test.dart: Small English phone keeps road behind expiry dialog: true
+00:24 +321: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_end_alarm_test.dart: Small English phone keeps road behind expiry dialog: true
+00:24 +322: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_end_alarm_test.dart: Small English phone keeps road behind expiry dialog: true
+00:24 +323: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_end_alarm_test.dart: Small English phone keeps road behind expiry dialog: true
+00:24 +324: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_end_alarm_test.dart: Small English phone keeps road behind expiry dialog: true
+00:24 +325: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_end_alarm_test.dart: Small English phone keeps road behind expiry dialog: true
+00:24 +326: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_end_alarm_test.dart: Small English phone keeps road behind expiry dialog: true
+00:24 +327: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_end_alarm_test.dart: Small English phone keeps road behind expiry dialog: true
+00:24 +328: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_end_alarm_test.dart: Small English phone keeps road behind expiry dialog: true
+00:24 +329: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_end_alarm_test.dart: Small English phone keeps road behind expiry dialog: true
+00:24 +330: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_end_alarm_test.dart: Small English phone keeps road behind expiry dialog: true
+00:24 +331: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_end_alarm_test.dart: Small English phone keeps road behind expiry dialog: true
+00:24 +332: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_end_alarm_test.dart: Small English phone keeps road behind expiry dialog: true
+00:24 +333: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_end_alarm_test.dart: Small English phone keeps road behind expiry dialog: true
+00:24 +334: /private/tmp/timey-p0-20261114/jy_yamyam/test/sticker_collection_screen_test.dart: Collection fits width 1024.0, scale 2.0, es
+00:24 +335: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_end_alarm_test.dart: Small English phone keeps road behind expiry dialog: false
+00:24 +336: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_end_alarm_test.dart: Small English phone keeps road behind expiry dialog: false
+00:24 +337: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_end_alarm_test.dart: Small English phone keeps road behind expiry dialog: false
+00:24 +338: /private/tmp/timey-p0-20261114/jy_yamyam/test/sticker_collection_screen_test.dart: Collection fits width 1440.0, scale 1.3, es
+00:24 +339: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_end_alarm_test.dart: Expiry rings before 900ms modal and never restarts on ticks
+00:24 +340: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_end_alarm_test.dart: Expiry rings before 900ms modal and never restarts on ticks
+00:24 +341: /private/tmp/timey-p0-20261114/jy_yamyam/test/sticker_collection_screen_test.dart: Collection fits width 1440.0, scale 3.0, en
+00:24 +342: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_end_alarm_test.dart: Automatic response true silences then records existing status
+00:24 +343: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_end_alarm_test.dart: Automatic response true silences then records existing status
+00:25 +344: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_end_alarm_test.dart: Automatic response true silences then records existing status
+00:25 +345: /private/tmp/timey-p0-20261114/jy_yamyam/test/sticker_collection_screen_test.dart: Collection wraps long names with large text in ja
+00:25 +346: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_end_alarm_test.dart: Automatic response false silences then records existing status
+00:25 +347: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_end_alarm_test.dart: Automatic response false silences then records existing status
+00:25 +348: /private/tmp/timey-p0-20261114/jy_yamyam/test/sticker_collection_screen_test.dart: Collection wraps long names with large text in pt_BR
+00:25 +349: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_end_alarm_test.dart: Automatic response null silences then records existing status
+00:25 +350: /private/tmp/timey-p0-20261114/jy_yamyam/test/road_painter_test.dart: GoalStarPulse has a stronger pulse and respects reduced motion
+00:25 +351: /private/tmp/timey-p0-20261114/jy_yamyam/test/road_painter_test.dart: GoalStarPulse has a stronger pulse and respects reduced motion
+00:25 +352: /private/tmp/timey-p0-20261114/jy_yamyam/test/road_painter_test.dart: GoalStarPulse has a stronger pulse and respects reduced motion
+00:25 +353: /private/tmp/timey-p0-20261114/jy_yamyam/test/road_painter_test.dart: GoalStarPulse has a stronger pulse and respects reduced motion
+00:25 +354: /private/tmp/timey-p0-20261114/jy_yamyam/test/road_painter_test.dart: GoalStarPulse has a stronger pulse and respects reduced motion
+00:25 +355: /private/tmp/timey-p0-20261114/jy_yamyam/test/road_painter_test.dart: GoalStarPulse has a stronger pulse and respects reduced motion
+00:25 +356: /private/tmp/timey-p0-20261114/jy_yamyam/test/road_painter_test.dart: GoalStarPulse has a stronger pulse and respects reduced motion
+00:25 +357: /private/tmp/timey-p0-20261114/jy_yamyam/test/road_painter_test.dart: GoalStarPulse has a stronger pulse and respects reduced motion
+00:25 +358: /private/tmp/timey-p0-20261114/jy_yamyam/test/road_painter_test.dart: GoalStarPulse has a stronger pulse and respects reduced motion
+00:25 +359: /private/tmp/timey-p0-20261114/jy_yamyam/test/road_painter_test.dart: GoalStarPulse has a stronger pulse and respects reduced motion
+00:25 +360: /private/tmp/timey-p0-20261114/jy_yamyam/test/road_painter_test.dart: GoalStarPulse has a stronger pulse and respects reduced motion
+00:25 +361: /private/tmp/timey-p0-20261114/jy_yamyam/test/road_painter_test.dart: GoalStarPulse has a stronger pulse and respects reduced motion
+00:25 +362: /private/tmp/timey-p0-20261114/jy_yamyam/test/road_painter_test.dart: GoalStarPulse has a stronger pulse and respects reduced motion
+00:25 +363: /private/tmp/timey-p0-20261114/jy_yamyam/test/road_painter_test.dart: GoalStarPulse has a stronger pulse and respects reduced motion
+00:25 +364: /private/tmp/timey-p0-20261114/jy_yamyam/test/road_painter_test.dart: GoalStarPulse has a stronger pulse and respects reduced motion
+00:25 +365: /private/tmp/timey-p0-20261114/jy_yamyam/test/road_painter_test.dart: GoalStarPulse has a stronger pulse and respects reduced motion
+00:25 +366: /private/tmp/timey-p0-20261114/jy_yamyam/test/road_painter_test.dart: GoalStarPulse has a stronger pulse and respects reduced motion
+00:25 +367: /private/tmp/timey-p0-20261114/jy_yamyam/test/road_painter_test.dart: GoalStarPulse has a stronger pulse and respects reduced motion
+00:25 +368: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_end_alarm_test.dart: Background expiry defers sound and modal until resume
+00:25 +369: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_end_alarm_test.dart: Background expiry defers sound and modal until resume
+00:25 +370: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_end_alarm_test.dart: Background expiry defers sound and modal until resume
+00:25 +371: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_end_alarm_test.dart: Background expiry defers sound and modal until resume
+00:25 +372: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_end_alarm_test.dart: Background expiry defers sound and modal until resume
+00:25 +373: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_end_alarm_test.dart: Background expiry defers sound and modal until resume
+00:25 +374: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_end_alarm_test.dart: Background expiry defers sound and modal until resume
+00:25 +375: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_end_alarm_test.dart: Background expiry defers sound and modal until resume
+00:25 +376: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_end_alarm_test.dart: Background expiry defers sound and modal until resume
+00:25 +377: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_end_alarm_test.dart: Background expiry defers sound and modal until resume
+00:25 +378: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_end_alarm_test.dart: Background expiry defers sound and modal until resume
+00:25 +379: /private/tmp/timey-p0-20261114/jy_yamyam/test/result_screen_test.dart: Completed-before-arrival result shows intro video screen
+00:25 +380: /private/tmp/timey-p0-20261114/jy_yamyam/test/result_screen_test.dart: Completed-before-arrival result shows intro video screen
+00:25 +381: /private/tmp/timey-p0-20261114/jy_yamyam/test/result_screen_test.dart: Completed-before-arrival result shows intro video screen
+00:25 +382: /private/tmp/timey-p0-20261114/jy_yamyam/test/result_screen_test.dart: Completed-before-arrival result shows intro video screen
+00:26 +383: /private/tmp/timey-p0-20261114/jy_yamyam/test/result_screen_test.dart: Completed-before-arrival result shows intro video screen
+00:26 +383: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_end_alarm_test.dart: Save failure retries without another alarm or duplicate sticker
+Unable to persist completed meal: Bad state: Test completion failure
+#0      _Progress.recordMealResult (file:///private/tmp/timey-p0-20261114/jy_yamyam/test/timer_end_alarm_test.dart:74:15)
+<asynchronous suspension>
+#1      _TimerScreenState._saveCompletionAndOpenResult (package:jy_yamyam/screens/timer_screen.dart:1100:29)
+<asynchronous suspension>
+#2      _TimerScreenState._preserveCompletion (package:jy_yamyam/screens/timer_screen.dart:1088:5)
+<asynchronous suspension>
+#3      _TimerScreenState._confirmComplete (package:jy_yamyam/screens/timer_screen.dart:1066:7)
+<asynchronous suspension>
+00:26 +384: /private/tmp/timey-p0-20261114/jy_yamyam/test/result_screen_test.dart: Completed-before-arrival result shows intro video screen
+00:26 +385: /private/tmp/timey-p0-20261114/jy_yamyam/test/result_screen_test.dart: Completed-before-arrival result shows intro video screen
+00:26 +386: /private/tmp/timey-p0-20261114/jy_yamyam/test/result_screen_test.dart: Completed-before-arrival result shows intro video screen
+00:26 +387: /private/tmp/timey-p0-20261114/jy_yamyam/test/result_screen_test.dart: Completed-before-arrival result shows intro video screen
+00:26 +388: /private/tmp/timey-p0-20261114/jy_yamyam/test/release_asset_bundle_test.dart: optimized assets load while preserved originals stay outside bundle
+00:26 +389: /private/tmp/timey-p0-20261114/jy_yamyam/test/release_asset_bundle_test.dart: optimized assets load while preserved originals stay outside bundle
+00:26 +390: /private/tmp/timey-p0-20261114/jy_yamyam/test/release_asset_bundle_test.dart: optimized assets load while preserved originals stay outside bundle
+00:26 +391: /private/tmp/timey-p0-20261114/jy_yamyam/test/release_asset_bundle_test.dart: optimized assets load while preserved originals stay outside bundle
+00:26 +392: /private/tmp/timey-p0-20261114/jy_yamyam/test/release_asset_bundle_test.dart: optimized assets load while preserved originals stay outside bundle
+00:26 +393: /private/tmp/timey-p0-20261114/jy_yamyam/test/release_asset_bundle_test.dart: optimized assets load while preserved originals stay outside bundle
+00:26 +394: /private/tmp/timey-p0-20261114/jy_yamyam/test/release_asset_bundle_test.dart: optimized assets load while preserved originals stay outside bundle
+00:26 +395: /private/tmp/timey-p0-20261114/jy_yamyam/test/release_asset_bundle_test.dart: optimized assets load while preserved originals stay outside bundle
+00:26 +396: /private/tmp/timey-p0-20261114/jy_yamyam/test/release_asset_bundle_test.dart: optimized assets load while preserved originals stay outside bundle
+00:26 +397: /private/tmp/timey-p0-20261114/jy_yamyam/test/release_asset_bundle_test.dart: optimized assets load while preserved originals stay outside bundle
+00:26 +398: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_completion_test.dart: failed completion retains result and retry awards only once
+00:26 +399: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_completion_test.dart: failed completion retains result and retry awards only once
+00:26 +400: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_completion_test.dart: failed completion retains result and retry awards only once
+00:27 +401: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_completion_test.dart: failed completion retains result and retry awards only once
+00:27 +402: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_completion_test.dart: failed completion retains result and retry awards only once
+00:27 +403: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_completion_test.dart: failed completion retains result and retry awards only once
+00:27 +404: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_completion_test.dart: failed completion retains result and retry awards only once
+00:27 +405: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_completion_test.dart: failed completion retains result and retry awards only once
+00:27 +406: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_completion_test.dart: failed completion retains result and retry awards only once
+Unable to persist completed meal: Bad state: Storage temporarily unavailable
+#4      _FailOnceProgressService.recordMealResult (file:///private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_completion_test.dart:620:21)
+#5      _TimerScreenState._saveCompletionAndOpenResult (package:jy_yamyam/screens/timer_screen.dart:1100:62)
+#7      _TimerScreenState._saveCompletionAndOpenResult (package:jy_yamyam/screens/timer_screen.dart:1099:7)
+#8      _TimerScreenState._preserveCompletion (package:jy_yamyam/screens/timer_screen.dart:1088:11)
+#9      _TimerScreenState._confirmComplete (package:jy_yamyam/screens/timer_screen.dart:1066:13)
+#11     _TimerScreenState._confirmComplete (package:jy_yamyam/screens/timer_screen.dart:996:25)
+#12     main.<anonymous closure> (file:///private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_completion_test.dart:42:77)
+#14     main.<anonymous closure> (file:///private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_completion_test.dart:27:5)
+#15     testWidgets.<anonymous closure>.<anonymous closure> (package:flutter_test/src/widget_tester.dart:192:29)
+#17     testWidgets.<anonymous closure>.<anonymous closure> (package:flutter_test/src/widget_tester.dart:189:25)
+#18     TestWidgetsFlutterBinding._runTestBody (package:flutter_test/src/binding.dart:1952:19)
+#20     TestWidgetsFlutterBinding._runTestBody (package:flutter_test/src/binding.dart:1941:5)
+#23     TestWidgetsFlutterBinding._runTest (package:flutter_test/src/binding.dart:1926:10)
+#24     AutomatedTestWidgetsFlutterBinding.runTest.<anonymous closure> (package:flutter_test/src/binding.dart:2489:24)
+#25     FakeAsync.run.<anonymous closure>.<anonymous closure> (package:fake_async/fake_async.dart:182:47)
+#30     withClock (package:clock/src/default.dart:52:10)
+#31     FakeAsync.run.<anonymous closure> (package:fake_async/fake_async.dart:182:15)
+#36     FakeAsync.run (package:fake_async/fake_async.dart:181:52)
+#37     AutomatedTestWidgetsFlutterBinding.runTest (package:flutter_test/src/binding.dart:2486:15)
+#38     testWidgets.<anonymous closure> (package:flutter_test/src/widget_tester.dart:184:24)
+#39     Declarer.test.<anonymous closure>.<anonymous closure> (package:test_api/src/backend/declarer.dart:253:25)
+#41     Declarer.test.<anonymous closure>.<anonymous closure> (package:test_api/src/backend/declarer.dart:252:15)
+#46     Declarer.test.<anonymous closure> (package:test_api/src/backend/declarer.dart:250:17)
+#47     Invoker._waitForOutstandingCallbacks.<anonymous closure> (package:test_api/src/backend/invoker.dart:318:17)
+#52     Invoker._waitForOutstandingCallbacks (package:test_api/src/backend/invoker.dart:314:5)
+#53     Invoker._onRun.<anonymous closure>.<anonymous closure>.<anonymous closure> (package:test_api/src/backend/invoker.dart:457:21)
+#55     Invoker._onRun.<anonymous closure>.<anonymous closure>.<anonymous closure> (package:test_api/src/backend/invoker.dart:455:15)
+#60     Invoker._onRun.<anonymous closure>.<anonymous closure> (package:test_api/src/backend/invoker.dart:445:11)
+#61     Invoker._guardIfGuarded (package:test_api/src/backend/invoker.dart:500:15)
+#62     Invoker._onRun.<anonymous closure> (package:test_api/src/backend/invoker.dart:444:9)
+#69     Invoker._onRun (package:test_api/src/backend/invoker.dart:442:11)
+#70     LiveTestController.run (package:test_api/src/backend/live_test_controller.dart:161:11)
+#71     RemoteListener._runLiveTest.<anonymous closure> (package:test_api/src/backend/remote_listener.dart:323:16)
+#76     RemoteListener._runLiveTest (package:test_api/src/backend/remote_listener.dart:322:5)
+#77     RemoteListener._serializeTest.<anonymous closure> (package:test_api/src/backend/remote_listener.dart:263:7)
+#95     _GuaranteeSink.add (package:stream_channel/src/guarantee_channel.dart:125:12)
+#96     new _MultiChannel.<anonymous closure> (package:stream_channel/src/multi_channel.dart:159:31)
+#98     CastStreamSubscription._onData (dart:_internal/async_cast.dart:95:11)
+#124    new _WebSocketImpl._fromSocket.<anonymous closure> (dart:_http/websocket_impl.dart:1252:27)
+#130    _WebSocketProtocolTransformer._messageFrameEnd (dart:_http/websocket_impl.dart:348:23)
+#131    _WebSocketProtocolTransformer.add (dart:_http/websocket_impl.dart:238:46)
+#139    _Socket._onData (dart:io-patch/socket_patch.dart:2874:41)
+#146    new _RawSocket.<anonymous closure> (dart:io-patch/socket_patch.dart:2312:31)
+#147    _NativeSocket.issueReadEvent.issue (dart:io-patch/socket_patch.dart:1647:14)
+(elided 105 frames from dart:async and package:stack_trace)
+00:27 +407: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_completion_test.dart: failed completion retains result and retry awards only once
+00:27 +408: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_completion_test.dart: failed completion retains result and retry awards only once
+00:27 +409: /private/tmp/timey-p0-20261114/jy_yamyam/test/result_screen_test.dart: Failed result screen skips the intro video
+00:27 +410: /private/tmp/timey-p0-20261114/jy_yamyam/test/result_screen_test.dart: Failed result screen skips the intro video
+00:27 +411: /private/tmp/timey-p0-20261114/jy_yamyam/test/result_screen_test.dart: Failed result screen skips the intro video
+00:27 +412: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_completion_test.dart: Meal done before arrival does not immediately push result
+00:27 +413: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_completion_test.dart: Meal done before arrival does not immediately push result
+00:27 +414: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_completion_test.dart: Meal done before arrival does not immediately push result
+00:27 +415: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_completion_test.dart: Meal done before arrival does not immediately push result
+00:27 +416: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_completion_test.dart: Meal done before arrival does not immediately push result
+00:27 +417: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_completion_test.dart: Meal done before arrival does not immediately push result
+00:28 +418: /private/tmp/timey-p0-20261114/jy_yamyam/test/avatar_setup_vehicle_lock_test.dart: Avatar setup locked vehicle opens guardian gate and purchase sheet
+00:28 +419: /private/tmp/timey-p0-20261114/jy_yamyam/test/result_screen_test.dart: Portrait result title stays clear of sticker album for es at 1.0x text scale
+00:28 +420: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_completion_test.dart: Fast finish drive animates display progress to finish
+00:28 +421: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_completion_test.dart: Fast finish drive animates display progress to finish
+00:28 +422: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_completion_test.dart: Fast finish drive animates display progress to finish
+00:28 +423: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_completion_test.dart: Fast finish drive animates display progress to finish
+00:28 +424: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_completion_test.dart: Fast finish drive animates display progress to finish
+00:28 +425: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_completion_test.dart: Fast finish drive animates display progress to finish
+00:28 +426: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_completion_test.dart: Fast finish drive animates display progress to finish
+00:28 +427: /private/tmp/timey-p0-20261114/jy_yamyam/test/result_screen_test.dart: Completed result help explains sticker reward
+00:28 +428: /private/tmp/timey-p0-20261114/jy_yamyam/test/vehicle_pack_purchase_sheet_test.dart: Vehicle pack purchase sheet loads product details
+00:28 +429: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_completion_test.dart: Fast finish drive plays short SFX for medium finish duration
+00:28 +430: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_completion_test.dart: Fast finish drive plays short SFX for medium finish duration
+00:28 +431: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_completion_test.dart: Fast finish drive plays short SFX for medium finish duration
+00:28 +432: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_completion_test.dart: Fast finish drive plays short SFX for medium finish duration
+00:28 +433: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_completion_test.dart: Fast finish drive plays short SFX for medium finish duration
+00:28 +434: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_completion_test.dart: Fast finish drive plays short SFX for medium finish duration
+00:28 +435: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_completion_test.dart: Fast finish drive plays short SFX for medium finish duration
+00:28 +436: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_completion_test.dart: Fast finish drive plays short SFX for medium finish duration
+00:28 +437: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_completion_test.dart: Fast finish drive plays short SFX for medium finish duration
+00:28 +438: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_completion_test.dart: Fast finish drive plays short SFX for medium finish duration
+00:28 +439: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_completion_test.dart: Fast finish drive plays short SFX for medium finish duration
+00:28 +440: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_completion_test.dart: Fast finish drive plays short SFX for medium finish duration
+00:28 +441: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_completion_test.dart: Fast finish drive plays short SFX for medium finish duration
+00:29 +442: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_completion_test.dart: Fast finish drive plays short SFX for medium finish duration
+00:29 +443: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_configuration_test.dart: Timer screen does not apply avatar saved for another vehicle
+00:29 +444: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_configuration_test.dart: Timer screen does not apply avatar saved for another vehicle
+00:29 +445: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_configuration_test.dart: Timer screen does not apply avatar saved for another vehicle
+00:29 +446: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_configuration_test.dart: Timer screen does not apply avatar saved for another vehicle
+00:29 +447: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_configuration_test.dart: Timer screen does not apply avatar saved for another vehicle
+00:29 +448: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_configuration_test.dart: Timer screen does not apply avatar saved for another vehicle
+00:29 +449: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_configuration_test.dart: Timer screen does not apply avatar saved for another vehicle
+00:29 +450: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_configuration_test.dart: Timer screen does not apply avatar saved for another vehicle
+00:29 +451: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_configuration_test.dart: Timer screen does not apply avatar saved for another vehicle
+00:29 +452: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_configuration_test.dart: Timer screen does not apply avatar saved for another vehicle
+00:29 +453: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_configuration_test.dart: Timer screen does not apply avatar saved for another vehicle
+00:29 +454: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_configuration_test.dart: Timer screen does not apply avatar saved for another vehicle
+00:29 +455: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_configuration_test.dart: Timer screen does not apply avatar saved for another vehicle
+00:29 +456: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_configuration_test.dart: Timer screen does not apply avatar saved for another vehicle
+00:29 +457: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_configuration_test.dart: Timer screen does not apply avatar saved for another vehicle
+00:29 +458: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_configuration_test.dart: Timer screen does not apply avatar saved for another vehicle
+00:29 +459: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_configuration_test.dart: Timer screen does not apply avatar saved for another vehicle
+00:29 +460: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_completion_test.dart: Fast finish drive chooses long SFX and skips near-finish SFX
+00:29 +461: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_completion_test.dart: Fast finish drive chooses long SFX and skips near-finish SFX
+00:29 +462: /private/tmp/timey-p0-20261114/jy_yamyam/test/meal_history_linked_delete_screen_test.dart: Dialog defaults to history only; selected linked=false is applied
+00:29 +463: /private/tmp/timey-p0-20261114/jy_yamyam/test/meal_history_linked_delete_screen_test.dart: Dialog defaults to history only; selected linked=false is applied
+00:29 +464: /private/tmp/timey-p0-20261114/jy_yamyam/test/meal_history_linked_delete_screen_test.dart: Dialog defaults to history only; selected linked=false is applied
+00:29 +465: /private/tmp/timey-p0-20261114/jy_yamyam/test/meal_history_linked_delete_screen_test.dart: Dialog defaults to history only; selected linked=false is applied
+00:29 +466: /private/tmp/timey-p0-20261114/jy_yamyam/test/settings_legal_support_test.dart: Settings shows help and about sections near the bottom
+00:29 +467: /private/tmp/timey-p0-20261114/jy_yamyam/test/settings_legal_support_test.dart: Settings shows help and about sections near the bottom
+00:29 +468: /private/tmp/timey-p0-20261114/jy_yamyam/test/settings_legal_support_test.dart: Settings shows help and about sections near the bottom
+00:29 +469: /private/tmp/timey-p0-20261114/jy_yamyam/test/settings_legal_support_test.dart: Settings shows help and about sections near the bottom
+00:29 +470: /private/tmp/timey-p0-20261114/jy_yamyam/test/settings_legal_support_test.dart: Settings shows help and about sections near the bottom
+00:29 +471: /private/tmp/timey-p0-20261114/jy_yamyam/test/settings_legal_support_test.dart: Settings shows help and about sections near the bottom
+00:29 +472: /private/tmp/timey-p0-20261114/jy_yamyam/test/settings_legal_support_test.dart: Settings shows help and about sections near the bottom
+00:29 +473: /private/tmp/timey-p0-20261114/jy_yamyam/test/settings_legal_support_test.dart: Settings shows help and about sections near the bottom
+00:29 +474: /private/tmp/timey-p0-20261114/jy_yamyam/test/settings_legal_support_test.dart: Settings shows help and about sections near the bottom
+00:29 +475: /private/tmp/timey-p0-20261114/jy_yamyam/test/meal_history_linked_delete_screen_test.dart: Dialog defaults to history only; selected linked=true is applied
+00:29 +476: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_completion_test.dart: Controls are disabled during fast finish drive
+00:30 +477: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_completion_test.dart: Controls are disabled during fast finish drive
+00:30 +478: /private/tmp/timey-p0-20261114/jy_yamyam/test/settings_legal_support_test.dart: User Guide opens internally without guardian gate
+00:30 +479: /private/tmp/timey-p0-20261114/jy_yamyam/test/meal_history_linked_delete_screen_test.dart: Incomplete meal with no linked rewards hides checkbox
+00:30 +480: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_completion_test.dart: Completing after arrival opens result without fast finish
+00:30 +481: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_completion_test.dart: Completing after arrival opens result without fast finish
+00:30 +482: /private/tmp/timey-p0-20261114/jy_yamyam/test/settings_legal_support_test.dart: Restore Purchase runs after guardian gate
+00:30 +483: /private/tmp/timey-p0-20261114/jy_yamyam/test/settings_legal_support_test.dart: Restore Purchase runs after guardian gate
+00:30 +484: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_audio_lifecycle_test.dart: timer BGM starts after preview and not on repeated ticks
+00:30 +485: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_audio_lifecycle_test.dart: timer BGM starts after preview and not on repeated ticks
+00:30 +486: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_audio_lifecycle_test.dart: timer BGM starts after preview and not on repeated ticks
+00:30 +487: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_audio_lifecycle_test.dart: timer BGM starts after preview and not on repeated ticks
+00:30 +488: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_audio_lifecycle_test.dart: timer BGM starts after preview and not on repeated ticks
+00:30 +489: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_audio_lifecycle_test.dart: timer BGM starts after preview and not on repeated ticks
+00:30 +490: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_audio_lifecycle_test.dart: timer BGM starts after preview and not on repeated ticks
+00:30 +491: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_audio_lifecycle_test.dart: timer BGM starts after preview and not on repeated ticks
+00:30 +492: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_audio_lifecycle_test.dart: timer BGM starts after preview and not on repeated ticks
+00:30 +493: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_audio_lifecycle_test.dart: timer BGM starts after preview and not on repeated ticks
+00:30 +494: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_session_test.dart: TimerScreen saves an active session when started
+00:30 +495: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_session_test.dart: TimerScreen saves an active session when started
+00:30 +496: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_session_test.dart: TimerScreen saves an active session when started
+00:30 +497: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_session_test.dart: TimerScreen saves an active session when started
+00:31 +498: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_session_test.dart: TimerScreen saves an active session when started
+00:31 +499: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_session_test.dart: TimerScreen saves an active session when started
+00:31 +500: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_session_test.dart: TimerScreen saves an active session when started
+00:31 +501: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_session_test.dart: TimerScreen saves an active session when started
+00:31 +502: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_session_test.dart: TimerScreen saves an active session when started
+00:31 +503: /private/tmp/timey-p0-20261114/jy_yamyam/test/meal_history_linked_delete_screen_test.dart: Deleted timer completion retries session cleanup only
+00:31 +504: /private/tmp/timey-p0-20261114/jy_yamyam/test/meal_history_linked_delete_screen_test.dart: Deleted timer completion retries session cleanup only
+00:31 +505: /private/tmp/timey-p0-20261114/jy_yamyam/test/meal_history_linked_delete_screen_test.dart: Deleted timer completion retries session cleanup only
+00:31 +506: /private/tmp/timey-p0-20261114/jy_yamyam/test/meal_history_linked_delete_screen_test.dart: Deleted timer completion retries session cleanup only
+00:31 +507: /private/tmp/timey-p0-20261114/jy_yamyam/test/meal_history_linked_delete_screen_test.dart: Deleted timer completion retries session cleanup only
+00:31 +508: /private/tmp/timey-p0-20261114/jy_yamyam/test/meal_history_linked_delete_screen_test.dart: Deleted timer completion retries session cleanup only
+00:31 +509: /private/tmp/timey-p0-20261114/jy_yamyam/test/meal_history_linked_delete_screen_test.dart: Deleted timer completion retries session cleanup only
+00:31 +510: /private/tmp/timey-p0-20261114/jy_yamyam/test/meal_history_linked_delete_screen_test.dart: Deleted timer completion retries session cleanup only
+00:31 +511: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_session_test.dart: TimerScreen updates active session when paused and resumed
+00:31 +512: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_session_test.dart: TimerScreen updates active session when paused and resumed
+00:31 +513: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_session_test.dart: TimerScreen updates active session when paused and resumed
+00:31 +514: /private/tmp/timey-p0-20261114/jy_yamyam/test/rider_guide_bottom_sheet_test.dart: Rider guide bottom sheet renders guide content
+00:32 +515: /private/tmp/timey-p0-20261114/jy_yamyam/test/rider_guide_bottom_sheet_test.dart: Rider guide bottom sheet renders guide content
+00:32 +516: /private/tmp/timey-p0-20261114/jy_yamyam/test/rider_guide_bottom_sheet_test.dart: Rider guide bottom sheet renders guide content
+00:32 +517: /private/tmp/timey-p0-20261114/jy_yamyam/test/result_sticker_album_test.dart: Result sticker album uses bounded three-column landscape grid
+00:32 +518: /private/tmp/timey-p0-20261114/jy_yamyam/test/result_sticker_album_test.dart: Result sticker album uses bounded three-column landscape grid
+00:32 +519: /private/tmp/timey-p0-20261114/jy_yamyam/test/result_sticker_album_test.dart: Result sticker album uses bounded three-column landscape grid
+00:32 +520: /private/tmp/timey-p0-20261114/jy_yamyam/test/result_sticker_album_test.dart: Result sticker album uses bounded three-column landscape grid
+00:32 +521: /private/tmp/timey-p0-20261114/jy_yamyam/test/result_sticker_album_test.dart: Result sticker album uses bounded three-column landscape grid
+00:32 +522: /private/tmp/timey-p0-20261114/jy_yamyam/test/road_view_test.dart: road fits a road viewport of Size(350.0, 348.0)
+00:32 +523: /private/tmp/timey-p0-20261114/jy_yamyam/test/road_view_test.dart: road fits a road viewport of Size(350.0, 348.0)
+00:32 +524: /private/tmp/timey-p0-20261114/jy_yamyam/test/road_view_test.dart: road fits a road viewport of Size(350.0, 348.0)
+00:32 +525: /private/tmp/timey-p0-20261114/jy_yamyam/test/road_view_test.dart: road fits a road viewport of Size(350.0, 348.0)
+00:32 +526: /private/tmp/timey-p0-20261114/jy_yamyam/test/road_view_test.dart: road fits a road viewport of Size(350.0, 348.0)
+00:32 +527: /private/tmp/timey-p0-20261114/jy_yamyam/test/road_view_test.dart: road fits a road viewport of Size(350.0, 348.0)
+00:32 +528: /private/tmp/timey-p0-20261114/jy_yamyam/test/road_view_test.dart: road fits a road viewport of Size(350.0, 348.0)
+00:32 +529: /private/tmp/timey-p0-20261114/jy_yamyam/test/road_view_test.dart: road fits a road viewport of Size(350.0, 348.0)
+00:32 +530: /private/tmp/timey-p0-20261114/jy_yamyam/test/road_view_test.dart: road fits a road viewport of Size(350.0, 348.0)
+00:32 +531: /private/tmp/timey-p0-20261114/jy_yamyam/test/road_view_test.dart: road fits a road viewport of Size(350.0, 348.0)
+00:32 +532: /private/tmp/timey-p0-20261114/jy_yamyam/test/settings_purchase_section_test.dart: Settings shows locked vehicle pack section
+00:32 +533: /private/tmp/timey-p0-20261114/jy_yamyam/test/settings_purchase_section_test.dart: Settings shows locked vehicle pack section
+00:32 +534: /private/tmp/timey-p0-20261114/jy_yamyam/test/settings_purchase_section_test.dart: Settings shows locked vehicle pack section
+00:32 +535: /private/tmp/timey-p0-20261114/jy_yamyam/test/settings_purchase_section_test.dart: Settings shows locked vehicle pack section
+00:32 +536: /private/tmp/timey-p0-20261114/jy_yamyam/test/settings_purchase_section_test.dart: Settings shows locked vehicle pack section
+00:32 +537: /private/tmp/timey-p0-20261114/jy_yamyam/test/settings_purchase_section_test.dart: Settings shows locked vehicle pack section
+00:32 +538: /private/tmp/timey-p0-20261114/jy_yamyam/test/settings_purchase_section_test.dart: Settings shows locked vehicle pack section
+00:32 +539: /private/tmp/timey-p0-20261114/jy_yamyam/test/settings_purchase_section_test.dart: Settings shows locked vehicle pack section
+00:32 +540: /private/tmp/timey-p0-20261114/jy_yamyam/test/settings_purchase_section_test.dart: Settings shows locked vehicle pack section
+00:32 +541: /private/tmp/timey-p0-20261114/jy_yamyam/test/settings_purchase_section_test.dart: Settings shows locked vehicle pack section
+00:32 +542: /private/tmp/timey-p0-20261114/jy_yamyam/test/settings_purchase_section_test.dart: Settings shows locked vehicle pack section
+00:32 +543: /private/tmp/timey-p0-20261114/jy_yamyam/test/settings_purchase_section_test.dart: Settings shows locked vehicle pack section
+00:32 +544: /private/tmp/timey-p0-20261114/jy_yamyam/test/settings_purchase_section_test.dart: Settings shows locked vehicle pack section
+00:32 +545: /private/tmp/timey-p0-20261114/jy_yamyam/test/settings_purchase_section_test.dart: Settings shows locked vehicle pack section
+00:32 +546: /private/tmp/timey-p0-20261114/jy_yamyam/test/settings_purchase_section_test.dart: Settings shows locked vehicle pack section
+00:32 +547: /private/tmp/timey-p0-20261114/jy_yamyam/test/settings_purchase_section_test.dart: Settings shows locked vehicle pack section
+00:32 +548: /private/tmp/timey-p0-20261114/jy_yamyam/test/settings_purchase_section_test.dart: Settings shows locked vehicle pack section
+00:32 +549: /private/tmp/timey-p0-20261114/jy_yamyam/test/settings_purchase_section_test.dart: Settings shows locked vehicle pack section
+00:32 +550: /private/tmp/timey-p0-20261114/jy_yamyam/test/settings_purchase_section_test.dart: Settings shows locked vehicle pack section
+00:32 +551: /private/tmp/timey-p0-20261114/jy_yamyam/test/settings_purchase_section_test.dart: Settings shows locked vehicle pack section
+00:32 +552: /private/tmp/timey-p0-20261114/jy_yamyam/test/settings_purchase_section_test.dart: Settings shows locked vehicle pack section
+00:32 +553: /private/tmp/timey-p0-20261114/jy_yamyam/test/settings_purchase_section_test.dart: Settings shows locked vehicle pack section
+00:33 +554: /private/tmp/timey-p0-20261114/jy_yamyam/test/settings_purchase_section_test.dart: Settings shows locked vehicle pack section
+00:33 +555: /private/tmp/timey-p0-20261114/jy_yamyam/test/settings_purchase_section_test.dart: Settings shows locked vehicle pack section
+00:33 +556: /private/tmp/timey-p0-20261114/jy_yamyam/test/settings_purchase_section_test.dart: Settings shows locked vehicle pack section
+00:33 +557: /private/tmp/timey-p0-20261114/jy_yamyam/test/settings_purchase_section_test.dart: Settings shows locked vehicle pack section
+00:33 +558: /private/tmp/timey-p0-20261114/jy_yamyam/test/settings_purchase_section_test.dart: Settings shows locked vehicle pack section
+00:33 +559: /private/tmp/timey-p0-20261114/jy_yamyam/test/settings_purchase_section_test.dart: Settings shows locked vehicle pack section
+00:33 +560: /private/tmp/timey-p0-20261114/jy_yamyam/test/settings_purchase_section_test.dart: Settings shows locked vehicle pack section
+00:33 +561: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_session_test.dart: TimerScreen refreshes elapsed time when app resumes
+00:33 +562: /private/tmp/timey-p0-20261114/jy_yamyam/test/road_view_test.dart: RoadView keeps dense ingredient markers clear of finish star
+00:33 +563: /private/tmp/timey-p0-20261114/jy_yamyam/test/settings_purchase_section_test.dart: Settings purchase CTA requires guardian gate
+00:33 +564: /private/tmp/timey-p0-20261114/jy_yamyam/test/settings_purchase_section_test.dart: Settings purchase CTA requires guardian gate
+00:33 +565: /private/tmp/timey-p0-20261114/jy_yamyam/test/settings_purchase_section_test.dart: Settings purchase CTA requires guardian gate
+00:33 +566: /private/tmp/timey-p0-20261114/jy_yamyam/test/settings_purchase_section_test.dart: Settings purchase CTA requires guardian gate
+00:33 +567: /private/tmp/timey-p0-20261114/jy_yamyam/test/settings_purchase_section_test.dart: Settings purchase CTA requires guardian gate
+00:33 +568: /private/tmp/timey-p0-20261114/jy_yamyam/test/settings_purchase_section_test.dart: Settings purchase CTA requires guardian gate
+00:33 +569: /private/tmp/timey-p0-20261114/jy_yamyam/test/settings_purchase_section_test.dart: Settings purchase CTA requires guardian gate
+00:33 +570: /private/tmp/timey-p0-20261114/jy_yamyam/test/settings_purchase_section_test.dart: Settings purchase CTA requires guardian gate
+00:33 +571: /private/tmp/timey-p0-20261114/jy_yamyam/test/road_view_test.dart: RoadVehicleLayer keeps long-course vehicle inside viewport
+00:33 +572: /private/tmp/timey-p0-20261114/jy_yamyam/test/settings_purchase_section_test.dart: Settings restore CTA restores directly after guardian gate
+00:33 +573: /private/tmp/timey-p0-20261114/jy_yamyam/test/settings_purchase_section_test.dart: Settings restore CTA restores directly after guardian gate
+00:33 +574: /private/tmp/timey-p0-20261114/jy_yamyam/test/settings_purchase_section_test.dart: Settings restore CTA shows restored purchase feedback
+00:33 +575: /private/tmp/timey-p0-20261114/jy_yamyam/test/settings_purchase_section_test.dart: Settings unlocked vehicle pack section hides purchase CTA
+00:35 +576: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_lifecycle_test.dart: Timer screen keeps vehicle fixed when paused
+00:35 +577: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_lifecycle_test.dart: Timer screen keeps vehicle fixed when paused
+00:35 +578: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_lifecycle_test.dart: Timer screen keeps vehicle fixed when paused
+00:35 +579: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_lifecycle_test.dart: Timer screen keeps vehicle fixed when paused
+00:35 +580: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_lifecycle_test.dart: Timer screen keeps vehicle fixed when paused
+00:35 +581: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_lifecycle_test.dart: Timer screen keeps vehicle fixed when paused
+00:36 +582: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_lifecycle_test.dart: Timer screen keeps vehicle fixed when paused
+00:36 +583: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_lifecycle_test.dart: Timer screen keeps vehicle fixed when paused
+00:36 +584: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_lifecycle_test.dart: Timer screen keeps vehicle fixed when paused
+00:36 +585: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_lifecycle_test.dart: Timer screen keeps vehicle fixed when paused
+00:36 +586: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_lifecycle_test.dart: Timer screen keeps vehicle fixed when paused
+00:36 +587: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_lifecycle_test.dart: Timer screen keeps vehicle fixed when paused
+00:36 +588: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_lifecycle_test.dart: Timer screen keeps vehicle fixed when paused
+00:36 +589: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_lifecycle_test.dart: Timer screen keeps vehicle fixed when paused
+00:36 +590: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_lifecycle_test.dart: Timer screen keeps vehicle fixed when paused
+00:36 +591: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_lifecycle_test.dart: Timer screen keeps vehicle fixed when paused
+00:36 +592: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_lifecycle_test.dart: Timer screen keeps vehicle fixed when paused
+00:36 +593: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_lifecycle_test.dart: Timer screen keeps vehicle fixed when paused
+00:36 +594: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_lifecycle_test.dart: Timer screen keeps vehicle fixed when paused
+00:36 +595: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_lifecycle_test.dart: Timer screen keeps vehicle fixed when paused
+00:36 +596: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_lifecycle_test.dart: Timer screen keeps vehicle fixed when paused
+00:36 +597: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_lifecycle_test.dart: Timer screen keeps vehicle fixed when paused
+00:36 +598: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_lifecycle_test.dart: Timer screen keeps vehicle fixed when paused
+00:36 +599: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_lifecycle_test.dart: Timer screen keeps vehicle fixed when paused
+00:36 +600: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_lifecycle_test.dart: Timer screen keeps vehicle fixed when paused
+00:36 +601: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_lifecycle_test.dart: Timer screen keeps vehicle fixed when paused
+00:36 +602: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_lifecycle_test.dart: Timer screen keeps vehicle fixed when paused
+00:36 +603: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_lifecycle_test.dart: Timer screen keeps vehicle fixed when paused
+00:36 +604: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_lifecycle_test.dart: Timer screen keeps vehicle fixed when paused
+00:36 +605: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_lifecycle_test.dart: Timer screen keeps vehicle fixed when paused
+00:36 +606: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_lifecycle_test.dart: Timer screen keeps vehicle fixed when paused
+00:36 +607: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_lifecycle_test.dart: Timer screen keeps vehicle fixed when paused
+00:36 +608: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_lifecycle_test.dart: Timer screen keeps vehicle fixed when paused
+00:36 +609: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_lifecycle_test.dart: Timer screen keeps vehicle fixed when paused
+00:36 +610: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_lifecycle_test.dart: Timer screen keeps vehicle fixed when paused
+00:36 +611: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_lifecycle_test.dart: Timer screen keeps vehicle fixed when paused
+00:36 +612: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_lifecycle_test.dart: Timer screen keeps vehicle fixed when paused
+00:36 +613: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_lifecycle_test.dart: Timer screen keeps vehicle fixed when paused
+00:36 +614: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_lifecycle_test.dart: Timer screen keeps vehicle fixed when paused
+00:36 +615: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_lifecycle_test.dart: Timer screen keeps vehicle fixed when paused
+00:36 +616: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_lifecycle_test.dart: Timer screen keeps vehicle fixed when paused
+00:36 +617: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_lifecycle_test.dart: Timer screen keeps vehicle fixed when paused
+00:36 +618: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_lifecycle_test.dart: Timer screen keeps vehicle fixed when paused
+00:36 +619: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_lifecycle_test.dart: Timer screen keeps vehicle fixed when paused
+00:36 +620: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_lifecycle_test.dart: Timer screen keeps vehicle fixed when paused
+00:36 +621: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_lifecycle_test.dart: Timer screen keeps vehicle fixed when paused
+00:36 +622: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_lifecycle_test.dart: Timer screen keeps vehicle fixed when paused
+00:36 +623: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_lifecycle_test.dart: Timer screen keeps vehicle fixed when paused
+00:36 +624: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_lifecycle_test.dart: Timer screen keeps vehicle fixed when paused
+00:37 +625: /private/tmp/timey-p0-20261114/jy_yamyam/test/settings_screen_test.dart: Remaining time setting can be turned off
+00:37 +626: /private/tmp/timey-p0-20261114/jy_yamyam/test/settings_screen_test.dart: Remaining time setting can be turned off
+00:37 +627: /private/tmp/timey-p0-20261114/jy_yamyam/test/settings_screen_test.dart: Remaining time setting can be turned off
+00:37 +628: /private/tmp/timey-p0-20261114/jy_yamyam/test/settings_screen_test.dart: Remaining time setting can be turned off
+00:37 +629: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_lifecycle_test.dart: Landscape finish drive message has room for Japanese copy
+00:37 +630: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_lifecycle_test.dart: Landscape finish drive message has room for Japanese copy
+00:37 +631: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_lifecycle_test.dart: Landscape finish drive message has room for Japanese copy
+00:37 +632: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_lifecycle_test.dart: Landscape finish drive message has room for Japanese copy
+00:37 +633: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_lifecycle_test.dart: Landscape finish drive message has room for Japanese copy
+00:37 +634: /private/tmp/timey-p0-20261114/jy_yamyam/test/settings_screen_test.dart: Settings screen updates motivation video settings
+00:37 +635: /private/tmp/timey-p0-20261114/jy_yamyam/test/avatar_setup_screen_test.dart: Avatar setup successful upload shows pending preview
+00:37 +636: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_lifecycle_test.dart: Timer screen keeps long landscape course viewport fixed
+00:37 +637: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_lifecycle_test.dart: Timer screen keeps long landscape course viewport fixed
+00:37 +638: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_lifecycle_test.dart: Timer screen keeps long landscape course viewport fixed
+00:37 +639: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_lifecycle_test.dart: Timer screen keeps long landscape course viewport fixed
+00:37 +640: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_lifecycle_test.dart: Timer screen keeps long landscape course viewport fixed
+00:37 +641: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_lifecycle_test.dart: Timer screen keeps long landscape course viewport fixed
+00:37 +642: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_lifecycle_test.dart: Timer screen keeps long landscape course viewport fixed
+00:37 +643: /private/tmp/timey-p0-20261114/jy_yamyam/test/settings_screen_test.dart: Child name settings limits input length
+00:38 +644: /private/tmp/timey-p0-20261114/jy_yamyam/test/settings_screen_test.dart: Child name settings limits input length
+00:38 +645: /private/tmp/timey-p0-20261114/jy_yamyam/test/settings_screen_test.dart: Child name settings limits input length
+00:38 +646: /private/tmp/timey-p0-20261114/jy_yamyam/test/settings_screen_test.dart: Child name settings limits input length
+00:38 +647: /private/tmp/timey-p0-20261114/jy_yamyam/test/avatar_setup_screen_test.dart: Avatar setup default image button saves default avatar mode
+00:38 +648: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_lifecycle_test.dart: Timer screen allows landscape only while mounted
+00:38 +649: /private/tmp/timey-p0-20261114/jy_yamyam/test/settings_screen_test.dart: Empty child name in settings shows validation message
+00:38 +650: /private/tmp/timey-p0-20261114/jy_yamyam/test/settings_screen_test.dart: Empty child name in settings shows validation message
+00:38 +651: /private/tmp/timey-p0-20261114/jy_yamyam/test/settings_screen_test.dart: Empty child name in settings shows validation message
+00:38 +652: /private/tmp/timey-p0-20261114/jy_yamyam/test/settings_screen_test.dart: Empty child name in settings shows validation message
+00:38 +653: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_lifecycle_test.dart: Timer screen asks before leaving with the back button
+00:38 +654: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_lifecycle_test.dart: Timer screen asks before leaving with the back button
+00:38 +655: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_lifecycle_test.dart: Timer screen asks before leaving with the back button
+00:38 +656: /private/tmp/timey-p0-20261114/jy_yamyam/test/avatar_setup_screen_test.dart: Avatar setup confirm without image is disabled and safe
+00:38 +657: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_lifecycle_test.dart: English locale shows English timer progress copy
+00:38 +658: /private/tmp/timey-p0-20261114/jy_yamyam/test/timer_screen_lifecycle_test.dart: Paused timer shows paused status copy
+00:39 +659: All tests passed!

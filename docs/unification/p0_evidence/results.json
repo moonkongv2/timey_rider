@@ -1,0 +1,44 @@
+{
+  "timey": {
+    "analyze": "VERIFIED: No issues found",
+    "test_passed": 663,
+    "test_failed": 0,
+    "source": "working-tree copy before SQLite dependency addition",
+    "deliberate_fault_log": "test-playback-failure"
+  },
+  "yamyam": {
+    "analyze": "VERIFIED: No issues found",
+    "test_passed": 659,
+    "test_failed": 0,
+    "source": "working-tree copy before SQLite dependency addition",
+    "deliberate_fault_log": "test-playback-failure"
+  },
+  "sqlite_ios": {
+    "status": "VERIFIED",
+    "device": "iPhone 16 Pro simulator / iOS 18.6",
+    "sqlite": "3.43.2",
+    "create_commit_rollback_reopen": true,
+    "journal_mode": "delete",
+    "synchronous": 2,
+    "integrity_check": "ok"
+  },
+  "timey_sqlite_dependency_resolution": {
+    "status": "VERIFIED",
+    "added_packages": 5,
+    "changed_existing_package_versions": 0,
+    "analyze": "VERIFIED",
+    "android_debug_build": "VERIFIED"
+  },
+  "sqlite_android": {
+    "status": "VERIFIED",
+    "device": "Pixel_10dks emulator / Android 17 API 37",
+    "sqlite": "3.50.6",
+    "create_commit_rollback_reopen": true,
+    "journal_mode": "delete",
+    "synchronous": 2,
+    "integrity_check": "ok",
+    "runner_gradle": "8.12",
+    "runner_agp": "8.9.1",
+    "runner_kotlin": "2.1.0"
+  }
+}
